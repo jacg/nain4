@@ -58,5 +58,10 @@
 
         defaultPackage = packages.B1;
 
+        defaultApp = {
+          type = "app";
+          program = "${packages.B1}/bin/exampleB1";
+        };
+
       });
 }
