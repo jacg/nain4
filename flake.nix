@@ -36,8 +36,8 @@
           '';
 
           installPhase = ''
-            mkdir -p $out/bin    && install -t $out/bin exampleB1
-            mkdir -p $out/macros && install -t $out/macros *.mac
+            mkdir -p $out/bin    && install        -t $out/bin     exampleB1
+            mkdir -p $out/macros && install -m 444 -t $out/macros *.mac
           '';
 
         };
