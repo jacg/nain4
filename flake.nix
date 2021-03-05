@@ -31,7 +31,8 @@
           buildPhase = ''
             mkdir -p example-B1/build
             cd example-B1/build
-            ${pkgs.cmake}/bin/cmake -DGeant4_DIR=$(${pkgs.which}/bin/which geant4.sh)/../.. ..
+            G4DIR=${pkgs.geant4};
+            ${pkgs.cmake}/bin/cmake -DGeant4_DIR=$G4DIR ..
             make -j $NIX_BUILD_CORES
           '';
 
