@@ -32,7 +32,7 @@
             mkdir -p example-B1/build
             cd example-B1/build
             G4DIR=${pkgs.geant4};
-            ${pkgs.cmake}/bin/cmake -DGeant4_DIR=$G4DIR ..
+            ${pkgs.cmake}/bin/cmake .. # Why can we get away without setting -DGeant4_DIR
             make -j $NIX_BUILD_CORES
           '';
 
