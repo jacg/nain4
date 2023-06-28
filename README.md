@@ -31,7 +31,7 @@ just run B1
 
 This should copy the sources of the most basic example that is distributed with Geant4, into the local directory, configure it, compile it and execute it.
 
-If all goes well, an image of a detector should appear. Try typing `/run/beamOn 10` in the Geant4 shell, and some simulated events should appear on the image. Type `exit` or press `control-d` in the Geant4 shell, to exit.
+If all goes well, an image of a detector should appear. Try typing `/run/beamOn 10` in the `Session` box, and some simulated events should appear on the image.
 
 You should be able to modify the source code (for example increase the value of `env_sizeZ` in `B1/src/DetectorConstruction.cc` (change it from 30 to 130, to make the change obvious)) and run your modified version by repeating the earlier command `just run B1`.
 
@@ -61,14 +61,13 @@ Various configuration options of Geant4 itself can be changed by editing `flake.
 (geant4.override {
   enableMultiThreading = false;
   enableInventor       = false;
-  enableQt             = false;
+  enableQt             = true;
   enableXM             = false;
   enableOpenGLX11      = true;
   enablePython         = false;
   enableRaytracerX11   = false;
 })
 ```
-Qt is currently known not to work.
 
 If you change the Geant4 configuration (if you are using `direnv`, it will notice the change, and automatically switch to the new configuration (recompiling Geant4, if this is a configuration not seen before) at your next shell prompt).
 
