@@ -54,6 +54,7 @@
           ];
 
           B1_MACRO_DIR = "${packages.B1}/macros";
+          G4_DIR = "${pkgs.geant4}";
 
         };
 
