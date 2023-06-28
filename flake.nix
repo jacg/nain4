@@ -8,13 +8,13 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let pkgs = import nixpkgs { inherit system; };
-      in rec {
+      in {
 
-        packages.B1 = pkgs.stdenv.mkDerivation {
-          name = "geant4-example-B1";
-          src = self;
+        devShell = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
+          name = "G4-examples-devenv";
 
-          nativeBuildInputs = with pkgs; [
+          packages = with pkgs; [
+            #(geant4.override { enableQt = true; })
             geant4
             geant4.data.G4PhotonEvaporation
             geant4.data.G4EMLOW
@@ -24,45 +24,13 @@
             geant4.data.G4PARTICLEXS
             geant4.data.G4NDL
             clang_16
+            clang-tools
+            cmake
+            just
           ];
 
-          buildInputs = [ ];
-
-          buildPhase = ''
-            mkdir -p example-B1/build
-            cd example-B1/build
-            G4DIR=${pkgs.geant4};
-            ${pkgs.cmake}/bin/cmake .. # Why can we get away without setting -DGeant4_DIR
-            make -j $NIX_BUILD_CORES
-          '';
-
-          installPhase = ''
-            mkdir -p $out/bin    && install        -t $out/bin     exampleB1
-            mkdir -p $out/macros && install -m 444 -t $out/macros *.mac
-          '';
-
-        };
-
-        devShell = pkgs.llvmPackages_16.stdenv.mkDerivation {
-          inherit (packages.B1) name nativeBuildInputs;
-
-          buildInputs = packages.B1.nativeBuildInputs ++ [
-            pkgs.clang-tools
-            pkgs.clang_16
-            pkgs.bear
-            pkgs.cmake
-          ];
-
-          B1_MACRO_DIR = "${packages.B1}/macros";
           G4_DIR = "${pkgs.geant4}";
-
-        };
-
-        defaultPackage = packages.B1;
-
-        defaultApp = {
-          type = "app";
-          program = "${packages.B1}/bin/exampleB1";
+          G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
         };
 
       });
