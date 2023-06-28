@@ -14,8 +14,17 @@
           name = "G4-examples-devenv";
 
           packages = with pkgs; [
-            #(geant4.override { enableQt = true; })
-            geant4
+
+            (geant4.override {
+              enableMultiThreading = false;
+              enableInventor       = false;
+              enableQt             = false;
+              enableXM             = false;
+              enableOpenGLX11      = true;
+              enablePython         = false;
+              enableRaytracerX11   = false;
+            })
+
             geant4.data.G4PhotonEvaporation
             geant4.data.G4EMLOW
             geant4.data.G4RadioactiveDecay
