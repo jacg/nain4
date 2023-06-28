@@ -2,7 +2,7 @@
 
   description = "Playing with G4 examples";
 
-  inputs.nixpkgs    .url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs    .url = "github:NixOS/nixpkgs/nixos-23.05";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils }:
@@ -23,7 +23,7 @@
             geant4.data.G4SAIDDATA
             geant4.data.G4PARTICLEXS
             geant4.data.G4NDL
-            clang_11
+            clang_16
           ];
 
           buildInputs = [ ];
@@ -43,12 +43,12 @@
 
         };
 
-        devShell = pkgs.llvmPackages_11.stdenv.mkDerivation {
+        devShell = pkgs.llvmPackages_16.stdenv.mkDerivation {
           inherit (packages.B1) name nativeBuildInputs;
 
           buildInputs = packages.B1.nativeBuildInputs ++ [
             pkgs.clang-tools
-            pkgs.clang_11
+            pkgs.clang_16
             pkgs.bear
             pkgs.cmake
           ];
