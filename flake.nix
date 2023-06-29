@@ -36,6 +36,7 @@
             clang-tools
             cmake
             cmake-language-server
+            catch2
             just
             gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
           ];
