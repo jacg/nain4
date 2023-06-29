@@ -5,7 +5,16 @@ run EXAMPLE='B1':
 	#!/usr/bin/env sh
 	just compile {{EXAMPLE}}
 	cd       {{EXAMPLE}}/build
-	./example{{EXAMPLE}}
+	if [ -x ./example{{EXAMPLE}} ]
+	then
+		./example{{EXAMPLE}}
+	elif [ -x ./{{EXAMPLE}} ]
+	then
+		./{{EXAMPLE}}
+	else
+		echo "Couldn't guess executable name."
+		fail
+	fi
 
 compile EXAMPLE:
 	#!/usr/bin/env sh
