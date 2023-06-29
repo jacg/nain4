@@ -25,6 +25,7 @@ compile EXAMPLE:
 configure EXAMPLE:
 	#!/usr/bin/env sh
 	just copy {{EXAMPLE}}
+	just hack-cmake {{EXAMPLE}}
 	mkdir -p {{EXAMPLE}}/build
 	cd       {{EXAMPLE}}/build
 	cmake ..
@@ -49,3 +50,8 @@ find EXAMPLE:
 expunge EXAMPLE:
 	#!/usr/bin/env sh
 	rm {{EXAMPLE}} -rf
+
+# Modify EXAMPLE's CMakeLists.txt to enable LSP to find the correct header files
+hack-cmake EXAMPLE:
+	#!/usr/bin/env sh
+	sed -i '/^project[(]/r clangd-headers.cmake' {{EXAMPLE}}/CMakeLists.txt

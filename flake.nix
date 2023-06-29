@@ -36,6 +36,7 @@
             clang-tools
             cmake
             just
+            gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
           ];
 
           G4_DIR = "${pkgs.geant4}";
