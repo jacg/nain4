@@ -1,3 +1,5 @@
+#include "nain4.hh"
+
 #include <G4Box.hh>
 #include <G4RunManagerFactory.hh>
 #include <G4SystemOfUnits.hh>
@@ -34,10 +36,9 @@ int main(int argc, char** argv) {
 
   // ----- Pre-testing setup: G4 boilerplate -------------------------------
 
-  // Redirect G4cout to /dev/null while Geant4 makes noise
-  std::ofstream dev_null{"/dev/null"};
-  auto g4cout_buf = G4cout.rdbuf();
-  G4cout.rdbuf(dev_null.rdbuf());
+  // Redirect G4cout to /dev/null while Geant4 makes noise RAII would be a pain,
+  // as `run_manager` (defined next) must outlive `hush`.
+  auto hush = std::make_unique<n4::silence>(std::cout);
 
   // Construct the default run manager
   auto run_manager = unique_ptr<G4RunManager>
@@ -60,7 +61,7 @@ int main(int argc, char** argv) {
   run_manager -> SetUserInitialization(new dummy_action_init{});
 
   // Stop redicecting G4cout to /dev/null
-  G4cout.rdbuf(g4cout_buf);
+  hush = nullptr;
 
   // ----- Catch2 session --------------------------------------------------
   int result = Catch::Session().run(argc, argv);
