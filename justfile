@@ -3,13 +3,18 @@
 # (Re)compile and run the example
 run EXAMPLE='B1':
 	#!/usr/bin/env sh
+	just compile {{EXAMPLE}}
+	cd       {{EXAMPLE}}/build &&
+	./example{{EXAMPLE}}
+
+compile EXAMPLE:
+	#!/usr/bin/env sh
 	just copy {{EXAMPLE}}
 	echo {{EXAMPLE}}
 	mkdir -p {{EXAMPLE}}/build &&
 	cd       {{EXAMPLE}}/build &&
 	cmake ..
 	make -j
-	./example{{EXAMPLE}}
 
 # Copy the source of the given example into the top-level directory, ready for compilation
 copy EXAMPLE:
