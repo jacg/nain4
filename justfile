@@ -1,7 +1,7 @@
 # -*-Makefile-*-
 
 # (Re)compile and run the example
-run EXAMPLE:
+run EXAMPLE='B1':
 	#!/usr/bin/env sh
 	just copy {{EXAMPLE}}
 	echo {{EXAMPLE}}
