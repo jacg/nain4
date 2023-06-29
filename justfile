@@ -4,15 +4,15 @@
 run EXAMPLE='B1':
 	#!/usr/bin/env sh
 	just compile {{EXAMPLE}}
-	cd       {{EXAMPLE}}/build &&
+	cd       {{EXAMPLE}}/build
 	./example{{EXAMPLE}}
 
 compile EXAMPLE:
 	#!/usr/bin/env sh
 	just copy {{EXAMPLE}}
 	echo {{EXAMPLE}}
-	mkdir -p {{EXAMPLE}}/build &&
-	cd       {{EXAMPLE}}/build &&
+	mkdir -p {{EXAMPLE}}/build
+	cd       {{EXAMPLE}}/build
 	cmake ..
 	make -j
 
