@@ -3,7 +3,7 @@
 # (Re)compile and run the example
 run EXAMPLE='B1':
 	#!/usr/bin/env sh
-	just compile {{EXAMPLE}}
+	just compile {{EXAMPLE}} &&
 	cd       {{EXAMPLE}}/build
 	if [ -x ./example{{EXAMPLE}} ]
 	then
