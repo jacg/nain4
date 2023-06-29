@@ -35,6 +35,7 @@
             clang_16
             clang-tools
             cmake
+            cmake-language-server
             just
             gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
           ];
