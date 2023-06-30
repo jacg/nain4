@@ -13,22 +13,15 @@ run EXAMPLE='B1':
 		./{{EXAMPLE}}
 	else
 		echo "Couldn't guess executable name."
-		fail
+		false
 	fi
 
 compile EXAMPLE:
 	#!/usr/bin/env sh
-	just configure {{EXAMPLE}}
-	cd       {{EXAMPLE}}/build
-	make -j
-
-configure EXAMPLE:
-	#!/usr/bin/env sh
 	just copy {{EXAMPLE}}
-	just hack-cmake {{EXAMPLE}}
-	mkdir -p {{EXAMPLE}}/build
-	cd       {{EXAMPLE}}/build
-	cmake ..
+	cd {{EXAMPLE}}
+	cmake -S . -B build
+	cmake --build build -j
 
 # Copy the source of the given example into the top-level directory, ready for compilation
 copy EXAMPLE:
@@ -37,6 +30,7 @@ copy EXAMPLE:
 	then
 		echo Copying source of example {{EXAMPLE}}
 		cp -r --no-preserve=mode,ownership `just find {{EXAMPLE}}` .
+		just hack-cmake {{EXAMPLE}}
 	else
 		echo Source of example {{EXAMPLE}} already present
 	fi
