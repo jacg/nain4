@@ -20,6 +20,7 @@ include(${Geant4_USE_FILE})
 
 set(Nain4_TESTS
   test/test-nain4.cc
+  test/trivial-full-app-test.cc
 )
 
 # ----- Use Catch2 as C++ testing framework ---------------------------------
