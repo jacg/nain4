@@ -1,0 +1,54 @@
+# -*-Makefile-*-
+
+# Run all tests in hand-written loop: more informative and colourful than ctest
+test-all *FLAGS:
+	just test '' {{FLAGS}}
+
+
+# Run a selection of tests
+test PATTERN *FLAGS: build
+	#!/usr/bin/env bash
+	cd build
+	NPASSED=0
+	NFAILED=0
+	FAILED=
+	while read -r testname
+	do
+		if ! ./nain4-tests "$testname" {{FLAGS}}; then
+			FAILED=$FAILED"$testname"\\n
+			NFAILED=$((NFAILED+1))
+		else
+			NPASSED=$((NPASSED+1))
+		fi
+	done < <(./nain4-tests {{PATTERN}} --list-test-names-only)
+	if ! [ -z "$FAILED" ]; then
+		printf "\\033[91m===========================================================================\n"
+		printf "\\033[32m Passed $NPASSED tests, \\033[91m Failed $NFAILED\n\n"
+		printf "\\033[91m Failures: \n\n$FAILED\n"
+		printf "\\033[91m===========================================================================\n"
+		printf "\\033[91mOVERALL: ============================== FAIL ==============================\n"
+		printf "\\033[91m===========================================================================\n"
+		printf "\\033[0m"
+		exit 1
+	else
+		printf "\\033[32m Ran $NPASSED tests\n\n"
+		printf "\\033[32m===========================================================================\n"
+		printf "\\033[32mOVERALL: ============================== PASS ==============================\n"
+		printf "\\033[32m===========================================================================\n"
+		printf "\\033[0m"
+	fi
+
+build: cmake
+	#!/usr/bin/env sh
+	cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo . && make -j
+
+cmake:
+	#!/usr/bin/env sh
+	if ! [ -d build ]; then
+		mkdir build
+		cd    build
+		cmake ..
+	fi
+
+clean:
+	rm build -rf
