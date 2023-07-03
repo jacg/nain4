@@ -1,3 +1,9 @@
+# `nain4`
+
+This repository is going to be the home of `nain4`. The process of extracting it from the repository of the project in which it was born, has just started, so this is very much a Work In Progress, and there is no documentation *yet*.
+
+The rest of this README refers to the old primary use case of this repository: an Nix flake for easy provision of Geant4 user and application-developer environments.
+
 # TL;DR
 
 1. Clone this repository.
