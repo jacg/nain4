@@ -1,0 +1,6 @@
+[book]
+authors = ["Jacek Generowicz"]
+language = "en"
+multilingual = false
+src = "src"
+title = "nain4"
