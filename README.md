@@ -1,65 +1,131 @@
-# `nain4`
-
 This repository is going to be the home of `nain4`. The process of extracting it from the repository of the project in which it was born, has just started, so this is very much a Work In Progress, and there is no documentation *yet*.
 
-The rest of this README refers to the old primary use case of this repository: an Nix flake for easy provision of Geant4 user and application-developer environments.
+# What is this?
 
-# TL;DR
+This repository contains two orthogonal but related products:
 
-1. Clone this repository.
-2. `cd` into it  (and type `direnv allow`, if prompted to do so).
-3. Type `just run B1`.
+1. `nain4`
 
-If, after a lot of downloading and compiling, an image of a small simulated detector appears, hoooray! You have an environment in which you can execute the Geant4 examples, and develop and run your own Geant4 code.
+   Utilities that make writing and testing Geant4 applications much easier.
+
+2. A [Nix](https://nixos.org/) flake for easy provision of Geant4 user and application-developer environments.
+
+   The value proposition is: If *you* [install Nix](https://nixos.org/download.html) on your machine *we* can provide a zero-effort means of installing Geant4 plus dependencies and development tools.
+ 
+The flake is not necessary to *use* `nain4`, but an installation of Geant4 is necessary to *test* `nain4`.
+
+Providing an easy means of using `nain4` without the flake is a top priority, but the extraction of `nain4` from its parent repository has only just begun, so this is not ready yet. 
+
+If you manage to persuade `cmake` to treat the contents of `<this-repo>/nain4/` as a package or library (sorry, not sure of the exact cmake nomencladure) in your Geant4 application, then it should work.
+ 
+# `nain4`
+
+Nain4 is a collection of utilities whose aim is to
+
+1. make it significantly easier to write Geant4 applications, in code that is much more robust, readable and self-documenting; 
+2. make it possible/easy to write unit and integration tests for Geant4 application code;
+3. make it more difficult to write invalid Geant4 code by promoting errors to compile time;
+
+As a quick taster, here is a translation of the [detector geometry from Geant4 example `basic/B1` ](https://gitlab.cern.ch/geant4/geant4/-/blob/9f34590941fb8a3f7ad139731089ec3794947545/examples/basic/B1/src/DetectorConstruction.cc#L50-L165) into `nain4`:
+```C++
+// Materials
+auto water  = n4::material("G4_WATER");
+auto air    = n4::material("G4_AIR");
+auto tissue = n4::material("G4_A-150_TISSUE");
+auto bone   = n4::material("G4_BONE_COMPACT_ICRU");
+
+// Dimensions
+// ...
+// world_sizeXY = ... unremarkable value settings elided for brevity
+// ...
+
+// Volumes
+auto world     = n4::volume<G4Box> ("World"   , air   , world_sizeXY/2, world_sizeXY/2, world_sizeZ/2);
+auto envelope  = n4::volume<G4Box> ("Envelope", water ,   env_sizeXY/2,   env_sizeXY/2,   env_sizeZ/2);
+auto cone      = n4::volume<G4Cons>("Tissue"  , tissue, cone_rmina, cone_rmaxa, cone_rminb, cone_rmaxb, cone_hz, cone_phimin, cone_phimax);
+auto trapezoid = n4::volume<G4Trd> ("Bone"    , bone  , trd_dxa/2, trd_dxb/2, trd_dya/2, trd_dyb/2, trd_dz/2);
+
+// Set Trapezoid as scoring volume
+this -> fScoringVolume = trapezoid;
+
+// Placement
+n4::       place(envelope) .in(world)                       .now();
+n4::       place(cone)     .in(envelope).at(0,  2*cm, -7*cm).now();
+n4::       place(trapezoid).in(envelope).at(0, -1*cm,  7*cm).now();
+return n4::place(world)                                     .now();
+```
+This is the complete (except for setting of the values like `world_sizeXYZ`) `nain4` implementation of `DetectorConstruction::Construct()`. 
+
+These 13 lines of code (without comments or blank lines) correspond to 62 lines in the original example.
+
+# The Nix flake
+
+## Getting started
+
+1. [install Nix](https://nixos.org/download.html): `sh <(curl -L https://nixos.org/nix/install) --daemon`
+
+2. Clone this repository: `git clone https://github.com/jacg/nain4`
+
+3. `cd` into it
+
+4. Type `nix develop --extra-experimental-features 'nix-command flakes'`
+
+   This step will take a while, the very first time you do it: it will download and compile Geant4. Thereafter, the build result is cached, and subsequent invocations should take under a second.
+
+5. Type `just g4-example/run B1`.
+
+   This step compiles and runs the `basic/B1` example that is distributed with Geant4, in interactive mode. A visualization window should pop up.
+
+If all this worked, hooray! You have an environment in which you can execute the Geant4 examples, and develop and run your own Geant4 code.
 
 If not, read on to see possible problems and fixes.
 
-# Caveats
+## Operating systems
 
-1. This is a Nix flake, therefore it won't work without a *flakes-enabled* (i.e. unstable) Nix.
++ Linux: This code is developed and tested on Linux. If the above procedure didn't work, it's a bug. Please report it.
 
-2. I don't know how to get Geant4 to work in Nix on MacOS, so this only works on Linux. (This seems to have been fixed in a recent `nixpkgs` ? If so, it might work. I don't have the means to check it myself.)
++ Windows: It should work equally well in WSL2 on Windows.
 
-# Activating the environment
+  Caveat: if you are going to install Nix in multi-user mode, make sure that `systemd` is enabled. In short, this requires you to ensure that the file `/etc/wsl.conf` exists in your in-WSL linux and that it contains the lines
+  ```shell
+  [boot]
+  systemd=true
+  ```
++ MacOS: The Geant4 provided by this flake compiles on MacOS12 x86_64. Beyond that, the status on MacOS is not known, at present.
 
-If you have [direnv](https://direnv.net/) installed and configured, it will automatically activate the development environment when you enter this directory (though you will have to approve it the first time with `direnv allow`) and disable it when you leave the directory.
+## Ergonomics
 
-Without `direnv` you can manually enable the environment with `nix develop`, and disable it by quitting the shell started by `nix develop`.
+### Automatic environment switching with `direnv`
 
+As is stands you have to write `nix develop --extra-experimenal-features 'nix-command flakes'` in order to activate the environment necessary to run and develop this code. What is more, `nix develop` places you in a minimal bash shell in which any personal configurations you may be used to, will be missing.
 
-# Something to try, that should work
+Both of these problems can be fixed with [direnv](https://direnv.net/) which:
+  * automatically enables the environment when you enter the directory (asking your permission, the first time)
+  * updates the environment in whatever shell you happen to be using, thus allowing you to enjoy your previous settings.
 
-Once the environment has been activated, try typing
+To use `direnv`:
 
+1. Make sure that it is [installed](https://direnv.net/docs/installation.html) on your system.
+
+2. Don't forget to [hook](https://direnv.net/docs/hook.html) it into your shell.
+
+Depending on which shell you are using, this will involve adding one of the following lines to the end of your shell configuration file:
 ``` shell
-just run B1
+eval "$(direnv hook bash)"  # in ~/.bashrc
+eval "$(direnv hook zsh)"   # in ~/.zshrc
+eval `direnv hook tcsh`     # in ~/.cshrc
 ```
 
-This should copy the sources of the most basic example that is distributed with Geant4, into the local directory, configure it, compile it and execute it.
+### Enable flakes
 
-If all goes well, an image of a detector should appear. Try typing `/run/beamOn 10` in the `Session` box, and some simulated events should appear on the image.
+Flakes are a feature of Nix which are not enabled by default. If you use `direnv` this is unlikely to matter to you. If you do not use `direnv` you might want to enable flake by editing one of `~/.config/nix/nix.conf` or `/etc/nix/nix.conf` and adding the line:
 
-You should be able to modify the source code (for example increase the value of `env_sizeZ` in `B1/src/DetectorConstruction.cc` (change it from 30 to 130, to make the change obvious)) and run your modified version by repeating the earlier command `just run B1`.
+``` nix
+experimental-features = nix-command flakes
+```
+This will remove the need to add `--extra-experimenal-features 'nix-command flakes'` every time you run `nix develop`.
 
-# Running other examples
-
-Many of the other examples can be run in the same way: `just run <example-name>`. 
-
-+ Some of them will fail because necessary libraries have not (yet) been provided in this flake. 
-
-+ Others will fail because the internal organization of the example differs from that of the simple ones, which is assumed by `just run`.
-
-  In many of these cases it should be fairly easy to figure out how to compile and execute the example by hand. The procedure tends to me something like
-  
-  1. Create a `build` subirectory the example's top-level directory
-  2. `cd` into the newly-created `build` directory
-  3. `cmake ..`
-  4. `make -j N` (where `N` specifies the number of processors you want to use during compilation)
-  5. Find the executable which was produced by the previous step, and execute it by preceding its name with `./` In the case of the B1 example, this would be `./exampleB1`. 
-
-Fixes to these problems may be provided eventually. Don't hold your breath.
-
-# Geant 4 configuration
+## Geant 4 configuration
 
 Various configuration options of Geant4 itself can be changed by editing `flake.nix` here: 
 
@@ -78,3 +144,33 @@ Various configuration options of Geant4 itself can be changed by editing `flake.
 If you change the Geant4 configuration (if you are using `direnv`, it will notice the change, and automatically switch to the new configuration (recompiling Geant4, if this is a configuration not seen before) at your next shell prompt).
 
 Be sure to expunge any examples you had compiled with a differently-configured Geant4, otherwise you may get mysterious problems.
+
+## Standard Geant4 examples
+
+This repository also allows you to run and edit the standard Geant4 examples. For example,
+
+``` shell
+just g4-examples/run B1
+```
+
+This should copy the sources of the most basic example that is distributed with Geant4, into the `g4-examples` directory, configure it, compile it and execute it.
+
+If all goes well, an image of a detector should appear. Try typing `/run/beamOn 10` in the `Session` box, and some simulated events should appear on the image.
+
+You should be able to modify the source code (for example increase the value of `env_sizeZ` in `B1/src/DetectorConstruction.cc` (change it from 30 to 130, to make the change obvious)) and run your modified version by repeating the earlier command `just G4-examples/run B1`.
+
+### Running other examples
+
+Many of the other examples can be run in the same way: `just g4-examples/run <example-name>`.
+
++ Some of them will fail because they require Geant4 to be compiled with multithreading enabled. By default, multithreading is disabled in `flake.nix`. 
+
++ Others will fail because the internal organization of the example differs from that of the simple ones, which is assumed by `just g4-examples/run`.
+
+  In many of these cases it should be fairly easy to figure out how to compile and execute the example by hand. The procedure tends to me something like
+  
+  1. Create a `build` subirectory the example's top-level directory
+  2. `cd` into the newly-created `build` directory
+  3. `cmake -S . -B build`
+  4. `cmake --build build -j`
+  5. Find the executable which was produced by the previous step, and execute it by preceding its name with `./` In the case of the B1 example, this would be `./exampleB1`. 
