@@ -2,6 +2,29 @@ cmake_minimum_required(VERSION 3.25)
 
 project(Nain4)
 
+# ----- Set installation variables
+# Defaults to <top>/install, but can be overriden from CLI
+set(CMAKE_INSTALL_PREFIX
+    ${PROJECT_SOURCE_DIR}/../install/
+    CACHE PATH
+    "Default installation directory"
+    FORCE
+)
+
+set(CMAKE_INSTALL_LIBDIR
+    "lib"
+    CACHE PATH
+    "Library installation directory"
+)
+
+set(CMAKE_INSTALL_INCLUDEDIR
+    "include"
+    CACHE PATH
+    "Header installation directory"
+)
+
+
+
 # ----- Generate compile_commands.json, unless otherwise instructed on CLI --
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
@@ -11,6 +34,8 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
 endif()
 
 include_directories(${PROJECT_SOURCE_DIR})
+
+FILE(GLOB Nain4_HEADERS ${PROJECT_SOURCE_DIR}/*.hh)
 
 add_library(Nain4 nain4.cc g4-mandatory.cc)
 
@@ -41,6 +66,27 @@ target_link_libraries(
   ${Geant4_LIBRARIES}
   Nain4
 )
+
+target_include_directories(
+  Nain4
+  INTERFACE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 include(CTest)
 include(Catch)
 catch_discover_tests(nain4-tests)
+
+set(NAIN4_CONFIG_DESTINATION ${CMAKE_INSTALL_LIBDIR}/Nain4/Nain4)
+
+install(TARGETS Nain4
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(FILES ${Nain4_HEADERS}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(FILES ${CMAKE_SOURCE_DIR}/../Nain4Config.cmake
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/"
+)
