@@ -49,3 +49,15 @@ expunge EXAMPLE:
 hack-cmake EXAMPLE:
 	#!/usr/bin/env sh
 	sed -i '/^project[(]/r clangd-headers.cmake' {{EXAMPLE}}/CMakeLists.txt
+
+run-examples-that-work:
+	#!/usr/bin/env sh
+	just run B1      run1.mac
+	just run B2a     run1.mac
+	just run B3a     run1.mac
+	just run B3b     run1.mac
+	just run B5      run1.mac
+	just run AnaEx01 run1.mac
+	just run B01
+	just run B02
+	just run B03
