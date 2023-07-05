@@ -1,4 +1,6 @@
-This repository is going to be the home of `nain4`. The process of extracting it from the repository of the project in which it was born, has just started, so this is very much a Work In Progress, and there is no documentation *yet*.
+This repository is going to be the home of `nain4`. The process of extracting it from the repository of the project in which it was born, has just started, so this is very much a Work In Progress.
+
+The documentation for `nain4` is gradually being written [here](https://jacg.github.io/nain4/).
 
 # What is this?
 
