@@ -1,3 +1,17 @@
+
+This documentation is structured according to the [Diátaxis architecture](https://diataxis.fr/):
+
+|             | Study                           | Work                         |
+|-------------|---------------------------------|------------------------------|
+| Practical   | [Tutorials](./tutorials.md)     | [How-To Guides](./how-to.md) |
+| Theoretical | [Explanation](./explanation.md) | [Reference](./reference.md)  |
+
+
+
+
+
+<hr/>
+
 # Introduction
 
 `nain4` has 3 main goals:
@@ -27,7 +41,3 @@ In English this is, very roughly, something like *nuh*.
 This sound tends to get drowned out and sound odd, in the middle of a sentence spoken
 in English, and many other languages. Therefore feel free to pronounce it
 *nano*. In Spanish, *enano* is especially appropriate.
-
-<hr/>
-
-The structure of this documentation is inspired by  [Diátaxis architecture](https://diataxis.fr/).
