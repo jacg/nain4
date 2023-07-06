@@ -129,8 +129,8 @@ public:
 // volume with a 10% margin around its contents.
 class geometry : public G4VUserDetectorConstruction {
 public:
-  geometry(G4double y_min, G4double y_max, G4double z_min, G4double z_max )
-    : y_min{y_min}, y_max{y_max}, z_min{z_min}, z_max{z_max} {}
+  geometry(G4double y_min_, G4double y_max_, G4double z_min_, G4double z_max_)
+    : y_min{y_min_}, y_max{y_max_}, z_min{z_min_}, z_max{z_max_} {}
 
   G4VPhysicalVolume* Construct() {
     // --- Use meaningless materials in this example ---------------------------
@@ -219,10 +219,10 @@ private:
 // Optionally we MAY also set other user hooks.
 class actions : public G4VUserActionInitialization {
 public:
-  actions(unsigned n_gun, unsigned n_loop)
+  actions(unsigned n_gun_, unsigned n_loop_)
     : G4VUserActionInitialization()
-    , n_gun{n_gun}
-    , n_loop{n_loop}
+    , n_gun{n_gun_}
+    , n_loop{n_loop_}
   {}
 
   // This one is relevant for multi-threaded mode TODO discuss
