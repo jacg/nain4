@@ -17,6 +17,10 @@
 #include <G4Material.hh>
 #include <G4Gamma.hh>
 
+// User interface
+#include <G4UIsession.hh>
+#include <G4UImanager.hh>
+
 #include <catch2/catch.hpp>
 
 // Many of the tests below check physical quantities. Dividing physical
@@ -372,5 +376,56 @@ TEST_CASE("nain geometry iterator", "[nain][geometry][iterator]") {
   std::vector<G4VPhysicalVolume*> found{begin(p), end(p)};
   std::vector<G4VPhysicalVolume*> expected{p, p1, p2, p11, p21, p22};
   CHECK(found == expected);
+
+}
+
+TEST_CASE("nain messenger", "[nain][messenger]") {
+  class test_class {
+  public:
+    test_class() {
+      msg_ = new nain4::messenger{this, "/some_group/", "group description"};
+      auto msg = *msg_;
+
+      msg.add("cmd1", var1, "description of var1")
+         .unit("mm")
+         .dimension("Length")
+         .range("cmd1 > 0");
+      msg.add("cmd2", var2, "description of var2")
+         .options("a b c d")
+         .optional();
+      msg.add("cmd3", var3)
+         .description("description of var3")
+         .default_to("false")
+         .required();
+    }
+
+    nain4::messenger* msg_;
+    G4double var1;
+    G4String var2;
+    G4bool   var3;
+  };
+
+  auto cls = test_class();
+
+  // THIS DOESN'T WORK. WHY???
+  auto ui   = G4UImanager::GetUIpointer();
+  auto out1 = ui->ApplyCommand("/some_group/cmd1 3.0 mm");
+  auto out2 = ui->ApplyCommand("/some_group/cmd2 b");
+  auto out3 = ui->ApplyCommand("/some_group/cmd3 true");
+  auto out4 = ui->ApplyCommand("/some_group/cmd4");
+  auto out5 = ui->ApplyCommand("/some_group/cmd2 e");
+  auto out6 = ui->ApplyCommand("/some_group/cmd1 -12.3 mm");
+
+  CHECK(out1 == fCommandSucceeded);
+  CHECK(out2 == fCommandSucceeded);
+  CHECK(out3 == fCommandSucceeded);
+  CHECK(out4 == fCommandNotFound);
+  CHECK(out5 == fParameterOutOfCandidates);
+  CHECK(out6 == fParameterOutOfRange);
+
+  CHECK(cls.var1 / mm == 3.0);
+  CHECK(cls.var2 == "b");
+  CHECK(cls.var3);
+
 
 }
