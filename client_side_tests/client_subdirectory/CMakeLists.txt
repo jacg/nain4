@@ -7,7 +7,7 @@ add_subdirectory(nain4/nain4)
 find_package(Geant4 REQUIRED)
 include(${Geant4_USE_FILE})
 
-add_executable(client_exe main.cxx)
+add_executable(client_exe main.cc)
 
 target_link_libraries(
 client_exe
