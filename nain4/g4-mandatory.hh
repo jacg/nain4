@@ -96,7 +96,7 @@ private:
 struct stepping_action : public G4UserSteppingAction {
   using action_t = std::function<void(const G4Step*)>;
   // Only one method, so set it in constructor.
-  stepping_action(action_t action_) : action{action_} {}
+  stepping_action(action_t action) : action{action} {}
   void UserSteppingAction(const G4Step* step) override { action(step); }
 private:
   action_t action;
@@ -151,7 +151,7 @@ private:
 // The subclass via which G4 insists that you manage the information that
 // interests you about an event.
 struct event_data : public G4VUserEventInformation {
-  event_data(std::vector<G4Step>&& hits_) : G4VUserEventInformation(), hits{std::move(hits_)} {}
+  event_data(std::vector<G4Step>&& hits) : G4VUserEventInformation(), hits{std::move(hits)} {}
   ~event_data() override {};
   void Print() const override {/* purely virtual in superclass */};
   void set_hits(std::vector<G4Step>&& sensor_hits) { hits = std::move(sensor_hits); }

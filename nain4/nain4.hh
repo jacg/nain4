@@ -158,7 +158,7 @@ G4Material* material_from_elements_F(std::string name, G4double density, G4State
 
 class place {
 public:
-  place(G4LogicalVolume* child_)  : child(child_ ? make_optional(child_) : nullopt) {}
+  place(G4LogicalVolume* child)  : child(child ? make_optional(child) : nullopt) {}
   place(place const&) = default;
 
   place& rotate(G4RotationMatrix& rot)     { transformation = HepGeom::Rotate3D{rot}      * transformation; return *this; }

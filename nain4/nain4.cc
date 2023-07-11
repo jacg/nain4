@@ -66,10 +66,10 @@ material_properties& material_properties::add(G4String const& key, G4double valu
 
 // --------------------------------------------------------------------------------
 // definition of sensitive_detector
-sensitive_detector::sensitive_detector(G4String name, process_hits_fn process_hits_, end_of_event_fn end_of_event_)
+sensitive_detector::sensitive_detector(G4String name, process_hits_fn process_hits, end_of_event_fn end_of_event)
 : G4VSensitiveDetector{name}
-, process_hits{process_hits_}
-, end_of_event{end_of_event_} {
+, process_hits{process_hits}
+, end_of_event{end_of_event} {
   fully_activate_sensitive_detector(this);
 }
 
@@ -85,20 +85,20 @@ void sensitive_detector::EndOfEvent (G4HCofThisEvent* hc) {
 // stream redirection utilities
 
 // redirect to arbitrary stream or buffer
-redirect::redirect(std::ios& stream_, std::streambuf* new_buffer)
-: original_buffer(stream_.rdbuf())
-, stream(stream_) {
+redirect::redirect(std::ios& stream, std::streambuf* new_buffer)
+: original_buffer(stream.rdbuf())
+, stream(stream) {
   stream.rdbuf(new_buffer);
 }
 
-redirect::redirect(std::ios& stream_, std::ios& new_stream) : redirect{stream_, new_stream.rdbuf()} {}
+redirect::redirect(std::ios& stream, std::ios& new_stream) : redirect{stream, new_stream.rdbuf()} {}
 
 redirect::~redirect() { stream.rdbuf(original_buffer); }
 
 // redirect to /dev/null
-silence::silence(std::ios& stream_)
-  : original_buffer{stream_.rdbuf()}
-  , stream{stream_}
+silence::silence(std::ios& stream)
+  : original_buffer{stream.rdbuf()}
+  , stream{stream}
   , dev_null{"/dev/null"} {
   stream.rdbuf(dev_null.rdbuf());
 }
