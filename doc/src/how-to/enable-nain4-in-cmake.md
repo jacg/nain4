@@ -16,14 +16,14 @@ include(FetchContent)
 FetchContent_Declare(
   Nain4
   GIT_REPOSITORY https://github.com/jacg/nain4.git
-  GIT_TAG        <tag>
+  GIT_TAG        v0.0.0
   SOURCE_SUBDIR  nain4
 )
 
 FetchContent_MakeAvailable(Nain4)
 ```
 
-where `<tag>` may be a branch name (`origin/<branch-name>`), a tag or a commit hash. When opting for the 'branch name' option, it's important to be aware of the potential risk of losing reproducibility. With each execution of CMake, the library may be updated to a different state, introducing changes that can impact the reproducibility of your project. This can lead to compilation or runtime errors, making it challenging to recreate specific build or runtime environments. Thus, we advise to use a commit hash or a tag instead.
+The value given to `GIT_TAG` may be a replaced with a branch name (`origin/<branch-name>`) or a commit hash. When opting for the 'branch name' option, it's important to be aware of the potential risk of losing reproducibility. With each execution of CMake, the library may be updated to a different state, introducing changes that can impact the reproducibility of your project. This can lead to compilation or runtime errors, making it challenging to recreate specific build or runtime environments. Thus, we advise to use a commit hash or a tag instead.
 
 
 ## Adding Nain4 as a subdirectory to your project
