@@ -44,11 +44,9 @@ build: cmake
 
 cmake:
 	#!/usr/bin/env sh
-	if ! [ -d build ]; then
-		mkdir build
-		cd    build
-		cmake ..
-	fi
+	cmake -S . -B build
+	cmake --build build -j
+
 
 clean:
 	rm build -rf
