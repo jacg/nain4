@@ -41,10 +41,13 @@ jobs:
         run: nix develop
 
       - name: Test nain4
-        run: nix develop -c just
+        run: nix develop -c just test-nain4
 
       - name: nix-shell
         run: nix-shell --run just
 
       - name: Run G4 examples
         run: nix develop -c just g4-examples/run-examples-that-work
+
+      - name: Run client-side tests
+        run: nix develop -c just test-client-side
