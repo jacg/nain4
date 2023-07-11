@@ -15,7 +15,7 @@ test-fetch-content:
 	if [[ $? -eq 0 ]]; then
 	  printf "\\033[32m => Client project compiled successfully with fetch content";
 	else
-	  printf "\\033[91m => Client project could not be compiled with fetch content"";
+	  printf "\\033[91m => Client project could not be compiled with fetch content";
 	fi
 
 test-fetch-content-recompile:
