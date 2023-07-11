@@ -29,6 +29,9 @@
 #include <tuple>
 #include <algorithm>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 // ----- Fundamental requirements of Geant4 --------------------------------------
 
 // Geant4 apps need to register 3 mandatory user-defined classes with the Geant4
@@ -282,3 +285,5 @@ TEST_CASE("trivial app", "[app]") {
   // Verify that all generated particles arrived at the detector
   CHECK(sd->detected_particles == expected_hits);
 }
+
+#pragma GCC diagnostic pop

@@ -5,6 +5,9 @@
 #include <G4Run.hh>
 #include <G4RunManager.hh>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 
 // ----- actions --------------------------------------------------------------------
@@ -26,3 +29,5 @@ void generator::geantino_along_x(G4Event* event) {
 }
 
 } // namespace nain4
+
+#pragma GCC diagnostic pop

@@ -10,6 +10,10 @@
 #include <algorithm>
 #include <iterator>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
+
 namespace nain4 {
 
 G4PVPlacement* place::now() {
@@ -71,7 +75,7 @@ sensitive_detector::sensitive_detector(G4String name, process_hits_fn process_hi
 , process_hits{process_hits}
 , end_of_event{end_of_event} {
   fully_activate_sensitive_detector(this);
-};
+}
 
 G4bool sensitive_detector::ProcessHits(G4Step* step, G4TouchableHistory*) {
   return process_hits ? process_hits(step) : true;  // TODO what does true mean?
@@ -145,7 +149,7 @@ G4VPhysicalVolume* combine_geometries(G4VPhysicalVolume* phantom, G4VPhysicalVol
 
   n4::place(phantom_logical).in(detector_envelope).at(phantom_translation).now();
   return detector;
-};
+}
 
 
 } // namespace nain4
@@ -159,3 +163,5 @@ geometry_iterator begin(G4LogicalVolume& vol) { return geometry_iterator{&vol}; 
 geometry_iterator   end(G4LogicalVolume&    ) { return geometry_iterator{    }; }
 geometry_iterator begin(G4LogicalVolume* vol) { return begin(*vol); }
 geometry_iterator   end(G4LogicalVolume* vol) { return   end(*vol); }
+
+#pragma GCC diagnostic pop

@@ -20,6 +20,9 @@
 
 #include <vector>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 
 // ----- run_action -----------------------------------------------------------------
@@ -163,5 +166,7 @@ private:
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
+
+#pragma GCC diagnostic pop
 
 #endif
