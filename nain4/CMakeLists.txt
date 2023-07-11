@@ -4,12 +4,14 @@ project(Nain4)
 
 # ----- Set installation variables
 # Defaults to <top>/install, but can be overriden from CLI
-set(CMAKE_INSTALL_PREFIX
-    ${PROJECT_SOURCE_DIR}/../install/
-    CACHE PATH
-    "Default installation directory"
-    FORCE
-)
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX
+      ${PROJECT_SOURCE_DIR}/../install/
+      CACHE PATH
+      "Default installation directory"
+      FORCE
+  )
+endif()
 
 set(CMAKE_INSTALL_LIBDIR
     "lib"
