@@ -43,5 +43,8 @@ jobs:
       - name: Test nain4
         run: nix develop -c just
 
+      - name: nix-shell
+        run: nix-shell --run just
+
       - name: Run G4 examples
         run: nix develop -c just g4-examples/run-examples-that-work
