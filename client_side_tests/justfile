@@ -11,7 +11,7 @@ test-all:
 
 test-fetch-content:
   #!/usr/bin/env bash
-  bash test_client_project_compiles.sh
+  bash test_fetch_content.sh
   if [[ $? -eq 0 ]]; then
     printf "\\033[32m => Client project compiled successfully with fetch content";
   else
