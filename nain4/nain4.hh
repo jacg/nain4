@@ -33,6 +33,14 @@
 #include <optional>
 
 
+// Disable GCC's shadow warnings
+// This happens in constructors where it is a C++ idiom to use
+// the same name for the argument and the class member.
+// This has been reported to gcc's bug tracker
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78147
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Note 1
 //
@@ -326,5 +334,6 @@ geometry_iterator begin(G4LogicalVolume*);
 geometry_iterator   end(G4LogicalVolume*);
 
 
+#pragma GCC diagnostic pop
 
 #endif

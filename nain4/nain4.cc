@@ -10,6 +10,10 @@
 #include <algorithm>
 #include <iterator>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
+
 namespace nain4 {
 
 G4PVPlacement* place::now() {
@@ -159,3 +163,5 @@ geometry_iterator begin(G4LogicalVolume& vol) { return geometry_iterator{&vol}; 
 geometry_iterator   end(G4LogicalVolume&    ) { return geometry_iterator{    }; }
 geometry_iterator begin(G4LogicalVolume* vol) { return begin(*vol); }
 geometry_iterator   end(G4LogicalVolume* vol) { return   end(*vol); }
+
+#pragma GCC diagnostic pop
