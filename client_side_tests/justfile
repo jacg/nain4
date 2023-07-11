@@ -1,12 +1,12 @@
 # -*-Makefile-*-
 
-# Run all tests in hand-written loop: more informative and colourful than ctest
-
 test-all:
-  just test-fetch-content
-  just test-fetch-content-recompile
-  just test-subdirectory
-  just test-independent-installation
+  t0=$(just test-fetch-content)
+  t1=$(just test-fetch-content-recompile)
+  t2=$(just test-subdirectory)
+  t3=$(just test-independent-installation)
+
+  [[ t0 && (t1 && (t2 && t3)) ]]
 
 
 test-fetch-content:
@@ -20,7 +20,7 @@ test-fetch-content:
 
 test-fetch-content-recompile:
   #!/usr/bin/env bash
-  sudo -E bash test_recompile_does_not_use_network.sh
+  sudo -E bash test_fetch_content_recompile.sh
   if [[ $? -eq 0 ]]; then
     printf "\\033[32m => Client project recompiled without using the network";
   else
