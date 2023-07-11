@@ -10,24 +10,25 @@
 
   outputs = { self, nixpkgs, flake-utils, flake-compat }:
     flake-utils.lib.eachDefaultSystem (system:
-      let pkgs = import nixpkgs { inherit system; };
+      let
+        pkgs = import nixpkgs { inherit system; };
+        my-geant4 = (pkgs.geant4.override {
+          enableMultiThreading = false;
+          enableInventor       = false;
+          enableQt             = true;
+          enableXM             = false;
+          enableOpenGLX11      = true;
+          enablePython         = false;
+          enableRaytracerX11   = false;
+        });
+
       in {
 
         devShell = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
           name = "G4-examples-devenv";
 
           packages = with pkgs; [
-
-            (geant4.override {
-              enableMultiThreading = false;
-              enableInventor       = false;
-              enableQt             = true;
-              enableXM             = false;
-              enableOpenGLX11      = true;
-              enablePython         = false;
-              enableRaytracerX11   = false;
-            })
-
+            my-geant4
             geant4.data.G4PhotonEvaporation
             geant4.data.G4EMLOW
             geant4.data.G4RadioactiveDecay
@@ -50,6 +51,9 @@
           QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
         };
+
+        packages.geant4  = my-geant4;
+        packages.default = my-geant4;
 
       });
 }
