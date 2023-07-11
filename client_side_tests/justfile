@@ -1,0 +1,46 @@
+# -*-Makefile-*-
+
+# Run all tests in hand-written loop: more informative and colourful than ctest
+
+test-all:
+  just test-fetch-content
+  just test-fetch-content-recompile
+  just test-subdirectory
+  just test-independent-installation
+
+
+test-fetch-content:
+	#!/usr/bin/env bash
+	bash test_client_project_compiles.sh
+	if [[ $? -eq 0 ]]; then
+	  printf "\\033[32m => Client project compiled successfully with fetch content";
+	else
+	  printf "\\033[91m => Client project could not be compiled with fetch content"";
+	fi
+
+test-fetch-content-recompile:
+	#!/usr/bin/env bash
+	sudo -E bash test_recompile_does_not_use_network.sh
+	if [[ $? -eq 0 ]]; then
+	  printf "\\033[32m => Client project recompiled without using the network";
+	else
+	  printf "\\033[91m => Client project could not be recompiled without using the network";
+	fi
+
+test-subdirectory:
+	#!/usr/bin/env bash
+	bash test_subdirectory.sh
+	if [[ $? -eq 0 ]]; then
+	  printf "\\033[32m => Client project compiled successfully with nain4 as a subdirectory";
+	else
+	  printf "\\033[91m => Client project could not be compiled with nain4 as a subdirectory";
+	fi
+
+test-independent-installation:
+	#!/usr/bin/env bash
+	bash test_independent_installation.sh
+	if [[ $? -eq 0 ]]; then
+	  printf "\\033[32m => Client project compiled successfully with an independent installation of nain4";
+	else
+	  printf "\\033[91m => Client project could not be compiled with an independent installation of nain4";
+	fi
