@@ -34,8 +34,8 @@
 
 
 // Disable GCC's shadow warnings
-// This happens in constructors where it is a C++ idiom to use
-// the same name for the argument and the class member.
+// This happens in constructors where it is a C++ idiom to have
+// constructor parameters match memeber names.
 // This has been reported to gcc's bug tracker
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78147
 #pragma GCC diagnostic push
