@@ -1,0 +1,638 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Constructing solids and logical volumes - nain4</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../tutorials.html"><strong aria-hidden="true">2.</strong> Tutorials</a></li><li class="chapter-item expanded "><a href="../how-to.html"><strong aria-hidden="true">3.</strong> How-To Guides</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../how-to/install-nix.html"><strong aria-hidden="true">3.1.</strong> How to install nix</a></li><li class="chapter-item expanded "><a href="../how-to/enable-nain4-in-cmake.html"><strong aria-hidden="true">3.2.</strong> How to make nain4 available in a Geant4/cmake project</a></li><li class="chapter-item expanded "><a href="../how-to/start-a-nain4-based-project.html"><strong aria-hidden="true">3.3.</strong> How start a nain4-based project</a></li><li class="chapter-item expanded "><a href="../how-to/build-a-minimal-nain4-app.html"><strong aria-hidden="true">3.4.</strong> How to build a minimal nain4 app</a></li><li class="chapter-item expanded "><a href="../how-to/upgrade-nain4.html"><strong aria-hidden="true">3.5.</strong> How to upgrade your nain4 dependency</a></li><li class="chapter-item expanded "><a href="../how-to/generate_random_numbers.html"><strong aria-hidden="true">3.6.</strong> How to generate random numbers</a></li></ol></li><li class="chapter-item expanded "><a href="../explanation.html"><strong aria-hidden="true">4.</strong> Explanation</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../explanation/placement-laziness-and-accumulation.html"><strong aria-hidden="true">4.1.</strong> Placement: laziness and accumulation</a></li><li class="chapter-item expanded "><a href="../explanation/displacements-and-rotations-are-not-commutative.html"><strong aria-hidden="true">4.2.</strong> Displacements and rotations are not commutative</a></li><li class="chapter-item expanded "><a href="../explanation/input-types-of-boolean-solids-methods.html"><strong aria-hidden="true">4.3.</strong> Input types of boolean solids' methods</a></li><li class="chapter-item expanded "><a href="../explanation/process-hits-return-value.html"><strong aria-hidden="true">4.4.</strong> Return value of G4VSensitiveDetector::ProcessHits</a></li><li class="chapter-item expanded "><a href="../explanation/why-nix.html"><strong aria-hidden="true">4.5.</strong> Why nix?</a></li></ol></li><li class="chapter-item expanded "><a href="../reference.html"><strong aria-hidden="true">5.</strong> Reference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../reference/headers.html"><strong aria-hidden="true">5.1.</strong> Headers</a></li><li class="chapter-item expanded "><a href="../reference/n4-shape.html" class="active"><strong aria-hidden="true">5.2.</strong> Constructing solids and logical volumes</a></li><li class="chapter-item expanded "><a href="../reference/n4-place.html"><strong aria-hidden="true">5.3.</strong> Placement of physical volumes</a></li><li class="chapter-item expanded "><a href="../reference/n4-boolean-solids.html"><strong aria-hidden="true">5.4.</strong> Constructing boolean solids</a></li><li class="chapter-item expanded "><a href="../reference/managing-nain4-versions.html"><strong aria-hidden="true">5.5.</strong> Managing nain4 versions</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">nain4</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="constructing-solids-and-logical-volumes"><a class="header" href="#constructing-solids-and-logical-volumes">Constructing solids and logical volumes</a></h1>
+<p>Header: <code>&lt;n4-shapes.hh&gt;</code></p>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<h3 id="constructing-a-g4vsolid"><a class="header" href="#constructing-a-g4vsolid">Constructing a <code>G4VSolid</code></a></h3>
+<!-- TODO: put this in some common .css -->
+<style>
+details.g4 > summary::before {
+  font-size: 80%;
+  color: #888;
+  content: "Click to show/hide equivalent in pure Geant4 ";
+}
+details.g4 {
+  border-style: none none none solid;
+  border-color: #888;
+  padding-left: 1em;
+}
+</style>
+<pre><code class="language-c++">auto ball = n4::sphere(&quot;ball&quot;).r(1.2*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius = 1.2*m;
+auto ball   = new G4Sphere(&quot;ball&quot;, 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
+</code></pre>
+<p><font size=-2>(In this specific example, <code>n4::sphere</code> notices that it would be more efficient to create a <code>G4Orb</code> instead of a <code>G4Sphere</code> and does that for you automatically.)</font></p>
+</details>
+<h3 id="constructing-a-g4logicalvolume"><a class="header" href="#constructing-a-g4logicalvolume">Constructing a <code>G4LogicalVolume</code></a></h3>
+<p>Frequently, after having made a <code>G4VSolid</code> you immediately use it to make a <code>G4LogicalVolume</code> with the same name. <code>nain4</code> allows you to do this in a single step:</p>
+<pre><code class="language-c++">auto copper = n4::material(&quot;G4_Cu&quot;);
+auto ball   = n4::sphere(&quot;ball&quot;).r(1.2*m).volume(copper);
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto copper = G4NistManager::Instance() -&gt; FindOrBuildMaterial(&quot;G4_Cu&quot;);
+auto radius = 1.2*m;
+auto ball_solid = new G4Sphere(&quot;ball&quot;, 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
+auto ball = new G4VLogicalVolume(ball_solid, copper, &quot;ball&quot;);
+</code></pre>
+</details>
+<p>If you need to do this as two separate steps</p>
+<pre><code class="language-c++">auto copper     = n4::material(&quot;G4_Cu&quot;);
+auto ball_solid = n4::sphere(&quot;ball&quot;).r(1.2*m).solid();
+auto ball       = n4::volume(ball_solid, copper);
+</code></pre>
+<p>Not all <code>G4VSolid</code>s are supported by the <code>nain4::shape</code> interface, yet. In such cases <code>n4::volume</code> lets you combine the construction of a solid and corresponding logical volume in a single step. Here is how you could do it if <code>n4::sphere</code> did not exist:</p>
+<pre><code class="language-c++">auto copper = n4::material(&quot;G4_Cu&quot;);
+auto radius = 1.2*m;
+auto ball   = n4::volume&lt;G4Sphere&gt;(&quot;ball&quot;, copper, 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
+</code></pre>
+<p>The arguments passed after the name and material, are forwarded to the specified <code>G4VSolid</code>'s constructor.</p>
+<h3 id="placing-a-volume"><a class="header" href="#placing-a-volume">Placing a volume</a></h3>
+<p>Should you want to place your <code>G4LogicalVolume</code> immediately, <code>nain4</code> allows you to include this in a single step, too:</p>
+<pre><code class="language-c++">auto safe = ...
+auto gold = n4::material(&quot;G4_Au&quot;);
+n4::box(&quot;nugget&quot;).cube(2*cm).place(gold).in(safe).now();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto safe_solid = ...
+auto safe = ...
+auto gold = G4NistManager::Instance() -&gt; FindOrBuildMaterial(&quot;G4_Au&quot;);
+auto nugget_solid = new G4Box(&quot;nugget&quot;, 2*cm/2, 2*cm/2, 2*cm/2);
+auto nugget_logical = new G4VLogicalVolume(nugget_solid, gold, &quot;nugget&quot;);
+new G4PVPlacement(nullptr, {}, nugget_logical, &quot;nugget&quot;, safe, false, 0);
+</code></pre>
+</details>
+<p>However, frequently you need to keep a handle to the logical volume, in order to be able to place things into it later. In such cases you would break this into two separate steps:</p>
+<pre><code class="language-c++">auto safe   = ...
+auto gold   = n4::material(&quot;G4_Au&quot;);
+auto nugget = n4::box(&quot;nugget&quot;).cube(2*cm).volume(gold);
+n4::place(nugget).in(safe).now();
+</code></pre>
+<p><code>nain4</code>'s placement utilities have a rich interface, which is described in <a href="./n4-place.html">Placement of physical volumes</a>.</p>
+<h3 id="summary-1"><a class="header" href="#summary-1">Summary</a></h3>
+<pre><code class="language-c++">G4VSolid        * s = n4::SOLID(&quot;name&quot;, ...).solid();
+G4VLogicalVolume* v = n4::SOLID(&quot;name&quot;, ...).volume(material);
+G4PVPlacement   * p = n4::SOLID(&quot;name&quot;, ...).place (material).in(volume) ... .now();
+</code></pre>
+<h2 id="specifying-dimensions"><a class="header" href="#specifying-dimensions">Specifying Dimensions</a></h2>
+<p>The <code>G4VSolid</code>s, and hence also the <code>n4::shape</code>s, are parameterized by combinations of four principal types of coordinate</p>
+<ol>
+<li>Cartesian lengths, <code>x</code>, <code>y</code> and <code>z</code></li>
+<li>Radial length, <code>r</code></li>
+<li>Azimuthal angle, <code>φ</code></li>
+<li>Polar angle, <code>θ</code></li>
+</ol>
+<p><code>nain4</code> provides a consistent set of methods for setting these, in any <code>n4::shape</code> that uses them. These methods are described here, the <code>n4::shapes</code> are described in the next section.
+All the methods provided by <code>nain4</code> have short, but explicit names. This removes the need for the user to remember the order of the arguments while highlighting their meaning.</p>
+<h3 id="cartesian-lengths"><a class="header" href="#cartesian-lengths">Cartesian lengths</a></h3>
+<p>The principal methods for setting Cartesian lengths are</p>
+<ul>
+<li><code>x</code></li>
+<li><code>half_x</code></li>
+</ul>
+<p>and their equivalents for <code>y</code> and <code>z</code>.</p>
+<h4 id="explicit-names"><a class="header" href="#explicit-names">Explicit names</a></h4>
+<p>Unlike Geant4, <code>nain4</code> favours the use of full lengths instead of half-lengths.
+Using half-lengths creates noise by either introducing <code>/2</code> operations
+continuously or by defining variables with long names to indicate the subtle but
+important distinction between half- and full-lengths. For instance, in order to
+create a cube of side 1 m in pure <code>G4</code>:</p>
+<pre><code class="language-c++">auto box_half_length = 0.5*m;
+G4Box* box1 = new G4Box(&quot;box&quot;, box_half_length,  box_half_length,  box_half_length);
+// or
+auto box_length = 1*m;
+G4Box* box2 = new G4Box(&quot;box&quot;, box_length/2,  box_length/2,  box_length/2);
+</code></pre>
+<p>In contrast, in <code>nain4</code> one can simply write</p>
+<pre><code class="language-c++">auto box = n4::box(&quot;box&quot;).cube(1*m);
+</code></pre>
+<h4 id="overriding"><a class="header" href="#overriding">Overriding</a></h4>
+<p>If you set a Cartesian length more than once in the same shape, the last setting overrides previous ones. For example:</p>
+<pre><code class="language-c++">.x(1*m).half_x(3*m)  // `x` set to 6 m
+.x(1*m).     x(3*m)  // `x` set to 3 m
+</code></pre>
+<h4 id="convenient-alternatives"><a class="header" href="#convenient-alternatives">Convenient alternatives</a></h4>
+<p><code>n4::shape</code>s which depend on more than one Cartesian length, typically provide extra methods for setting various combinations, for example <code>n4::box</code> offers extra methods <code>cube</code>, <code>xyz</code>, <code>xy</code>, <code>xz</code> and <code>yz</code> along with their <code>half_</code> variants.</p>
+<h3 id="radial-length-r"><a class="header" href="#radial-length-r">Radial length: <code>r</code></a></h3>
+<p>Three methods are provided for specifying the two degrees of freedom in radial lengths:</p>
+<ul>
+<li><code>r_inner</code></li>
+<li><code>r_delta</code></li>
+<li><code>r</code></li>
+</ul>
+<p>with the constraint <code>r = r_inner + r_delta</code>. Thus valid combinations of these methods are</p>
+<style>
+.thick {
+    border-left-width: 8px;
+    border-left-colour: #888;
+  }
+</style>
+<table>
+  <tr>
+    <th colspan="3">Methods used</th>
+    <th colspan="3">Implied value</th>
+  </tr>
+  <tr>
+    <td colspan="3"></td><td class="thick">r_inner</td><td>r_delta</td><td>r</td>
+  </tr>
+  <tr><td>       </td><td>       </td><td>r</td>  <td class="thick">0          </td><td>r          </td><td>                 </td></tr>
+  <tr><td>r_inner</td><td>       </td><td>r</td>  <td class="thick">           </td><td>r - r_inner</td><td>                 </td></tr>
+  <tr><td>       </td><td>r_delta</td><td>r</td>  <td class="thick">r - r_delta</td><td>           </td><td>                 </td></tr>
+  <tr><td>r_inner</td><td>r_delta</td><td> </td>  <td class="thick">0          </td><td>           </td><td>r_inner + r_delta</td></tr>
+</table>
+<p>Providing too few or too many values results in a run-time error.</p>
+<p>Some shapes, such as <code>n4::cons</code> (<code>G4Cons</code>), have multiple radii. In such cases the method names acquire a number, to distinguish between them <code>r*</code> -&gt; <code>r1*</code>, <code>r2*</code>.</p>
+<h3 id="azimuthal-angle-φ"><a class="header" href="#azimuthal-angle-φ">Azimuthal angle: <code>φ</code></a></h3>
+<p>Three methods are provided for specifying the two degrees of freedom in azimuthal angles:</p>
+<ul>
+<li><code>phi_start</code></li>
+<li><code>phi_delta</code></li>
+<li><code>phi_end</code></li>
+</ul>
+<p>with the constraint <code>phi_end = phi_start + phi_delta</code>. Thus valid combinations of these methods are</p>
+<table>
+  <tr>
+    <th colspan="3">Methods used</th>
+    <th colspan="3">Implied value</th>
+  </tr>
+  <tr>
+    <td colspan="3"></td><td class="thick">phi_start</td><td>phi_delta</td><td>phi_end</td>
+  </tr>
+  <tr><td>         </td><td>         </td><td>       </td>  <td class="thick">0      </td><td>2π         </td><td>2π       </td></tr>
+  <tr><td>phi_start</td><td>         </td><td>       </td>  <td class="thick">       </td><td>2π - start </td><td>2π       </td></tr>
+  <tr><td>         </td><td>phi_delta</td><td>       </td>  <td class="thick">0      </td><td>           </td><td>δ        </td></tr>
+  <tr><td>         </td><td>         </td><td>phi_end</td>  <td class="thick">0      </td><td>end        </td><td>         </td></tr>
+  <tr><td>         </td><td>phi_delta</td><td>phi_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td></tr>
+  <tr><td>phi_start</td><td>         </td><td>phi_end</td>  <td class="thick">       </td><td>end - start</td><td>         </td></tr>
+  <tr><td>phi_start</td><td>phi_delta</td><td>       </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
+</table>
+<p>Providing too few or too many values results in a run-time error.</p>
+<h3 id="polar-angle-θ"><a class="header" href="#polar-angle-θ">Polar angle: <code>θ</code></a></h3>
+<p>Three methods are provided for specifying the two degrees of freedom in polar angles:</p>
+<ul>
+<li><code>theta_start</code></li>
+<li><code>theta_delta</code></li>
+<li><code>theta_end</code></li>
+</ul>
+<p>with the constraint <code>theta_end = theta_start + theta_delta</code>. Thus valid combinations of these methods are</p>
+<table>
+  <tr>
+    <th colspan="3">Methods used</th>
+    <th colspan="3">Implied value</th>
+  </tr>
+  <tr>
+    <td colspan="3"></td><td class="thick">theta_start</td><td>theta_delta</td><td>theta_end</td>
+  </tr>
+  <tr><td>           </td><td>           </td><td>         </td>  <td class="thick">0      </td><td>π          </td><td>π        </td></tr>
+  <tr><td>theta_start</td><td>           </td><td>         </td>  <td class="thick">       </td><td>π - start </td><td>π        </td></tr>
+  <tr><td>           </td><td>theta_delta</td><td>         </td>  <td class="thick">0      </td><td>           </td><td>δ        </td></tr>
+  <tr><td>           </td><td>           </td><td>theta_end</td>  <td class="thick">0      </td><td>end        </td><td>         </td></tr>
+  <tr><td>           </td><td>theta_delta</td><td>theta_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td></tr>
+  <tr><td>theta_start</td><td>           </td><td>theta_end</td>  <td class="thick">       </td><td>end - start</td><td>         </td></tr>
+  <tr><td>theta_start</td><td>theta_delta</td><td>         </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
+</table>
+<p>Providing too few or too many values results in a run-time error.</p>
+<h2 id="common-methods"><a class="header" href="#common-methods">Common methods</a></h2>
+<p>All <code>n4::SOLID</code>s share the following methods:</p>
+<ul>
+<li>Builder methods
+<ul>
+<li><a href="#constructing-a-g4vsolid"><code>.solid()</code></a></li>
+<li><a href="#constructing-a-g4logicalvolume"><code>.volume(material)</code></a></li>
+<li><a href="#placing-a-volume"><code>.place(material)</code></a></li>
+</ul>
+</li>
+<li><a href="./n4-boolean-solids.html">Boolean solid methods</a>:
+<ul>
+<li><code>add()</code> / <code>join()</code></li>
+<li><code>sub()</code> / <code>subtract()</code></li>
+<li><code>inter()</code> / <code>intersect()</code></li>
+</ul>
+</li>
+<li>Optional logical volume settings:
+<ul>
+<li><code>sensitive(sensitive-detector)</code></li>
+<li>TODO maybe field manager, user limits, optimize</li>
+</ul>
+</li>
+</ul>
+<h2 id="available-shapes"><a class="header" href="#available-shapes">Available Shapes</a></h2>
+<h3 id="n4box"><a class="header" href="#n4box"><code>n4::box</code></a></h3>
+<p>Constructs <code>G4Box</code>: cuboid with side lengths <code>x</code>, <code>y</code> and <code>z</code>. Within its frame of reference it is centred on the origin with sides parallel to the <code>x</code>/<code>y</code>/<code>z</code> axes. Displacements and rotations can be applied with <a href="#placing-a-volume"><code>.place(material)</code></a>.</p>
+<h4 id="example"><a class="header" href="#example">Example</a></h4>
+<pre><code class="language-c++">G4Box* box = n4::box(&quot;box&quot;).xz(10*cm).y(50*cm).solid();
+</code></pre>
+<details class="g4">
+<summary></summary>
+<pre><code class="language-c++">auto cross_section_length = 10*cm, y_length = 50*cm;
+G4Box* box = new G4Box(&quot;box&quot;, cross_section_length/2, y_length/2, cross_section_length/2);
+</code></pre>
+</details>
+<h4 id="methods"><a class="header" href="#methods">Methods</a></h4>
+<h5 id="full-length-methods"><a class="header" href="#full-length-methods">Full-length methods</a></h5>
+<p>All these methods take full (as opposed to half-) lengths:</p>
+<ul>
+<li><code>x(lx)</code>, <code>y(ly)</code>, <code>z(ly)</code>: set one dimension.</li>
+<li><code>xy(l)</code>, <code>xz(l)</code>, <code>yz(l)</code>: set two dimensions to the same value.</li>
+<li><code>xyz(lx, ly, lz)</code>, <code>xyz(g4-three-vector)</code>: set three dimensions independently</li>
+<li><code>cube(l)</code>: set all dimensions to the same value.</li>
+</ul>
+<p>Note the, perhaps surprising, difference between <code>.xyz()</code> and the <code>.xy()</code>-<code>.xz()</code>-<code>.yz()</code> triumvirate: The latter assign a single value to multiple coordinates; the former accepts a separate value for each coordinate it sets.</p>
+<h5 id="half-length-methods"><a class="header" href="#half-length-methods">Half-length methods</a></h5>
+<p>All the aforementioned full-length methods have alternatives which accept half-lengths: <code>half_x(lx/2)</code>, <code>half_cube(l/2)</code>, <code>half_xy(lxy)</code>, etc.</p>
+<h5 id="overriding-1"><a class="header" href="#overriding-1">Overriding</a></h5>
+<p>If any value is specified more than once, the last setting overrides any earlier ones. Thus, the following three lines are equivalent.</p>
+<pre><code class="language-c++">.cube(1*m          ).z(2*m)
+.xyz (1*m, 1*m, 1*m).z(2*m)
+.xy  (1*m          ).z(2*m)
+</code></pre>
+<p>While the first two work, the last one states the intent most clearly.</p>
+<p>See the sections about setting <a href="#cartesian-lengths">Cartesian lengths</a> for more details.</p>
+<h3 id="n4sphere"><a class="header" href="#n4sphere"><code>n4::sphere</code></a></h3>
+<p>Constructs <code>G4Sphere</code> or <code>G4Orb</code>, depending on values provided.</p>
+<ul>
+<li><code>G4Sphere</code>: section of a spherical shell, between specified azimuthal (φ) and polar (θ) angles. Within its frame of reference, φ is measured counterclockwise WRT the x-axis when viewed from positive z; θ is measured WRT positive z. Displacements and rotations can be applied with <a href="#placing-a-volume"><code>.place(material)</code></a>.</li>
+<li><code>G4Orb</code>: special case of <code>G4Sphere</code>.</li>
+</ul>
+<h4 id="examples"><a class="header" href="#examples">Examples</a></h4>
+<p>A solid sphere</p>
+<pre><code class="language-c++">G4Orb* ball = n4::sphere(&quot;ball&quot;).r(1*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">G4Orb* ball = new G4Orb(&quot;ball&quot;, 1*m);
+</code></pre>
+<p>thus <code>nain4</code> helps you avoid the common mistake of creating an equivalent (but less efficient) <code>G4Sphere</code> instead</p>
+<pre><code class="language-c++">G4Sphere* ball = new G4Sphere(&quot;ball&quot;, 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
+</code></pre>
+</details>
+<p>A hollow sphere</p>
+<pre><code class="language-c++">G4Sphere* hollow = n4::sphere(&quot;hollow&quot;).r(2*m).r_delta(10*cm).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto outer = 2*m, thickness = 10*cm;
+G4Sphere* hollow = new G4Sphere(&quot;hollow&quot;, outer - thickness, outer, 0, CLHEP::twopi, 0, CLHEP::pi);
+</code></pre>
+</details>
+<p>A spherical wedge</p>
+<pre><code class="language-c++">G4Sphere* wedge = n4::sphere(&quot;wedge&quot;).r(1*m).phi_start(20*deg).phi_end(30*deg).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto start_phi = 20*deg, end_phi = 30*deg;
+G4Sphere* wedge = new G4Sphere(&quot;wedge&quot;, 0, 1*m, start_phi, end_phi - start_phi, 0, CLHEP::pi);
+</code></pre>
+</details>
+<h4 id="methods-1"><a class="header" href="#methods-1">Methods</a></h4>
+<ul>
+<li><code>r_inner(l)</code></li>
+<li><code>r_delta(l)</code></li>
+<li><code>r(l)</code></li>
+<li><code>phi_start(a)</code></li>
+<li><code>phi_delta(a)</code></li>
+<li><code>phi_end(a)</code></li>
+<li><code>theta_start(a)</code></li>
+<li><code>theta_delta(a)</code></li>
+<li><code>theta_end(a)</code></li>
+</ul>
+<p>See the sections about setting <a href="#radial-length-r">radial lengths</a>, <a href="#azimuthal-angle-%CF%86">azimuthal angles</a> and <a href="#polar-angle-%CE%B8">polar angles</a> for more details.</p>
+<h3 id="n4tubs"><a class="header" href="#n4tubs"><code>n4::tubs</code></a></h3>
+<p>Constructs <code>G4Tubs</code>: tube or tube segment. Within its frame of reference, it is parallel to and centred on the z-axis; φ is measured counterclockwise WRT the x-axis when viewed from positive z. Displacements and rotations can be applied with <a href="#placing-a-volume"><code>.place(material)</code></a>.</p>
+<h4 id="examples-1"><a class="header" href="#examples-1">Examples</a></h4>
+<p>A solid cylinder</p>
+<pre><code class="language-c++">G4Tubs* cylinder = n4::tubs(&quot;cylinder&quot;).r(1*m).z(2*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius   = 1*m;
+auto z_length = 2*m;
+G4Tubs* cylinder = new G4Tubs(&quot;cylinder&quot;, 0, radius, z_length/2, 0, CLHEP::twopi);
+</code></pre>
+</details>
+<p>A tube</p>
+<pre><code class="language-c++">G4Tubs* tube = n4::tubs(&quot;tube&quot;).r(1*m).r_delta(10*cm).z(2*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto z_length = 2*m, outer_radius = 1*m, thickness = 10*cm;
+G4Tubs* tube = new G4Tubs(&quot;tube&quot;, outer_radius - thickness, 1*m, z_length/2, 0, CLHEP::twopi);
+</code></pre>
+</details>
+<p>A cylindrical wedge</p>
+<pre><code class="language-c++">G4Tubs* wedge = n4::tubs(&quot;wedge&quot;).r(1*m).z(2*m).phi_start(20*deg).phi_end(30*deg).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto z_length = 2*m, radius = 1*m, start_phi = 20*deg, end_phi = 30*deg;
+G4Tubs* wedge = new G4Tubs(&quot;wedge&quot;, 0, radius, z_length/2, start_phi, end_phi - start_phi);
+</code></pre>
+</details>
+<h4 id="methods-2"><a class="header" href="#methods-2">Methods</a></h4>
+<ul>
+<li><code>z()</code></li>
+<li><code>half_z()</code></li>
+<li><code>r_inner(l)</code></li>
+<li><code>r_delta(l)</code></li>
+<li><code>r(l)</code></li>
+<li><code>phi_start(a)</code></li>
+<li><code>phi_delta(a)</code></li>
+<li><code>phi_end(a)</code></li>
+</ul>
+<p>See the sections about setting <a href="#cartesian-lengths">Cartesian lengths</a>, <a href="#radial-length-r">radial lengths</a> and <a href="#azimuthal-angle-%CF%86">azimuthal angles</a> for more details.</p>
+<h3 id="n4trd"><a class="header" href="#n4trd"><code>n4::trd</code></a></h3>
+<p>Constructs <code>G4Trd</code>: frustrum (a.k.a. truncated pyramid) with two
+parallel rectangular faces and four trapezoidal faces. The rectangular
+faces are perpendicular to the z axis and their sides are parallel to
+the x and y axes. The bottom face (placed at negative z) has side
+lengths <code>x1</code>, <code>y1</code>, and the top face (placed at positive z) has side
+lengths <code>x2</code>, <code>y2</code>. Both faces are separated by a distance
+<code>z</code>. Within its frame of reference it is centred on the
+origin. Displacements and rotations can be applied with
+<a href="#placing-a-volume"><code>.place(material)</code></a>.</p>
+<h4 id="example-1"><a class="header" href="#example-1">Example</a></h4>
+<pre><code class="language-c++">G4Trd* trd = n4::trd(&quot;trd&quot;).xy1(10*cm).xy2(5*cm).z(50*cm).solid();
+</code></pre>
+<details class="g4">
+<summary></summary>
+<pre><code class="language-c++">auto cross_section_bottom = 10*cm, cross_section_top = 5*cm, z_length = 50*cm;
+G4Trd* trd = new G4Trd(&quot;trd&quot;, cross_section_bottom/2, cross_section_top/2, cross_section_bottom/2, cross_section_top/2, z_length/2);
+</code></pre>
+</details>
+<h4 id="methods-3"><a class="header" href="#methods-3">Methods</a></h4>
+<h5 id="full-length-methods-1"><a class="header" href="#full-length-methods-1">Full-length methods</a></h5>
+<p>All these methods take full (as opposed to half-) lengths:</p>
+<ul>
+<li><code>x1(lx)</code>, <code>x2(ly)</code>, <code>y1(lx)</code>, <code>y2(ly)</code>: set one dimension of one
+rectangular face. 1 Refers to the bottom face, while 2 refers to the
+top face.</li>
+<li><code>xy1(l)</code>, <code>xy2(l)</code>: set both dimensions of one face. 1 Refers to the
+bottom face, while 2 refers to the top face.</li>
+<li><code>z(l)</code>: set the distance between the two parallel faces.</li>
+</ul>
+<h5 id="half-length-methods-1"><a class="header" href="#half-length-methods-1">Half-length methods</a></h5>
+<p>All the aforementioned full-length methods have alternatives which
+accept half-lengths: <code>half_x1(lx/2)</code>, <code>half_xy2(lxy/2)</code>,
+<code>half_z(lz/2)</code>, etc.</p>
+<p>See the sections about setting <a href="#cartesian-lengths">Cartesian lengths</a> for more details.</p>
+<h3 id="n4cons"><a class="header" href="#n4cons"><code>n4::cons</code></a></h3>
+<p>Constructs <code>G4Cons</code>: truncated cone or cone section. Within its frame of reference, it is parallel to and centred on the z-axis; φ is measured counterclockwise WRT the x-axis when viewed from positive z. Displacements and rotations can be applied with <a href="#placing-a-volume"><code>.place(material)</code></a>.</p>
+<h4 id="examples-2"><a class="header" href="#examples-2">Examples</a></h4>
+<p>A solid truncated cone</p>
+<pre><code class="language-c++">G4Tubs* solid_cone = n4::tubs(&quot;solid_cone&quot;).r1(1*m).r2(2*m).z(3*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius_1 = 1*m, radius_2 = 2*m, z_length = 3*m;
+G4Cons* solid_cone = new G4Cons(&quot;solid_cone&quot;, 0, radius_1, 0, radius_2, z_length/2, 0, CLHEP::twopi);
+</code></pre>
+</details>
+<p>A hollow cone</p>
+<pre><code class="language-c++">G4Cone* hollow_cone = n4::cone(&quot;hollow_cone&quot;).r1(1*m).r2(2*cm).r_delta(10*cm).z(3*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius_1 = 1*m, radius_2 = 2*m, thickness = 10*cm, z_length = 3*m;
+G4Cons* hollow_cone = new G4Cons(&quot;hollow_cone&quot;, radius_1 - thickness, radius_1, radius_2 - thickness, radius_2, z_length/2, 0, CLHEP::twopi);
+</code></pre>
+</details>
+<p>A conical wedge</p>
+<pre><code class="language-c++">G4Cons* wedge = n4::cons(&quot;wedge&quot;).r1(1*m).r2(2*m).z(3*m).phi_start(20*deg).phi_end(30*deg).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius_1 = 1*m, radius_2 = 2*m, z_length = 3*m, start_phi = 20*deg, end_phi = 30*deg;
+G4Cons* wedge = new G4Cons(&quot;wedge&quot;, 0, radius_1, 0, radius_2, z_length/2, start_phi, end_phi - start_phi);
+</code></pre>
+</details>
+<h4 id="methods-4"><a class="header" href="#methods-4">Methods</a></h4>
+<ul>
+<li><code>z()</code></li>
+<li><code>half_z()</code></li>
+<li><code>r1_inner(l)</code>, <code>r1_delta(l)</code>, <code>r1(l)</code>: Sets the radial limits of the bottom (negative z) side</li>
+<li><code>r2_inner(l)</code>, <code>r2_delta(l)</code>, <code>r2(l)</code>: Sets the radial limits of the top    (positive z) side</li>
+<li><code>r_delta</code>: Sets both <code>r1_delta</code> and <code>r2_delta</code></li>
+<li><code>phi_start(a)</code></li>
+<li><code>phi_delta(a)</code></li>
+<li><code>phi_end(a)</code></li>
+</ul>
+<p>See the sections about setting <a href="#cartesian-lengths">Cartesian lengths</a>, <a href="#radial-length-r">radial lengths</a> and <a href="#azimuthal-angle-%CF%86">azimuthal angles</a> for more details.</p>
+<h2 id="obviously-missing-shapes"><a class="header" href="#obviously-missing-shapes">Obviously missing shapes</a></h2>
+<h3 id="n4torus"><a class="header" href="#n4torus"><code>n4::torus</code></a></h3>
+<h3 id="n4trap"><a class="header" href="#n4trap"><code>n4::trap</code></a></h3>
+<h3 id="n4para"><a class="header" href="#n4para"><code>n4::para</code></a></h3>
+<h3 id="n4polycone"><a class="header" href="#n4polycone"><code>n4::polycone</code></a></h3>
+<h3 id="n4elliptical_tube"><a class="header" href="#n4elliptical_tube"><code>n4::elliptical_tube</code></a></h3>
+<h3 id="n4ellipse"><a class="header" href="#n4ellipse"><code>n4::ellipse</code></a></h3>
+<h3 id="n4ellipsoid"><a class="header" href="#n4ellipsoid"><code>n4::ellipsoid</code></a></h3>
+<h3 id="n4elliptical_cone"><a class="header" href="#n4elliptical_cone"><code>n4::elliptical_cone</code></a></h3>
+<h3 id="n4tet-rahedron"><a class="header" href="#n4tet-rahedron"><code>n4::tet</code> (...rahedron)</a></h3>
+<h3 id="n4hype-rbolic-cone"><a class="header" href="#n4hype-rbolic-cone"><code>n4::hype</code> (...rbolic cone)</a></h3>
+<h3 id="n4twisted_"><a class="header" href="#n4twisted_"><code>n4::twisted_*</code></a></h3>
+<h3 id="n4breps-boundary-represented-solids"><a class="header" href="#n4breps-boundary-represented-solids"><code>n4::breps</code> Boundary Represented Solids</a></h3>
+<h3 id="n4tesselated_solids"><a class="header" href="#n4tesselated_solids"><code>n4::tesselated_solids</code></a></h3>
+<p>TODO: document envelope_of</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../reference/headers.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="../reference/n4-place.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../reference/headers.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="../reference/n4-place.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

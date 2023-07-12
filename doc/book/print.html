@@ -1,0 +1,1687 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>nain4</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="tutorials.html"><strong aria-hidden="true">2.</strong> Tutorials</a></li><li class="chapter-item expanded "><a href="how-to.html"><strong aria-hidden="true">3.</strong> How-To Guides</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="how-to/install-nix.html"><strong aria-hidden="true">3.1.</strong> How to install nix</a></li><li class="chapter-item expanded "><a href="how-to/enable-nain4-in-cmake.html"><strong aria-hidden="true">3.2.</strong> How to make nain4 available in a Geant4/cmake project</a></li><li class="chapter-item expanded "><a href="how-to/start-a-nain4-based-project.html"><strong aria-hidden="true">3.3.</strong> How start a nain4-based project</a></li><li class="chapter-item expanded "><a href="how-to/build-a-minimal-nain4-app.html"><strong aria-hidden="true">3.4.</strong> How to build a minimal nain4 app</a></li><li class="chapter-item expanded "><a href="how-to/upgrade-nain4.html"><strong aria-hidden="true">3.5.</strong> How to upgrade your nain4 dependency</a></li><li class="chapter-item expanded "><a href="how-to/generate_random_numbers.html"><strong aria-hidden="true">3.6.</strong> How to generate random numbers</a></li></ol></li><li class="chapter-item expanded "><a href="explanation.html"><strong aria-hidden="true">4.</strong> Explanation</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="explanation/placement-laziness-and-accumulation.html"><strong aria-hidden="true">4.1.</strong> Placement: laziness and accumulation</a></li><li class="chapter-item expanded "><a href="explanation/displacements-and-rotations-are-not-commutative.html"><strong aria-hidden="true">4.2.</strong> Displacements and rotations are not commutative</a></li><li class="chapter-item expanded "><a href="explanation/input-types-of-boolean-solids-methods.html"><strong aria-hidden="true">4.3.</strong> Input types of boolean solids' methods</a></li><li class="chapter-item expanded "><a href="explanation/process-hits-return-value.html"><strong aria-hidden="true">4.4.</strong> Return value of G4VSensitiveDetector::ProcessHits</a></li><li class="chapter-item expanded "><a href="explanation/why-nix.html"><strong aria-hidden="true">4.5.</strong> Why nix?</a></li></ol></li><li class="chapter-item expanded "><a href="reference.html"><strong aria-hidden="true">5.</strong> Reference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="reference/headers.html"><strong aria-hidden="true">5.1.</strong> Headers</a></li><li class="chapter-item expanded "><a href="reference/n4-shape.html"><strong aria-hidden="true">5.2.</strong> Constructing solids and logical volumes</a></li><li class="chapter-item expanded "><a href="reference/n4-place.html"><strong aria-hidden="true">5.3.</strong> Placement of physical volumes</a></li><li class="chapter-item expanded "><a href="reference/n4-boolean-solids.html"><strong aria-hidden="true">5.4.</strong> Constructing boolean solids</a></li><li class="chapter-item expanded "><a href="reference/managing-nain4-versions.html"><strong aria-hidden="true">5.5.</strong> Managing nain4 versions</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">nain4</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>This documentation is structured according to the <a href="https://diataxis.fr/">Diátaxis architecture</a>:</p>
+<div class="table-wrapper"><table><thead><tr><th></th><th>Study</th><th>Work</th></tr></thead><tbody>
+<tr><td>Practical</td><td><a href="./tutorials.html">Tutorials</a></td><td><a href="./how-to.html">How-To Guides</a></td></tr>
+<tr><td>Theoretical</td><td><a href="./explanation.html">Explanation</a></td><td><a href="./reference.html">Reference</a></td></tr>
+</tbody></table>
+</div><hr/>
+<h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p><code>nain4</code> has 3 main goals:</p>
+<ol>
+<li>
+<p>Enabling writing <code>Geant4</code> application code much more concisely: increasing the signal to noise ratio of <code>Geant4</code> code.</p>
+</li>
+<li>
+<p>Making it easy to write automated tests for <code>Geant4</code> application code.</p>
+</li>
+<li>
+<p>Promoting <code>Geant4</code> errors from run-time to compile-time.</p>
+</li>
+</ol>
+<h2 id="why-is-it-called-nain4"><a class="header" href="#why-is-it-called-nain4">Why is it called <code>nain4</code>?</a></h2>
+<p><em>Géant</em> and <em>nain</em> are French words:</p>
+<ul>
+<li><em>Géant</em>: giant (noun); giant, huge (adjectives)</li>
+<li><em>Nain</em>: dwarf, midget (nouns); dwarf, miniature (adjectives)</li>
+</ul>
+<p>With <code>nain4</code>, you can express in a tiny amount of code, that which would take huge amounts of code to express in plain <code>Geant4</code>; turn your gigantic source files into miniature ones, without loss of meaning.</p>
+<h2 id="how-should-i-pronounce-nain4"><a class="header" href="#how-should-i-pronounce-nain4">How should I pronounce <code>nain4</code>?</a></h2>
+<p>Rendered in the International Phonetic Alphabet, the pronunciation of the French  word <em>nain</em>, is \nɛ̃\.</p>
+<p>In English this is, very roughly, something like <em>nuh</em>. </p>
+<p>This sound tends to get drowned out and sound odd, in the middle of a sentence spoken
+in English, and many other languages. Therefore feel free to pronounce it
+<em>nano</em>. In Spanish, <em>enano</em> is especially appropriate.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tutorials"><a class="header" href="#tutorials">Tutorials</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-guides"><a class="header" href="#how-to-guides">How-To Guides</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-install-nix"><a class="header" href="#how-to-install-nix">How to install <code>nix</code></a></h1>
+<p><code>nain4</code> is distributed and its dependencies are managed using
+<code>nix</code>. The reasons for this are explained in <a href="how-to/../explanation/why-nix.html">why nix?</a>.</p>
+<h2 id="on-your-personal-computer"><a class="header" href="#on-your-personal-computer">On your personal computer</a></h2>
+<p>In order to install <code>nix</code> on your personal computer, simply use<sup class="footnote-reference"><a href="#1">1</a></sup></p>
+<pre><code class="language-bash">curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+</code></pre>
+<p>The installer will guide you through the installation steps. This
+installer requires super-user permissions (<code>sudo</code>).</p>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>From <a href="https://determinate.systems/posts/determinate-nix-installer">https://determinate.systems/posts/determinate-nix-installer</a></p>
+</div>
+<h2 id="on-a-hpc-cluster"><a class="header" href="#on-a-hpc-cluster">On a HPC cluster</a></h2>
+<p>The situation on HPC clusters is different, as we usually we don't
+have super-user permissions. At the moment the installation of nix in
+this kind of environments is not fully supported. In the meantime, you
+may want to check <a href="how-to/./enable-nain4-in-cmake.html">How to make nain4 available in a Geant4/cmake
+project</a></p>
+<h2 id="direnv"><a class="header" href="#direnv"><code>direnv</code></a></h2>
+<p>We <em>strongly</em> recommend using <a href="https://direnv.net/"><code>direnv</code></a> to automatically
+activate and deactivate development environments when entering or
+leaving a project directory.</p>
+<p>To use <code>direnv</code>:</p>
+<ol>
+<li>
+<p>Make sure that it is <a href="https://direnv.net/docs/installation.html">installed</a> on your system.
+To install <code>direnv</code> with <code>nix</code>, run</p>
+<pre><code class="language-bash">nix profile install nixpkgs#direnv
+</code></pre>
+</li>
+<li>
+<p>Don't forget to <a href="https://direnv.net/docs/hook.html">hook</a> it into your shell.
+Depending on which shell you are using, this will involve adding
+one of the following lines to the end of your shell configuration
+file:</p>
+<pre><code class="language-bash">eval &quot;$(direnv hook bash)&quot;  # in ~/.bashrc
+eval &quot;$(direnv hook zsh)&quot;   # in ~/.zshrc
+eval `direnv hook tcsh`     # in ~/.cshrc
+</code></pre>
+</li>
+</ol>
+<p>The first time <code>direnv</code> wants to perform an automatic switch in a new context
+(combination of directory + <code>.envrc</code> contents), it asks you for permission to do
+so. You can give it permission by typing <code>direnv allow</code> in the shell. The
+message that <code>direnv</code> gives you at this stage is pretty clear, but it's usually
+written in red, thus you might get the mistaken impression that there is an
+error.</p>
+<p>Now, every time you enter the directory you will see a message like:</p>
+<pre><code class="language-bash">direnv: loading .envrc
+direnv export: +FOO +BAR +BAZ ...
+</code></pre>
+<p>and when you exit</p>
+<pre><code class="language-bash">direnv: unloading
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-make-nain4-available-in-a-geant4cmake-project"><a class="header" href="#how-to-make-nain4-available-in-a-geant4cmake-project">How to make nain4 available in a Geant4/cmake project</a></h1>
+<p>There are 3 options to include nain4 in your project:</p>
+<ol>
+<li>Adding it as an external project (recommended)</li>
+<li>Adding it as a subdirectory in your project</li>
+<li>Creating an independent installation</li>
+</ol>
+<h2 id="adding-nain4-as-a-external-project"><a class="header" href="#adding-nain4-as-a-external-project">Adding Nain4 as a external project</a></h2>
+<p>Add this snippet to your CMakeLists.txt:</p>
+<pre><code>include(FetchContent)
+
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE BOOL &quot;Cache package contents to avoid unnecessary downloads&quot;)
+
+FetchContent_Declare(
+  nain4
+  GIT_REPOSITORY https://github.com/${USERNAME}/nain4.git
+  GIT_TAG        ${COMMIT_HASH}
+  # make sure that no other nain4 installation is used
+  OVERRIDE_FIND_PACKAGE
+  SOURCE_SUBDIR nain4/src
+)
+
+FetchContent_MakeAvailable(nain4)
+</code></pre>
+<p>The value given to <code>GIT_TAG</code> may be a replaced with a branch name (<code>origin/&lt;branch-name&gt;</code>) or a commit hash. When opting for the 'branch name' option, it's important to be aware of the potential risk of losing reproducibility. With each execution of CMake, the library may be updated to a different state, introducing changes that can impact the reproducibility of your project. This can lead to compilation or runtime errors, making it challenging to recreate specific build or runtime environments. Thus, we advise to use a commit hash or a tag instead.</p>
+<h2 id="adding-nain4-as-a-subdirectory-to-your-project"><a class="header" href="#adding-nain4-as-a-subdirectory-to-your-project">Adding Nain4 as a subdirectory to your project</a></h2>
+<p>Clone the Nain4 repository into your own project or create a symbolic link to the clone. Then simply add</p>
+<pre><code>add_subdirectory(nain4/nain4/src)
+</code></pre>
+<p>to your CMakeLists.txt.</p>
+<h2 id="install-nain4-independently"><a class="header" href="#install-nain4-independently">Install Nain4 independently</a></h2>
+<pre><code>git clone https://github.com/jacg/nain4.git
+cd nain4
+cmake [-DCMAKE_INSTALL_PREFIX=/path/to/install/] -S nain4 -B build
+cmake --build build --target install
+</code></pre>
+<p>Unless the option <code>CMAKE_INSTALL_PREFIX</code> is speficied, the files will be installed in <code>/path/to/nain4/install</code>.
+Then add to your CMakeLists.txt:</p>
+<pre><code>set(nain4_DIR &quot;$ENV{NAIN4_INSTALL}/lib/cmake/nain4/&quot;)
+
+find_package(nain4 REQUIRED)
+</code></pre>
+<p>Make sure you have <code>NAIN4_INSTALL</code> set in your shell environment before running <code>cmake</code> or replace it by <code>/path/to/install/</code> in the CMakeLists.txt file.</p>
+<h2 id="linking-to-nain4"><a class="header" href="#linking-to-nain4">Linking to Nain4</a></h2>
+<p>Regardless of the chosen option, you will also need to link the library to each target like:</p>
+<pre><code>target_link_libraries(
+client_exe
+PRIVATE
+nain4
+${Geant4_LIBRARIES}
+)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-start-a-nain4-based-project"><a class="header" href="#how-to-start-a-nain4-based-project">How to start a nain4-based project</a></h1>
+<p>The following instructions assume that you have <code>nix</code> installed. If
+not, please see <a href="how-to/./install-nix.html">Install nix</a>.</p>
+<h2 id="setting-up-a-new-nain4-project"><a class="header" href="#setting-up-a-new-nain4-project">Setting up a new <code>nain4</code> project</a></h2>
+<p>In order to create a <code>nain4</code>-based project use <code>bootstrap-client-project</code> like this:</p>
+<pre><code class="language-bash">nix run github:jacg/nain4#bootstrap-client-project path/to/your/project your-chosen-name &quot;one line project description&quot;
+</code></pre>
+<p>where</p>
+<ul>
+<li><code>path/to/your/project</code> should not exist before you run the command.</li>
+<li><code>your-chosen-name</code> should be replaced with a name of your choice: this should
+be a valid identifier in both <code>bash</code> and the <code>Nix</code> language, so, roughly
+speaking, it should not contain any spaces, slashes or other dodgy characters.
+It will be used to name various things within your project.</li>
+<li><code>&quot;one line project description&quot;</code> should be replaced with some text of your
+choice. Don't forget the quotes.</li>
+</ul>
+<h2 id="basic-usage"><a class="header" href="#basic-usage">Basic usage</a></h2>
+<ul>
+<li><code>just run -n 100</code>: run the application in batch mode with <code>/run/beamOn 100</code></li>
+<li><code>just run -g</code>: run the application with the interactive GUI
+WARNING: unless you are running on
+<ul>
+<li><code>NixOS</code></li>
+<li><code>macOS</code> this will probably take a long time the first time you try it, as it
+will download and compile <code>nixGL</code> which is used to detect graphics hardware
+automatically and guarantee the presence of the required graphics drivers. On
+subsequent runs, this overhead will disappear.</li>
+</ul>
+</li>
+<li>TODO: describe the early/late CLI options</li>
+<li>TODO: describe the macro path CLI options</li>
+</ul>
+<h2 id="project-contents"><a class="header" href="#project-contents">Project contents</a></h2>
+<p>Your bootstrapped project will contain the following files</p>
+<pre><code>path/to/your/project
+├── execute-with-nixgl-if-needed.sh
+├── flake
+│  └── outputs.nix
+├── flake.lock
+├── flake.nix
+├── justfile
+├── macs
+│  ├── early-cli.mac
+│  ├── early-hard-wired.mac
+│  ├── late-cli.mac
+│  ├── late-hard-wired.mac
+│  ├── run.mac
+│  ├── vis.mac
+│  └── vis2.mac
+├── run-each-test-in-separate-process.sh.in
+├── src
+│  ├── LXe.cc
+│  ├── LXe.hh
+│  ├── meson.build
+│  └── n4app.cc
+└── test
+   ├── catch2-main-test.cc
+   ├── meson.build
+   ├── test-catch2-demo.cc
+   └── test-LXe.cc
+</code></pre>
+<ul>
+<li>
+<p>TODO: discuss the contents of <code>src</code> and <code>test</code></p>
+</li>
+<li>
+<p>The <code>macs</code> directory contains Geant4 macro files, used to provide
+some app configuration parameters at runtime.</p>
+<ul>
+<li><code>macs/run.mac</code> controls aspects of the simulation</li>
+<li><code>macs/vis.mac</code> controls aspects of visulisation (only used in interactive mode)</li>
+</ul>
+</li>
+<li>
+<p>The <code>justfile</code> file defines some recipes for easier usage of the
+application.</p>
+</li>
+<li>
+<p>The <code>flake</code> directory and <code>flake.lock</code>, <code>flake.nix</code> files describe
+the dependency tree for your project. In most cases, you will not
+need to read or modify them.</p>
+</li>
+</ul>
+<h2 id="make-it-your-project"><a class="header" href="#make-it-your-project">Make it <em>your</em> project</a></h2>
+<p>Because this is a template, there are a number of variables that take
+a generic name. We encourage you to change them to represent something
+meaningfull to you. You can find these variables by running</p>
+<pre><code class="language-bash">grep -Rn CHANGEME .
+</code></pre>
+<p>on the root folder of your project. You will see an output with
+several lines like</p>
+<pre><code>[file]:[line-number]:#CHANGEME: [description]
+</code></pre>
+<p>Open those files with your favourite text editor and rename those
+variables.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-create-a-minimal-nain4-app"><a class="header" href="#how-to-create-a-minimal-nain4-app">How to create a minimal nain4 app</a></h1>
+<h2 id="building-the-app"><a class="header" href="#building-the-app">Building the app</a></h2>
+<p>One of the most basic examples of a nain4 app can be found in <code>templates/basic/src/n4app.cc</code>. Here is the full file:</p>
+<pre><code class="language-c++">#include &lt;n4-all.hh&gt;
+
+#include &lt;G4GenericMessenger.hh&gt;
+
+#include &lt;G4PrimaryParticle.hh&gt;
+#include &lt;G4String.hh&gt;
+#include &lt;G4SystemOfUnits.hh&gt;   // physical units such as `m` for metre
+#include &lt;G4Event.hh&gt;           // needed to inject primary particles into an event
+#include &lt;G4Box.hh&gt;             // for creating shapes in the geometry
+#include &lt;G4Sphere.hh&gt;          // for creating shapes in the geometry
+#include &lt;FTFP_BERT.hh&gt;         // our choice of physics list
+#include &lt;G4RandomDirection.hh&gt; // for launching particles in random directions
+
+
+#include &lt;G4ThreeVector.hh&gt;
+#include &lt;cstdlib&gt;
+
+struct my {
+  G4double       straw_radius{0.1 * m};
+  G4double      bubble_radius{0.2 * m};
+  G4double      socket_rot   {-90 * deg};
+  G4String      particle_name{&quot;geantino&quot;};
+  G4double      particle_energy{511 * keV};
+  G4ThreeVector particle_dir {};
+};
+
+auto my_generator(const my&amp; my) {
+  return [&amp;](G4Event* event) {
+    auto particle_type = n4::find_particle(my.particle_name);
+    auto vertex = new G4PrimaryVertex();
+    auto r = my.particle_dir.mag2() &gt; 0 ? my.particle_dir : G4RandomDirection();
+    vertex -&gt; SetPrimary(new G4PrimaryParticle(
+                           particle_type,
+                           r.x(), r.y(), r.z(),
+                           my.particle_energy
+                         ));
+    event  -&gt; AddPrimaryVertex(vertex);
+  };
+}
+
+n4::actions* create_actions(my&amp; my, unsigned&amp; n_event) {
+  auto my_stepping_action = [&amp;] (const G4Step* step) {
+    auto pt = step -&gt; GetPreStepPoint();
+    auto volume_name = pt -&gt; GetTouchable() -&gt; GetVolume() -&gt; GetName();
+    if (volume_name == &quot;straw&quot; || volume_name == &quot;bubble&quot;) {
+      auto pos = pt -&gt; GetPosition();
+      std::cout &lt;&lt; volume_name &lt;&lt; &quot; &quot; &lt;&lt; pos &lt;&lt; std::endl;
+    }
+  };
+
+  auto my_event_action = [&amp;] (const G4Event*) {
+     n_event++;
+     std::cout &lt;&lt; &quot;end of event &quot; &lt;&lt; n_event &lt;&lt; std::endl;
+  };
+
+  return (new n4::        actions{my_generator(my)  })
+ -&gt; set( (new n4::   event_action{                  }) -&gt; end(my_event_action) )
+ -&gt; set(  new n4::stepping_action{my_stepping_action});
+}
+
+auto my_geometry(const my&amp; my) {
+  auto r_bub = my.bubble_radius;
+  auto r_str = my.straw_radius;
+  auto water  = n4::material(&quot;G4_WATER&quot;);
+  auto air    = n4::material(&quot;G4_AIR&quot;);
+  auto steel  = n4::material(&quot;G4_STAINLESS-STEEL&quot;);
+  auto world  = n4::box(&quot;world&quot;).cube(2*m).x(3*m).volume(water);
+
+  n4::sphere(&quot;bubble&quot;).r(r_bub)         .place(air).in(world).at  (1.3*m, 0.8*m, 0.3*m).now();
+  n4::tubs  (&quot;straw&quot; ).r(r_str).z(1.9*m).place(air).in(world).at_x(0.2*m              ).now();
+
+  n4       ::sphere(&quot;socket-cap&quot; ).r(0.3*m).phi_delta(180*deg)
+    .sub(n4::box   (&quot;socket-hole&quot;).cube(0.4*m))
+    .name(&quot;socket&quot;)
+    .place(steel).in(world).rotate_x(my.socket_rot).at(1*m, 0, 0.7*m).now();
+
+  return n4::place(world).now();
+}
+
+int main(int argc, char* argv[]) {
+  unsigned n_event = 0;
+
+  my my;
+
+  G4int physics_verbosity = 0;
+
+  // The trailing slash after '/my_geometry' is CRUCIAL: without it, the
+  // messenger violates the principle of least surprise.
+  auto messenger = new G4GenericMessenger{nullptr, &quot;/my/&quot;, &quot;docs: bla bla bla&quot;};
+  messenger -&gt; DeclarePropertyWithUnit(&quot;straw_radius&quot;      , &quot;m&quot;  , my. straw_radius  );
+  messenger -&gt; DeclarePropertyWithUnit(&quot;bubble_radius&quot;     , &quot;m&quot;  , my.bubble_radius  );
+  messenger -&gt; DeclarePropertyWithUnit(&quot;socket_rot&quot;        , &quot;deg&quot;, my.socket_rot     );
+  messenger -&gt; DeclarePropertyWithUnit(&quot;particle_energy&quot;   , &quot;keV&quot;, my.particle_energy);
+  messenger -&gt; DeclareProperty        (&quot;particle&quot;          ,        my.particle_name  );
+  messenger -&gt; DeclareProperty        (&quot;particle_direction&quot;,        my.particle_dir   );
+  messenger -&gt; DeclareProperty        (&quot;physics_verbosity&quot; ,        physics_verbosity );
+
+  n4::run_manager::create()
+    .ui(&quot;CHANGEME-EXE&quot;, argc, argv)
+    .macro_path(&quot;macs&quot;)
+    .apply_command(&quot;/my/straw_radius 0.5 m&quot;)
+    .apply_early_macro(&quot;early-hard-wired.mac&quot;)
+    .apply_cli_early() // CLI --early executed at this point
+    // .apply_command(...) // also possible after apply_early_macro
+
+    .physics&lt;FTFP_BERT&gt;(physics_verbosity)
+    .geometry([&amp;] { return my_geometry(my); })
+    .actions(create_actions(my, n_event))
+
+    .apply_command(&quot;/my/particle e-&quot;)
+    .apply_late_macro(&quot;late-hard-wired.mac&quot;)
+    .apply_cli_late() // CLI --late executed at this point
+    // .apply_command(...) // also possible after apply_late_macro
+
+    .run();
+
+
+
+  // Important! physics list has to be set before the generator!
+
+}
+</code></pre>
+<p>Now, let's split it into bite-sized portions. First we create a simple program that reads the number of events from CLI:</p>
+<pre><code class="language-c++">int main(int argc, char* argv[]) {
+}
+</code></pre>
+<p>In order to run a simulation we need to create a run manager:</p>
+<pre><code class="language-c++">  n4::run_manager::create()
+    .ui(&quot;CHANGEME-EXE&quot;, argc, argv)
+    .macro_path(&quot;macs&quot;)
+    .apply_command(&quot;/my/straw_radius 0.5 m&quot;)
+    .apply_early_macro(&quot;early-hard-wired.mac&quot;)
+    .apply_cli_early() // CLI --early executed at this point
+    // .apply_command(...) // also possible after apply_early_macro
+
+    .physics&lt;FTFP_BERT&gt;(physics_verbosity)
+    .geometry([&amp;] { return my_geometry(my); })
+    .actions(create_actions(my, n_event))
+
+    .apply_command(&quot;/my/particle e-&quot;)
+    .apply_late_macro(&quot;late-hard-wired.mac&quot;)
+    .apply_cli_late() // CLI --late executed at this point
+    // .apply_command(...) // also possible after apply_late_macro
+
+    .run();
+
+
+</code></pre>
+<p>The run manager needs to be initialized with 3 attributes:</p>
+<ul>
+<li>A physics list</li>
+<li>A geometry</li>
+<li>A set of actions</li>
+</ul>
+<p>To build the action set we need to provide a primary generator action. Other actions are optional.
+Note that the physics list must be instantiated and given to the run manager before the primary generator is instantiated. We provide the run manager with these attributes:</p>
+<pre><code class="language-c++">  // Important! physics list has to be set before the generator!
+</code></pre>
+<p>here, <code>my_geometry</code>, and <code>my_generator</code> are the two functions we need to provide to run our simulation:</p>
+<pre><code class="language-c++">auto my_geometry(const my&amp; my) {
+  auto r_bub = my.bubble_radius;
+  auto r_str = my.straw_radius;
+  auto water  = n4::material(&quot;G4_WATER&quot;);
+  auto air    = n4::material(&quot;G4_AIR&quot;);
+  auto steel  = n4::material(&quot;G4_STAINLESS-STEEL&quot;);
+  auto world  = n4::box(&quot;world&quot;).cube(2*m).x(3*m).volume(water);
+
+  n4::sphere(&quot;bubble&quot;).r(r_bub)         .place(air).in(world).at  (1.3*m, 0.8*m, 0.3*m).now();
+  n4::tubs  (&quot;straw&quot; ).r(r_str).z(1.9*m).place(air).in(world).at_x(0.2*m              ).now();
+
+  n4       ::sphere(&quot;socket-cap&quot; ).r(0.3*m).phi_delta(180*deg)
+    .sub(n4::box   (&quot;socket-hole&quot;).cube(0.4*m))
+    .name(&quot;socket&quot;)
+    .place(steel).in(world).rotate_x(my.socket_rot).at(1*m, 0, 0.7*m).now();
+
+  return n4::place(world).now();
+}
+
+auto my_generator(const my&amp; my) {
+  return [&amp;](G4Event* event) {
+    auto particle_type = n4::find_particle(my.particle_name);
+    auto vertex = new G4PrimaryVertex();
+    auto r = my.particle_dir.mag2() &gt; 0 ? my.particle_dir : G4RandomDirection();
+    vertex -&gt; SetPrimary(new G4PrimaryParticle(
+                           particle_type,
+                           r.x(), r.y(), r.z(),
+                           my.particle_energy
+                         ));
+    event  -&gt; AddPrimaryVertex(vertex);
+  };
+}
+</code></pre>
+<p>and <code>create_actions</code> is defined as:</p>
+<pre><code class="language-c++">n4::actions* create_actions(my&amp; my, unsigned&amp; n_event) {
+  auto my_stepping_action = [&amp;] (const G4Step* step) {
+    auto pt = step -&gt; GetPreStepPoint();
+    auto volume_name = pt -&gt; GetTouchable() -&gt; GetVolume() -&gt; GetName();
+    if (volume_name == &quot;straw&quot; || volume_name == &quot;bubble&quot;) {
+      auto pos = pt -&gt; GetPosition();
+      std::cout &lt;&lt; volume_name &lt;&lt; &quot; &quot; &lt;&lt; pos &lt;&lt; std::endl;
+    }
+  };
+
+  auto my_event_action = [&amp;] (const G4Event*) {
+     n_event++;
+     std::cout &lt;&lt; &quot;end of event &quot; &lt;&lt; n_event &lt;&lt; std::endl;
+  };
+
+  return (new n4::        actions{my_generator(my)  })
+ -&gt; set( (new n4::   event_action{                  }) -&gt; end(my_event_action) )
+ -&gt; set(  new n4::stepping_action{my_stepping_action});
+}
+</code></pre>
+<p>With this, our setup is ready, and we can start the simulation with</p>
+<pre><code class="language-c++">
+</code></pre>
+<p>Don't forget to add the relevant includes</p>
+<pre><code class="language-c++">#include &lt;n4-all.hh&gt;
+
+#include &lt;G4GenericMessenger.hh&gt;
+
+#include &lt;G4PrimaryParticle.hh&gt;
+#include &lt;G4String.hh&gt;
+#include &lt;G4SystemOfUnits.hh&gt;   // physical units such as `m` for metre
+#include &lt;G4Event.hh&gt;           // needed to inject primary particles into an event
+#include &lt;G4Box.hh&gt;             // for creating shapes in the geometry
+#include &lt;G4Sphere.hh&gt;          // for creating shapes in the geometry
+#include &lt;FTFP_BERT.hh&gt;         // our choice of physics list
+#include &lt;G4RandomDirection.hh&gt; // for launching particles in random directions
+
+
+#include &lt;G4ThreeVector.hh&gt;
+#include &lt;cstdlib&gt;
+</code></pre>
+<h2 id="compiling-the-app"><a class="header" href="#compiling-the-app">Compiling the app</a></h2>
+<p>The app comes with its own <code>CMakeLists.txt</code>:</p>
+<pre><code class="language-cmake">{{#include ../../../examples/00-basic/CMakeLists.txt:full_file}}
+</code></pre>
+<p>This contains the following bits. First, we have the project initialization:</p>
+<pre><code class="language-cmake">{{#include ../../../examples/00-basic/CMakeLists.txt:project_setup}}
+</code></pre>
+<p>It specifies the minimum cmake version, defines the project name and some lines necessary for code analysis in IDEs.
+Next, we include <code>nain4</code> and <code>Geant4</code> in our project:</p>
+<pre><code class="language-cmake">{{#include ../../../examples/00-basic/CMakeLists.txt:include_nain4_geant4}}
+</code></pre>
+<p>Note that we have chosen to use an existing installation of <code>nain4</code> so this example runs out of the box when run within <code>nain4</code>. If you were to copy this example and run it elsewhere, make sure to check <a href="how-to/./enable-nain4-in-cmake.html">How to make nain4 available in a Geant4/cmake project</a>.</p>
+<p>Finally, we create an executable file and link it to the relevant libraries.</p>
+<pre><code class="language-cmake">{{#include ../../../examples/00-basic/CMakeLists.txt:create_exe_and_link}}
+</code></pre>
+<p>To compile the app we <code>cd</code> into <code>00-basic</code> and run <code>just compile-app</code> or</p>
+<pre><code>cmake -S . -B build &amp;&amp; cmake --build build
+</code></pre>
+<h2 id="running-the-app"><a class="header" href="#running-the-app">Running the app</a></h2>
+<p>To run this app type <code>just run-app &lt;number of events&gt;</code> (after compilation) from the <code>00-basic</code> directory. You can also achieve the same typing <code>./build/n4-00-basic &lt;number of events&gt;</code>.</p>
+<p>As this simulation is extremelly basic, it doesn't produce anything. You will only see a Geant4 header.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-upgrade-your-nain4-dependency"><a class="header" href="#how-to-upgrade-your-nain4-dependency">How to upgrade your nain4 dependency</a></h1>
+<p>To upgrade <code>nain4</code> to the lastest version available on <code>master</code>:</p>
+<ol>
+<li>
+<p><code>nix flake lock --update-input nain4</code></p>
+<p>This operation modifies <code>flake.lock</code>. Commit these modifications, either right now, or after step 3.</p>
+</li>
+<li>
+<p><code>just clean</code></p>
+<p>This ensures that there are no old build products which still use the old version. <font size=-1>(Hopefully this will no longer be necessary once <code>nain4</code> migrates its build infrastructure from <code>cmake</code> to <code>meson</code>.)</font></p>
+</li>
+<li>
+<p>Build, run and test the behaviour of your project, and fix any problems caused by incompatibility of your code with the new version of <code>nain4</code>.</p>
+</li>
+<li>
+<p>Commit these changes to your repository. Don't forget to commit the modified <code>flake.lock</code>; this is important in order to ensure that every checkout of a given commit in your repository uses exactly the same version of dependencies and that the versions of the dependencies are compatible with the version of your code.</p>
+</li>
+</ol>
+<h2 id="using-other-versions-of-nain4"><a class="header" href="#using-other-versions-of-nain4">Using other versions of <code>nain4</code></a></h2>
+<p>It is possible to use versions of <code>nain4</code> other than those available on the official <code>master</code> branch. See <a href="how-to/../reference/managing-nain4-versions.html">here</a> for details.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="how-to-generate-random-numbers"><a class="header" href="#how-to-generate-random-numbers">How to generate random numbers</a></h1>
+<p><code>nain4</code> offers a range of utilities to generate random numbers. This includes
+scalars, tuples and 3-vectors. All these methods are declared in the
+<a href="how-to/../reference/headers.html">header</a> <code>&lt;n4-random.hh&gt;</code> which is transitively
+included by <code>&lt;n4-utils.hh&gt;</code>. They are gathered in the namespace <code>nain4::random</code>.</p>
+<h2 id="scalars"><a class="header" href="#scalars">Scalars</a></h2>
+<p>The methods described in this section generate a single number.</p>
+<h3 id="continuous-distributions"><a class="header" href="#continuous-distributions">Continuous distributions</a></h3>
+<ul>
+<li><code>uniform()</code>: generates a random floating point number homogeneously
+distributed in the range [0, 1).</li>
+<li><code>uniform(low, high)</code>: generates a random floating point number
+homogeneously distributed in the range [<code>low</code>, <code>high</code>).</li>
+<li><code>uniform_half_width(hw)</code>: generates a random floating point number
+homogeneously distributed in the range [<code>-hw</code>, <code>hw</code>).</li>
+<li><code>uniform_width(w)</code>: generates a random floating point number
+homogeneously distributed in the range [<code>-w/2</code>, <code>w/2</code>).</li>
+</ul>
+<h3 id="discrete-distributions"><a class="header" href="#discrete-distributions">Discrete distributions</a></h3>
+<ul>
+<li><code>biased_coin(p_true)</code>: generates a random boolean with probability
+<code>p_true</code> of being <code>true</code>.</li>
+<li><code>fair_die(n_sides)</code>: generates a random unsigned integer in the
+range [0, <code>n_sides - 1</code>] with equal probability.</li>
+<li><code>gen = biased_choice(weights)</code>: provides a generator of unsigned integers
+in the range [0, <code>weights.size() - 1</code>] with given <code>weights</code>. The
+generator must be called to obtain a number: <code>random_number = gen()</code>.</li>
+</ul>
+<h2 id="tuples"><a class="header" href="#tuples">Tuples</a></h2>
+<ul>
+<li><code>random_in_disc(r)</code>: generates a pair of floating point numbers <code>{x, y}</code> that satisfy <code>x^2 + y^2 &lt;= r^2</code>.</li>
+</ul>
+<h2 id="3-vectors"><a class="header" href="#3-vectors">3-vectors</a></h2>
+<p>The methods described in this section generate <code>G4ThreeVector</code>s.</p>
+<ul>
+<li><code>random_in_sphere(r)</code>: generates a vector of floating point numbers <code>{x, y, z}</code> that satisfy <code>x^2 + y^2 + z^2 &lt;= r^2</code>.</li>
+</ul>
+<h3 id="directions"><a class="header" href="#directions">Directions</a></h3>
+<p><code>nain4</code> provides the <code>direction</code> builder to help generate random directions. By
+default this tool generates unit vectors distributed isotropically in 4π, but it
+can be configured to restrict the generation to certain directions.</p>
+<p>The general usage pattern is</p>
+<pre><code class="language-c++">auto generator = n4::random::direction{}.&lt;optional extra specifications&gt;;
+auto one_random_unit_vector = generator.get();
+</code></pre>
+<p>The <code>&lt;optional extra specifications&gt;</code> are described below. <code>θ</code> (theta) is the
+polar angle measured with respect to the positive z-axis and φ (phi) is the
+azimuthal angle with <code>φ=0</code> in the plane of the positive x-axis and increasing
+towards the positive y-axis, unless the axes are re-oriented with
+<code>.rotate_{x,y,z}</code>.</p>
+<p>The following specifiers (with hopefully self-explanatory names) restrict the angles of the generated directions</p>
+<ul>
+<li>
+<p><code>{min,max}_theta(&lt;angle in radians&gt;)</code> or <code>(&lt;angle in degrees&gt; * deg)</code></p>
+<ul>
+<li>range: <code>[0, π]</code> or <code>[0, 180°]</code></li>
+</ul>
+</li>
+<li>
+<p><code>{min,max}_cos_theta(&lt;ratio&gt;)</code> range: <code>[-1, 1]</code></p>
+</li>
+<li>
+<p><code>{min,max}_phi(&lt;angle in radians&gt;)</code> or <code>(&lt;angle in degrees&gt; * deg)</code></p>
+<ul>
+<li>range: <code>[0, 2π]</code> or <code>[0, 360°]</code></li>
+</ul>
+</li>
+<li>
+<p><code>rotate_{x,y,z}(&lt;angle in radians&gt;)</code> or <code>(&lt;angle in degrees&gt; * deg)</code></p>
+<p>rotation around the specified axis. range: <code>[0, 2π]</code> or <code>[0, 360°]</code></p>
+</li>
+<li>
+<p><code>rotate(&lt;G4RotationMatrix&gt;)</code></p>
+</li>
+<li>
+<p><code>bidirectional()</code>: accept both the current selection and its
+reflection in the origin.</p>
+</li>
+<li>
+<p><code>exclude()</code>: invert the selection. Generates the complement of the selected
+criteria. Bear in mind that this method is more computationally expensive as
+it needs to generate directions until the result is not rejected. Very
+restricted directionalities are discouraged.</p>
+</li>
+</ul>
+<h4 id="examples"><a class="header" href="#examples">Examples</a></h4>
+<p>TODO: add pictures</p>
+<ul>
+<li>
+<p>Isotropic emission: <code>n4::direction{}</code></p>
+</li>
+<li>
+<p>Opening angle around the positive z axis: <code>n4::direction().max_theta(theta)</code></p>
+</li>
+<li>
+<p>Opening angle around the positive x axis: <code>n4::direction().max_theta(theta).rotate_y(90 * deg)</code></p>
+</li>
+<li>
+<p>Only one octant:
+<code>n4::direction().min_cos_theta(0).min_phi(CLHEP::halfpi).max_phi(CLHEP::pi)</code></p>
+</li>
+<li>
+<p>Back-to-back beams around the positive z axis with some opening angle:
+<code>n4::direction().max_theta(theta).bidirectional()</code></p>
+</li>
+<li>
+<p>Isotropic except for some small angle around the negative z-axis:
+<code>n4::direction().min_theta(7*CLHEP::pi/8).exclude()</code></p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="explanation"><a class="header" href="#explanation">Explanation</a></h1>
+<ul>
+<li>Functions better than classes</li>
+<li>Closures</li>
+<li>Always prefer <code>std::vector</code> over C-arrays.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="placement-laziness-and-accumulation"><a class="header" href="#placement-laziness-and-accumulation">Placement: Laziness and Accumulation</a></h1>
+<p>The auxiliary placement methods belong to an object of type <code>n4::place</code>.
+Instances of this type can accumulate state.</p>
+<p>This can be useful for reducing repetition: compare the following two code
+samples, which produce identical results</p>
+<pre><code class="language-c++">// Store complicated configuration
+auto place_box = n4::box(&quot;box&quot;).cube(1*m).place(gold).in(world).at_x(1*m);
+// Reuse it many times, emphasizing what differs: rot_z(angle) and copy_no(N)
+place_box.clone().rot_z(23*deg).copy_no(1).now();
+place_box.clone().rot_z(54*deg).copy_no(2).now();
+place_box.clone().rot_z(91*deg).copy_no(3).now();
+</code></pre>
+<pre><code class="language-c++">// Repeat complicated configuration explicitly: signal lost in the noise 
+n4::box(&quot;box&quot;).cube(1*m).place(gold).in(world).at_x(1*m).copy_no(1).rot_z(23*deg).now();
+n4::box(&quot;box&quot;).cube(1*m).place(gold).in(world).at_x(1*m).copy_no(2).rot_z(54*deg).now();
+n4::box(&quot;box&quot;).cube(1*m).place(gold).in(world).at_x(1*m).copy_no(3).rot_z(91*deg).now();
+</code></pre>
+<p>However, note the presence of <code>.clone()</code> on each line of the first sample.
+Without it, the effect of each call to <code>rot_z</code> would be accumulated in
+<code>place_box</code></p>
+<pre><code class="language-c++">place_box = n4::box(&quot;box&quot;).cube(1*m).place(copper).in(world);
+
+// Place boxes at 1, 2 and 3 metres
+for (auto k : {1,2,3}) { place_box.clone().at_x(k*m).now(); }
+// Place boxes at 1, 3 and 6 metres
+for (auto k : {1,2,3}) { place_box        .at_x(k*m).now(); }
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="displacements-and-rotations-are-not-commutative"><a class="header" href="#displacements-and-rotations-are-not-commutative">Displacements and rotations are not commutative</a></h1>
+<p>TODO</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="input-types-for-boolean-solids-methods"><a class="header" href="#input-types-for-boolean-solids-methods">Input types for boolean solids' methods</a></h1>
+<p><code>nain4</code> provides a collection of methods to create boolean solids
+described in <a href="explanation/../reference/n4-boolean-solids.html">n4 boolean solids</a>. These
+functions accept either a <code>n4::shape</code> or <code>G4VSolid*</code>. However, when
+building a geometry, it's fairly easy to get confused with the
+different stages of the creation of components (<code>solid</code>,
+<code>(logical)volume</code>, <code>place(ment)</code>). This can produce errors that might
+be difficult to understand. <code>nain4</code> attempts to clarify them
+by providing explicit compile-time messages for the most
+likely cases. Here we describe all these errors and try to give a
+through explanation of their causes and how to handle them.</p>
+<p>For this explanation we will use the addition of two boxes as an
+example, but the rationale does not depend on the shapes or the
+methods used. Here is the definition of the boxes:</p>
+<pre><code class="language-c++">n4::box box1 = n4::box(&quot;box1&quot;).cube(1*m);
+n4::box box2 = n4::box(&quot;box2&quot;).cube(2*m);
+G4Box*  box3 = new G4Box{&quot;box3&quot;, 3*m, 3*m, 3*m};
+</code></pre>
+<h2 id="the-correct-syntax"><a class="header" href="#the-correct-syntax">The correct syntax</a></h2>
+<p>For reference, here are three possible options to create a union
+solid from these boxes:</p>
+<pre><code class="language-c++">box1.add(box2        ); // OK
+box1.add(box2.solid()); // OK
+box1.add(box3        ); // OK
+</code></pre>
+<p>Here, <code>add</code> could be replaced with its alias <code>join</code> to produce the same
+result. Also, notice that the union solid is not created until
+<code>.solid()</code>, <code>volume(...)</code> or <code>.place(...)</code> is called on the result of
+<code>add(...)</code>.</p>
+<h2 id="possible-errors"><a class="header" href="#possible-errors">Possible errors</a></h2>
+<p>All the errors share the same message, with a hint of what the type
+of the incorrect input is. The error message looks like this:</p>
+<pre><code>[n4::boolean_shape::&lt;METHOD&gt;]
+Attempted to create a boolean shape using &lt;TYPE_HINT&gt;.
+Only n4::shape and G4VSolid* are accepted.
+For more details, please check https://jacg.github.io/nain4/explanation/boolean_solid_input_types.md
+</code></pre>
+<p>where <code>&lt;METHOD&gt;</code> indicates the method which generated the error (this
+might help in the case of chained operations) and <code>&lt;TYPE_HINT&gt;</code>
+indicates the input type that gave rise to the error.</p>
+<h3 id="type_hint--a-g4logicalvolume"><a class="header" href="#type_hint--a-g4logicalvolume"><code>&lt;TYPE_HINT&gt; = a G4LogicalVolume</code></a></h3>
+<p>The variable passed to the boolean-creation method is of type
+<code>G4LogicalVolume*</code>. The most likely causes are:</p>
+<ol>
+<li>
+<p>[G4-style] this variable was bound to a <code>new G4LogicalVolume(...)</code>, e.g.</p>
+<pre><code class="language-c++">G4Box*           box2_solid = new G4Box(...);
+G4LogicalVolume* box2_logic = new G4LogicalVolume(box2_solid, ...);
+box1.add(box2_logic); // WRONG
+</code></pre>
+<p>The solution is to pass <code>box2_solid</code> instead of <code>box2_logic</code>.</p>
+</li>
+<li>
+<p>[n4-style] you called <code>.volume(...)</code> on the input solid, e.g.</p>
+<pre><code class="language-c++">box1.add(box2.volume(...)); // WRONG
+</code></pre>
+<p>The solution is to remove the call to <code>volume(...)</code> or call <code>.solid()</code>
+instead.</p>
+</li>
+</ol>
+<h3 id="type_hint--a-g4pvplacement"><a class="header" href="#type_hint--a-g4pvplacement"><code>&lt;TYPE_HINT&gt; = a G4PVPlacement</code></a></h3>
+<p>The variable passed to the boolean-creation method is of type
+<code>G4PVPlacement*</code>. The most likely causes are:</p>
+<ol>
+<li>
+<p>[G4-style] this variable was assigned to <code>new G4PVPlacement(...)</code>, e.g.</p>
+<pre><code class="language-c++">G4Box*           box2_solid = new G4Box(...);
+G4LogicalVolume* box2_logic = new G4LogicalVolume(box2_solid, ...);
+G4PVPlacement*   box2_place = new G4PVPlacement(box2_logic, ...);
+box1.add(box2_place); // WRONG
+</code></pre>
+<p>The solution is to pass <code>box2_solid</code> instead of <code>box2_place</code>.</p>
+</li>
+<li>
+<p>[n4-style] you called <code>.place(...).other().methods().now()</code> on the input solid, e.g.</p>
+<pre><code class="language-c++">box1.add(box2.place(...).other().methods().now()); // WRONG
+</code></pre>
+<p>The solution is to remove the call to
+<code>place(...).other().methods().now()</code> or call <code>.solid()</code> instead.</p>
+</li>
+</ol>
+<h3 id="type_hint--a-n4place"><a class="header" href="#type_hint--a-n4place"><code>&lt;TYPE_HINT&gt; = a n4::place</code></a></h3>
+<p>The variable passed to the boolean-creation method is of type
+<code>n4::place</code>. The most likely cause is that you called <code>.place(...)</code>
+(without calling <code>.now()</code>) on the input solid, e.g.</p>
+<pre><code class="language-c++">box1.add(box2.place(...).other().methods()); // WRONG
+</code></pre>
+<p>The solution is to remove the call to <code>place(...).other().methods()</code> or
+call <code>.solid()</code> instead.</p>
+<h3 id="type_hint--an-unknown-type"><a class="header" href="#type_hint--an-unknown-type"><code>&lt;TYPE_HINT&gt; = an unknown type</code></a></h3>
+<p>The type of the variable passed to the boolean-creation method is
+neither a valid one (<code>n4::shape</code>, <code>G4VSolid*</code>) nor one of the specific
+cases described above. In this case <code>nain4</code> cannot provide any
+help. You must find the latest assignment of this variable and
+understand what its type is. A LSP plugin in you text editor might
+help.</p>
+<h2 id="requesting-the-handling-of-other-cases"><a class="header" href="#requesting-the-handling-of-other-cases">Requesting the handling of other cases</a></h2>
+<p>If you find that there is another case that <code>nain4</code> should handle,
+please open an issue at <code>https://github.com/jacg/nain4/issues</code>!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="return-value-of-g4vsensitivedetectorprocesshits"><a class="header" href="#return-value-of-g4vsensitivedetectorprocesshits">Return value of G4VSensitiveDetector::ProcessHits</a></h1>
+<p><code>G4VSensitiveDetector</code>'s method <code>ProcessHits</code> <em>must</em> be implemented by the user. <code>nain4</code> provides <code>n4::sensitive_detector</code> to ease implementing <code>G4VSensitiveDetector</code> subclasses. Because <code>ProcessHits</code> is mandatory, <code>nain4</code> obliges the user to provide an implementation as a construction argument to <code>n4::sensitive_detector</code>.</p>
+<p>The aforementioned method returns <code>bool</code> for historical reasons. (This seems to be undocumented, but see <a href="https://geant4-forum.web.cern.ch/t/return-value-of-g4vsensitivedetector-processhits/1993/2">this Geant4 forum comment</a>.)</p>
+<p>The summary is:</p>
+<ul>
+<li>The actual value returned doesn't matter: it is ignored by G4.</li>
+<li>One day the Geant4 developers may decide to change the return type to <code>void</code> at which point old code will give compilation errors.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="why-nix"><a class="header" href="#why-nix">Why nix?</a></h1>
+<p>TODO</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="reference"><a class="header" href="#reference">Reference</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="library-headers"><a class="header" href="#library-headers">Library headers</a></h1>
+<p><code>nain4</code> provides headers of different granularity, for convenience in different situations.</p>
+<h2 id="n4-allhh"><a class="header" href="#n4-allhh"><code>&lt;n4-all.hh&gt;</code></a></h2>
+<p>Gives access to <em>all</em> <code>nain4</code> components. This header is meant to be used for exploration:</p>
+<ul>
+<li>
+<p>when you are just getting started with <code>nain4</code> and don't want to be distracted by the need to find specific headers for specific situations</p>
+</li>
+<li>
+<p>when you want LSP to help you discover available features</p>
+</li>
+<li>
+<p>When your whole <code>nain4</code> application still lives in a single source file</p>
+</li>
+</ul>
+<p>As your program grows and is split into multiple files, and you gain more experience with <code>nain4</code>, it would be more appropriate to use the more fine-grained headers, described below.</p>
+<ul>
+<li>
+<p><code>&lt;n4-main.hh&gt;</code></p>
+<p>Groups together utilities that are required to write the <code>main</code> function of a <code>nain4</code> application. These are also available via the separate headers:</p>
+<ul>
+<li><code>&lt;n4-run-manager.hh&gt;</code>: <code>nain4</code> interface for configuring the Geant4 run manager</li>
+<li><code>&lt;n4-mandatory.hh&gt;</code>: <code>nain4</code> utilities for concise implementation of the user-defined classes that must be registered with the run manager</li>
+</ul>
+</li>
+<li>
+<p><code>&lt;n4-geometry.hh&gt;</code></p>
+<p>Groups together functionality that is typically used in defining detector geometries. These are also available via the separate headers:</p>
+<ul>
+<li><code>&lt;n4-material&gt;</code>: finding existing materials; constructing new materials</li>
+<li><code>&lt;n4-shape&gt;</code>: construction of <code>G4VSolid</code>s</li>
+<li><code>&lt;n4-boolean-shape&gt;</code>: construction of boolean solids</li>
+<li><code>&lt;n4-volume&gt;</code> creation of logical volumes</li>
+<li><code>&lt;n4-place&gt;</code> creation and placement of physical volumes</li>
+<li><code>&lt;n4-sensitive&gt;</code> <code>nain4</code> utilities for concise implementation of <code>G4VSensitiveDetector</code></li>
+</ul>
+</li>
+<li>
+<p><code>&lt;n4-utils.hh&gt;</code></p>
+<p>Various ready-made conveniences to alleviate the tedium and verbosity of oft-encountered tasks.  These are also available via the separate headers:</p>
+<ul>
+<li><code>&lt;n4-constants.hh&gt;</code>: physical constants not provided by <code>CLHEP</code></li>
+<li><code>&lt;n4-inspect.hh&gt;</code>: finding existing geometry components, materials, etc.</li>
+<li><code>&lt;n4-random.hh&gt;</code>: random number generation</li>
+<li><code>&lt;n4-sequences.hh&gt;</code>: convenient creation of sequences of numerical data</li>
+<li><code>&lt;n4-stream.hh&gt;</code>: redirecting or silencing C++ output streams</li>
+</ul>
+</li>
+<li>
+<p><code>&lt;n4-testing.hh&gt;</code></p>
+<p>Utilities to help with writing automated tests for <code>nain4</code> applications. These are also available via the separate headers:</p>
+<ul>
+<li><code>&lt;n4-defaults.hh&gt;</code>: ready-made dummy application components</li>
+<li><code>&lt;n4-geometry-iterators.hh&gt;</code>: iterating over all sub-elements of a geometry</li>
+</ul>
+</li>
+<li>
+<p>Other headers</p>
+<ul>
+<li><code>&lt;n4-exceptions.hh&gt;</code>: exceptions relating to situations arising in nain4 code</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="constructing-solids-and-logical-volumes"><a class="header" href="#constructing-solids-and-logical-volumes">Constructing solids and logical volumes</a></h1>
+<p>Header: <code>&lt;n4-shapes.hh&gt;</code></p>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<h3 id="constructing-a-g4vsolid"><a class="header" href="#constructing-a-g4vsolid">Constructing a <code>G4VSolid</code></a></h3>
+<!-- TODO: put this in some common .css -->
+<style>
+details.g4 > summary::before {
+  font-size: 80%;
+  color: #888;
+  content: "Click to show/hide equivalent in pure Geant4 ";
+}
+details.g4 {
+  border-style: none none none solid;
+  border-color: #888;
+  padding-left: 1em;
+}
+</style>
+<pre><code class="language-c++">auto ball = n4::sphere(&quot;ball&quot;).r(1.2*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius = 1.2*m;
+auto ball   = new G4Sphere(&quot;ball&quot;, 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
+</code></pre>
+<p><font size=-2>(In this specific example, <code>n4::sphere</code> notices that it would be more efficient to create a <code>G4Orb</code> instead of a <code>G4Sphere</code> and does that for you automatically.)</font></p>
+</details>
+<h3 id="constructing-a-g4logicalvolume"><a class="header" href="#constructing-a-g4logicalvolume">Constructing a <code>G4LogicalVolume</code></a></h3>
+<p>Frequently, after having made a <code>G4VSolid</code> you immediately use it to make a <code>G4LogicalVolume</code> with the same name. <code>nain4</code> allows you to do this in a single step:</p>
+<pre><code class="language-c++">auto copper = n4::material(&quot;G4_Cu&quot;);
+auto ball   = n4::sphere(&quot;ball&quot;).r(1.2*m).volume(copper);
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto copper = G4NistManager::Instance() -&gt; FindOrBuildMaterial(&quot;G4_Cu&quot;);
+auto radius = 1.2*m;
+auto ball_solid = new G4Sphere(&quot;ball&quot;, 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
+auto ball = new G4VLogicalVolume(ball_solid, copper, &quot;ball&quot;);
+</code></pre>
+</details>
+<p>If you need to do this as two separate steps</p>
+<pre><code class="language-c++">auto copper     = n4::material(&quot;G4_Cu&quot;);
+auto ball_solid = n4::sphere(&quot;ball&quot;).r(1.2*m).solid();
+auto ball       = n4::volume(ball_solid, copper);
+</code></pre>
+<p>Not all <code>G4VSolid</code>s are supported by the <code>nain4::shape</code> interface, yet. In such cases <code>n4::volume</code> lets you combine the construction of a solid and corresponding logical volume in a single step. Here is how you could do it if <code>n4::sphere</code> did not exist:</p>
+<pre><code class="language-c++">auto copper = n4::material(&quot;G4_Cu&quot;);
+auto radius = 1.2*m;
+auto ball   = n4::volume&lt;G4Sphere&gt;(&quot;ball&quot;, copper, 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
+</code></pre>
+<p>The arguments passed after the name and material, are forwarded to the specified <code>G4VSolid</code>'s constructor.</p>
+<h3 id="placing-a-volume"><a class="header" href="#placing-a-volume">Placing a volume</a></h3>
+<p>Should you want to place your <code>G4LogicalVolume</code> immediately, <code>nain4</code> allows you to include this in a single step, too:</p>
+<pre><code class="language-c++">auto safe = ...
+auto gold = n4::material(&quot;G4_Au&quot;);
+n4::box(&quot;nugget&quot;).cube(2*cm).place(gold).in(safe).now();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto safe_solid = ...
+auto safe = ...
+auto gold = G4NistManager::Instance() -&gt; FindOrBuildMaterial(&quot;G4_Au&quot;);
+auto nugget_solid = new G4Box(&quot;nugget&quot;, 2*cm/2, 2*cm/2, 2*cm/2);
+auto nugget_logical = new G4VLogicalVolume(nugget_solid, gold, &quot;nugget&quot;);
+new G4PVPlacement(nullptr, {}, nugget_logical, &quot;nugget&quot;, safe, false, 0);
+</code></pre>
+</details>
+<p>However, frequently you need to keep a handle to the logical volume, in order to be able to place things into it later. In such cases you would break this into two separate steps:</p>
+<pre><code class="language-c++">auto safe   = ...
+auto gold   = n4::material(&quot;G4_Au&quot;);
+auto nugget = n4::box(&quot;nugget&quot;).cube(2*cm).volume(gold);
+n4::place(nugget).in(safe).now();
+</code></pre>
+<p><code>nain4</code>'s placement utilities have a rich interface, which is described in <a href="reference/./n4-place.html">Placement of physical volumes</a>.</p>
+<h3 id="summary-1"><a class="header" href="#summary-1">Summary</a></h3>
+<pre><code class="language-c++">G4VSolid        * s = n4::SOLID(&quot;name&quot;, ...).solid();
+G4VLogicalVolume* v = n4::SOLID(&quot;name&quot;, ...).volume(material);
+G4PVPlacement   * p = n4::SOLID(&quot;name&quot;, ...).place (material).in(volume) ... .now();
+</code></pre>
+<h2 id="specifying-dimensions"><a class="header" href="#specifying-dimensions">Specifying Dimensions</a></h2>
+<p>The <code>G4VSolid</code>s, and hence also the <code>n4::shape</code>s, are parameterized by combinations of four principal types of coordinate</p>
+<ol>
+<li>Cartesian lengths, <code>x</code>, <code>y</code> and <code>z</code></li>
+<li>Radial length, <code>r</code></li>
+<li>Azimuthal angle, <code>φ</code></li>
+<li>Polar angle, <code>θ</code></li>
+</ol>
+<p><code>nain4</code> provides a consistent set of methods for setting these, in any <code>n4::shape</code> that uses them. These methods are described here, the <code>n4::shapes</code> are described in the next section.
+All the methods provided by <code>nain4</code> have short, but explicit names. This removes the need for the user to remember the order of the arguments while highlighting their meaning.</p>
+<h3 id="cartesian-lengths"><a class="header" href="#cartesian-lengths">Cartesian lengths</a></h3>
+<p>The principal methods for setting Cartesian lengths are</p>
+<ul>
+<li><code>x</code></li>
+<li><code>half_x</code></li>
+</ul>
+<p>and their equivalents for <code>y</code> and <code>z</code>.</p>
+<h4 id="explicit-names"><a class="header" href="#explicit-names">Explicit names</a></h4>
+<p>Unlike Geant4, <code>nain4</code> favours the use of full lengths instead of half-lengths.
+Using half-lengths creates noise by either introducing <code>/2</code> operations
+continuously or by defining variables with long names to indicate the subtle but
+important distinction between half- and full-lengths. For instance, in order to
+create a cube of side 1 m in pure <code>G4</code>:</p>
+<pre><code class="language-c++">auto box_half_length = 0.5*m;
+G4Box* box1 = new G4Box(&quot;box&quot;, box_half_length,  box_half_length,  box_half_length);
+// or
+auto box_length = 1*m;
+G4Box* box2 = new G4Box(&quot;box&quot;, box_length/2,  box_length/2,  box_length/2);
+</code></pre>
+<p>In contrast, in <code>nain4</code> one can simply write</p>
+<pre><code class="language-c++">auto box = n4::box(&quot;box&quot;).cube(1*m);
+</code></pre>
+<h4 id="overriding"><a class="header" href="#overriding">Overriding</a></h4>
+<p>If you set a Cartesian length more than once in the same shape, the last setting overrides previous ones. For example:</p>
+<pre><code class="language-c++">.x(1*m).half_x(3*m)  // `x` set to 6 m
+.x(1*m).     x(3*m)  // `x` set to 3 m
+</code></pre>
+<h4 id="convenient-alternatives"><a class="header" href="#convenient-alternatives">Convenient alternatives</a></h4>
+<p><code>n4::shape</code>s which depend on more than one Cartesian length, typically provide extra methods for setting various combinations, for example <code>n4::box</code> offers extra methods <code>cube</code>, <code>xyz</code>, <code>xy</code>, <code>xz</code> and <code>yz</code> along with their <code>half_</code> variants.</p>
+<h3 id="radial-length-r"><a class="header" href="#radial-length-r">Radial length: <code>r</code></a></h3>
+<p>Three methods are provided for specifying the two degrees of freedom in radial lengths:</p>
+<ul>
+<li><code>r_inner</code></li>
+<li><code>r_delta</code></li>
+<li><code>r</code></li>
+</ul>
+<p>with the constraint <code>r = r_inner + r_delta</code>. Thus valid combinations of these methods are</p>
+<style>
+.thick {
+    border-left-width: 8px;
+    border-left-colour: #888;
+  }
+</style>
+<table>
+  <tr>
+    <th colspan="3">Methods used</th>
+    <th colspan="3">Implied value</th>
+  </tr>
+  <tr>
+    <td colspan="3"></td><td class="thick">r_inner</td><td>r_delta</td><td>r</td>
+  </tr>
+  <tr><td>       </td><td>       </td><td>r</td>  <td class="thick">0          </td><td>r          </td><td>                 </td></tr>
+  <tr><td>r_inner</td><td>       </td><td>r</td>  <td class="thick">           </td><td>r - r_inner</td><td>                 </td></tr>
+  <tr><td>       </td><td>r_delta</td><td>r</td>  <td class="thick">r - r_delta</td><td>           </td><td>                 </td></tr>
+  <tr><td>r_inner</td><td>r_delta</td><td> </td>  <td class="thick">0          </td><td>           </td><td>r_inner + r_delta</td></tr>
+</table>
+<p>Providing too few or too many values results in a run-time error.</p>
+<p>Some shapes, such as <code>n4::cons</code> (<code>G4Cons</code>), have multiple radii. In such cases the method names acquire a number, to distinguish between them <code>r*</code> -&gt; <code>r1*</code>, <code>r2*</code>.</p>
+<h3 id="azimuthal-angle-φ"><a class="header" href="#azimuthal-angle-φ">Azimuthal angle: <code>φ</code></a></h3>
+<p>Three methods are provided for specifying the two degrees of freedom in azimuthal angles:</p>
+<ul>
+<li><code>phi_start</code></li>
+<li><code>phi_delta</code></li>
+<li><code>phi_end</code></li>
+</ul>
+<p>with the constraint <code>phi_end = phi_start + phi_delta</code>. Thus valid combinations of these methods are</p>
+<table>
+  <tr>
+    <th colspan="3">Methods used</th>
+    <th colspan="3">Implied value</th>
+  </tr>
+  <tr>
+    <td colspan="3"></td><td class="thick">phi_start</td><td>phi_delta</td><td>phi_end</td>
+  </tr>
+  <tr><td>         </td><td>         </td><td>       </td>  <td class="thick">0      </td><td>2π         </td><td>2π       </td></tr>
+  <tr><td>phi_start</td><td>         </td><td>       </td>  <td class="thick">       </td><td>2π - start </td><td>2π       </td></tr>
+  <tr><td>         </td><td>phi_delta</td><td>       </td>  <td class="thick">0      </td><td>           </td><td>δ        </td></tr>
+  <tr><td>         </td><td>         </td><td>phi_end</td>  <td class="thick">0      </td><td>end        </td><td>         </td></tr>
+  <tr><td>         </td><td>phi_delta</td><td>phi_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td></tr>
+  <tr><td>phi_start</td><td>         </td><td>phi_end</td>  <td class="thick">       </td><td>end - start</td><td>         </td></tr>
+  <tr><td>phi_start</td><td>phi_delta</td><td>       </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
+</table>
+<p>Providing too few or too many values results in a run-time error.</p>
+<h3 id="polar-angle-θ"><a class="header" href="#polar-angle-θ">Polar angle: <code>θ</code></a></h3>
+<p>Three methods are provided for specifying the two degrees of freedom in polar angles:</p>
+<ul>
+<li><code>theta_start</code></li>
+<li><code>theta_delta</code></li>
+<li><code>theta_end</code></li>
+</ul>
+<p>with the constraint <code>theta_end = theta_start + theta_delta</code>. Thus valid combinations of these methods are</p>
+<table>
+  <tr>
+    <th colspan="3">Methods used</th>
+    <th colspan="3">Implied value</th>
+  </tr>
+  <tr>
+    <td colspan="3"></td><td class="thick">theta_start</td><td>theta_delta</td><td>theta_end</td>
+  </tr>
+  <tr><td>           </td><td>           </td><td>         </td>  <td class="thick">0      </td><td>π          </td><td>π        </td></tr>
+  <tr><td>theta_start</td><td>           </td><td>         </td>  <td class="thick">       </td><td>π - start </td><td>π        </td></tr>
+  <tr><td>           </td><td>theta_delta</td><td>         </td>  <td class="thick">0      </td><td>           </td><td>δ        </td></tr>
+  <tr><td>           </td><td>           </td><td>theta_end</td>  <td class="thick">0      </td><td>end        </td><td>         </td></tr>
+  <tr><td>           </td><td>theta_delta</td><td>theta_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td></tr>
+  <tr><td>theta_start</td><td>           </td><td>theta_end</td>  <td class="thick">       </td><td>end - start</td><td>         </td></tr>
+  <tr><td>theta_start</td><td>theta_delta</td><td>         </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
+</table>
+<p>Providing too few or too many values results in a run-time error.</p>
+<h2 id="common-methods"><a class="header" href="#common-methods">Common methods</a></h2>
+<p>All <code>n4::SOLID</code>s share the following methods:</p>
+<ul>
+<li>Builder methods
+<ul>
+<li><a href="reference/n4-shape.html#constructing-a-g4vsolid"><code>.solid()</code></a></li>
+<li><a href="reference/n4-shape.html#constructing-a-g4logicalvolume"><code>.volume(material)</code></a></li>
+<li><a href="reference/n4-shape.html#placing-a-volume"><code>.place(material)</code></a></li>
+</ul>
+</li>
+<li><a href="reference/./n4-boolean-solids.html">Boolean solid methods</a>:
+<ul>
+<li><code>add()</code> / <code>join()</code></li>
+<li><code>sub()</code> / <code>subtract()</code></li>
+<li><code>inter()</code> / <code>intersect()</code></li>
+</ul>
+</li>
+<li>Optional logical volume settings:
+<ul>
+<li><code>sensitive(sensitive-detector)</code></li>
+<li>TODO maybe field manager, user limits, optimize</li>
+</ul>
+</li>
+</ul>
+<h2 id="available-shapes"><a class="header" href="#available-shapes">Available Shapes</a></h2>
+<h3 id="n4box"><a class="header" href="#n4box"><code>n4::box</code></a></h3>
+<p>Constructs <code>G4Box</code>: cuboid with side lengths <code>x</code>, <code>y</code> and <code>z</code>. Within its frame of reference it is centred on the origin with sides parallel to the <code>x</code>/<code>y</code>/<code>z</code> axes. Displacements and rotations can be applied with <a href="reference/n4-shape.html#placing-a-volume"><code>.place(material)</code></a>.</p>
+<h4 id="example"><a class="header" href="#example">Example</a></h4>
+<pre><code class="language-c++">G4Box* box = n4::box(&quot;box&quot;).xz(10*cm).y(50*cm).solid();
+</code></pre>
+<details class="g4">
+<summary></summary>
+<pre><code class="language-c++">auto cross_section_length = 10*cm, y_length = 50*cm;
+G4Box* box = new G4Box(&quot;box&quot;, cross_section_length/2, y_length/2, cross_section_length/2);
+</code></pre>
+</details>
+<h4 id="methods"><a class="header" href="#methods">Methods</a></h4>
+<h5 id="full-length-methods"><a class="header" href="#full-length-methods">Full-length methods</a></h5>
+<p>All these methods take full (as opposed to half-) lengths:</p>
+<ul>
+<li><code>x(lx)</code>, <code>y(ly)</code>, <code>z(ly)</code>: set one dimension.</li>
+<li><code>xy(l)</code>, <code>xz(l)</code>, <code>yz(l)</code>: set two dimensions to the same value.</li>
+<li><code>xyz(lx, ly, lz)</code>, <code>xyz(g4-three-vector)</code>: set three dimensions independently</li>
+<li><code>cube(l)</code>: set all dimensions to the same value.</li>
+</ul>
+<p>Note the, perhaps surprising, difference between <code>.xyz()</code> and the <code>.xy()</code>-<code>.xz()</code>-<code>.yz()</code> triumvirate: The latter assign a single value to multiple coordinates; the former accepts a separate value for each coordinate it sets.</p>
+<h5 id="half-length-methods"><a class="header" href="#half-length-methods">Half-length methods</a></h5>
+<p>All the aforementioned full-length methods have alternatives which accept half-lengths: <code>half_x(lx/2)</code>, <code>half_cube(l/2)</code>, <code>half_xy(lxy)</code>, etc.</p>
+<h5 id="overriding-1"><a class="header" href="#overriding-1">Overriding</a></h5>
+<p>If any value is specified more than once, the last setting overrides any earlier ones. Thus, the following three lines are equivalent.</p>
+<pre><code class="language-c++">.cube(1*m          ).z(2*m)
+.xyz (1*m, 1*m, 1*m).z(2*m)
+.xy  (1*m          ).z(2*m)
+</code></pre>
+<p>While the first two work, the last one states the intent most clearly.</p>
+<p>See the sections about setting <a href="reference/n4-shape.html#cartesian-lengths">Cartesian lengths</a> for more details.</p>
+<h3 id="n4sphere"><a class="header" href="#n4sphere"><code>n4::sphere</code></a></h3>
+<p>Constructs <code>G4Sphere</code> or <code>G4Orb</code>, depending on values provided.</p>
+<ul>
+<li><code>G4Sphere</code>: section of a spherical shell, between specified azimuthal (φ) and polar (θ) angles. Within its frame of reference, φ is measured counterclockwise WRT the x-axis when viewed from positive z; θ is measured WRT positive z. Displacements and rotations can be applied with <a href="reference/n4-shape.html#placing-a-volume"><code>.place(material)</code></a>.</li>
+<li><code>G4Orb</code>: special case of <code>G4Sphere</code>.</li>
+</ul>
+<h4 id="examples-1"><a class="header" href="#examples-1">Examples</a></h4>
+<p>A solid sphere</p>
+<pre><code class="language-c++">G4Orb* ball = n4::sphere(&quot;ball&quot;).r(1*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">G4Orb* ball = new G4Orb(&quot;ball&quot;, 1*m);
+</code></pre>
+<p>thus <code>nain4</code> helps you avoid the common mistake of creating an equivalent (but less efficient) <code>G4Sphere</code> instead</p>
+<pre><code class="language-c++">G4Sphere* ball = new G4Sphere(&quot;ball&quot;, 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
+</code></pre>
+</details>
+<p>A hollow sphere</p>
+<pre><code class="language-c++">G4Sphere* hollow = n4::sphere(&quot;hollow&quot;).r(2*m).r_delta(10*cm).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto outer = 2*m, thickness = 10*cm;
+G4Sphere* hollow = new G4Sphere(&quot;hollow&quot;, outer - thickness, outer, 0, CLHEP::twopi, 0, CLHEP::pi);
+</code></pre>
+</details>
+<p>A spherical wedge</p>
+<pre><code class="language-c++">G4Sphere* wedge = n4::sphere(&quot;wedge&quot;).r(1*m).phi_start(20*deg).phi_end(30*deg).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto start_phi = 20*deg, end_phi = 30*deg;
+G4Sphere* wedge = new G4Sphere(&quot;wedge&quot;, 0, 1*m, start_phi, end_phi - start_phi, 0, CLHEP::pi);
+</code></pre>
+</details>
+<h4 id="methods-1"><a class="header" href="#methods-1">Methods</a></h4>
+<ul>
+<li><code>r_inner(l)</code></li>
+<li><code>r_delta(l)</code></li>
+<li><code>r(l)</code></li>
+<li><code>phi_start(a)</code></li>
+<li><code>phi_delta(a)</code></li>
+<li><code>phi_end(a)</code></li>
+<li><code>theta_start(a)</code></li>
+<li><code>theta_delta(a)</code></li>
+<li><code>theta_end(a)</code></li>
+</ul>
+<p>See the sections about setting <a href="reference/n4-shape.html#radial-length-r">radial lengths</a>, <a href="reference/n4-shape.html#azimuthal-angle-%CF%86">azimuthal angles</a> and <a href="reference/n4-shape.html#polar-angle-%CE%B8">polar angles</a> for more details.</p>
+<h3 id="n4tubs"><a class="header" href="#n4tubs"><code>n4::tubs</code></a></h3>
+<p>Constructs <code>G4Tubs</code>: tube or tube segment. Within its frame of reference, it is parallel to and centred on the z-axis; φ is measured counterclockwise WRT the x-axis when viewed from positive z. Displacements and rotations can be applied with <a href="reference/n4-shape.html#placing-a-volume"><code>.place(material)</code></a>.</p>
+<h4 id="examples-2"><a class="header" href="#examples-2">Examples</a></h4>
+<p>A solid cylinder</p>
+<pre><code class="language-c++">G4Tubs* cylinder = n4::tubs(&quot;cylinder&quot;).r(1*m).z(2*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius   = 1*m;
+auto z_length = 2*m;
+G4Tubs* cylinder = new G4Tubs(&quot;cylinder&quot;, 0, radius, z_length/2, 0, CLHEP::twopi);
+</code></pre>
+</details>
+<p>A tube</p>
+<pre><code class="language-c++">G4Tubs* tube = n4::tubs(&quot;tube&quot;).r(1*m).r_delta(10*cm).z(2*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto z_length = 2*m, outer_radius = 1*m, thickness = 10*cm;
+G4Tubs* tube = new G4Tubs(&quot;tube&quot;, outer_radius - thickness, 1*m, z_length/2, 0, CLHEP::twopi);
+</code></pre>
+</details>
+<p>A cylindrical wedge</p>
+<pre><code class="language-c++">G4Tubs* wedge = n4::tubs(&quot;wedge&quot;).r(1*m).z(2*m).phi_start(20*deg).phi_end(30*deg).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto z_length = 2*m, radius = 1*m, start_phi = 20*deg, end_phi = 30*deg;
+G4Tubs* wedge = new G4Tubs(&quot;wedge&quot;, 0, radius, z_length/2, start_phi, end_phi - start_phi);
+</code></pre>
+</details>
+<h4 id="methods-2"><a class="header" href="#methods-2">Methods</a></h4>
+<ul>
+<li><code>z()</code></li>
+<li><code>half_z()</code></li>
+<li><code>r_inner(l)</code></li>
+<li><code>r_delta(l)</code></li>
+<li><code>r(l)</code></li>
+<li><code>phi_start(a)</code></li>
+<li><code>phi_delta(a)</code></li>
+<li><code>phi_end(a)</code></li>
+</ul>
+<p>See the sections about setting <a href="reference/n4-shape.html#cartesian-lengths">Cartesian lengths</a>, <a href="reference/n4-shape.html#radial-length-r">radial lengths</a> and <a href="reference/n4-shape.html#azimuthal-angle-%CF%86">azimuthal angles</a> for more details.</p>
+<h3 id="n4trd"><a class="header" href="#n4trd"><code>n4::trd</code></a></h3>
+<p>Constructs <code>G4Trd</code>: frustrum (a.k.a. truncated pyramid) with two
+parallel rectangular faces and four trapezoidal faces. The rectangular
+faces are perpendicular to the z axis and their sides are parallel to
+the x and y axes. The bottom face (placed at negative z) has side
+lengths <code>x1</code>, <code>y1</code>, and the top face (placed at positive z) has side
+lengths <code>x2</code>, <code>y2</code>. Both faces are separated by a distance
+<code>z</code>. Within its frame of reference it is centred on the
+origin. Displacements and rotations can be applied with
+<a href="reference/n4-shape.html#placing-a-volume"><code>.place(material)</code></a>.</p>
+<h4 id="example-1"><a class="header" href="#example-1">Example</a></h4>
+<pre><code class="language-c++">G4Trd* trd = n4::trd(&quot;trd&quot;).xy1(10*cm).xy2(5*cm).z(50*cm).solid();
+</code></pre>
+<details class="g4">
+<summary></summary>
+<pre><code class="language-c++">auto cross_section_bottom = 10*cm, cross_section_top = 5*cm, z_length = 50*cm;
+G4Trd* trd = new G4Trd(&quot;trd&quot;, cross_section_bottom/2, cross_section_top/2, cross_section_bottom/2, cross_section_top/2, z_length/2);
+</code></pre>
+</details>
+<h4 id="methods-3"><a class="header" href="#methods-3">Methods</a></h4>
+<h5 id="full-length-methods-1"><a class="header" href="#full-length-methods-1">Full-length methods</a></h5>
+<p>All these methods take full (as opposed to half-) lengths:</p>
+<ul>
+<li><code>x1(lx)</code>, <code>x2(ly)</code>, <code>y1(lx)</code>, <code>y2(ly)</code>: set one dimension of one
+rectangular face. 1 Refers to the bottom face, while 2 refers to the
+top face.</li>
+<li><code>xy1(l)</code>, <code>xy2(l)</code>: set both dimensions of one face. 1 Refers to the
+bottom face, while 2 refers to the top face.</li>
+<li><code>z(l)</code>: set the distance between the two parallel faces.</li>
+</ul>
+<h5 id="half-length-methods-1"><a class="header" href="#half-length-methods-1">Half-length methods</a></h5>
+<p>All the aforementioned full-length methods have alternatives which
+accept half-lengths: <code>half_x1(lx/2)</code>, <code>half_xy2(lxy/2)</code>,
+<code>half_z(lz/2)</code>, etc.</p>
+<p>See the sections about setting <a href="reference/n4-shape.html#cartesian-lengths">Cartesian lengths</a> for more details.</p>
+<h3 id="n4cons"><a class="header" href="#n4cons"><code>n4::cons</code></a></h3>
+<p>Constructs <code>G4Cons</code>: truncated cone or cone section. Within its frame of reference, it is parallel to and centred on the z-axis; φ is measured counterclockwise WRT the x-axis when viewed from positive z. Displacements and rotations can be applied with <a href="reference/n4-shape.html#placing-a-volume"><code>.place(material)</code></a>.</p>
+<h4 id="examples-3"><a class="header" href="#examples-3">Examples</a></h4>
+<p>A solid truncated cone</p>
+<pre><code class="language-c++">G4Tubs* solid_cone = n4::tubs(&quot;solid_cone&quot;).r1(1*m).r2(2*m).z(3*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius_1 = 1*m, radius_2 = 2*m, z_length = 3*m;
+G4Cons* solid_cone = new G4Cons(&quot;solid_cone&quot;, 0, radius_1, 0, radius_2, z_length/2, 0, CLHEP::twopi);
+</code></pre>
+</details>
+<p>A hollow cone</p>
+<pre><code class="language-c++">G4Cone* hollow_cone = n4::cone(&quot;hollow_cone&quot;).r1(1*m).r2(2*cm).r_delta(10*cm).z(3*m).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius_1 = 1*m, radius_2 = 2*m, thickness = 10*cm, z_length = 3*m;
+G4Cons* hollow_cone = new G4Cons(&quot;hollow_cone&quot;, radius_1 - thickness, radius_1, radius_2 - thickness, radius_2, z_length/2, 0, CLHEP::twopi);
+</code></pre>
+</details>
+<p>A conical wedge</p>
+<pre><code class="language-c++">G4Cons* wedge = n4::cons(&quot;wedge&quot;).r1(1*m).r2(2*m).z(3*m).phi_start(20*deg).phi_end(30*deg).solid();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto radius_1 = 1*m, radius_2 = 2*m, z_length = 3*m, start_phi = 20*deg, end_phi = 30*deg;
+G4Cons* wedge = new G4Cons(&quot;wedge&quot;, 0, radius_1, 0, radius_2, z_length/2, start_phi, end_phi - start_phi);
+</code></pre>
+</details>
+<h4 id="methods-4"><a class="header" href="#methods-4">Methods</a></h4>
+<ul>
+<li><code>z()</code></li>
+<li><code>half_z()</code></li>
+<li><code>r1_inner(l)</code>, <code>r1_delta(l)</code>, <code>r1(l)</code>: Sets the radial limits of the bottom (negative z) side</li>
+<li><code>r2_inner(l)</code>, <code>r2_delta(l)</code>, <code>r2(l)</code>: Sets the radial limits of the top    (positive z) side</li>
+<li><code>r_delta</code>: Sets both <code>r1_delta</code> and <code>r2_delta</code></li>
+<li><code>phi_start(a)</code></li>
+<li><code>phi_delta(a)</code></li>
+<li><code>phi_end(a)</code></li>
+</ul>
+<p>See the sections about setting <a href="reference/n4-shape.html#cartesian-lengths">Cartesian lengths</a>, <a href="reference/n4-shape.html#radial-length-r">radial lengths</a> and <a href="reference/n4-shape.html#azimuthal-angle-%CF%86">azimuthal angles</a> for more details.</p>
+<h2 id="obviously-missing-shapes"><a class="header" href="#obviously-missing-shapes">Obviously missing shapes</a></h2>
+<h3 id="n4torus"><a class="header" href="#n4torus"><code>n4::torus</code></a></h3>
+<h3 id="n4trap"><a class="header" href="#n4trap"><code>n4::trap</code></a></h3>
+<h3 id="n4para"><a class="header" href="#n4para"><code>n4::para</code></a></h3>
+<h3 id="n4polycone"><a class="header" href="#n4polycone"><code>n4::polycone</code></a></h3>
+<h3 id="n4elliptical_tube"><a class="header" href="#n4elliptical_tube"><code>n4::elliptical_tube</code></a></h3>
+<h3 id="n4ellipse"><a class="header" href="#n4ellipse"><code>n4::ellipse</code></a></h3>
+<h3 id="n4ellipsoid"><a class="header" href="#n4ellipsoid"><code>n4::ellipsoid</code></a></h3>
+<h3 id="n4elliptical_cone"><a class="header" href="#n4elliptical_cone"><code>n4::elliptical_cone</code></a></h3>
+<h3 id="n4tet-rahedron"><a class="header" href="#n4tet-rahedron"><code>n4::tet</code> (...rahedron)</a></h3>
+<h3 id="n4hype-rbolic-cone"><a class="header" href="#n4hype-rbolic-cone"><code>n4::hype</code> (...rbolic cone)</a></h3>
+<h3 id="n4twisted_"><a class="header" href="#n4twisted_"><code>n4::twisted_*</code></a></h3>
+<h3 id="n4breps-boundary-represented-solids"><a class="header" href="#n4breps-boundary-represented-solids"><code>n4::breps</code> Boundary Represented Solids</a></h3>
+<h3 id="n4tesselated_solids"><a class="header" href="#n4tesselated_solids"><code>n4::tesselated_solids</code></a></h3>
+<p>TODO: document envelope_of</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="placement-of-physical-volumes"><a class="header" href="#placement-of-physical-volumes">Placement of physical volumes</a></h1>
+<!-- TODO: put this in some common .css -->
+<style>
+details.g4 > summary::before {
+  font-size: 80%;
+  color: #888;
+  content: "Click to show/hide equivalent in pure Geant4 ";
+}
+details.g4 {
+  border-style: none none none solid;
+  border-color: #888;
+  padding-left: 1em;
+}
+</style>
+<h2 id="summary-2"><a class="header" href="#summary-2">Summary</a></h2>
+<h3 id="world-volumes"><a class="header" href="#world-volumes">World volumes</a></h3>
+<p><code>nain4</code>'s placement API can be used to place a logical volume as it is being created</p>
+<pre><code class="language-c++">auto air = n4::material(&quot;G4_AIR&quot;);
+n4::box(&quot;world&quot;).cube(&quot;1*m&quot;).place(air).now();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto air = G4NistManager::Instance() -&gt; FindOrBuildMaterial(&quot;G4_AIR&quot;);
+auto world_size = 1*m;
+auto world_solid = new G4Box(&quot;world&quot;, world_size/2, world_size/2, world_size/2);
+auto world_logical = new G4LogicalVolume(world_solid, air, &quot;world&quot;)
+new G4PVPlacement(nullptr, {}, world_logical, &quot;world&quot;, nullptr, false, 0);
+</code></pre>
+</details>
+<p>or to place an existing logical volume</p>
+<pre><code class="language-c++">auto air = n4::material(&quot;G4_AIR&quot;);
+G4LogicalVolume* existing_logical_volume = n4::box(&quot;world&quot;).cube(1*m).volume(air);
+n4::place(existing_logical_volume).now();
+</code></pre>
+<p><font size=-1>(The Geant4 equivalent of this sample is essentially identical to that of the previous sample.)</font></p>
+<p>In the above examples, no mother volume was specified in the placement phase,
+therefore these volumes are <em>world</em> volumes: all other volumes must be placed
+within the world volume—either directly, or in its daughters—and they must not
+protrude beyond the bounds of the world volume.</p>
+<!-- TODO replace with an mdbook-admonish thing, or some other higher-level
+feature --> <font color="red">NOTE: the volume is not placed until the `.now()`
+<p>method is called.</font> See <a href="reference/../explanation/placement-laziness-and-accumulation.html">Placement: Laziness and
+Accumulation</a> for more details.</p>
+<h3 id="daughter-volumes"><a class="header" href="#daughter-volumes">Daughter volumes</a></h3>
+<ul>
+<li>Daughter volumes are placed inside a mother volume with the <code>.in(mother)</code>
+method.</li>
+<li>The position and orientation, as well as other information about the
+placement, can be specified with the placement API's auxiliary methods.</li>
+</ul>
+<p>Just like in the case of world volumes, a logical volume can be placed as it is being created</p>
+<pre><code class="language-c++">auto copper = n4::material(&quot;G4_Cu&quot;);
+n4::box(&quot;box&quot;).cube(1*cm).place(copper).in(world).at_y(3*cm).rot_z(30*deg).now();
+</code></pre>
+<details class="g4"> <summary></summary>
+<pre><code class="language-c++">auto copper = G4NistManager::Instance() -&gt; FindOrBuildMaterial(&quot;G4_Cu&quot;);
+auto box_size = 1*cm;
+auto box_solid = new G4Box(&quot;box&quot;, box_size/2, box_size/2, box_size/2);
+auto box_logical = new G4LogicalVolume(box_solid, copper, &quot;box&quot;)
+auto rot_z_30 = new G4RotationMatrix();
+rot_z_30 -&gt; rotateZ(30*deg);
+new G4PVPlacement(rot_z_30, {0, 3*cm, 0}, box_logical, &quot;box&quot;, world, false, 0);
+</code></pre>
+</details>
+<p>or in two separate steps</p>
+<pre><code class="language-c++">auto copper = n4::material(&quot;G4_Cu&quot;);
+auto box = n4::box(&quot;box&quot;).cube(1*cm).volume(copper);
+n4::place(box).in(world).at_y(3*cm).rot_z(30*deg).now();
+</code></pre>
+<h2 id="methods-5"><a class="header" href="#methods-5">Methods</a></h2>
+<ul>
+<li>
+<p>Mother volume</p>
+<ul>
+<li><code>in(logical-volume)</code></li>
+<li><code>in(physical-volume)</code> // not implemented yet</li>
+<li><code>in(n4::place)</code> // not implemented yet</li>
+</ul>
+<p>If no mother volume is specified, the placed volume becomes the world volume.
+There can be only one world volume in a Geant4 application. <code>nain4</code> issues a
+run-time error if more than one world volume is created.</p>
+</li>
+<li>
+<p>Translations</p>
+<ul>
+<li><code>at(G4ThreeVector)</code></li>
+<li><code>at(x,y,z)</code></li>
+<li><code>at_x(x)</code>, <code>at_y(y)</code>, <code>at_z(z)</code></li>
+</ul>
+<p>The above methods specify the displacement of the daughter volume's origin with respect to the mother volume's origin.</p>
+<p>By default there is no displacement between the two.</p>
+<p>The effect of these methods is cumulative. Thus the following are equivalent</p>
+<pre><code class="language-c++">.at  (1*m,      2*m,      3*m)
+.at_x(1*m).at_y(2*m).at_z(3*m)
+</code></pre>
+<p>as are these</p>
+<pre><code class="language-c++">.at_x(101*m)
+.at_x(1*m).at_x(100*m)
+</code></pre>
+<p>NOTE: <a href="reference/../explanation/displacements-and-rotations-are-not-commutative.html">Displacements and rotations are not commutative</a>.</p>
+</li>
+<li>
+<p>Rotations</p>
+<ul>
+<li><code>rotate(G4RotationMatrix)</code>, <code>rot(G4RotationMatrix)</code> (identical meanings)</li>
+<li><code>rotate_x(angle)</code>, <code>rotate_y(angle)</code>, <code>rotate_z(angle)</code></li>
+<li><code>rot_x(angle)</code>, <code>rot_y(angle)</code>, <code>rot_z(angle)</code> (shorter-named equivalents of the above)</li>
+</ul>
+<p>The above methods specify the rotation of the daughter volume with respect to its mother volume.</p>
+<p>By default there is no rotation between the two.</p>
+<p>The effect of these methods is cumulative. Thus, the following two lines are equivalent</p>
+<pre><code class="language-c++">.rot_x(60*deg).rot_x(30*deg)
+.rot_x(90*deg)
+</code></pre>
+<p>NOTE: Rotations around distinct axes are not commutative. Thus the following two lines are <strong>NOT</strong> equivalent</p>
+<pre><code class="language-c++">.rot_x(90*deg).rot_y(90*deg)
+.rot_y(90*deg).rot_x(90*deg)
+</code></pre>
+<p>NOTE: <a href="reference/../explanation/displacements-and-rotations-are-not-commutative.html">Displacements and rotations are not commutative</a>.</p>
+</li>
+<li>
+<p>Transformations</p>
+<ul>
+<li><code>transform(G4Transform3D*)</code>, <code>trans(G4Transform3D*)</code> (identical meanings)</li>
+</ul>
+<p>The above methods specify the overall transformation of the daughter volume with respect to its mother volume.</p>
+</li>
+<li>
+<p><code>name(string)</code> By default the physical volume inherits the name of the logical
+volume being placed. This method allows overriding the inherited name.</p>
+</li>
+<li>
+<p><code>copy_no(N)</code> Useful to distinguish between multiple placements of a single
+logical volume. Implicitly appends &quot;-N&quot; to the physical volume's name, in
+addition to setting an copy-number attribute.</p>
+</li>
+<li>
+<p>Overlap checking</p>
+<p>Besides daughter volumes being placed entirely within their mothers, there
+should be no overlap between volumes. If this happens, the behaviour of
+tracking <a href="https://geant4-forum.web.cern.ch/t/whats-the-consequence-of-overlapping/4914/8">becomes inconsistent</a>.</p>
+<p>The following methods control overlap checking.</p>
+<p>When overlap checking is enabled, Geant4 will throw a runtime error if
+overlaps are detected, as opposed to allowing your program to run with an
+ill-defined geometry. However, this process may consume significant resources
+and slow down the construction of the geometry. Therefore, you may not want to
+have overlap checking enabled permanently.</p>
+<ul>
+<li>
+<p><code>check_overlaps()</code> Activates checking for this placement only.</p>
+</li>
+<li>
+<p><code>n4::place::check_overlaps_switch_on()</code> Activate checking for all placements until further notice.</p>
+</li>
+<li>
+<p><code>n4::place::check_overlaps_switch_off()</code> Deactivate checking until further
+notice, for placements which do not have it explicitly enabled with
+<code>.check_overlaps()</code>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Controlling state accumulation</p>
+<ul>
+<li><code>clone()</code> Create an independent copy of the current placement state.</li>
+</ul>
+<p>Observe the difference in the effect of these two loops, whose source differs
+only in the presence/absence of <code>.clone()</code></p>
+<pre><code class="language-c++">place_box = n4::box(&quot;box&quot;).cube(1*m).place(copper).in(world);
+
+// Place boxes at 1, 2 and 3 metres
+for (auto k : {1,2,3}) { place_box.clone().at_x(k*m).now(); }
+// Place boxes at 1, 3 and 6 metres
+for (auto k : {1,2,3}) { place_box        .at_x(k*m).now(); }
+</code></pre>
+<p>See <a href="reference/../explanation/placement-laziness-and-accumulation.html">Placement: Laziness and Accumulation</a>.</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="constructing-boolean-solids"><a class="header" href="#constructing-boolean-solids">Constructing boolean solids</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="managing-nain4-versions"><a class="header" href="#managing-nain4-versions">Managing nain4 versions</a></h1>
+<p>The version of <code>nain4</code> used by your project is determined by two files in its top-level directory:</p>
+<ol>
+<li><code>flake.nix</code></li>
+<li><code>flake.lock</code></li>
+</ol>
+<p>By default, <code>flake.nix</code> contains the line</p>
+<pre><code class="language-nix">nain4.url = &quot;github:jacg/nain4&quot;;
+</code></pre>
+<p>which states that <code>nain4</code> should be taken from the default branch (<code>master</code>) of the <code>nain4</code> repository owned by user <code>jacg</code> on GitHub.</p>
+<p>However</p>
+<ul>
+<li>the official <code>master</code> branch receives frequent updates, and</li>
+<li>you don't want the version of <code>nain4</code> that your project uses to change without
+your knowledge and consent.</li>
+</ul>
+<p>This is the purpose of <code>flake.lock</code>: it pins the precise version (the commit id) of all of your project's <code>flake.nix</code>-specified dependencies.</p>
+<h2 id="upgrading-to-the-lastest-version-of-nain4-available-of-master"><a class="header" href="#upgrading-to-the-lastest-version-of-nain4-available-of-master">Upgrading to the lastest version of <code>nain4</code> available of <code>master</code></a></h2>
+<p>If you want to upgrade to the most recent version of <code>nain4</code> available on its <code>master</code> branch, see <a href="reference/../how-to/upgrade-nain4.html">here</a>.</p>
+<h2 id="using-other-versions-of-nain4-1"><a class="header" href="#using-other-versions-of-nain4-1">Using other versions of <code>nain4</code></a></h2>
+<p>By default, <code>flake.nix</code> instructs your system to use the latest <code>master</code> and <code>flake.lock</code> pins it to a specific version of <code>master</code>. But you can specify other versions of any dependency, including ones which are not located in the official repository. Here a few examples of how you might modify the corresponding line in your project's <code>flake.nix</code>:</p>
+<ul>
+<li>
+<p>Use a preview of a feature being developed on the <code>some-experimental-feature</code> branch in the <code>nain4</code> repo.</p>
+<p><code>nain4.url = &quot;github:jacg/nain4?branch=some-experimental-feature&quot;</code></p>
+</li>
+<li>
+<p>Use a specific tagged version of <code>nain4</code>.</p>
+<p><code>nain4.url = &quot;github:jacg/nain4?ref=v1.2.3&quot;</code></p>
+</li>
+<li>
+<p>Use a specific commit available in the <code>nain4</code> repo.</p>
+<p><code>nain4.url = &quot;github:jacg/nain4?ref=9b4699ca25539d41bd1f5965a341be5e8ff862f1&quot;</code></p>
+</li>
+<li>
+<p>Use a version of <code>nain4</code> made available in a repo other than the official <code>nain4</code> one.</p>
+<p><code>nain4.url = &quot;github:gonzaponte/nain4?branch=cool-idea&quot;</code></p>
+</li>
+<li>
+<p>Use a version of <code>nain4</code> being developed on your own machine.</p>
+<p><code>nain4.url = &quot;/home/me/src/nain4?branch=cool-idea&quot;</code></p>
+</li>
+</ul>
+<p>For the full details, see the <a href="https://nixos.org/manual/nix/unstable/command-ref/new-cli/nix3-flake#url-like-syntax">Nix manual</a>.</p>
+<p>Don't forget that, after switching to a different version of <code>nain4</code>, you may need to <code>just clean</code> and recompile your code, to avoid mysterious and annoying errors caused by stale build artefacts. (Hopefully this will be done for you automatically once <code>nain4</code> migrates its build infrastructure from <code>cmake</code> to <code>meson</code>.)</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
