@@ -13,35 +13,31 @@ test-all:
 test-fetch-content:
   #!/usr/bin/env bash
   bash test_fetch_content.sh
-  if [[ $? -eq 0 ]]; then
-    printf "\\033[32m => Client project compiled successfully with fetch content\n";
-  else
-    printf "\\033[91m => Client project could not be compiled with fetch content\n";
-  fi
+  just print $? "using fetch content"
+
 
 test-fetch-content-recompile:
   #!/usr/bin/env bash
   sudo -E bash test_fetch_content_recompile.sh
-  if [[ $? -eq 0 ]]; then
-    printf "\\033[32m => Client project recompiled without using the network\n";
-  else
-    printf "\\033[91m => Client project could not be recompiled without using the network\n";
-  fi
+  just print $? "a second time without a network"
+
 
 test-subdirectory:
   #!/usr/bin/env bash
   bash test_subdirectory.sh
-  if [[ $? -eq 0 ]]; then
-    printf "\\033[32m => Client project compiled successfully with nain4 as a subdirectory\n";
-  else
-    printf "\\033[91m => Client project could not be compiled with nain4 as a subdirectory\n";
-  fi
+  just print $? "using nain4 as a subdirectory"
+
 
 test-independent-installation:
   #!/usr/bin/env bash
   bash test_independent_installation.sh
-  if [[ $? -eq 0 ]]; then
-    printf "\\033[32m => Client project compiled successfully with an independent installation of nain4\n";
+  just print $? "using an independent installation of nain4"
+
+
+print exit_status explanation:
+  #!/usr/bin/env bash
+  if [[ {{exit_status}} -eq 0 ]]; then
+    printf "\\033[32m => Client project compiled successfully {{explanation}}\n";
   else
-    printf "\\033[91m => Client project could not be compiled with an independent installation of nain4\n";
+    printf "\\033[91m => Client project could not be compiled {{explanation}}\n";
   fi
