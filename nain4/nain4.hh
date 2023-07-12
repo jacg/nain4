@@ -4,6 +4,7 @@
 #define nain4_hh
 
 #include <CLHEP/Geometry/Transform3D.h>
+#include <G4IntersectionSolid.hh>
 #include <G4LogicalVolume.hh>
 #include <G4LogicalVolumeStore.hh>
 #include <G4Material.hh>
@@ -18,8 +19,10 @@
 #include <G4String.hh>
 #include <G4SolidStore.hh>
 #include <G4SDManager.hh>
+#include <G4SubtractionSolid.hh>
 #include <G4ThreeVector.hh>
 #include <G4Transform3D.hh>
+#include <G4UnionSolid.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4VSensitiveDetector.hh>
 #include <G4VUserActionInitialization.hh>
@@ -74,6 +77,25 @@ G4LogicalVolume* volume(NAME name, G4Material* material, ArgTypes&&... args) {
   auto solid = new SOLID{std::forward<NAME>(name), std::forward<ArgTypes>(args)...};
   return new G4LogicalVolume{solid, material, solid->GetName()};
 }
+
+#define NOMATERIAL nullptr
+
+#define ADD       G4UnionSolid
+#define JOIN      G4UnionSolid
+#define SUB       G4SubtractionSolid
+#define SUBTRACT  G4SubtractionSolid
+#define INT       G4IntersectionSolid
+#define INTERSECT G4IntersectionSolid
+
+template<class BOOL, class NAME, class... ArgTypes>
+G4LogicalVolume* boolean(NAME name, G4LogicalVolume* main, G4LogicalVolume* secondary, ArgTypes&&... args) {
+  return volume<BOOL>( name
+                     , main     ->GetMaterial()
+                     , main     ->GetSolid()
+                     , secondary->GetSolid()
+                     , std::forward<ArgTypes>(args)...);
+}
+
 
 // --------------------------------------------------------------------------------
 // Utilies for concisely retrieving things from stores
