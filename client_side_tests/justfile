@@ -1,0 +1,43 @@
+# -*-Makefile-*-
+
+test-all:
+  #!/usr/bin/env sh
+  just test-fetch-content           ;(( status |= $? ))
+  $(exit 0)                         ;(( status |= $? ))
+  just test-subdirectory            ;(( status |= $? ))
+  just test-independent-installation;(( status |= $? ))
+
+  exit $status
+
+
+test-fetch-content:
+  #!/usr/bin/env bash
+  bash test_fetch_content.sh
+  just print $? "using fetch content"
+
+
+test-fetch-content-recompile:
+  #!/usr/bin/env bash
+  sudo -E bash test_fetch_content_recompile.sh
+  just print $? "a second time without a network"
+
+
+test-subdirectory:
+  #!/usr/bin/env bash
+  bash test_subdirectory.sh
+  just print $? "using nain4 as a subdirectory"
+
+
+test-independent-installation:
+  #!/usr/bin/env bash
+  bash test_independent_installation.sh
+  just print $? "using an independent installation of nain4"
+
+
+print exit_status explanation:
+  #!/usr/bin/env bash
+  if [[ {{exit_status}} -eq 0 ]]; then
+    printf "\\033[32m => Client project compiled successfully {{explanation}}\n";
+  else
+    printf "\\033[91m => Client project could not be compiled {{explanation}}\n";
+  fi
