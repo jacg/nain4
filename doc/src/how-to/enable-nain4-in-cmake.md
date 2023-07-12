@@ -11,16 +11,7 @@ There are 3 options to include nain4 in your project:
 Add this snippet to your CMakeLists.txt:
 
 ```
-include(FetchContent)
-
-FetchContent_Declare(
-  Nain4
-  GIT_REPOSITORY https://github.com/jacg/nain4.git
-  GIT_TAG        v0.0.0
-  SOURCE_SUBDIR  nain4
-)
-
-FetchContent_MakeAvailable(Nain4)
+{{#include ../../../client_side_tests/client_fetch_content/CMakeLists.txt:5:18}}
 ```
 
 The value given to `GIT_TAG` may be a replaced with a branch name (`origin/<branch-name>`) or a commit hash. When opting for the 'branch name' option, it's important to be aware of the potential risk of losing reproducibility. With each execution of CMake, the library may be updated to a different state, introducing changes that can impact the reproducibility of your project. This can lead to compilation or runtime errors, making it challenging to recreate specific build or runtime environments. Thus, we advise to use a commit hash or a tag instead.
@@ -31,7 +22,7 @@ The value given to `GIT_TAG` may be a replaced with a branch name (`origin/<bran
 Clone the Nain4 repository into your own project or create a symbolic link to the clone. Then simply add
 
 ```
-add_subdirectory(nain4/nain4)
+{{#include ../../../client_side_tests/client_subdirectory/CMakeLists.txt:5}}
 ```
 
 to your CMakeLists.txt.
@@ -41,29 +32,22 @@ to your CMakeLists.txt.
 
 ```
 git clone https://github.com/jacg/nain4.git
-mkdir nain4/build && cd $_
-cmake [-DCMAKE_INSTALL_PREFIX=/path/to/install/] ../nain4/
-make && make install
+cd nain4
+cmake [-DCMAKE_INSTALL_PREFIX=/path/to/install/] -S nain4 -B build
+cmake --build build --target install
 ```
 
 Unless the option `CMAKE_INSTALL_PREFIX` is speficied, the files will be installed in `/path/to/nain4/install`.
 Then add to your CMakeLists.txt:
 
 ```
-set(Nain4_DIR "/path/to/install/lib/cmake/Nain4/")
-find_package(Nain4 REQUIRED)
+{{#include ../../../client_side_tests/client_independent_installation/CMakeLists.txt:5:6}}
 ```
 
 ## Linking to Nain4
 
-Regardless of the chosen option, you will also need to link the library to your targets:
+Regardless of the chosen option, you will also need to link the library to each target like:
 
 ```
-foreach(target <targets>)
-  target_link_libraries(
-    <target>
-    PRIVATE
-    ${NAIN4_LIBRARIES}
-  )
-endforeach()
+{{#include ../../../client_side_tests/client_fetch_content/CMakeLists.txt:23:28}}
 ```
