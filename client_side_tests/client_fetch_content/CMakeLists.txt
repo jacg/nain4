@@ -4,6 +4,8 @@ project(Client)
 
 include(FetchContent)
 
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE BOOL "Cache package contents to avoid unnecessary downloads")
+
 FetchContent_Declare(
   Nain4
   GIT_REPOSITORY https://github.com/jacg/nain4.git
