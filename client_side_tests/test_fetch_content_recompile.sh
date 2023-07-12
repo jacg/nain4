@@ -1,25 +1,22 @@
 #!/bin/bash
 
-if [[ $(id -u) -ne 0 ]]; then
-  echo This program must be run with su privileges!
-  exit 1
-fi
-
 tmp_dir=$(mktemp -d -t nain4-recompile-XXXXXX)
 test_dir=$(dirname "$(readlink -f "$0")")
 
 cd $tmp_dir
-cmake $test_dir/client_fetch_content && make && rm exe
+cmake -S $test_dir/client_fetch_content -B build
+cmake --build build
+rm -f build/client_exe # Make sure the executable does not exist unless we recompile
 
-result1=$(unshare --net cmake $test_dir/client_fetch_content)
-result2=$(unshare --net  make)
+# Block network access temporarily
+sudo iptables -A OUTPUT -j DROP
 
-result=$result1 && $result2
+cmake -S $test_dir/client_fetch_content -B build; status1=$?
+cmake --build build; status2=$?
+./build/client_exe; status3=$?
 
-echo RESULT $result1 $result2 $result
+# Restore network access
+sudo iptables -D OUTPUT -j DROP
 
-if [[ $result -eq 0 ]]; then
-  exit 1;
-else
-  exit 0;
-fi
+(( status = status1 | status2 | status3 ))
+exit $status
