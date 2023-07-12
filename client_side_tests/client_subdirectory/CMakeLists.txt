@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.25)
 
 project(Client)
 
+# ANCHOR: add_subdir
 add_subdirectory(nain4/nain4)
+# ANCHOR_END: add_subdir
 
 find_package(Geant4 REQUIRED)
 include(${Geant4_USE_FILE})
