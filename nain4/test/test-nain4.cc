@@ -21,7 +21,7 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-using namespace Catch;
+using Catch::Approx;
 
 // Many of the tests below check physical quantities. Dividing physical
 // quantities by their units gives raw numbers which are easily understandable
