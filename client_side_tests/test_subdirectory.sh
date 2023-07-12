@@ -8,7 +8,6 @@ cd $tmp_dir/client_subdirectory
 
 ln -s $test_dir/../ nain4
 
-mkdir build && cd $_
-cmake ../ && make && ./client_exe
+cmake -S . -B build && cmake --build build && ./build/client_exe
 
 exit $?
