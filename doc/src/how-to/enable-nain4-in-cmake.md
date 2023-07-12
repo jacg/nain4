@@ -44,6 +44,9 @@ Then add to your CMakeLists.txt:
 {{#include ../../../client_side_tests/client_independent_installation/CMakeLists.txt:find_package}}
 ```
 
+Make sure you have `NAIN4_INSTALL` set in your shell environment before running `cmake` or replace it by `/path/to/install/` in the CMakeLists.txt file.
+
+
 ## Linking to Nain4
 
 Regardless of the chosen option, you will also need to link the library to each target like:
