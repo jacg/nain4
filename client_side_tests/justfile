@@ -2,12 +2,12 @@
 
 test-all:
   #!/usr/bin/env sh
-  t0=$(just test-fetch-content)
-  t1=0
-  t2=$(just test-subdirectory)
-  t3=$(just test-independent-installation)
+  just test-fetch-content           ;(( status |= $? ))
+  $(exit 0)                         ;(( status |= $? ))
+  just test-subdirectory            ;(( status |= $? ))
+  just test-independent-installation;(( status |= $? ))
 
-  ! (( $t0 | $t1 | $t2 | $t3 ))
+  exit $status
 
 
 test-fetch-content:
