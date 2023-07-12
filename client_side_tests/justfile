@@ -18,7 +18,7 @@ test-fetch-content:
 
 test-fetch-content-recompile:
   #!/usr/bin/env bash
-  sudo -E bash test_fetch_content_recompile.sh
+  bash test_fetch_content_recompile.sh
   just print $? "a second time without a network"
 
 
