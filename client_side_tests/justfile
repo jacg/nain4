@@ -3,7 +3,7 @@
 test-all:
   #!/usr/bin/env sh
   just test-fetch-content           ;(( status |= $? ))
-  $(exit 0)                         ;(( status |= $? ))
+  just test-fetch-content-recompile ;(( status |= $? ))
   just test-subdirectory            ;(( status |= $? ))
   just test-independent-installation;(( status |= $? ))
 
