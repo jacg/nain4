@@ -1,12 +1,13 @@
 # -*-Makefile-*-
 
 test-all:
+  #!/usr/bin/env sh
   t0=$(just test-fetch-content)
   t1=0
   t2=$(just test-subdirectory)
   t3=$(just test-independent-installation)
 
-  [[ t0 && (t1 && (t2 && t3)) ]]
+  ! (( $t0 | $t1 | $t2 | $t3 ))
 
 
 test-fetch-content:
