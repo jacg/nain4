@@ -11,8 +11,8 @@
 #include <G4EmStandardPhysics_option4.hh>
 #include <G4OpticalPhysics.hh>
 
-#define CATCH_CONFIG_RUNNER
-#include <catch2/catch.hpp>
+#include <catch2/catch_session.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <fstream>
 #include <memory>

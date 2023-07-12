@@ -17,7 +17,11 @@
 #include <G4Material.hh>
 #include <G4Gamma.hh>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+using namespace Catch;
 
 // Many of the tests below check physical quantities. Dividing physical
 // quantities by their units gives raw numbers which are easily understandable
