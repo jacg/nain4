@@ -13,25 +13,32 @@ test-all:
 test-fetch-content:
   #!/usr/bin/env bash
   bash test_fetch_content.sh
-  just print $? "using fetch content"
-
+  status=$?
+  just print $status "using fetch content"
+  exit $status
 
 test-fetch-content-recompile:
   #!/usr/bin/env bash
   bash test_fetch_content_recompile.sh
-  just print $? "a second time without a network"
+  status=$?
+  just print $status "a second time without a network"
+  exit $status
 
 
 test-subdirectory:
   #!/usr/bin/env bash
   bash test_subdirectory.sh
-  just print $? "using nain4 as a subdirectory"
+  status=$?
+  just print $status "using nain4 as a subdirectory"
+  exit $status
 
 
 test-independent-installation:
   #!/usr/bin/env bash
   bash test_independent_installation.sh
-  just print $? "using an independent installation of nain4"
+  status=$?
+  just print $status "using an independent installation of nain4"
+  exit $status
 
 
 print exit_status explanation:
