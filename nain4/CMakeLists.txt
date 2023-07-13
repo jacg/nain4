@@ -57,7 +57,7 @@ set(Nain4_TESTS
 )
 
 # ----- Use Catch2 as C++ testing framework ---------------------------------
-find_package(Catch2 REQUIRED)
+find_package(Catch2 3 REQUIRED)
 set(ALL_TEST_SOURCES
   test/catch2-main-test.cc
   # ${Nain4_SOURCES}
