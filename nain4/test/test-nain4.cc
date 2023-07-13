@@ -60,7 +60,7 @@ TEST_CASE("nain material", "[nain][material]") {
     auto name = "n4test_FR4";
     auto density = 1.85 * g/cm3;
     auto state = kStateSolid;
-    auto [nH, nC, nO] = std::make_tuple(12, 18, 3);
+    auto [nH, nC, nO] = make_tuple(12, 18, 3);
 
     // Make the material using nain4::material_from_elements
     auto fr4 = nain4::material_from_elements_N(name, density, state,
@@ -110,7 +110,7 @@ TEST_CASE("nain material", "[nain][material]") {
     auto name = "n4test_LYSO";
     auto density = 7.1 * g/cm3;
     auto state = kStateSolid;
-    auto [fLu, fY, fSi, fO] = std::make_tuple(0.714, 0.040, 0.064, 0.182);
+    auto [fLu, fY, fSi, fO] = make_tuple(0.714, 0.040, 0.064, 0.182);
 
     // Make the material using nain4::material_from_elements
     auto lyso = nain4::material_from_elements_F(name, density, state,
