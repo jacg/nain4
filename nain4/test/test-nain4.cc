@@ -27,6 +27,8 @@
 
 #include <numeric>
 
+using std::make_tuple;
+
 TEST_CASE("nain material", "[nain][material]") {
 
   // nain4::material finds the same materials as the verbose G4 style
@@ -174,6 +176,46 @@ TEST_CASE("nain volume", "[nain][volume]") {
   CHECK(solid->GetCubicVolume() / m3 == Approx(8 *  lx    * ly    * lz     / m3));
   CHECK(solid->GetSurfaceArea() / m2 == Approx(8 * (lx*ly + ly*lz + lz*lx) / m2));
   CHECK(solid->GetName()             == "test_box");
+}
+
+TEST_CASE("nain boolean", "[nain][boolean]") {
+  auto water = nain4::material("G4_WATER");
+  auto l     = 2 * m;
+  auto dr    = G4ThreeVector{l/2, l/2, l/2};
+  auto norot = nullptr;
+  auto vbox  = l*l*l;
+  auto vint  =     vbox / 8.;
+  auto vsum  = 2 * vbox - vint;
+  auto vsub  =     vbox - vint;
+
+  auto box1 = nain4::volume<G4Box>("test_box1",      water, l/2, l/2, l/2);
+  auto box2 = nain4::volume<G4Box>("test_box2", NOMATERIAL, l/2, l/2, l/2);
+
+  auto union1 = nain4::boolean<ADD      >("test_add"      , box1, box2, norot, dr);
+  auto union2 = nain4::boolean<JOIN     >("test_join"     , box1, box2, norot, dr);
+  auto subtr1 = nain4::boolean<SUB      >("test_sub"      , box1, box2, norot, dr);
+  auto subtr2 = nain4::boolean<SUBTRACT >("test_subtract" , box1, box2, norot, dr);
+  auto inter1 = nain4::boolean<INT      >("test_int"      , box1, box2, norot, dr);
+  auto inter2 = nain4::boolean<INTERSECT>("test_intersect", box1, box2, norot, dr);
+
+  //                        object  volume name
+  auto items = { make_tuple(union1, vsum, "add")
+               , make_tuple(union2, vsum, "join")
+               , make_tuple(subtr1, vsub, "sub")
+               , make_tuple(subtr2, vsub, "subtract")
+               , make_tuple(inter1, vint, "int")
+               , make_tuple(inter2, vint, "intersect")
+               };
+
+  auto density = water->GetDensity();
+  for (auto& item : items){
+    auto [obj, vol, name] = item;
+    CHECK(obj->TotalVolumeEntities() == 1);
+    CHECK(obj->GetMass() / kg        == Approx(vol * density / kg));
+    CHECK(obj->GetMaterial()         == water);
+    CHECK(obj->GetName()             == std::string("test_") + name);
+  }
+
 }
 
 TEST_CASE("nain place", "[nain][place]") {
