@@ -40,7 +40,7 @@
             clang-tools
             cmake
             cmake-language-server
-            catch2
+            catch2_3
             just
             gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
             mdbook
