@@ -9,8 +9,8 @@ set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE BOOL "Cache package contents to a
 
 FetchContent_Declare(
   Nain4
-  GIT_REPOSITORY https://github.com/gonzaponte/nain4.git
-  GIT_TAG        04cac7ba64f3a832cd1e05ec0b0a8f73d1b0288d
+  GIT_REPOSITORY https://github.com/jacg/nain4.git
+  GIT_TAG        v0.0.2
   # make sure that no other nain4 installation is used
   OVERRIDE_FIND_PACKAGE
   SOURCE_SUBDIR nain4
