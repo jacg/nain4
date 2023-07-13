@@ -37,7 +37,7 @@ test-independent-installation:
 print exit_status explanation:
   #!/usr/bin/env bash
   if [[ {{exit_status}} -eq 0 ]]; then
-    printf "\\033[32m => Client project compiled successfully {{explanation}}\n";
+    printf "\\033[32m => Client project compiled successfully {{explanation}}\x1B[37m\n";
   else
-    printf "\\033[91m => Client project could not be compiled {{explanation}}\n";
+    printf "\\033[91m => Client project could not be compiled {{explanation}}\x1B[37m\n";
   fi
