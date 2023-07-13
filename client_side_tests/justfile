@@ -11,37 +11,30 @@ test-all:
 
 
 test-fetch-content:
-  #!/usr/bin/env bash
-  bash test_fetch_content.sh
-  status=$?
-  just print $status "using fetch content"
-  exit $status
+  just execute test_fetch_content.sh "using fetch content"
+
 
 test-fetch-content-recompile:
-  #!/usr/bin/env bash
-  bash test_fetch_content_recompile.sh
-  status=$?
-  just print $status "a second time without a network"
-  exit $status
+  just execute test_fetch_content_recompile.sh "a second time without a network"
 
 
 test-subdirectory:
-  #!/usr/bin/env bash
-  bash test_subdirectory.sh
-  status=$?
-  just print $status "using nain4 as a subdirectory"
-  exit $status
+  just execute test_subdirectory.sh "using nain4 as a subdirectory"
 
 
 test-independent-installation:
+  just execute test_independent_installation.sh "using an independent installation of nain4"
+
+
+execute test_name *label:
   #!/usr/bin/env bash
-  bash test_independent_installation.sh
+  bash {{test_name}}
   status=$?
-  just print $status "using an independent installation of nain4"
+  just print $status {{label}}
   exit $status
 
 
-print exit_status explanation:
+print exit_status *explanation:
   #!/usr/bin/env bash
   if [[ {{exit_status}} -eq 0 ]]; then
     printf "\\033[32m => Client project compiled successfully {{explanation}}\x1B[37m\n";
