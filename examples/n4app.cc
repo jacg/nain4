@@ -38,8 +38,8 @@ G4VPhysicalVolume* my_geometry() {
 void my_generator(G4Event* event) {
   auto geantino = n4::find_particle("geantino");
   auto vertex   = new G4PrimaryVertex();
-  vertex->SetPrimary(new G4PrimaryParticle(geantino, 1, 0, 0));
-  event->AddPrimaryVertex(vertex);
+  vertex -> SetPrimary(new G4PrimaryParticle(geantino, 1, 0, 0));
+  event  -> AddPrimaryVertex(vertex);
 }
 // ANCHOR_END: my_generator
 
