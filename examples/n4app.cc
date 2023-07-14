@@ -3,8 +3,6 @@
 #include "nain4.hh"
 #include "g4-mandatory.hh"
 
-#include <G4RunManager.hh> // handle to the simulation framework
-#include <G4RunManagerFactory.hh> // generates the handle
 #include <G4SystemOfUnits.hh>
 #include <G4VPhysicalVolume.hh> // the output of our geometry
 #include <G4Event.hh> // handle to the event for primary generation of particles
@@ -60,8 +58,7 @@ int main(int argc, char* argv[]) {
   // ANCHOR_END: pick_cli_arguments
 
   // ANCHOR: create_run_manager
-  auto run_manager = std::unique_ptr<G4RunManager>
-  {G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly)};
+  auto run_manager = n4::run_manager();
   // ANCHOR_END: create_run_manager
 
   // ANCHOR: build_minimal_framework
