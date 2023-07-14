@@ -50,8 +50,8 @@ private:
 struct event_action : public G4UserEventAction {
   using action_t = std::function<void(G4Event const*)>;
 
-  void BeginOfEventAction  (G4Event const* event) override { if (begin_) begin_(event); }
-  void   EndOfEventAction  (G4Event const* event) override { if   (end_)   end_(event); }
+  void BeginOfEventAction(G4Event const* event) override { if (begin_) begin_(event); }
+  void   EndOfEventAction(G4Event const* event) override { if   (end_)   end_(event); }
 
   event_action* begin(action_t action) { begin_ = action; return this; }
   event_action*   end(action_t action) {   end_ = action; return this; }
