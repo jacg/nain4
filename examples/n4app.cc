@@ -3,13 +3,13 @@
 #include "nain4.hh"
 #include "g4-mandatory.hh"
 
-#include <G4RunManager.hh>
-#include <G4RunManagerFactory.hh>
+#include <G4RunManager.hh> // handle to the simulation framework
+#include <G4RunManagerFactory.hh> // generates the handle
 #include <G4SystemOfUnits.hh>
-#include <G4VPhysicalVolume.hh>
-#include <G4Event.hh>
+#include <G4VPhysicalVolume.hh> // the output of our geometry
+#include <G4Event.hh> // handle to the event for primary generation of particles
 #include <G4Box.hh>
-#include <FTFP_BERT.hh>
+#include <FTFP_BERT.hh> // physics list
 
 #include <cstdlib>
 // ANCHOR_END: includes
