@@ -9,18 +9,30 @@
   };
 
   outputs = { self, nixpkgs, flake-utils, flake-compat }:
+    let
+      geant4-dbg-overlay = final: prev: {
+        geant4-dbg = prev.geant4.overrideAttrs (old: {
+          cmakeBuildType = "Debug";
+        });
+      };
+      geant4-config = {
+        enableMultiThreading = false;
+        enableInventor       = false;
+        enableQt             = true;
+        enableXM             = false;
+        enableOpenGLX11      = true;
+        enablePython         = false;
+        enableRaytracerX11   = false;
+      };
+    in
     flake-utils.lib.eachSystem ["x86_64-linux" "i686-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"] (system:
       let
-        pkgs = import nixpkgs { inherit system; };
-        my-geant4 = (pkgs.geant4.override {
-          enableMultiThreading = false;
-          enableInventor       = false;
-          enableQt             = true;
-          enableXM             = false;
-          enableOpenGLX11      = true;
-          enablePython         = false;
-          enableRaytracerX11   = false;
-        });
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ geant4-dbg-overlay ];
+        };
+        my-geant4-dbg = (pkgs.geant4-dbg.override geant4-config);
+        my-geant4     = (pkgs.geant4    .override geant4-config);
 
       in {
 
@@ -28,7 +40,7 @@
           name = "G4-examples-devenv";
 
           packages = with pkgs; [
-            my-geant4
+            my-geant4-dbg
             geant4.data.G4PhotonEvaporation
             geant4.data.G4EMLOW
             geant4.data.G4RadioactiveDecay
@@ -44,6 +56,7 @@
             just
             gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
             mdbook
+            gdb
           ];
 
           G4_DIR = "${pkgs.geant4}";
