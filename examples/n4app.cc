@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
   if (argc != 2) {
     std::cerr << "Wrong number of parameters: " << argc << std::endl;
     print_usage();
-    return 1;
+    std::exit(EXIT_FAILURE);
   }
 
   auto n_events = atoi(argv[1]);
@@ -86,7 +86,6 @@ int main(int argc, char* argv[]) {
   // ANCHOR_END: close_gracefully
 
 // ANCHOR: closing_bracket
-  return 0;
 }
 // ANCHOR_END: closing_bracket
 // ANCHOR_END: full_file
