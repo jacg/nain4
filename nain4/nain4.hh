@@ -12,6 +12,7 @@
 #include <G4RotationMatrix.hh>
 #include <G4Run.hh>
 #include <G4RunManager.hh>
+#include <G4RunManagerFactory.hh>
 #include <G4String.hh>
 #include <G4SolidStore.hh>
 #include <G4ThreeVector.hh>
@@ -19,6 +20,7 @@
 #include <G4VPhysicalVolume.hh>
 #include <G4VisAttributes.hh>
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -67,10 +69,16 @@ G4LogicalVolume* volume(NAME name, G4Material* material, ArgTypes&&... args) {
   auto solid = new SOLID{std::forward<NAME>(name), std::forward<ArgTypes>(args)...};
   return new G4LogicalVolume{solid, material, solid->GetName()};
 }
+// --------------------------------------------------------------------------------
+// Utilities for concise creation of run manager
+// clang-format off
+inline
+std::unique_ptr<G4RunManager> run_manager(G4RunManagerType type = G4RunManagerType::SerialOnly) {
+  return std::unique_ptr<G4RunManager>{G4RunManagerFactory::CreateRunManager(type)};
+}
 
 // --------------------------------------------------------------------------------
 // Utilies for concisely retrieving things from stores
-// clang-format off
 #define NAME     (G4String const& name)
 #define NAME_VRB (G4String const& name, G4bool verbose=true)
 #define IA inline auto
