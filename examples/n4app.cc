@@ -53,7 +53,7 @@ G4VUserPhysicsList* my_physics_list() {
 // ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
   if (argc != 2) {
-    std::cerr << "Wrong number of parameters: " << argc << std::endl;
+    std::cerr << "Wrong number of arguments: " << argc << std::endl;
     print_usage();
     std::exit(EXIT_FAILURE);
   }
