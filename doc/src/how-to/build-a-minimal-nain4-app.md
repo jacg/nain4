@@ -17,17 +17,20 @@ In order to run a simulation we need to create a run manager:
 {{#include ../../../examples/n4app.cc:create_run_manager}}
 ```
 
-The run manager needs to be initialized with 4 attributes:
+The run manager needs to be initialized with 3 attributes:
 - A physics list
 - A geometry
-- A primary generator
 - A set of actions
 
+To build the action set we need to provide a primary generator action. Other actions are optional.
 Note that the physics list must be instantiated and given to the run manager before the primary generator is instantiated. We provide the run manager with these attributes:
+
 ```c++
 {{#include ../../../examples/n4app.cc:build_minimal_framework}}
 ```
+
 here, `my_geometry`, and `my_generator` are the two functions we need to provide to run our simulation:
+
 ```c++
 {{#include ../../../examples/n4app.cc:my_geometry}}
 
