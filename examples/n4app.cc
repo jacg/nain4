@@ -52,12 +52,6 @@ void my_generator(G4Event* event) {
 // ANCHOR_END: my_generator
 
 
-// ANCHOR: my_physics_list
-G4VUserPhysicsList* my_physics_list() {
-  return new FTFP_BERT{0};
-}
-// ANCHOR_END: my_physics_list
-
 // ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
   verify_call_signature(argc);
@@ -72,14 +66,9 @@ int main(int argc, char* argv[]) {
 
   // ANCHOR: build_minimal_framework
   // Important! physics list has to be set before the generator!
-  run_manager -> SetUserInitialization(my_physics_list());
-
-  auto geometry  = new n4::geometry {my_geometry};
-  auto generator = new n4::generator{my_generator};
-  auto actions   = new n4::actions  {generator};
-
-  run_manager -> SetUserInitialization(geometry);
-  run_manager -> SetUserInitialization(actions);
+  run_manager -> SetUserInitialization(new FTFP_BERT{0}); // version 0
+  run_manager -> SetUserInitialization(new n4::geometry{my_geometry});
+  run_manager -> SetUserInitialization(new n4::actions {new n4::generator{my_generator}});
   run_manager -> Initialize();
   // ANCHOR_END: build_minimal_framework
 
