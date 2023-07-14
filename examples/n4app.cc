@@ -28,11 +28,9 @@ void verify_number_of_args(int argc){
 
 // ANCHOR: my_geometry
 auto my_geometry() {
-  auto world_halfsize = 1 * m;
-
-  auto world = n4::volume<G4Box>( "world"
-                                , n4::material("G4_AIR")
-                                , world_halfsize, world_halfsize, world_halfsize);
+  auto hl = 1 * m; // HALF-length of world volume
+  auto air = n4::material("G4_AIR");
+  auto world = n4::volume<G4Box>("world", air, hl, hl, hl);
   return n4::place(world).now();
 }
 // ANCHOR_END: my_geometry
