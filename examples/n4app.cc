@@ -17,7 +17,7 @@ void print_usage() {
             << "./n4app <number of events>" << std::endl;
 }
 
-void verify_call_signature(int argc){
+void verify_number_of_args(int argc){
   if (argc != 2) {
     std::cerr << "Wrong number of arguments: " << argc << std::endl;
     print_usage();
@@ -51,7 +51,7 @@ void my_generator(G4Event* event) {
 
 // ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
-  verify_call_signature(argc);
+  verify_number_of_args(argc);
 
   auto n_events = std::stoi(argv[1]);
   // ANCHOR_END: pick_cli_arguments
