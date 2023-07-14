@@ -11,7 +11,7 @@
 #include <G4Box.hh>
 #include <FTFP_BERT.hh>
 
-#include <stdlib.h>
+#include <cstdlib>
 // ANCHOR_END: includes
 
 // ANCHOR: print_usage
