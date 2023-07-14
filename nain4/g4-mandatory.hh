@@ -1,5 +1,6 @@
 #ifndef nain4_g4_mandatory_hh
 #define nain4_g4_mandatory_hh
+#include <G4SDManager.hh>
 
 #include <G4Box.hh>
 #include <G4ClassificationOfNewTrack.hh>
@@ -166,6 +167,13 @@ private:
   process_hits_fn process_hits;
   end_of_event_fn end_of_event;
 };
+// --------------------------------------------------------------------------------
+template<class SENSITIVE>
+auto fully_activate_sensitive_detector(SENSITIVE* detector) {
+  detector -> Activate(true);
+  G4SDManager::GetSDMpointer() -> AddNewDetector(detector);
+  return detector;
+}
 
 // --------------------------------------------------------------------------------
 // TODO Currently has a hard-wired storing of steps: generalize :

@@ -17,7 +17,6 @@
 #include <G4RunManager.hh>
 #include <G4String.hh>
 #include <G4SolidStore.hh>
-#include <G4SDManager.hh>
 #include <G4ThreeVector.hh>
 #include <G4Transform3D.hh>
 #include <G4VPhysicalVolume.hh>
@@ -95,15 +94,6 @@ IA event_number  ()       { return G4RunManager::GetRunManager()->GetCurrentRun(
 
 // Remove all, logical/physical volumes, solids and assemblies.
 inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeometry(true); }
-
-
-// --------------------------------------------------------------------------------
-template<class SENSITIVE>
-auto fully_activate_sensitive_detector(SENSITIVE* detector) {
-  detector -> Activate(true);
-  G4SDManager::GetSDMpointer() -> AddNewDetector(detector);
-  return detector;
-}
 
 // --------------------------------------------------------------------------------
 // The G4Material::AddElement is overloaded on double/int in the second
