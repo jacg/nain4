@@ -90,7 +90,7 @@ IA find_physical NAME_VRB { return G4PhysicalVolumeStore::GetInstance()->GetVolu
 IA find_solid    NAME_VRB { return G4SolidStore         ::GetInstance()->GetSolid           (name, verbose); }
 IA find_particle NAME     { return G4ParticleTable:: GetParticleTable()->FindParticle       (name         ); }
 
-IA event_number  ()       { return G4RunManager::GetRunManager()->GetCurrentRun()->GetNumberOfEvent(); }
+IA event_number  ()       { return get_run_manager() -> GetCurrentRun() -> GetNumberOfEvent(); }
 #undef IA
 #undef NAME
 #undef NAME_VRB
