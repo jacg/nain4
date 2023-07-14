@@ -11,6 +11,7 @@
 #include <G4UserStackingAction.hh>
 #include <G4UserSteppingAction.hh>
 #include <G4UserTrackingAction.hh>
+#include <G4VSensitiveDetector.hh>
 #include <G4VUserActionInitialization.hh>
 #include <G4VUserEventInformation.hh>
 #include <G4VUserDetectorConstruction.hh>
@@ -148,6 +149,22 @@ struct geometry : public G4VUserDetectorConstruction {
   G4VPhysicalVolume* Construct() override { return construct(); }
 private:
   construct_fn construct;
+};
+
+// --------------------------------------------------------------------------------
+// TODO make a builder for this (if more methods are added?)
+// TODO: needs tests
+class sensitive_detector : public G4VSensitiveDetector {
+public:
+  using process_hits_fn = std::function<bool(G4Step*)>;
+  using end_of_event_fn = std::function<void(G4HCofThisEvent*)>;
+
+  sensitive_detector(G4String name, process_hits_fn process_hits, end_of_event_fn end_of_event);
+  G4bool ProcessHits(G4Step* step, G4TouchableHistory*) override;
+  void   EndOfEvent (G4HCofThisEvent* hc)               override;
+private:
+  process_hits_fn process_hits;
+  end_of_event_fn end_of_event;
 };
 
 // --------------------------------------------------------------------------------

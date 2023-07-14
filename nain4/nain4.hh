@@ -106,23 +106,6 @@ auto fully_activate_sensitive_detector(SENSITIVE* detector) {
 }
 
 // --------------------------------------------------------------------------------
-// TODO make a builder for this (if more methods are added?)
-// TODO: needs tests
-// TODO: belongs with the actions in g4-mandatory
-class sensitive_detector : public G4VSensitiveDetector {
-public:
-  using process_hits_fn = std::function<bool(G4Step*)>;
-  using end_of_event_fn = std::function<void(G4HCofThisEvent*)>;
-
-  sensitive_detector(G4String name, process_hits_fn process_hits, end_of_event_fn end_of_event);
-  G4bool ProcessHits(G4Step* step, G4TouchableHistory*) override;
-  void   EndOfEvent (G4HCofThisEvent* hc)               override;
-private:
-  process_hits_fn process_hits;
-  end_of_event_fn end_of_event;
-};
-
-// --------------------------------------------------------------------------------
 // The G4Material::AddElement is overloaded on double/int in the second
 // parameter. Template argument deduction doesn't seem to be able to resolve
 // this, when the values are nested inside an std::initializer_list argument.
