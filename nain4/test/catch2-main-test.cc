@@ -41,9 +41,7 @@ int main(int argc, char** argv) {
   auto hush = std::make_unique<n4::silence>(std::cout);
 
   // Construct the default run manager
-  auto run_manager = unique_ptr<G4RunManager>
-    {G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly)};
-
+  auto run_manager = n4::run_manager();
   // Set mandatory initialization classes
 
   // run_manager takes ownership of detector_construction
