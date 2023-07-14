@@ -19,6 +19,14 @@ void print_usage() {
   std::cout << "Usage:" << std::endl
             << "./n4app <number of events>" << std::endl;
 }
+
+void verify_call_signature(int argc){
+  if (argc != 2) {
+    std::cerr << "Wrong number of arguments: " << argc << std::endl;
+    print_usage();
+    std::exit(EXIT_FAILURE);
+  }
+}
 // ANCHOR_END: print_usage
 
 
@@ -52,11 +60,7 @@ G4VUserPhysicsList* my_physics_list() {
 
 // ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
-  if (argc != 2) {
-    std::cerr << "Wrong number of arguments: " << argc << std::endl;
-    print_usage();
-    std::exit(EXIT_FAILURE);
-  }
+  verify_call_signature(argc);
 
   auto n_events = std::stoi(argv[1]);
   // ANCHOR_END: pick_cli_arguments
