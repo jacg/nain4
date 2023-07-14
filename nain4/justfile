@@ -45,7 +45,7 @@ build: cmake
 cmake:
 	#!/usr/bin/env sh
 	cmake -S . -B build
-	cmake --build build -j
+	cmake --build build --target install -j
 
 
 clean:
