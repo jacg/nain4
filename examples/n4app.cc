@@ -3,10 +3,10 @@
 #include "nain4.hh"
 #include "g4-mandatory.hh"
 
-#include <G4SystemOfUnits.hh>
-#include <G4Event.hh> // handle to the event for primary generation of particles
-#include <G4Box.hh>
-#include <FTFP_BERT.hh> // physics list
+#include <G4SystemOfUnits.hh> // physical units such as `m` for metre
+#include <G4Event.hh>         // needed to inject primary particles into an event
+#include <G4Box.hh>           // for creating shapes in the geometry
+#include <FTFP_BERT.hh>       // our choice of physics list
 
 #include <cstdlib>
 // ANCHOR_END: includes
