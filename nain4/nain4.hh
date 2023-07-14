@@ -3,13 +3,10 @@
 #ifndef nain4_hh
 #define nain4_hh
 
-#include <CLHEP/Geometry/Transform3D.h>
-#include <G4LogicalVolume.hh>
 #include <G4LogicalVolumeStore.hh>
 #include <G4Material.hh>
 #include <G4NistManager.hh>
 #include <G4PVPlacement.hh>
-#include <G4ParticleDefinition.hh>
 #include <G4ParticleTable.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4RotationMatrix.hh>
@@ -20,9 +17,6 @@
 #include <G4ThreeVector.hh>
 #include <G4Transform3D.hh>
 #include <G4VPhysicalVolume.hh>
-#include <G4VSensitiveDetector.hh>
-#include <G4VUserActionInitialization.hh>
-#include <G4VUserDetectorConstruction.hh>
 #include <G4VisAttributes.hh>
 
 #include <string>
