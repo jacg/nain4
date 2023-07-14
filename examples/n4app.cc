@@ -1,3 +1,5 @@
+// ANCHOR: full_file
+// ANCHOR: includes
 #include "nain4.hh"
 #include "g4-mandatory.hh"
 
@@ -9,14 +11,17 @@
 #include <FTFP_BERT.hh>
 
 #include <stdlib.h>
+// ANCHOR_END: includes
 
-
+// ANCHOR: print_usage
 void print_usage() {
   std::cout << "Usage:" << std::endl
             << "./n4app <number of events>" << std::endl;
 }
+// ANCHOR_END: print_usage
 
 
+// ANCHOR: my_geometry
 G4VPhysicalVolume* my_geometry() {
   auto world_halfsize = 1 * m;
 
@@ -25,18 +30,26 @@ G4VPhysicalVolume* my_geometry() {
                                 , world_halfsize, world_halfsize, world_halfsize);
   return n4::place(world).now();
 }
+// ANCHOR_END: my_geometry
 
+
+// ANCHOR: my_generator
 void my_generator(G4Event* event) {
   auto geantino = n4::find_particle("geantino");
   auto vertex   = new G4PrimaryVertex();
   vertex->SetPrimary(new G4PrimaryParticle(geantino, 1, 0, 0));
   event->AddPrimaryVertex(vertex);
 }
+// ANCHOR_END: my_generator
 
+
+// ANCHOR: my_physics_list
 G4VUserPhysicsList* my_physics_list() {
   return new FTFP_BERT{0};
 }
+// ANCHOR_END: my_physics_list
 
+// ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
   if (argc != 2) {
     std::cerr << "Wrong number of parameters: " << argc << std::endl;
@@ -45,10 +58,13 @@ int main(int argc, char* argv[]) {
   }
 
   auto n_events = atoi(argv[1]);
+  // ANCHOR_END: pick_cli_arguments
 
-
+  // ANCHOR: create_run_manager
   auto* run_manager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  // ANCHOR_END: create_run_manager
 
+  // ANCHOR: build_minimal_framework
   // Important! physics list has to be set before the generator!
   run_manager -> SetUserInitialization(my_physics_list());
 
@@ -59,10 +75,18 @@ int main(int argc, char* argv[]) {
   run_manager -> SetUserInitialization(geometry);
   run_manager -> SetUserInitialization(actions);
   run_manager -> Initialize();
+  // ANCHOR_END: build_minimal_framework
 
+  // ANCHOR: run
   run_manager -> BeamOn(n_events);
+  // ANCHOR_END: run
 
+  // ANCHOR: close_gracefully
   delete run_manager;
+  // ANCHOR_END: close_gracefully
 
+// ANCHOR: closing_bracket
   return 0;
 }
+// ANCHOR_END: closing_bracket
+// ANCHOR_END: full_file
