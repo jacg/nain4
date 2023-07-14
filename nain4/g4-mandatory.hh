@@ -1,5 +1,6 @@
 #ifndef nain4_g4_mandatory_hh
 #define nain4_g4_mandatory_hh
+#include <G4SDManager.hh>
 
 #include <G4Box.hh>
 #include <G4ClassificationOfNewTrack.hh>
@@ -11,6 +12,7 @@
 #include <G4UserStackingAction.hh>
 #include <G4UserSteppingAction.hh>
 #include <G4UserTrackingAction.hh>
+#include <G4VSensitiveDetector.hh>
 #include <G4VUserActionInitialization.hh>
 #include <G4VUserEventInformation.hh>
 #include <G4VUserDetectorConstruction.hh>
@@ -27,8 +29,8 @@ namespace nain4 {
 
 // ----- run_action -----------------------------------------------------------------
 struct run_action : public G4UserRunAction {
-  using action_t = std::function<void(G4Run const*)>;
-  using generate_t = std::function<G4Run*()>;
+  using action_t   = std::function<void   (G4Run const*)>;
+  using generate_t = std::function<G4Run* (            )>;
 
   G4Run* GenerateRun() override {
     if (generate_) { return generate_(); }
@@ -48,10 +50,10 @@ private:
 
 // ----- event_action ---------------------------------------------------------------
 struct event_action : public G4UserEventAction {
-  using action_t = std::function<void(G4Event const*)>;
+  using action_t = std::function<void (G4Event const*)>;
 
-  void BeginOfEventAction  (G4Event const* event) override { if (begin_) begin_(event); }
-  void   EndOfEventAction  (G4Event const* event) override { if   (end_)   end_(event); }
+  void BeginOfEventAction(G4Event const* event) override { if (begin_) begin_(event); }
+  void   EndOfEventAction(G4Event const* event) override { if   (end_)   end_(event); }
 
   event_action* begin(action_t action) { begin_ = action; return this; }
   event_action*   end(action_t action) {   end_ = action; return this; }
@@ -62,9 +64,9 @@ private:
 
 // ----- stacking_action ------------------------------------------------------------
 struct stacking_action : public G4UserStackingAction {
-  using classify_t = std::function<G4ClassificationOfNewTrack(G4Track const*)>;
-  using stage_t    = std::function<void(G4StackManager * const)>;
-  using voidvoid_t = std::function<void()>;
+  using classify_t = std::function<G4ClassificationOfNewTrack (G4Track const *)>;
+  using stage_t    = std::function<void              (G4StackManager * const  )>;
+  using voidvoid_t = std::function<void              (                        )>;
 
   G4ClassificationOfNewTrack ClassifyNewTrack(G4Track const* track) override {
     if (classify_) {return classify_(track); }
@@ -84,7 +86,7 @@ private:
 
 // ----- tracking_action ------------------------------------------------------------
 struct tracking_action : public G4UserTrackingAction {
-  using action_t = std::function<void(const G4Track*)>;
+  using action_t = std::function<void (const G4Track*)>;
   void  PreUserTrackingAction(const G4Track* track) override { if ( pre_)  pre_(track); }
   void PostUserTrackingAction(const G4Track* track) override { if (post_) post_(track); }
 
@@ -97,7 +99,7 @@ private:
 
 // ----- stepping_action ------------------------------------------------------------
 struct stepping_action : public G4UserSteppingAction {
-  using action_t = std::function<void(const G4Step*)>;
+  using action_t = std::function<void (const G4Step*)>;
   // Only one method, so set it in constructor.
   stepping_action(action_t action) : action{action} {}
   void UserSteppingAction(const G4Step* step) override { action(step); }
@@ -107,7 +109,7 @@ private:
 
 // ----- primary generator ----------------------------------------------------------
 struct generator : public G4VUserPrimaryGeneratorAction {
-  using function = std::function<void(G4Event*)>;
+  using function = std::function<void (G4Event*)>;
   generator(function fn = geantino_along_x) : doit{fn} {}
   void GeneratePrimaries(G4Event* event) override { doit(event); };
 private:
@@ -120,6 +122,7 @@ struct actions : public G4VUserActionInitialization {
   actions(G4VUserPrimaryGeneratorAction* generator) : generator_{generator} {}
   actions(generator::function fn) : generator_{new generator(fn)} {}
   // See B1 README for explanation of the role of BuildForMaster in multi-threaded mode.
+  // As nain4 recommend avoiding multithreaded G4, implementing this has the lowest priority
   //void BuildForMaster() const override;
   void Build() const override;
 
@@ -142,12 +145,35 @@ private:
 // Quickly implement G4VUserDetectorConstruction: just instantiate this class
 // with a function which returns the geometry
 struct geometry : public G4VUserDetectorConstruction {
-  using construct_fn = std::function<G4VPhysicalVolume*()>;
+  using construct_fn = std::function<G4VPhysicalVolume* ()>;
   geometry(construct_fn f) : construct{f} {}
   G4VPhysicalVolume* Construct() override { return construct(); }
 private:
   construct_fn construct;
 };
+
+// --------------------------------------------------------------------------------
+// TODO make a builder for this (if more methods are added?)
+// TODO: needs tests
+class sensitive_detector : public G4VSensitiveDetector {
+public:
+  using process_hits_fn = std::function<bool(G4Step*)>;
+  using end_of_event_fn = std::function<void(G4HCofThisEvent*)>;
+
+  sensitive_detector(G4String name, process_hits_fn process_hits, end_of_event_fn end_of_event);
+  G4bool ProcessHits(G4Step* step, G4TouchableHistory*) override;
+  void   EndOfEvent (G4HCofThisEvent* hc)               override;
+private:
+  process_hits_fn process_hits;
+  end_of_event_fn end_of_event;
+};
+// --------------------------------------------------------------------------------
+template<class SENSITIVE>
+auto fully_activate_sensitive_detector(SENSITIVE* detector) {
+  detector -> Activate(true);
+  G4SDManager::GetSDMpointer() -> AddNewDetector(detector);
+  return detector;
+}
 
 // --------------------------------------------------------------------------------
 // TODO Currently has a hard-wired storing of steps: generalize :

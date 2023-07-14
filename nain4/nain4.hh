@@ -3,13 +3,10 @@
 #ifndef nain4_hh
 #define nain4_hh
 
-#include <CLHEP/Geometry/Transform3D.h>
-#include <G4LogicalVolume.hh>
 #include <G4LogicalVolumeStore.hh>
 #include <G4Material.hh>
 #include <G4NistManager.hh>
 #include <G4PVPlacement.hh>
-#include <G4ParticleDefinition.hh>
 #include <G4ParticleTable.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4RotationMatrix.hh>
@@ -17,13 +14,9 @@
 #include <G4RunManager.hh>
 #include <G4String.hh>
 #include <G4SolidStore.hh>
-#include <G4SDManager.hh>
 #include <G4ThreeVector.hh>
 #include <G4Transform3D.hh>
 #include <G4VPhysicalVolume.hh>
-#include <G4VSensitiveDetector.hh>
-#include <G4VUserActionInitialization.hh>
-#include <G4VUserDetectorConstruction.hh>
 #include <G4VisAttributes.hh>
 
 #include <string>
@@ -95,32 +88,6 @@ IA event_number  ()       { return G4RunManager::GetRunManager()->GetCurrentRun(
 
 // Remove all, logical/physical volumes, solids and assemblies.
 inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeometry(true); }
-
-
-// --------------------------------------------------------------------------------
-template<class SENSITIVE>
-auto fully_activate_sensitive_detector(SENSITIVE* detector) {
-  detector -> Activate(true);
-  G4SDManager::GetSDMpointer() -> AddNewDetector(detector);
-  return detector;
-}
-
-// --------------------------------------------------------------------------------
-// TODO make a builder for this (if more methods are added?)
-// TODO: needs tests
-// TODO: belongs with the actions in g4-mandatory
-class sensitive_detector : public G4VSensitiveDetector {
-public:
-  using process_hits_fn = std::function<bool(G4Step*)>;
-  using end_of_event_fn = std::function<void(G4HCofThisEvent*)>;
-
-  sensitive_detector(G4String name, process_hits_fn process_hits, end_of_event_fn end_of_event);
-  G4bool ProcessHits(G4Step* step, G4TouchableHistory*) override;
-  void   EndOfEvent (G4HCofThisEvent* hc)               override;
-private:
-  process_hits_fn process_hits;
-  end_of_event_fn end_of_event;
-};
 
 // --------------------------------------------------------------------------------
 // The G4Material::AddElement is overloaded on double/int in the second
