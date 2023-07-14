@@ -70,13 +70,14 @@ G4LogicalVolume* volume(NAME name, G4Material* material, ArgTypes&&... args) {
   return new G4LogicalVolume{solid, material, solid->GetName()};
 }
 // --------------------------------------------------------------------------------
-// Utilities for concise creation of run manager
+// Utilities for concise creation and finding of run manager
 // clang-format off
 inline
 std::unique_ptr<G4RunManager> run_manager(G4RunManagerType type = G4RunManagerType::SerialOnly) {
   return std::unique_ptr<G4RunManager>{G4RunManagerFactory::CreateRunManager(type)};
 }
 
+inline G4RunManager* get_run_manager() { return G4RunManager::GetRunManager(); }
 // --------------------------------------------------------------------------------
 // Utilies for concisely retrieving things from stores
 #define NAME     (G4String const& name)
