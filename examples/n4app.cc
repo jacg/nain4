@@ -4,7 +4,6 @@
 #include "g4-mandatory.hh"
 
 #include <G4SystemOfUnits.hh>
-#include <G4VPhysicalVolume.hh> // the output of our geometry
 #include <G4Event.hh> // handle to the event for primary generation of particles
 #include <G4Box.hh>
 #include <FTFP_BERT.hh> // physics list
@@ -29,7 +28,7 @@ void verify_call_signature(int argc){
 
 
 // ANCHOR: my_geometry
-G4VPhysicalVolume* my_geometry() {
+auto my_geometry() {
   auto world_halfsize = 1 * m;
 
   auto world = n4::volume<G4Box>( "world"
