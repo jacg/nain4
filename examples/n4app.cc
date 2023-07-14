@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
 
   // ANCHOR: create_run_manager
   auto run_manager = std::unique_ptr<G4RunManager>
-  {G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default)};
+  {G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly)};
   // ANCHOR_END: create_run_manager
 
   // ANCHOR: build_minimal_framework
