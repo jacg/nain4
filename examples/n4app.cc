@@ -3,6 +3,7 @@
 #include "nain4.hh"
 #include "g4-mandatory.hh"
 
+#include <G4RunManager.hh>
 #include <G4RunManagerFactory.hh>
 #include <G4SystemOfUnits.hh>
 #include <G4VPhysicalVolume.hh>
@@ -61,7 +62,8 @@ int main(int argc, char* argv[]) {
   // ANCHOR_END: pick_cli_arguments
 
   // ANCHOR: create_run_manager
-  auto* run_manager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  auto run_manager = std::unique_ptr<G4RunManager>
+  {G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default)};
   // ANCHOR_END: create_run_manager
 
   // ANCHOR: build_minimal_framework
@@ -80,10 +82,6 @@ int main(int argc, char* argv[]) {
   // ANCHOR: run
   run_manager -> BeamOn(n_events);
   // ANCHOR_END: run
-
-  // ANCHOR: close_gracefully
-  delete run_manager;
-  // ANCHOR_END: close_gracefully
 
 // ANCHOR: closing_bracket
 }
