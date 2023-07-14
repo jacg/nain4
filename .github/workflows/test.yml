@@ -49,5 +49,8 @@ jobs:
       - name: Run client-side tests
         run: nix develop -c just test-client-side
 
+      - name: Run nain4 examples
+        run: nix develop -c just examples
+
       - name: Run G4 examples
         run: nix develop -c just g4-examples/run-examples-that-work
