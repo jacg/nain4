@@ -27,8 +27,8 @@ namespace nain4 {
 
 // ----- run_action -----------------------------------------------------------------
 struct run_action : public G4UserRunAction {
-  using action_t = std::function<void(G4Run const*)>;
-  using generate_t = std::function<G4Run*()>;
+  using action_t   = std::function<void   (G4Run const*)>;
+  using generate_t = std::function<G4Run* (            )>;
 
   G4Run* GenerateRun() override {
     if (generate_) { return generate_(); }
@@ -48,7 +48,7 @@ private:
 
 // ----- event_action ---------------------------------------------------------------
 struct event_action : public G4UserEventAction {
-  using action_t = std::function<void(G4Event const*)>;
+  using action_t = std::function<void (G4Event const*)>;
 
   void BeginOfEventAction(G4Event const* event) override { if (begin_) begin_(event); }
   void   EndOfEventAction(G4Event const* event) override { if   (end_)   end_(event); }
@@ -62,9 +62,9 @@ private:
 
 // ----- stacking_action ------------------------------------------------------------
 struct stacking_action : public G4UserStackingAction {
-  using classify_t = std::function<G4ClassificationOfNewTrack(G4Track const*)>;
-  using stage_t    = std::function<void(G4StackManager * const)>;
-  using voidvoid_t = std::function<void()>;
+  using classify_t = std::function<G4ClassificationOfNewTrack (G4Track const *)>;
+  using stage_t    = std::function<void              (G4StackManager * const  )>;
+  using voidvoid_t = std::function<void              (                        )>;
 
   G4ClassificationOfNewTrack ClassifyNewTrack(G4Track const* track) override {
     if (classify_) {return classify_(track); }
@@ -84,7 +84,7 @@ private:
 
 // ----- tracking_action ------------------------------------------------------------
 struct tracking_action : public G4UserTrackingAction {
-  using action_t = std::function<void(const G4Track*)>;
+  using action_t = std::function<void (const G4Track*)>;
   void  PreUserTrackingAction(const G4Track* track) override { if ( pre_)  pre_(track); }
   void PostUserTrackingAction(const G4Track* track) override { if (post_) post_(track); }
 
@@ -97,7 +97,7 @@ private:
 
 // ----- stepping_action ------------------------------------------------------------
 struct stepping_action : public G4UserSteppingAction {
-  using action_t = std::function<void(const G4Step*)>;
+  using action_t = std::function<void (const G4Step*)>;
   // Only one method, so set it in constructor.
   stepping_action(action_t action) : action{action} {}
   void UserSteppingAction(const G4Step* step) override { action(step); }
@@ -107,7 +107,7 @@ private:
 
 // ----- primary generator ----------------------------------------------------------
 struct generator : public G4VUserPrimaryGeneratorAction {
-  using function = std::function<void(G4Event*)>;
+  using function = std::function<void (G4Event*)>;
   generator(function fn = geantino_along_x) : doit{fn} {}
   void GeneratePrimaries(G4Event* event) override { doit(event); };
 private:
@@ -142,7 +142,7 @@ private:
 // Quickly implement G4VUserDetectorConstruction: just instantiate this class
 // with a function which returns the geometry
 struct geometry : public G4VUserDetectorConstruction {
-  using construct_fn = std::function<G4VPhysicalVolume*()>;
+  using construct_fn = std::function<G4VPhysicalVolume* ()>;
   geometry(construct_fn f) : construct{f} {}
   G4VPhysicalVolume* Construct() override { return construct(); }
 private:
