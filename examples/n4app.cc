@@ -26,7 +26,6 @@ void verify_number_of_args(int argc){
 }
 // ANCHOR_END: print_usage
 
-
 // ANCHOR: my_geometry
 auto my_geometry() {
   auto world_halfsize = 1 * m;
@@ -38,7 +37,6 @@ auto my_geometry() {
 }
 // ANCHOR_END: my_geometry
 
-
 // ANCHOR: my_generator
 void my_generator(G4Event* event) {
   auto geantino = n4::find_particle("geantino");
@@ -47,7 +45,6 @@ void my_generator(G4Event* event) {
   event  -> AddPrimaryVertex(vertex);
 }
 // ANCHOR_END: my_generator
-
 
 // ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
@@ -71,7 +68,6 @@ int main(int argc, char* argv[]) {
   // ANCHOR: run
   run_manager -> BeamOn(n_events);
   // ANCHOR_END: run
-
 // ANCHOR: closing_bracket
 }
 // ANCHOR_END: closing_bracket
