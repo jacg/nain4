@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
     std::exit(EXIT_FAILURE);
   }
 
-  auto n_events = atoi(argv[1]);
+  auto n_events = std::stoi(argv[1]);
   // ANCHOR_END: pick_cli_arguments
 
   // ANCHOR: create_run_manager
