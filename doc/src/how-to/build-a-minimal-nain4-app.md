@@ -27,10 +27,8 @@ Note that the physics list must be instantiated and given to the run manager bef
 ```c++
 {{#include ../../../examples/n4app.cc:build_minimal_framework}}
 ```
-here, `my_physics_list`, `my_geometry`, and `my_generator` are the three functions we need to provide to run our simulation:
+here, `my_geometry`, and `my_generator` are the two functions we need to provide to run our simulation:
 ```c++
-{{#include ../../../examples/n4app.cc:my_physics_list}}
-
 {{#include ../../../examples/n4app.cc:my_geometry}}
 
 {{#include ../../../examples/n4app.cc:my_generator}}
@@ -46,7 +44,4 @@ Don't forget to add the relevant includes
 {{#include ../../../examples/n4app.cc:includes}}
 ```
 
-and deleting the run_manager before exiting for proper memory deallocation.
-```c++
-{{#include ../../../examples/n4app.cc:close_gracefully}}
-```
+To run this test type `just test-examples` from the top `nain4` directory.
