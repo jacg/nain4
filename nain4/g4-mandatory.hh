@@ -120,6 +120,7 @@ struct actions : public G4VUserActionInitialization {
   actions(G4VUserPrimaryGeneratorAction* generator) : generator_{generator} {}
   actions(generator::function fn) : generator_{new generator(fn)} {}
   // See B1 README for explanation of the role of BuildForMaster in multi-threaded mode.
+  // As nain4 recommend avoiding multithreaded G4, implementing this has the lowest priority
   //void BuildForMaster() const override;
   void Build() const override;
 
