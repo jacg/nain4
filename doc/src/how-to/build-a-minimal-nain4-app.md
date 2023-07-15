@@ -1,5 +1,7 @@
 # How to create a minimal nain4 app
 
+## Building the app
+
 The most basic example of a nain4 app can be found in [examples/00-basic/n4app.cc](../../../examples/00-basic/n4app.cc). Here is the full file:
 
 ```c++
@@ -47,4 +49,43 @@ Don't forget to add the relevant includes
 {{#include ../../../examples/00-basic/n4app.cc:includes}}
 ```
 
-To run this test type `just test-examples` from the top `nain4` directory.
+## Compiling the app
+
+The app comes with its own `CMakeLists.txt`:
+
+```cmake
+{{#include ../../../examples/00-basic/CMakeLists.txt:full_file}}
+```
+
+This contains the following bits. First, we have the project initialization:
+
+```cmake
+{{#include ../../../examples/00-basic/CMakeLists.txt:project_setup}}
+```
+
+It specifies the minimum cmake version, defines the project name and some lines necessary for code analysis in IDEs.
+Next, we include `nain4` and `Geant4` in our project:
+
+```cmake
+{{#include ../../../examples/00-basic/CMakeLists.txt:include_nain4_geant4}}
+```
+
+Note that we have chosen to use an existing installation of `nain4` so this example runs out of the box when run within `nain4`. If you where to copy this example and run it elsewhere, make sure to check [How to make nain4 available in a Geant4/cmake project](@book/how-to/enable-nain4-in-cmake).
+
+Finally, we create an executable file and link it to the relevant libraries.
+
+```cmake
+{{#include ../../../examples/00-basic/CMakeLists.txt:create_exe_and_link}}
+```
+
+To compile the app we `cd` into `00-basic` and run `just compile-app` or
+```
+cmake -S . -B build && cmake --build build
+```
+
+
+## Running the app
+
+To run this app type `just run-app <number of events>` (after compilation) from the `00-basic` directory. You can also achieve the same typing `./build/n4-00-basic <number of events>`.
+
+As this simulation is extremelly basic, it doesn't produce anything. You will only see a Geant4 header.
