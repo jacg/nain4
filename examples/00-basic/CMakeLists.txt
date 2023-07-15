@@ -26,10 +26,10 @@ set(EXE n4app-00-basic)
 add_executable(${EXE} n4app.cc)
 
 target_link_libraries(
-${EXE}
-PRIVATE
-Nain4
-${Geant4_LIBRARIES}
+  ${EXE}
+  PRIVATE
+  Nain4
+  ${Geant4_LIBRARIES}
 )
 # ANCHOR_END: create_exe_and_link
 # ANCHOR_END: full_file
