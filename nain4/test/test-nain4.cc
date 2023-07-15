@@ -69,7 +69,7 @@ TEST_CASE("nain material", "[nain][material]") {
                                                {{"H", nH}, {"C", nC}, {"O", nO}});
     CHECK(fr4 != nullptr);
 
-    // Verify that the material can be retrieved with nani4::material
+    // Verify that the material can be retrieved with nain4::material
     auto fr4_found = nain4::material(name);
     CHECK(fr4 == fr4_found);
 
@@ -119,7 +119,7 @@ TEST_CASE("nain material", "[nain][material]") {
                                                 {{"Lu", fLu}, {"Y", fY}, {"Si", fSi}, {"O", fO}});
     CHECK(lyso != nullptr);
 
-    // Verify that the material can be retrieved with nani4::material
+    // Verify that the material can be retrieved with nain4::material
     auto fr4_found = nain4::material(name);
     CHECK(lyso == fr4_found);
 
