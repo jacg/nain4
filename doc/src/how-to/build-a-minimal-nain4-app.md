@@ -70,7 +70,7 @@ Next, we include `nain4` and `Geant4` in our project:
 {{#include ../../../examples/00-basic/CMakeLists.txt:include_nain4_geant4}}
 ```
 
-Note that we have chosen to use an existing installation of `nain4` so this example runs out of the box when run within `nain4`. If you where to copy this example and run it elsewhere, make sure to check [How to make nain4 available in a Geant4/cmake project](@book/how-to/enable-nain4-in-cmake).
+Note that we have chosen to use an existing installation of `nain4` so this example runs out of the box when run within `nain4`. If you were to copy this example and run it elsewhere, make sure to check [How to make nain4 available in a Geant4/cmake project](@book/how-to/enable-nain4-in-cmake).
 
 Finally, we create an executable file and link it to the relevant libraries.
 
