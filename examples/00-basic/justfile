@@ -12,5 +12,5 @@ compile-app:
 
 run-app N:
   #!/usr/bin/env sh
-  ./build/n4app {{N}}
+  ./build/n4app-00-basic {{N}}
   exit $?

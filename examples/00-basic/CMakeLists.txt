@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(n4app)
+project(n4app-00-basic)
 
 # ----- Generate compile_commands.json, unless otherwise instructed on CLI --
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
@@ -16,10 +16,11 @@ find_package(Nain4 REQUIRED)
 find_package(Geant4 REQUIRED)
 include(${Geant4_USE_FILE})
 
-add_executable(n4app n4app.cc)
+set(EXE n4app-00-basic)
+add_executable(${EXE} n4app.cc)
 
 target_link_libraries(
-n4app
+${EXE}
 PRIVATE
 Nain4
 ${Geant4_LIBRARIES}
