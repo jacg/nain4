@@ -1,0 +1,13 @@
+
+
+test-all:
+  just test-example 00-basic
+
+
+test-example name:
+  just {{name}}/test-app
+
+
+run-example name:
+  just {{name}}/compile-app
+  just {{name}}/run-app
