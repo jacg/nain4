@@ -7,7 +7,7 @@
 
 namespace nain4 {
 
-run_manager& run_manager::init() {
+run_manager&& run_manager::init() {
   bool must_exit = false;
   for (auto [name, count]: user_init_set_count) {
     if (count != 1) {
@@ -23,7 +23,7 @@ run_manager& run_manager::init() {
 
   manager_ -> Initialize();
 
-  return *this;
+  return std::move(*this);
 }
 
 } // namespace nain4

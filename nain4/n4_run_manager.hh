@@ -22,10 +22,13 @@ public:
   run_manager(G4RunManagerType type = G4RunManagerType::SerialOnly)
       : manager_{G4RunManagerFactory::CreateRunManager(type)}
     {}
-#define SET_U_INIT(METHOD, TYPE) run_manager& METHOD (TYPE* x) {    \
+
+  run_manager(run_manager&& other) = default;
+
+#define SET_U_INIT(METHOD, TYPE) run_manager&& METHOD (TYPE* x) {   \
         manager_ -> SetUserInitialization(x);                       \
         user_init_set_count[#METHOD] += 1;                          \
-        return *this;                                               \
+        return std::move(*this);                                    \
 }
 
   SET_U_INIT(actions , G4VUserActionInitialization)
@@ -33,13 +36,13 @@ public:
   SET_U_INIT(physics , G4VUserPhysicsList)
 
   template<class PHYSICS, class... ArgTypes>
-  run_manager& physics(ArgTypes&&... args) { return this -> physics(new PHYSICS{std::forward<ArgTypes>(args)...});  }
+  run_manager&& physics(ArgTypes&&... args) { return this -> physics(new PHYSICS{std::forward<ArgTypes>(args)...});  }
 
-  run_manager& geometry(n4::geometry::construct_fn   build) { return geometry(new n4::geometry{build}); }
-  run_manager& actions (n4::generator::function      build) { return  actions(new n4::actions {build}); }
-  run_manager& actions (G4VUserPrimaryGeneratorAction* gen) { return  actions(new n4::actions {gen  }); }
+  run_manager&& geometry(n4::geometry::construct_fn   build) { return geometry(new n4::geometry{build}); }
+  run_manager&& actions (n4::generator::function      build) { return  actions(new n4::actions {build}); }
+  run_manager&& actions (G4VUserPrimaryGeneratorAction* gen) { return  actions(new n4::actions {gen  }); }
 
-  run_manager& init();
+  run_manager&& init();
 #undef SET_U_INIT
 
   // G4RunManager has lots of methods. This is an escape hatch to enable use of
