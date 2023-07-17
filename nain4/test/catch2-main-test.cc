@@ -44,18 +44,19 @@ int main(int argc, char** argv) {
   // Set mandatory initialization classes
 
   // run_manager takes ownership of detector_construction
-  run_manager -> SetUserInitialization(new dummy_detector{});
+  run_manager.geometry(new dummy_detector{});
 
   { // Physics list
     auto verbosity = 0;
     auto physics_list = new FTFP_BERT{verbosity};
     physics_list -> ReplacePhysics(new G4EmStandardPhysics_option4());
     physics_list -> RegisterPhysics(new G4OpticalPhysics{});
-    run_manager  -> SetUserInitialization(physics_list);
+    run_manager.physics(physics_list);
   } // run_manager owns physics_list
 
   // User action initialization
-  run_manager -> SetUserInitialization(new dummy_action_init{});
+  run_manager.actions(new dummy_action_init{});
+
 
   // Stop redicecting G4cout to /dev/null
   hush = nullptr;
