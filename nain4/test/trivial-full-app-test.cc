@@ -7,7 +7,6 @@
 #include <G4EventManager.hh>
 #include <G4LogicalVolumeStore.hh>
 #include <G4ParticleGun.hh>
-#include <G4RunManager.hh>
 #include <G4String.hh>
 #include <G4SystemOfUnits.hh>
 #include <G4TouchableHistory.hh>

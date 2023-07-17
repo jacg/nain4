@@ -1,7 +1,6 @@
 #include "nain4.hh"
 
 #include <G4Box.hh>
-#include <G4RunManagerFactory.hh>
 #include <G4SystemOfUnits.hh>
 #include <G4UIExecutive.hh>
 #include <G4VUserActionInitialization.hh>

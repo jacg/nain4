@@ -3,7 +3,6 @@
 #include "nain4.hh"
 
 #include <G4Run.hh>
-#include <G4RunManager.hh>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
