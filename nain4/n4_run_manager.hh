@@ -12,6 +12,7 @@
 
 #include <G4RunManager.hh>
 #include <G4RunManagerFactory.hh>
+#include <G4VUserPrimaryGeneratorAction.hh>
 
 namespace nain4 {
 
@@ -30,7 +31,9 @@ public:
   template<class PHYSICS, class... ArgTypes>
   run_manager& physics(ArgTypes&&... args) { return this -> physics(new PHYSICS{std::forward<ArgTypes>(args)...});  }
 
-  run_manager& geometry(n4::geometry::construct_fn build) { return geometry(new n4::geometry{build}); }
+  run_manager& geometry(n4::geometry::construct_fn   build) { return geometry(new n4::geometry{build}); }
+  run_manager& actions (n4::generator::function      build) { return  actions(new n4::actions {build}); }
+  run_manager& actions (G4VUserPrimaryGeneratorAction* gen) { return  actions(new n4::actions {gen  }); }
 
   run_manager& init();
 #undef SET_U_INIT
