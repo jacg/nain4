@@ -22,7 +22,11 @@ public:
   run_manager(G4RunManagerType type = G4RunManagerType::SerialOnly)
       : manager_{G4RunManagerFactory::CreateRunManager(type)}
     {}
-#define SET_U_INIT(METHOD, TYPE) run_manager& METHOD (TYPE* x) { manager_ -> SetUserInitialization(x); return *this; }
+#define SET_U_INIT(METHOD, TYPE) run_manager& METHOD (TYPE* x) {    \
+        manager_ -> SetUserInitialization(x);                       \
+        user_init_set_count[#METHOD] += 1;                          \
+        return *this;                                               \
+}
 
   SET_U_INIT(actions , G4VUserActionInitialization)
   SET_U_INIT(geometry, G4VUserDetectorConstruction)
@@ -48,7 +52,7 @@ private:
   std::unique_ptr<G4VUserActionInitialization> actions_;
   std::unique_ptr<G4VUserDetectorConstruction> geometry_;
   std::unique_ptr<G4VUserPhysicsList>          physics_;
-
+  std::map<std::string, unsigned> user_init_set_count{{"physics", 0}, {"actions", 0}, {"geometry", 0}};
 };
 
 
