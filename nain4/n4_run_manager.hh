@@ -25,6 +25,9 @@ public:
   SET_U_INIT(geometry, G4VUserDetectorConstruction)
   SET_U_INIT(physics , G4VUserPhysicsList)
 
+  template<class PHYSICS, class... ArgTypes>
+  run_manager& physics(ArgTypes&&... args) { return this -> physics(new PHYSICS{std::forward<ArgTypes>(args)...});  }
+
   run_manager& init();
 #undef SET_U_INIT
 
