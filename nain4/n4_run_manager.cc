@@ -1,11 +1,9 @@
 #include "n4_run_manager.hh"
 
-
 #include <memory>
 
 namespace nain4 {
 
-// TODO this should probably return something different
 run_manager& run_manager::init() {
 
     // TODO warn about unset user actions
