@@ -46,19 +46,19 @@ int main(int argc, char* argv[]) {
   // ANCHOR_END: pick_cli_arguments
 
   // ANCHOR: create_run_manager
-  auto run_manager = n4::run_manager();
+  auto run_manager = n4::run_manager()
   // ANCHOR_END: create_run_manager
 
   // ANCHOR: build_minimal_framework
   // Important! physics list has to be set before the generator!
-  run_manager -> SetUserInitialization(new FTFP_BERT{0}); // version 0
-  run_manager -> SetUserInitialization(new n4::geometry{my_geometry});
-  run_manager -> SetUserInitialization(new n4::actions {new n4::generator{my_generator}});
-  run_manager -> Initialize();
+  .physics<FTFP_BERT>(0) // version 0
+  .geometry(my_geometry)
+  .actions(my_generator)
+  .init();
   // ANCHOR_END: build_minimal_framework
 
   // ANCHOR: run
-  run_manager -> BeamOn(n_events);
+  run_manager.here_be_dragons() -> BeamOn(n_events);
   // ANCHOR_END: run
 // ANCHOR: closing_bracket
 }

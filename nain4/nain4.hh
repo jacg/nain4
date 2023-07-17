@@ -3,6 +3,8 @@
 #ifndef nain4_hh
 #define nain4_hh
 
+#include "n4_run_manager.hh"
+
 #include <G4LogicalVolumeStore.hh>
 #include <G4Material.hh>
 #include <G4NistManager.hh>
@@ -11,8 +13,6 @@
 #include <G4PhysicalVolumeStore.hh>
 #include <G4RotationMatrix.hh>
 #include <G4Run.hh>
-#include <G4RunManager.hh>
-#include <G4RunManagerFactory.hh>
 #include <G4String.hh>
 #include <G4SolidStore.hh>
 #include <G4ThreeVector.hh>
@@ -70,16 +70,8 @@ G4LogicalVolume* volume(NAME name, G4Material* material, ArgTypes&&... args) {
   return new G4LogicalVolume{solid, material, solid->GetName()};
 }
 // --------------------------------------------------------------------------------
-// Utilities for concise creation and finding of run manager
-// clang-format off
-inline
-std::unique_ptr<G4RunManager> run_manager(G4RunManagerType type = G4RunManagerType::SerialOnly) {
-  return std::unique_ptr<G4RunManager>{G4RunManagerFactory::CreateRunManager(type)};
-}
-
-inline G4RunManager* get_run_manager() { return G4RunManager::GetRunManager(); }
-// --------------------------------------------------------------------------------
 // Utilies for concisely retrieving things from stores
+// clang-format off
 #define NAME     (G4String const& name)
 #define NAME_VRB (G4String const& name, G4bool verbose=true)
 #define IA inline auto

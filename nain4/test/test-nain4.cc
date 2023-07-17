@@ -7,7 +7,6 @@
 
 // Managers
 #include <G4NistManager.hh>
-#include <G4RunManager.hh>
 
 // Units
 #include <G4SystemOfUnits.hh>
