@@ -3,6 +3,8 @@
 #ifndef n4_run_manager_hh
 #define n4_run_manager_hh
 
+#include "g4-mandatory.hh"
+
 #include <G4RunManager.hh>
 #include <G4VUserActionInitialization.hh>
 #include <G4VUserDetectorConstruction.hh>
@@ -27,6 +29,8 @@ public:
 
   template<class PHYSICS, class... ArgTypes>
   run_manager& physics(ArgTypes&&... args) { return this -> physics(new PHYSICS{std::forward<ArgTypes>(args)...});  }
+
+  run_manager& geometry(n4::geometry::construct_fn build) { return geometry(new n4::geometry{build}); }
 
   run_manager& init();
 #undef SET_U_INIT
