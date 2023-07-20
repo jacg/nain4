@@ -1,6 +1,7 @@
 // clang-format off
 
 #include "nain4.hh"
+#include "test_utils.hh"
 
 #include <G4Box.hh>
 
@@ -262,21 +263,17 @@ TEST_CASE("trivial app", "[app]") {
   auto expected_hits = n_gun * n_beam_on * n_inside_generator;
 
 
-  auto run_manager = n4::run_manager();
-  // Tell Geant4 all it needs to know about the simulation, initialze and go!
-  {
-    nain4::silence _{G4cout};
-    auto physics_list = new FTFP_BERT{0};
-    physics_list -> ReplacePhysics(new G4EmStandardPhysics_option4());
-    physics_list -> RegisterPhysics(new G4OpticalPhysics{});
+  auto hush = std::make_unique<n4::silence>(std::cout);
+  auto run_manager = n4::make_run_manager()
+    .physics(default_physics_lists())
+    .geometry<geometry>(y_min, y_max, z_min, z_max)
+    .actions <actions >(n_gun, n_inside_generator)
+    .init();
 
-    run_manager.physics(physics_list)
-      .geometry(new geometry{y_min, y_max, z_min, z_max})
-      .actions(new actions{n_gun, n_inside_generator})
-      .init();
+  run_manager.beam_on(n_beam_on);
 
-    run_manager.here_be_dragons() -> BeamOn(n_beam_on);
-  }
+  hush = nullptr;
+
   // Verify that all the geantinos coming out from the source, hit the detector
   // in the source's x-axis-projection onto the detector
   auto sd = dynamic_cast<sensitive*>(nain4::find_logical("detector") -> GetSensitiveDetector());
