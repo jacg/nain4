@@ -31,50 +31,43 @@ using Catch::Approx;
 
 #include <numeric>
 
-// TEST_CASE("nain run_manager exists", "[nain][run_manager]") {
-//   CHECK(n4::run_manager::create().is_valid());
-// }
+TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
+  auto hush = n4::silence{std::cout};
 
-// TEST_CASE("nain run_manager correct initialization", "[nain][run_manager]") {
-//   auto initialized_rm = n4::run_manager::create()
-//      .physics(default_physics_lists())
-//      .geometry(water_box)
-//      .actions(do_nothing)
-//      .init();
+  auto rm = n4::run_manager::create()
+     .physics(default_physics_lists)
+     .geometry(water_box)
+     .actions(do_nothing);
+}
 
-//   CHECK(initialized_rm -> is_valid());
-// }
 
-// TEST_CASE("nain run_manager pointer validity", "[nain][run_manager]") {
-//   auto rm0 = n4::run_manager::create();
-//   CHECK(rm0.is_valid());
+struct dummy_geometry : G4VUserDetectorConstruction {
+  dummy_geometry(double, double, double) {}
+  G4PVPlacement* Construct() {
+    auto box = n4::volume<G4Box>("box", n4::material("G4_AIR"), 1., 1., 1.);
+    return n4::place(box).now();
+  }
+};
 
-//   auto rm1 = rm0.physics(default_physics_lists());
-//   CHECK(!rm0.is_valid());
-//   CHECK( rm1.is_valid());
+struct dummy_actions : G4VUserActionInitialization {
+  dummy_actions(int) {}
+  void Build() const override {SetUserAction(new n4::generator([] (auto) {}));}
+};
 
-//   auto rm2 = rm1.geometry(water_box);
-//   CHECK(!rm0.is_valid());
-//   CHECK(!rm1.is_valid());
-//   CHECK( rm2.is_valid());
+TEST_CASE("nain run_manager construct initialization", "[nain][run_manager]") {
+  auto hush = n4::silence{std::cout};
 
-//   auto rm3 = rm2.actions(do_nothing);
-//   CHECK(!rm0.is_valid());
-//   CHECK(!rm1.is_valid());
-//   CHECK(!rm2.is_valid());
-//   CHECK( rm3.is_valid());
+  auto rm = n4::run_manager::create()
+     .physics<FTFP_BERT>(0) // verbosity 0
+     .geometry<dummy_geometry>(1., 2., 3.)
+     .actions<dummy_actions>(10);
+}
 
-//   auto rm4 = rm3.init();
-//   CHECK(!rm0 .  is_valid());
-//   CHECK(!rm1 .  is_valid());
-//   CHECK(!rm2 .  is_valid());
-//   CHECK(!rm3 .  is_valid());
-//   CHECK( rm4 -> is_valid());
-// }
+TEST_CASE("nain run_manager basic initialization", "[nain][run_manager]") {
+  auto hush = n4::silence{std::cout};
 
-// TEST_CASE("nain run_manager move", "[nain][run_manager]") {
-//   auto rm0 = n4::run_manager::create();
-//   auto rm1 = std::move(rm0);
-//   CHECK(!rm0.is_valid());
-//   CHECK( rm1.is_valid());
-// }
+  auto rm = n4::run_manager::create()
+     .physics (new FTFP_BERT{0}) // verbosity 0
+     .geometry(new dummy_geometry{1., 2., 3.})
+     .actions<dummy_actions>(10);
+}
