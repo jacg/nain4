@@ -46,15 +46,14 @@ int main(int argc, char* argv[]) {
   // ANCHOR_END: pick_cli_arguments
 
   // ANCHOR: create_run_manager
-  auto run_manager = n4::run_manager()
+  auto run_manager = n4::run_manager::create()
   // ANCHOR_END: create_run_manager
 
   // ANCHOR: build_minimal_framework
   // Important! physics list has to be set before the generator!
   .physics<FTFP_BERT>(0) // version 0
   .geometry(my_geometry)
-  .actions(my_generator)
-  .init();
+  .actions(my_generator);
   // ANCHOR_END: build_minimal_framework
 
   // ANCHOR: run

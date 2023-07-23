@@ -53,6 +53,7 @@ include(${Geant4_USE_FILE})
 
 set(Nain4_TESTS
   test/test-nain4.cc
+  test/test-run-manager.cc
   test/trivial-full-app-test.cc
 )
 

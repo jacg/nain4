@@ -1,4 +1,5 @@
 #include "nain4.hh"
+#include "test_utils.hh"
 
 // Solids
 #include <G4Box.hh>
@@ -295,7 +296,9 @@ TEST_CASE("nain vis_attributes", "[nain][vis_attributes]") {
         vis_attributes{}.visible(false).colour({1,1,0}));
 }
 
-TEST_CASE("nain find", "[nain][find]") {
+TEST_CASE("nain find geometry", "[nain][find][geometry]") {
+  auto run_manager = default_run_manager();
+
   // Utilities for retrieving from stores
   SECTION("find_logical") {
     auto air       = nain4::material("G4_AIR");
@@ -313,18 +316,23 @@ TEST_CASE("nain find", "[nain][find]") {
       CHECK(found_placed != nullptr);
     }
   }
-
-  SECTION("find_particle") {
-    auto name = "gamma";
-    auto pita = G4ParticleTable::GetParticleTable()->FindParticle(name);
-    auto solid = G4Gamma::Definition();
-    auto convenient = nain4::find_particle(name);
-    CHECK(convenient == pita);
-    CHECK(convenient == solid);
-  }
 }
 
+TEST_CASE("nain find particle", "[nain][find][particle]") {
+  auto run_manager = default_run_manager();
+
+  auto name = "gamma";
+  auto pita = G4ParticleTable::GetParticleTable()->FindParticle(name);
+  auto solid = G4Gamma::Definition();
+  auto convenient = nain4::find_particle(name);
+  CHECK(convenient == pita);
+  CHECK(convenient == solid);
+ }
+
+
 TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
+  auto run_manager = default_run_manager();
+
   auto name = "vanish";
   auto air = nain4::material("G4_AIR");
   auto logical = nain4::volume<G4Box>(name, air, 1*cm, 1*cm, 1*cm);
@@ -356,6 +364,8 @@ TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
 }
 
 TEST_CASE("nain geometry iterator", "[nain][geometry][iterator]") {
+  auto run_manager = default_run_manager();
+
   auto air = nain4::material("G4_AIR");
 
   auto l   = nain4::volume<G4Box>("l",   air, 100*m, 100*m, 100*m);

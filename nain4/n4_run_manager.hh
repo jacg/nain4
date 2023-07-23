@@ -5,6 +5,7 @@
 
 #include "g4-mandatory.hh"
 
+#include <G4Run.hh>
 #include <G4RunManager.hh>
 #include <G4VUserActionInitialization.hh>
 #include <G4VUserDetectorConstruction.hh>
@@ -14,53 +15,148 @@
 #include <G4RunManagerFactory.hh>
 #include <G4VUserPrimaryGeneratorAction.hh>
 
+#include <cstdlib>
+
+
 namespace nain4 {
 
+// Type-state pattern to ensure that the run manager is fully
+// configured before initialization.
+// Usage:
+// auto run_manager = n4::run_manager::create()
+//                       .physics (...)
+//                       .geometry(...)
+//                       .actions (...);
+
+// The last step implicitly initializes the run manager. At each step
+// we provide three alternative styles of providing the required
+// information (using physics as an example)
+// .physics(a_physics_list_instance)            // implemented by NEXT_STATE_BASIC
+// .physics<a_physics_list_type>(args...)       // implemented by NEXT_CONSTRUCT
+// .physics(zero_arg_fn_returning_physics_list) // implemented by NEXT_BUILD_FN
+
+// Geant4 requires that the physics list be set **BEFORE** a primary
+// generator class is **INSTANTIATED**. This requirement cannot be
+// fully enforced, but we try to make it less likely by suppressing
+// the NEXT_STATE_BASIC option in .actions(...).
+
+// We impose greater restrictions than strictly necessary: G4 allows
+// geometry to commute with actions and physics. However our
+// constraint imposes no loss of generality.
 
 class run_manager {
+  using RM = std::unique_ptr<G4RunManager>;
+
+  run_manager(RM manager) : manager{std::move(manager)} {
+    rm_instance = this;
+  }
+
+  RM manager;
+  static run_manager* rm_instance;
+  static bool         create_called;
+
+// Each state needs temporarily owns the G4RunManager and hands over
+// ownership to the next state. The constructor is private to ensure
+// that clients cannot create their own; by making run_manager a
+// friend, each state can build the next because the states are
+// members of run_manager as is the create method.
+#define CORE(THIS_STATE)                                       \
+    friend run_manager;                                        \
+  private:                                                     \
+    RM manager;                                                \
+    THIS_STATE(RM manager) : manager{std::move(manager)} {}    \
+  public:
+
+
+// Transition to the next state by providing an instance of the
+// required G4VUser* class. In the last step (actions -> initialized),
+// the run manager is initialized implicitly, hence, this macro needs
+// the EXTRA parameter.
+#define NEXT_STATE_BASIC(NEXT_STATE, METHOD, TYPE, EXTRA) \
+  NEXT_STATE METHOD(TYPE* x) {                            \
+      manager -> SetUserInitialization(x);                \
+      EXTRA;                                              \
+      return NEXT_STATE{std::move(manager)};              \
+    }
+
+// Transition to the next state by specifying a class and its
+// construction arguments.
+#define NEXT_CONSTRUCT(NEXT_STATE, METHOD)                             \
+    template<class G4VUSERTYPE, class... ArgTypes>                     \
+    inline NEXT_STATE METHOD(ArgTypes&&... args) {                     \
+      return METHOD(new G4VUSERTYPE{std::forward<ArgTypes>(args)...}); \
+    }
+
+// Transition to the next state by providing a zero-argument function
+// which returns an instance of the required G4VUser* class.
+#define NEXT_BUILD_FN(NEXT_STATE, METHOD, FN_TYPE, BODY) \
+  NEXT_STATE METHOD(FN_TYPE build) {                     \
+    return METHOD(BODY);                                 \
+  }
+
+  struct set_actions {
+    CORE(set_actions)
+    using fn_type = n4::generator::function;
+  private: // To reduce the possibility of instantiating generator before setting physics
+    NEXT_STATE_BASIC(run_manager, actions, G4VUserActionInitialization, manager -> Initialize())
+  public:
+    NEXT_CONSTRUCT  (run_manager, actions)
+    NEXT_BUILD_FN   (run_manager, actions, fn_type, new n4::actions{new n4::generator{build}})
+    //TODO: Implement these methods
+    // NEXT_BUILD_FN   (run_manager, actions, fn_type, new n4::actions{build})
+    // NEXT_BUILD_FN   (run_manager, actions, fn_type, build())
+  };
+
+  struct set_geometry {
+    CORE(set_geometry)
+    using fn_type = n4::geometry::construct_fn;
+    NEXT_STATE_BASIC(set_actions, geometry, G4VUserDetectorConstruction,)
+    NEXT_CONSTRUCT  (set_actions, geometry)
+    NEXT_BUILD_FN   (set_actions, geometry, fn_type, new n4::geometry{build})
+    //TODO: Implement this method
+    // NEXT_BUILD_FN   (set_actions, geometry, fn_type, build())
+  };
+
+  struct set_physics {
+    CORE(set_physics)
+    using fn_type = std::function<G4VUserPhysicsList* ()>;
+    NEXT_STATE_BASIC(set_geometry, physics, G4VUserPhysicsList,)
+    NEXT_CONSTRUCT  (set_geometry, physics)
+    NEXT_BUILD_FN   (set_geometry, physics, fn_type, build())
+  };
+
+
 public:
-  run_manager(G4RunManagerType type = G4RunManagerType::SerialOnly)
-      : manager_{G4RunManagerFactory::CreateRunManager(type)}
-    {}
+  static set_physics create(G4RunManagerType type=G4RunManagerType::SerialOnly) {
+    if (run_manager::create_called) {
+      std::cerr << "run_manager::create has already been called. "
+                << "It makes no sense to call it more than once."
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
 
-  run_manager(run_manager&& other) = default;
+    run_manager::create_called = true;
 
-#define SET_U_INIT(METHOD, TYPE) run_manager&& METHOD (TYPE* x) {   \
-        manager_ -> SetUserInitialization(x);                       \
-        user_init_set_count[#METHOD] += 1;                          \
-        return std::move(*this);                                    \
-}
+    auto manager = std::unique_ptr<G4RunManager>{G4RunManagerFactory::CreateRunManager(type)};
+    return set_physics{std::move(manager)};
+  }
 
-  SET_U_INIT(actions , G4VUserActionInitialization)
-  SET_U_INIT(geometry, G4VUserDetectorConstruction)
-  SET_U_INIT(physics , G4VUserPhysicsList)
+  static run_manager* get() {
+    if (!rm_instance) {
+      std::cerr << "run_manager::get called before run_manager configuration completed. "
+                << "Configure the run_manager with:\n"
+                << "auto run_manager = n4::run_manager::create()\n"
+                << "                      .physics (...)\n"
+                << "                      .geometry(...)\n"
+                << "                      .actions (...);\n"
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
+    return rm_instance;
+  }
 
-  template<class PHYSICS, class... ArgTypes>
-  run_manager&& physics(ArgTypes&&... args) { return this -> physics(new PHYSICS{std::forward<ArgTypes>(args)...});  }
-
-  run_manager&& geometry(n4::geometry::construct_fn   build) { return geometry(new n4::geometry{build}); }
-  run_manager&& actions (n4::generator::function      build) { return  actions(new n4::actions {build}); }
-  run_manager&& actions (G4VUserPrimaryGeneratorAction* gen) { return  actions(new n4::actions {gen  }); }
-
-  run_manager&& init();
-#undef SET_U_INIT
-
-  // G4RunManager has lots of methods. This is an escape hatch to enable use of
-  // any that we haven't dealt with yet. But it does give the user the power to
-  // cause lot of trouble.
-  G4RunManager* here_be_dragons() { return manager_.get(); }
-
-private:
-  std::unique_ptr<G4RunManager>                manager_;
-  std::unique_ptr<G4VUserActionInitialization> actions_;
-  std::unique_ptr<G4VUserDetectorConstruction> geometry_;
-  std::unique_ptr<G4VUserPhysicsList>          physics_;
-  std::map<std::string, unsigned> user_init_set_count{{"physics", 0}, {"actions", 0}, {"geometry", 0}};
+  G4RunManager* here_be_dragons() { return manager.get(); }
 };
-
-
-inline G4RunManager* get_run_manager() { return G4RunManager::GetRunManager(); }
-
 
 } // namespace nain4
 
