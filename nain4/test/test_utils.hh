@@ -3,25 +3,10 @@
 
 #include "nain4.hh"
 
-#include <G4VUserDetectorConstruction.hh>
-#include <G4VUserActionInitialization.hh>
 #include <FTFP_BERT.hh>
 #include <G4EmStandardPhysics_option4.hh>
 #include <G4OpticalPhysics.hh>
 
-class dummy_detector : public G4VUserDetectorConstruction {
-public:
-  dummy_detector() : G4VUserDetectorConstruction() {}
-  G4VPhysicalVolume* Construct() override { return nullptr; };
-};
-
-
-class dummy_action_init : public G4VUserActionInitialization {
-public:
-  dummy_action_init() : G4VUserActionInitialization() {}
-  void BuildForMaster() const override {}
-  void Build         () const override {}
-};
 
 inline auto water_box() {
   auto water = n4::material("G4_WATER");
