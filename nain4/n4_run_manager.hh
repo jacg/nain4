@@ -48,12 +48,12 @@ class run_manager {
   using RM = std::unique_ptr<G4RunManager>;
 
   run_manager(RM manager) : manager{std::move(manager)} {
-    // TODO: Error on second call!
     rm_instance = this;
   }
 
   RM manager;
   static run_manager* rm_instance;
+  static bool         create_called;
 
 // Each state needs temporarily owns the G4RunManager and hands over
 // ownership to the next state. The constructor is private to ensure
@@ -128,18 +128,28 @@ class run_manager {
 
 public:
   static set_physics create(G4RunManagerType type=G4RunManagerType::SerialOnly) {
-    // TODO
-    // if (rm_instance) {
-    //   std::cerr << "MAL" << std::endl;
-    //   exit(EXIT_FAILURE);
-    // }
+    if (run_manager::create_called) {
+      std::cerr << "run_manager::create has already been called. "
+                << "It makes no sense to call it more than once."
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
+
+    run_manager::create_called = true;
+
     auto manager = std::unique_ptr<G4RunManager>{G4RunManagerFactory::CreateRunManager(type)};
     return set_physics{std::move(manager)};
   }
 
   static run_manager* get() {
     if (!rm_instance) {
-      std::cerr << "MAL" << std::endl;
+      std::cerr << "run_manager::get called before run_manager configuration completed. "
+                << "Configure the run_manager with:\n"
+                << "auto run_manager = n4::run_manager::create()\n"
+                << "                      .physics (...)\n"
+                << "                      .geometry(...)\n"
+                << "                      .actions (...);\n"
+                << std::endl;
       exit(EXIT_FAILURE);
     }
     return rm_instance;
