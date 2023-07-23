@@ -48,11 +48,11 @@ inline auto default_run_manager(){
   auto hush = std::make_unique<n4::silence>(std::cout);
 
   // Construct the default run manager
-  auto run_manager = n4::make_run_manager()
-                        .physics(default_physics_lists())
-                        .geometry<dummy_detector>()
-                        .actions<dummy_action_init>()
-                        .init();
+
+  auto run_manager = n4::run_manager::create()
+                        .physics(default_physics_lists)
+                        .geometry(water_box)
+                        .actions(do_nothing);
 
   // Stop redicecting G4cout to /dev/null
   hush = nullptr;

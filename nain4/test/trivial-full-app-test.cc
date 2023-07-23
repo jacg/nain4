@@ -33,6 +33,8 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 
+#define SHOUT(x) std::cout << "I am in " << x << std::endl << std::flush;
+
 // ----- Fundamental requirements of Geant4 --------------------------------------
 
 // Geant4 apps need to register 3 mandatory user-defined classes with the Geant4
@@ -262,16 +264,13 @@ TEST_CASE("trivial app", "[app]") {
   unsigned n_gun = 3; unsigned n_beam_on = 5; unsigned n_inside_generator = 7;
   auto expected_hits = n_gun * n_beam_on * n_inside_generator;
 
-
   auto hush = std::make_unique<n4::silence>(std::cout);
-  auto run_manager = n4::make_run_manager()
+  auto run_manager = n4::run_manager::create()
     .physics(default_physics_lists())
     .geometry<geometry>(y_min, y_max, z_min, z_max)
-    .actions <actions >(n_gun, n_inside_generator)
-    .init();
+    .actions <actions >(n_gun, n_inside_generator);
 
-  run_manager.beam_on(n_beam_on);
-
+  run_manager.here_be_dragons() -> BeamOn(n_beam_on);
   hush = nullptr;
 
   // Verify that all the geantinos coming out from the source, hit the detector
