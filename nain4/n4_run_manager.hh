@@ -51,6 +51,10 @@ class run_manager {
     rm_instance = this;
   }
 
+public:
+  run_manager(run_manager& ) = delete;
+  run_manager(run_manager&&) = default;
+
   RM manager;
   static run_manager* rm_instance;
   static bool         create_called;
