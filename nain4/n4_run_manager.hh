@@ -141,7 +141,7 @@ public:
     return set_physics{std::move(manager)};
   }
 
-  static run_manager* get() {
+  static run_manager& get() {
     if (!rm_instance) {
       std::cerr << "run_manager::get called before run_manager configuration completed. "
                 << "Configure the run_manager with:\n"
@@ -152,7 +152,7 @@ public:
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    return rm_instance;
+    return *rm_instance;
   }
 
   G4RunManager* here_be_dragons() { return manager.get(); }

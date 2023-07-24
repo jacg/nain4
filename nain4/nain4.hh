@@ -81,7 +81,7 @@ IA find_logical  NAME_VRB { return G4LogicalVolumeStore ::GetInstance()->GetVolu
 IA find_physical NAME_VRB { return G4PhysicalVolumeStore::GetInstance()->GetVolume          (name, verbose); }
 IA find_solid    NAME_VRB { return G4SolidStore         ::GetInstance()->GetSolid           (name, verbose); }
 IA find_particle NAME     { return G4ParticleTable:: GetParticleTable()->FindParticle       (name         ); }
-IA event_number  ()       { return run_manager::get() -> here_be_dragons() -> GetCurrentRun() -> GetNumberOfEvent(); }
+IA event_number  ()       { return run_manager::get().here_be_dragons() -> GetCurrentRun() -> GetNumberOfEvent(); }
 #undef IA
 #undef NAME
 #undef NAME_VRB
