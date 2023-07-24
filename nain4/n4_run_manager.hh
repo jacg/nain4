@@ -145,6 +145,10 @@ public:
     return set_physics{std::move(manager)};
   }
 
+  // TODO: Consider returning pointer to make compiler error message
+  // clearer, in cases such as
+  // auto rm = run_manager::get()
+  // where the auto requires an `&` for compilation to succeed.
   static run_manager& get() {
     if (!rm_instance) {
       std::cerr << "run_manager::get called before run_manager configuration completed. "
