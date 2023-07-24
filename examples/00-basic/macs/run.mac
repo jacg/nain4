@@ -1,0 +1,30 @@
+# Can be run in batch mode, without graphics
+# or interactively by issuing the command
+#
+#   /control/execute macs/run.mac
+#
+# in the UI.
+
+
+/run/beamOn 10
+
+
+# /control/verbose 2
+# /run/verbose 2
+# /event/verbose 0
+# /tracking/verbose 1
+# #
+# # gamma 6 MeV to the direction (0.,0.,1.)
+# #
+# /gun/particle gamma
+# /gun/energy 6 MeV
+# #
+# /run/beamOn 5
+# #
+# # proton 210 MeV to the direction (0.,0.,1.)
+# #
+# /gun/particle proton
+# /gun/energy 210 MeV
+# /tracking/verbose 2
+# #
+# /run/beamOn 1
