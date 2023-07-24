@@ -11,12 +11,6 @@ namespace nain4 {
 
 void ui(int argc, char** argv) {
 
-  // Initialize visualization
-  std::unique_ptr<G4VisManager> visManager = std::make_unique<G4VisExecutive>();
-  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  // G4VisManager* visManager = new G4VisExecutive("Quiet");
-  visManager -> Initialize();
-
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
   std::unique_ptr<G4UIExecutive> ui;
@@ -28,6 +22,12 @@ void ui(int argc, char** argv) {
     UImanager->ApplyCommand(command+fileName);
   } else {
     // interactive mode
+
+    // Initialize visualization
+    std::unique_ptr<G4VisManager> visManager = std::make_unique<G4VisExecutive>();
+    // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
+    // G4VisManager* visManager = new G4VisExecutive("Quiet");
+    visManager -> Initialize();
     UImanager->ApplyCommand("/control/execute macs/vis.mac");
     ui->SessionStart();
   }
