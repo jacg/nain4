@@ -10,26 +10,18 @@
 namespace nain4 {
 
 void ui(int argc, char** argv) {
+  G4UImanager& ui_manager = *G4UImanager::GetUIpointer();
+  G4String execute = "/control/execute ";
 
-  // Get the pointer to the User Interface manager
-  G4UImanager* UImanager = G4UImanager::GetUIpointer();
-  std::unique_ptr<G4UIExecutive> ui;
-  if ( argc == 1 ) { ui = std::make_unique<G4UIExecutive>(argc, argv); }
-  if ( ! ui ) {
-    // batch mode
-    G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command+fileName);
-  } else {
-    // interactive mode
-
-    // Initialize visualization
-    std::unique_ptr<G4VisManager> visManager = std::make_unique<G4VisExecutive>();
-    // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-    // G4VisManager* visManager = new G4VisExecutive("Quiet");
-    visManager -> Initialize();
-    UImanager->ApplyCommand("/control/execute macs/vis.mac");
-    ui->SessionStart();
+  if (argc == 1) { // No .mac file specified on CLI: run interactively in GUI
+    G4UIExecutive ui_executive{argc, argv};
+    G4VisExecutive vis_manager;
+    vis_manager.Initialize();
+    ui_manager.ApplyCommand(execute + "macs/vis.mac");
+    ui_executive.SessionStart();
+  } else { // Run in batch mode with the .mac file specified on CLI
+    G4String file_name = argv[1];
+    ui_manager.ApplyCommand(execute + file_name);
   }
 }
 
