@@ -16,8 +16,6 @@
 #include <fstream>
 #include <memory>
 
-using std::unique_ptr;
-
 int main(int argc, char** argv) {
 
   // ----- Catch2 session --------------------------------------------------
