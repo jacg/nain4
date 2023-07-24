@@ -27,20 +27,14 @@ inline auto default_physics_lists() {
 
 
 inline auto default_run_manager(){
-
-  // Redirect G4cout to /dev/null while Geant4 makes noise RAII would be a pain,
-  // as `run_manager` (defined next) must outlive `hush`.
-  auto hush = std::make_unique<n4::silence>(std::cout);
+  // Redirect G4cout to /dev/null while Geant4 makes noise
+  auto hush = n4::silence{std::cout};
 
   // Construct the default run manager
-
   auto run_manager = n4::run_manager::create()
                         .physics(default_physics_lists)
                         .geometry(water_box)
                         .actions(do_nothing);
-
-  // Stop redicecting G4cout to /dev/null
-  hush = nullptr;
   return run_manager;
 }
 
