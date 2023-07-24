@@ -2,11 +2,17 @@
 // ANCHOR: includes
 #include "nain4.hh"
 #include "g4-mandatory.hh"
+#include "n4_ui.hh"
 
-#include <G4SystemOfUnits.hh> // physical units such as `m` for metre
-#include <G4Event.hh>         // needed to inject primary particles into an event
-#include <G4Box.hh>           // for creating shapes in the geometry
-#include <FTFP_BERT.hh>       // our choice of physics list
+#include <CLHEP/Units/SystemOfUnits.h>
+#include <G4PrimaryParticle.hh>
+#include <G4SystemOfUnits.hh>   // physical units such as `m` for metre
+#include <G4Event.hh>           // needed to inject primary particles into an event
+#include <G4Box.hh>             // for creating shapes in the geometry
+#include <G4Sphere.hh>          // for creating shapes in the geometry
+#include <FTFP_BERT.hh>         // our choice of physics list
+#include <G4RandomDirection.hh> // for launching particles in random directions
+
 
 #include <cstdlib>
 // ANCHOR_END: includes
@@ -24,8 +30,15 @@ void verify_number_of_args(int argc){
 // ANCHOR: my_geometry
 auto my_geometry() {
   auto hl = 1 * m; // HALF-length of world volume
-  auto air = n4::material("G4_AIR");
-  auto world = n4::volume<G4Box>("world", air, hl, hl, hl);
+  auto   r_min = 0.0; auto       r_max =   0.2 * m;
+  auto   phi_0 = 0.0; auto   delta_phi = 360 * deg;
+  auto theta_0 = 0.0; auto delta_theta = 180 * deg;
+
+  auto water  = n4::material("G4_WATER");
+  auto air    = n4::material("G4_AIR");
+  auto bubble = n4::volume<G4Sphere>("bubble", air, r_min, r_max, phi_0, delta_phi, theta_0, delta_theta); // TODO: use our simplified API when ready
+  auto world  = n4::volume<G4Box>("world", water, hl, hl, hl);
+  n4::place(bubble).in(world).at(hl*0.7, hl/2, hl/6).now();
   return n4::place(world).now();
 }
 // ANCHOR_END: my_geometry
@@ -34,15 +47,14 @@ auto my_geometry() {
 void my_generator(G4Event* event) {
   auto geantino = n4::find_particle("geantino");
   auto vertex   = new G4PrimaryVertex();
-  vertex -> SetPrimary(new G4PrimaryParticle(geantino, 1, 0, 0));
+  auto r = G4RandomDirection();
+  vertex -> SetPrimary(new G4PrimaryParticle(geantino, r.x(), r.y(), r.z()));
   event  -> AddPrimaryVertex(vertex);
 }
 // ANCHOR_END: my_generator
 
 // ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
-  verify_number_of_args(argc);
-  auto n_events = std::stoi(argv[1]);
   // ANCHOR_END: pick_cli_arguments
 
   // ANCHOR: create_run_manager
@@ -57,7 +69,7 @@ int main(int argc, char* argv[]) {
   // ANCHOR_END: build_minimal_framework
 
   // ANCHOR: run
-  run_manager.here_be_dragons() -> BeamOn(n_events);
+  n4::ui(argc, argv);
   // ANCHOR_END: run
 // ANCHOR: closing_bracket
 }

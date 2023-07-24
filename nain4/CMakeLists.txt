@@ -47,7 +47,18 @@ add_library(Nain4 SHARED ${SOURCES} ${HEADERS})
 
 #set_target_properties(Nain4 PROPERTIES ENABLE_EXPORTS ON)
 
-find_package(Geant4 REQUIRED)
+#----------------------------------------------------------------------------
+# Find Geant4 package, activating all available UI and Vis drivers by default
+# You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
+# to build a batch mode only executable
+#
+option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" ON)
+if(WITH_GEANT4_UIVIS)
+  find_package(Geant4 REQUIRED ui_all vis_all)
+else()
+  find_package(Geant4 REQUIRED)
+endif()
+
 
 include(${Geant4_USE_FILE})
 
