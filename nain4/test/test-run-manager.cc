@@ -71,3 +71,11 @@ TEST_CASE("nain run_manager basic initialization", "[nain][run_manager]") {
      .geometry(new dummy_geometry{1., 2., 3.})
      .actions<dummy_actions>(10);
 }
+
+
+TEST_CASE("nain run_manager get", "[nain][run_manager]") {
+  auto  rm_value     = default_run_manager();
+  auto& rm_reference = n4::run_manager::get();
+
+  CHECK(&rm_value == &rm_reference);
+}

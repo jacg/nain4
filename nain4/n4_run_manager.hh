@@ -51,6 +51,10 @@ class run_manager {
     rm_instance = this;
   }
 
+public:
+  run_manager(run_manager& ) = delete;
+  run_manager(run_manager&&) = default;
+
   RM manager;
   static run_manager* rm_instance;
   static bool         create_called;
@@ -141,7 +145,11 @@ public:
     return set_physics{std::move(manager)};
   }
 
-  static run_manager* get() {
+  // TODO: Consider returning pointer to make compiler error message
+  // clearer, in cases such as
+  // auto rm = run_manager::get()
+  // where the auto requires an `&` for compilation to succeed.
+  static run_manager& get() {
     if (!rm_instance) {
       std::cerr << "run_manager::get called before run_manager configuration completed. "
                 << "Configure the run_manager with:\n"
@@ -152,7 +160,7 @@ public:
                 << std::endl;
       exit(EXIT_FAILURE);
     }
-    return rm_instance;
+    return *rm_instance;
   }
 
   G4RunManager* here_be_dragons() { return manager.get(); }
