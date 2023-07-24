@@ -1,6 +1,8 @@
+# ANCHOR: full_file
+# ANCHOR: project_setup
 cmake_minimum_required(VERSION 3.25)
 
-project(n4app)
+project(n4app-00-basic)
 
 # ----- Generate compile_commands.json, unless otherwise instructed on CLI --
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
@@ -8,19 +10,26 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
   set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
 endif()
+# ANCHOR_END: project_setup
 
-set(Nain4_DIR "../install/lib/cmake/Nain4/")
+# ANCHOR: include_nain4_geant4
+set(Nain4_DIR "../../install/lib/cmake/Nain4/")
 message(${Nain4_DIR})
 find_package(Nain4 REQUIRED)
 
 find_package(Geant4 REQUIRED)
 include(${Geant4_USE_FILE})
+# ANCHOR_END: include_nain4_geant4
 
-add_executable(n4app n4app.cc)
+# ANCHOR: create_exe_and_link
+set(EXE n4app-00-basic)
+add_executable(${EXE} n4app.cc)
 
 target_link_libraries(
-n4app
-PRIVATE
-Nain4
-${Geant4_LIBRARIES}
+  ${EXE}
+  PRIVATE
+  Nain4
+  ${Geant4_LIBRARIES}
 )
+# ANCHOR_END: create_exe_and_link
+# ANCHOR_END: full_file

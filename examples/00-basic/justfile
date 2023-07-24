@@ -1,0 +1,16 @@
+
+
+test-app:
+  just compile-app
+  just run-app 0 && just run-app 1
+
+
+compile-app:
+  cmake -S . -B build
+  cmake --build build
+
+
+run-app N:
+  #!/usr/bin/env sh
+  ./build/n4app-00-basic {{N}}
+  exit $?
