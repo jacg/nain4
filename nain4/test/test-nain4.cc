@@ -191,8 +191,8 @@ TEST_CASE("nain box", "[nain][box]") {
   CHECK(box_s -> GetSurfaceArea() / m2 == solid -> GetSurfaceArea() / m2);
   CHECK(box_s -> GetName()             == "box_s");
 
-  auto small_cube = n4::box("small_cube").cube_size     (lz).solid();
-  auto   big_cube = n4::box(  "big_cube").cube_half_size(lz).solid();
+  auto small_cube = n4::box("small_cube").cube     (lz).solid();
+  auto   big_cube = n4::box(  "big_cube").half_cube(lz).solid();
   CHECK(big_cube -> GetCubicVolume() / m3 == 8 * small_cube -> GetCubicVolume() / m3);
   CHECK(big_cube -> GetSurfaceArea() / m2 == 4 * small_cube -> GetSurfaceArea() / m2);
   CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetYHalfLength() / m );
