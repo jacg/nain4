@@ -32,8 +32,8 @@ private:
 
 struct sphere {
   sphere(G4String name) : name{name} {}
-  sphere& r_min       (G4double x) { r_min_       = x; return *this; };
-  sphere& r_max       (G4double x) { r_max_       = x; return *this; };
+  sphere& r_min       (G4double x) { r_inner_     = x; return *this; };
+  sphere& r           (G4double x) { r_           = x; return *this; };
   sphere& phi_start   (G4double x) { phi_start_   = x; return *this; };
   sphere& phi_delta   (G4double x) { phi_delta_   = x; return *this; };
   sphere& theta_start (G4double x) { theta_start_ = x; return *this; };
@@ -42,8 +42,8 @@ struct sphere {
   G4LogicalVolume* logical(G4Material* material) const;
 private:
   G4String name;
-  G4double r_min_       = 0;
-  G4double r_max_       = 0;
+  G4double r_inner_     = 0;
+  G4double r_           = 0;
   G4double phi_start_   = 0;
   G4double phi_delta_   = 360 * deg;
   G4double theta_start_ = 0;

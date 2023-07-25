@@ -31,7 +31,7 @@ void verify_number_of_args(int argc){
 auto my_geometry() {
   auto water  = n4::material("G4_WATER");
   auto air    = n4::material("G4_AIR");
-  auto bubble = n4::sphere("bubble").r_max(0.2*m).logical(air);
+  auto bubble = n4::sphere("bubble").r(0.2*m).logical(air);
   auto world  = n4::box("world").cube_size(2*m).x(3*m).logical(water);
   n4::place(bubble).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
   return n4::place(world).now();

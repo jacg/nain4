@@ -9,11 +9,11 @@
 namespace nain4 {
 
 G4Sphere* sphere::solid() const {
-  return new G4Sphere(name, r_min_, r_max_, phi_start_, phi_delta_, theta_start_, theta_delta_);
+  return new G4Sphere(name, r_inner_, r_, phi_start_, phi_delta_, theta_start_, theta_delta_);
 }
 
 G4LogicalVolume* sphere::logical(G4Material* material) const {
-  return volume<G4Sphere>(name, material, r_min_, r_max_, phi_start_, phi_delta_, theta_start_, theta_delta_);
+  return volume<G4Sphere>(name, material, r_inner_, r_, phi_start_, phi_delta_, theta_start_, theta_delta_);
 }
 
 G4Box* box::solid() const { return new G4Box(name, half_x_, half_y_, half_z_); }
