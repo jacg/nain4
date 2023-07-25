@@ -207,13 +207,14 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto sphere_s = n4::sphere("sphere_s").r(r).solid();
   auto sphere_l = n4::sphere("sphere_l").r(r).logical(water);
 
+  using CLHEP::pi;
   CHECK(sphere_l -> TotalVolumeEntities() == 1);
-  CHECK(sphere_l -> GetMass() / kg        == Approx(4 * CLHEP::pi / 3 * r * r * r * density / kg));
+  CHECK(sphere_l -> GetMass() / kg        == Approx(4 * pi / 3 * r * r * r * density / kg));
   CHECK(sphere_l -> GetMaterial()         == water);
   CHECK(sphere_l -> GetName()             == "sphere_l");
 
-  CHECK(sphere_s -> GetCubicVolume() / m3 == Approx(4 * CLHEP::pi / 3 * r * r * r / m3));
-  CHECK(sphere_s -> GetSurfaceArea() / m2 == Approx(4 * CLHEP::pi     * r * r     / m2));
+  CHECK(sphere_s -> GetCubicVolume() / m3 == Approx(4 * pi / 3 * r * r * r / m3));
+  CHECK(sphere_s -> GetSurfaceArea() / m2 == Approx(4 * pi     * r * r     / m2));
 
   using CLHEP::twopi;
   auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
