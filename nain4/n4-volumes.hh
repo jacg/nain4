@@ -40,6 +40,7 @@ struct sphere {
   sphere& phi_end     (G4double x) { phi_end_     = x; return *this; };
   sphere& phi_delta   (G4double x) { phi_delta_   = x; return *this; };
   sphere& theta_start (G4double x) { theta_start_ = x; return *this; };
+  sphere& theta_end   (G4double x) { theta_end_   = x; return *this; };
   sphere& theta_delta (G4double x) { theta_delta_ = x; return *this; };
   G4Sphere* solid() const;
   G4LogicalVolume* logical(G4Material* material) const;
