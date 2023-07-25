@@ -17,7 +17,17 @@ set(Nain4_DIR "../../install/lib/cmake/Nain4/")
 message(${Nain4_DIR})
 find_package(Nain4 REQUIRED)
 
-find_package(Geant4 REQUIRED)
+#----------------------------------------------------------------------------
+# Find Geant4 package, activating all available UI and Vis drivers by default
+# You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
+# to build a batch mode only executable
+option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" ON)
+if(WITH_GEANT4_UIVIS)
+  find_package(Geant4 REQUIRED ui_all vis_all)
+else()
+  find_package(Geant4 REQUIRED)
+endif()
+
 include(${Geant4_USE_FILE})
 # ANCHOR_END: include_nain4_geant4
 
@@ -33,3 +43,15 @@ target_link_libraries(
 )
 # ANCHOR_END: create_exe_and_link
 # ANCHOR_END: full_file
+
+#----------------------------------------------------------------------------
+# Link macro files directory to the build directory, i.e. the directory in which
+# we build ${EXE}. This is so that we can run the executable directly
+# because it relies on these macros being in the current working directory.
+#
+add_custom_command(
+  TARGET ${EXE} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E create_symlink
+  ${CMAKE_SOURCE_DIR}/macs $<TARGET_FILE_DIR:${EXE}>/macs
+  COMMENT "Symlinking G4 macros directory" VERBATIM
+)

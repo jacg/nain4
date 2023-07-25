@@ -6,7 +6,7 @@ project(Client)
 add_subdirectory(nain4/nain4)
 # ANCHOR_END: add_subdir
 
-find_package(Geant4 REQUIRED)
+find_package(Geant4 REQUIRED ui_all vis_all)
 include(${Geant4_USE_FILE})
 
 add_executable(client_exe main.cc)
