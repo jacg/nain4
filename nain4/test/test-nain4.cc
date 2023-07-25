@@ -219,13 +219,22 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto phi_s  = n4::sphere("phi_s" ).phi_start(start) /*.end(360)*/   .solid(); // 1/8 - 8/8    7/8
   auto phi_se = n4::sphere("phi_se").phi_start(start).phi_end  (end  ).solid(); // 1/8 - 4/8    3/8
-  // auto phi_sd = n4::sphere("phi_sd").phi_start(start).phi_delta(delta).solid(); // 1/8 - 3/8    2/8
+  auto phi_sd = n4::sphere("phi_sd").phi_start(start).phi_delta(delta).solid(); // 1/8 - 3/8    2/8
   auto phi_es = n4::sphere("phi_es").phi_end  (end  ).phi_start(start).solid(); // 1/8 - 4/8    3/8
-  // auto phi_ds = n4::sphere("phi_ds").phi_delta(delta).phi_start(start).solid(); // 1/8 - 3/8    2/8
+  auto phi_ds = n4::sphere("phi_ds").phi_delta(delta).phi_start(start).solid(); // 1/8 - 3/8    2/8
   auto phi_e  = n4::sphere("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid(); // 0/8 - 4/8    4/8
-  // auto phi_d  = n4::sphere("phi_d" ).phi_delta(delta) /* .start(0) */ .solid(); // 0/8 - 2/8    2/8
-
-  //CHECK(phi_s -> GetStartPhiAngle() == start);
+  auto phi_d  = n4::sphere("phi_d" ).phi_delta(delta) /* .start(0) */ .solid(); // 0/8 - 2/8    2/8
+  auto check_angles = [] (auto solid, auto start, auto delta) {
+      CHECK( solid -> GetStartPhiAngle() == start);
+      CHECK( solid -> GetDeltaPhiAngle() == delta);
+  };
+  check_angles(phi_s , start, twopi - start);
+  check_angles(phi_se, start,   end - start);
+  check_angles(phi_sd, start, delta);
+  check_angles(phi_es, start,   end - start);
+  check_angles(phi_ds, start, delta);
+  check_angles(phi_e ,     0,   end);
+  check_angles(phi_d ,     0, delta);
 }
 
 TEST_CASE("nain volume", "[nain][volume]") {
