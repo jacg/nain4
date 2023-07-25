@@ -11,6 +11,25 @@
 
 namespace nain4 {
 
+struct box {
+  box(G4String name) : name{name} {}
+  box&      x(G4double l) { half_x_ = l / 2; return *this; }
+  box&      y(G4double l) { half_y_ = l / 2; return *this; }
+  box&      z(G4double l) { half_z_ = l / 2; return *this; }
+  box& half_x(G4double l) { half_x_ = l    ; return *this; }
+  box& half_y(G4double l) { half_y_ = l    ; return *this; }
+  box& half_z(G4double l) { half_z_ = l    ; return *this; }
+  box& cube_size(G4double l);
+  box& cube_half_size(G4double l);
+  G4Box* solid() const;
+  G4LogicalVolume* logical(G4Material* material) const;
+private:
+  G4String name;
+  G4double half_x_;
+  G4double half_y_;
+  G4double half_z_;
+};
+
 struct sphere {
   sphere(G4String name) : name{name} {}
   sphere& r_min       (G4double x) { r_min_       = x; return *this; };

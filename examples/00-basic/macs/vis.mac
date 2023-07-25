@@ -52,8 +52,8 @@
 
 /vis/set/textColour white
 # Attach text to point in space
-#                   x y z units font-size 2d-offset    the text
-/vis/scene/add/text 1 1 1   m      18        4 4       Corner of the box
+#                    x  y z units font-size 2d-offset    the text
+/vis/scene/add/text 1.5 1 1   m      18        4 4       Corner of the box
 
 # Set colours, transparency and visibility
 
