@@ -14,6 +14,11 @@ G4double xxx(G4String name, const std::optional<G4double>& delta, const std::opt
   }
   if (!delta.has_value() && !end.has_value()) { return full; }
   return delta.value_or(end.value() - start);
+  // Option 1
+  // return delta.value_or(end.value_or(0.) - start);
+
+  // Option 2
+  return delta.has_value() ? delta.value() : end.value() - start;
 }
 
 namespace nain4 {
