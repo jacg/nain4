@@ -1,9 +1,12 @@
 #include "nain4.hh"
 #include "test_utils.hh"
+#include "n4-volumes.hh"
 
 // Solids
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Box.hh>
 #include <G4Cons.hh>
+#include <G4Sphere.hh>
 #include <G4Trd.hh>
 
 // Managers
@@ -161,14 +164,227 @@ TEST_CASE("nain material", "[nain][material]") {
   }
 }
 
+TEST_CASE("nain box", "[nain][box]") {
+  // nain4::box is a more convenient interface for constructing G4VSolids and
+  // G4LogicalVolumes based on G4Box
+  auto water = nain4::material("G4_WATER"); auto density = water -> GetDensity();
+  auto lx = 1 * m;
+  auto ly = 2 * m;
+  auto lz = 3 * m;
+  auto box_h = n4::box("box_h").half_x(lx/2).half_y(ly/2).half_z(lz/2).solid();
+  auto box_s = n4::box("box_s")     .x(lx  )     .y(ly  )     .z(lz  ).solid();
+  auto box_l = n4::box("box_l")     .x(lx  )     .y(ly  )     .z(lz  ).logical(water);
+  CHECK(box_h -> GetCubicVolume() / m3 == box_s -> GetCubicVolume() / m3);
+  CHECK(box_h -> GetSurfaceArea() / m2 == box_s -> GetSurfaceArea() / m2);
+
+  CHECK(box_l -> TotalVolumeEntities() == 1);
+  CHECK(box_l -> GetMass() / kg        == Approx(lx * ly * lz * density / kg));
+  CHECK(box_l -> GetMaterial()         == water);
+  CHECK(box_l -> GetName()             == "box_l");
+
+  auto solid = box_l -> GetSolid();
+  CHECK(solid -> GetCubicVolume() / m3 == Approx(     lx    * ly    * lz     / m3));
+  CHECK(solid -> GetSurfaceArea() / m2 == Approx(2 * (lx*ly + ly*lz + lz*lx) / m2));
+  CHECK(solid -> GetName()             == "box_l");
+
+  CHECK(box_s -> GetCubicVolume() / m3 == solid -> GetCubicVolume() / m3);
+  CHECK(box_s -> GetSurfaceArea() / m2 == solid -> GetSurfaceArea() / m2);
+  CHECK(box_s -> GetName()             == "box_s");
+
+  auto small_cube = n4::box("small_cube").cube     (lz).solid();
+  auto   big_cube = n4::box(  "big_cube").half_cube(lz).solid();
+  CHECK(big_cube -> GetCubicVolume() / m3 == 8 * small_cube -> GetCubicVolume() / m3);
+  CHECK(big_cube -> GetSurfaceArea() / m2 == 4 * small_cube -> GetSurfaceArea() / m2);
+  CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetYHalfLength() / m );
+  CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetZHalfLength() / m );
+
+  auto hmm = [lx, ly, lz] (auto box) {
+    CHECK(box -> GetXHalfLength() / m  == lx / 2 / m);
+    CHECK(box -> GetYHalfLength() / m  == ly / 2 / m);
+    CHECK(box -> GetZHalfLength() / m  == lz / 2 / m);
+  };
+
+  hmm(n4::box("box_xyz")     .     xyz(lx  , ly  , lz  ).solid());
+  hmm(n4::box("box_half_xyz").half_xyz(lx/2, ly/2, lz/2).solid());
+}
+
+TEST_CASE("nain sphere", "[nain][sphere]") {
+  // nain4::sphere is a more convenient interface for constructing G4VSolids and
+  // G4LogicalVolumes based on G4Sphere
+  auto water = nain4::material("G4_WATER"); auto density = water -> GetDensity();
+  auto r = 2*m;
+  auto sphere_s = n4::sphere("sphere_s").r(r).solid();
+  auto sphere_l = n4::sphere("sphere_l").r(r).logical(water);
+
+  using CLHEP::pi;
+  CHECK(sphere_l -> TotalVolumeEntities() == 1);
+  CHECK(sphere_l -> GetMass() / kg        == Approx(4 * pi / 3 * r * r * r * density / kg));
+  CHECK(sphere_l -> GetMaterial()         == water);
+  CHECK(sphere_l -> GetName()             == "sphere_l");
+
+  CHECK(sphere_s -> GetCubicVolume() / m3 == Approx(4 * pi / 3 * r * r * r / m3));
+  CHECK(sphere_s -> GetSurfaceArea() / m2 == Approx(4 * pi     * r * r     / m2));
+
+  using CLHEP::twopi;
+  auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
+  auto phi_s  = n4::sphere("phi_s" ).r(1).phi_start(start) /*.end(360)*/   .solid();
+  auto phi_se = n4::sphere("phi_se").r(1).phi_start(start).phi_end  (end  ).solid();
+  auto phi_sd = n4::sphere("phi_sd").r(1).phi_start(start).phi_delta(delta).solid();
+  auto phi_es = n4::sphere("phi_es").r(1).phi_end  (end  ).phi_start(start).solid();
+  auto phi_ds = n4::sphere("phi_ds").r(1).phi_delta(delta).phi_start(start).solid();
+  auto phi_e  = n4::sphere("phi_e" ).r(1).phi_end  (end  ) /* .start(0) */ .solid();
+  auto phi_d  = n4::sphere("phi_d" ).r(1).phi_delta(delta) /* .start(0) */ .solid();
+
+  auto check_phi = [] (auto solid, auto start, auto delta) {
+      CHECK( solid -> GetStartPhiAngle() == start);
+      CHECK( solid -> GetDeltaPhiAngle() == delta);
+  };
+  check_phi(phi_s , start, twopi - start );
+  check_phi(phi_se, start,   end - start );
+  check_phi(phi_sd, start, delta         );
+  check_phi(phi_es, start,   end - start );
+  check_phi(phi_ds, start, delta         );
+  check_phi(phi_e ,     0,   end         );
+  check_phi(phi_d ,     0, delta         );
+
+  using CLHEP::pi;
+  start = pi/8; end = pi/2; delta = pi/4;
+  auto theta_s  = n4::sphere("theta_s" ).r(1).theta_start(start) /*.end(180)*/     .solid();
+  auto theta_se = n4::sphere("theta_se").r(1).theta_start(start).theta_end  (end  ).solid();
+  auto theta_sd = n4::sphere("theta_sd").r(1).theta_start(start).theta_delta(delta).solid();
+  auto theta_es = n4::sphere("theta_es").r(1).theta_end  (end  ).theta_start(start).solid();
+  auto theta_ds = n4::sphere("theta_ds").r(1).theta_delta(delta).theta_start(start).solid();
+  auto theta_e  = n4::sphere("theta_e" ).r(1).theta_end  (end  ) /* .start(0) */   .solid();
+  auto theta_d  = n4::sphere("theta_d" ).r(1).theta_delta(delta) /* .start(0) */   .solid();
+
+  auto check_theta = [] (auto solid, auto start, auto delta) {
+      CHECK( solid -> GetStartThetaAngle() == start);
+      CHECK( solid -> GetDeltaThetaAngle() == delta);
+  };
+
+  check_theta(theta_s , start,    pi - start );
+  check_theta(theta_se, start,   end - start );
+  check_theta(theta_sd, start, delta         );
+  check_theta(theta_es, start,   end - start );
+  check_theta(theta_ds, start, delta         );
+  check_theta(theta_e ,     0,   end         );
+  check_theta(theta_d ,     0, delta         );
+
+  start = m/8; end = m/2; delta = m/4;
+  //  auto r_s  = n4::sphere("r_s" ).r_inner(start) /*.end(180)*/     .solid(); // 1/8 - 8/8    7/8
+  auto r_se = n4::sphere("r_se").r_inner(start).r      (end  ).solid();
+  auto r_sd = n4::sphere("r_sd").r_inner(start).r_delta(delta).solid();
+  auto r_ed = n4::sphere("r_ed").r      (end  ).r_delta(delta).solid();
+  auto r_es = n4::sphere("r_es").r      (end  ).r_inner(start).solid();
+  auto r_ds = n4::sphere("r_ds").r_delta(delta).r_inner(start).solid();
+  auto r_de = n4::sphere("r_de").r_delta(delta).r      (end  ).solid();
+  auto r_e  = n4::sphere("r_e" ).r      (end  )/*.r_inner(0)*/.solid();
+  auto r_d  = n4::sphere("r_d" ).r_delta(delta)/*.r_inner(0)*/.solid();
+
+  auto check_r = [] (auto solid, auto inner, auto outer) {
+      CHECK( solid -> GetInnerRadius() == inner);
+      CHECK( solid -> GetOuterRadius() == outer);
+  };
+
+  // check_r(r_s , start,    pi - start); // Shouldn't work
+  check_r(r_se,       start,   end         );
+  check_r(r_es,       start,   end         );
+
+  check_r(r_sd,       start, start + delta );
+  check_r(r_ds,       start, start + delta );
+
+  check_r(r_ed, end - delta,   end         );
+  check_r(r_de, end - delta,   end         );
+
+  check_r(r_e ,           0,   end         );
+
+  check_r(r_d ,           0, delta         );
+}
+
+TEST_CASE("nain tubs", "[nain][tubs]") {
+  // nain4::tubs is a more convenient interface for constructing G4VSolids and
+  // G4LogicalVolumes based on G4Tubs
+  auto water = nain4::material("G4_WATER"); auto density = water -> GetDensity();
+  auto r = 2*m;
+  auto z = 1*m;
+  auto tubs_s = n4::tubs("tubs_s").r(r).z(z).solid();
+  auto tubs_l = n4::tubs("tubs_l").r(r).z(z).logical(water);
+
+  using CLHEP::pi;
+  CHECK(tubs_l -> TotalVolumeEntities() == 1);
+  CHECK(tubs_l -> GetMass() / kg        == Approx(pi * r * r * z * density / kg));
+  CHECK(tubs_l -> GetMaterial()         == water);
+  CHECK(tubs_l -> GetName()             == "tubs_l");
+
+  CHECK(tubs_s -> GetCubicVolume() / m3 == Approx(     pi * r * r * z               / m3));
+  CHECK(tubs_s -> GetSurfaceArea() / m2 == Approx((2 * pi * r * z + 2 * pi * r * r) / m2));
+
+  using CLHEP::twopi;
+  auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
+  auto phi_s  = n4::tubs("phi_s" ).r(1).z(1).phi_start(start) /*.end(360)*/   .solid();
+  auto phi_se = n4::tubs("phi_se").r(1).z(1).phi_start(start).phi_end  (end  ).solid();
+  auto phi_sd = n4::tubs("phi_sd").r(1).z(1).phi_start(start).phi_delta(delta).solid();
+  auto phi_es = n4::tubs("phi_es").r(1).z(1).phi_end  (end  ).phi_start(start).solid();
+  auto phi_ds = n4::tubs("phi_ds").r(1).z(1).phi_delta(delta).phi_start(start).solid();
+  auto phi_e  = n4::tubs("phi_e" ).r(1).z(1).phi_end  (end  ) /* .start(0) */ .solid();
+  auto phi_d  = n4::tubs("phi_d" ).r(1).z(1).phi_delta(delta) /* .start(0) */ .solid();
+
+  auto check_phi = [] (auto solid, auto start, auto delta) {
+      CHECK( solid -> GetStartPhiAngle() == start);
+      CHECK( solid -> GetDeltaPhiAngle() == delta);
+  };
+  check_phi(phi_s , start, twopi - start );
+  check_phi(phi_se, start,   end - start );
+  check_phi(phi_sd, start, delta         );
+  check_phi(phi_es, start,   end - start );
+  check_phi(phi_ds, start, delta         );
+  check_phi(phi_e ,     0,   end         );
+  check_phi(phi_d ,     0, delta         );
+
+  auto z_full = n4::tubs("z_full").r(1).     z(z  ).solid();
+  auto z_half = n4::tubs("z_half").r(1).half_z(z/2).solid();
+
+  CHECK(z_full -> GetZHalfLength() == z_half -> GetZHalfLength());
+  CHECK(z_full -> GetZHalfLength() == z/2);
+
+  start = m/8; end = m/2; delta = m/4;
+  //  auto r_s  = n4::tubs("r_s" ).r_inner(start) /*.end(180)*/     .solid(); // 1/8 - 8/8    7/8
+  auto r_se = n4::tubs("r_se").r_inner(start).r      (end  ).solid();
+  auto r_sd = n4::tubs("r_sd").r_inner(start).r_delta(delta).solid();
+  auto r_ed = n4::tubs("r_ed").r      (end  ).r_delta(delta).solid();
+  auto r_es = n4::tubs("r_es").r      (end  ).r_inner(start).solid();
+  auto r_ds = n4::tubs("r_ds").r_delta(delta).r_inner(start).solid();
+  auto r_de = n4::tubs("r_de").r_delta(delta).r      (end  ).solid();
+  auto r_e  = n4::tubs("r_e" ).r      (end  )/*.r_inner(0)*/.solid();
+  auto r_d  = n4::tubs("r_d" ).r_delta(delta)/*.r_inner(0)*/.solid();
+
+  auto check_r = [] (auto solid, auto inner, auto outer) {
+      CHECK( solid -> GetInnerRadius() == inner);
+      CHECK( solid -> GetOuterRadius() == outer);
+  };
+
+  // check_r(r_s , start,    pi - start); // Shouldn't work
+  check_r(r_se,       start,   end         );
+  check_r(r_es,       start,   end         );
+
+  check_r(r_sd,       start, start + delta );
+  check_r(r_ds,       start, start + delta );
+
+  check_r(r_ed, end - delta,   end         );
+  check_r(r_de, end - delta,   end         );
+
+  check_r(r_e ,           0,   end         );
+
+  check_r(r_d ,           0, delta         );
+}
+
 TEST_CASE("nain volume", "[nain][volume]") {
   // nain4::volume produces objects with sensible sizes, masses, etc.
-  auto water = nain4::material("G4_WATER");
+  auto water = nain4::material("G4_WATER"); auto density = water->GetDensity();
   auto lx = 1 * m;
   auto ly = 2 * m;
   auto lz = 3 * m;
   auto box = nain4::volume<G4Box>("test_box", water, lx, ly, lz);
-  auto density = water->GetDensity();
   CHECK(box->TotalVolumeEntities() == 1);
   CHECK(box->GetMass() / kg        == Approx(8 * lx * ly * lz * density / kg));
   CHECK(box->GetMaterial()         == water);
