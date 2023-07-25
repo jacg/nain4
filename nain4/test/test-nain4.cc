@@ -3,8 +3,10 @@
 #include "n4-volumes.hh"
 
 // Solids
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Box.hh>
 #include <G4Cons.hh>
+#include <G4Sphere.hh>
 #include <G4Trd.hh>
 
 // Managers
@@ -165,7 +167,7 @@ TEST_CASE("nain material", "[nain][material]") {
 TEST_CASE("nain box", "[nain][box]") {
   // nain4::box is a more convenient interface for constructing G4VSolids and
   // G4LogicalVolumes based on G4Box
-  auto water = nain4::material("G4_WATER");
+  auto water = nain4::material("G4_WATER"); auto density = water -> GetDensity();
   auto lx = 1 * m;
   auto ly = 2 * m;
   auto lz = 3 * m;
@@ -175,7 +177,6 @@ TEST_CASE("nain box", "[nain][box]") {
   CHECK(box_h -> GetCubicVolume() / m3 == box_s -> GetCubicVolume() / m3);
   CHECK(box_h -> GetSurfaceArea() / m2 == box_s -> GetSurfaceArea() / m2);
 
-  auto density = water -> GetDensity();
   CHECK(box_l -> TotalVolumeEntities() == 1);
   CHECK(box_l -> GetMass() / kg        == Approx(lx * ly * lz * density / kg));
   CHECK(box_l -> GetMaterial()         == water);
@@ -198,14 +199,42 @@ TEST_CASE("nain box", "[nain][box]") {
   CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetZHalfLength() / m );
 }
 
+TEST_CASE("nain sphere", "[nain][sphere]") {
+  // nain4::sphere is a more convenient interface for constructing G4VSolids and
+  // G4LogicalVolumes based on G4Sphere
+  auto water = nain4::material("G4_WATER"); auto density = water -> GetDensity();
+  auto r = 2*m;
+  auto sphere_s = n4::sphere("sphere_s").r(r).solid();
+  auto sphere_l = n4::sphere("sphere_l").r(r).logical(water);
+
+  CHECK(sphere_l -> TotalVolumeEntities() == 1);
+  CHECK(sphere_l -> GetMass() / kg        == Approx(4 * CLHEP::pi / 3 * r * r * r * density / kg));
+  CHECK(sphere_l -> GetMaterial()         == water);
+  CHECK(sphere_l -> GetName()             == "sphere_l");
+
+  CHECK(sphere_s -> GetCubicVolume() / m3 == Approx(4 * CLHEP::pi / 3 * r * r * r / m3));
+  CHECK(sphere_s -> GetSurfaceArea() / m2 == Approx(4 * CLHEP::pi     * r * r     / m2));
+
+  using CLHEP::twopi;
+  auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
+  auto phi_s  = n4::sphere("phi_s" ).phi_start(start) /*.end(360)*/   .solid(); // 1/8 - 8/8    7/8
+  auto phi_se = n4::sphere("phi_se").phi_start(start).phi_end  (end  ).solid(); // 1/8 - 4/8    3/8
+  // auto phi_sd = n4::sphere("phi_sd").phi_start(start).phi_delta(delta).solid(); // 1/8 - 3/8    2/8
+  auto phi_es = n4::sphere("phi_es").phi_end  (end  ).phi_start(start).solid(); // 1/8 - 4/8    3/8
+  // auto phi_ds = n4::sphere("phi_ds").phi_delta(delta).phi_start(start).solid(); // 1/8 - 3/8    2/8
+  auto phi_e  = n4::sphere("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid(); // 0/8 - 4/8    4/8
+  // auto phi_d  = n4::sphere("phi_d" ).phi_delta(delta) /* .start(0) */ .solid(); // 0/8 - 2/8    2/8
+
+  //CHECK(phi_s -> GetStartPhiAngle() == start);
+}
+
 TEST_CASE("nain volume", "[nain][volume]") {
   // nain4::volume produces objects with sensible sizes, masses, etc.
-  auto water = nain4::material("G4_WATER");
+  auto water = nain4::material("G4_WATER"); auto density = water->GetDensity();
   auto lx = 1 * m;
   auto ly = 2 * m;
   auto lz = 3 * m;
   auto box = nain4::volume<G4Box>("test_box", water, lx, ly, lz);
-  auto density = water->GetDensity();
   CHECK(box->TotalVolumeEntities() == 1);
   CHECK(box->GetMass() / kg        == Approx(8 * lx * ly * lz * density / kg));
   CHECK(box->GetMaterial()         == water);

@@ -3,13 +3,25 @@
 #include "nain4.hh"
 #include <G4LogicalVolume.hh>
 #include <G4Sphere.hh>
+#include <G4String.hh>
 #include <G4VGraphicsScene.hh>
 
+
+G4double xxx(G4String name, const std::optional<G4double>& delta, const std::optional<G4double>& end, G4double start, G4double full) {
+  if (delta.has_value() && end.has_value()) {
+      name;
+      // TODO error
+  }
+  if (!delta.has_value() && !end.has_value()) { return full; }
+  return delta.value_or(end.value() - start);
+}
 
 namespace nain4 {
 
 G4Sphere* sphere::solid() const {
-  return new G4Sphere(name, r_inner_, r_, phi_start_, phi_delta_, theta_start_, theta_delta_);
+  auto   phi_delta = xxx("phi"  ,   phi_delta_,   phi_end_,   phi_start_,   phi_full);
+  auto theta_delta = xxx("theta", theta_delta_, theta_end_, theta_start_, theta_full);
+  return new G4Sphere(name, r_inner_, r_, phi_start_, phi_delta, theta_start_, theta_delta);
 }
 
 G4LogicalVolume* sphere::logical(G4Material* material) const { return n4::logical(solid(), material); }

@@ -18,6 +18,7 @@
 #include <G4ThreeVector.hh>
 #include <G4Transform3D.hh>
 #include <G4VPhysicalVolume.hh>
+#include <G4VSolid.hh>
 #include <G4VisAttributes.hh>
 
 #include <memory>
