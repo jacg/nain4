@@ -20,6 +20,8 @@
 
 namespace nain4 {
 
+#define OPT_DOUBLE std::optional<G4double>
+
 struct box {
   box(G4String name) : name{name} {}
   box&      x(G4double l) { half_x_ = l / 2; return *this; }
@@ -54,18 +56,46 @@ struct sphere {
   LOGICAL
 private:
   G4String name;
-  std::optional<G4double> r_inner_;
-  std::optional<G4double> r_delta_;
-  std::optional<G4double> r_outer_;
-  G4double                phi_start_   = 0;
-  std::optional<G4double> phi_end_;
-  std::optional<G4double> phi_delta_;
-  G4double                theta_start_ = 0;
-  std::optional<G4double> theta_end_;
-  std::optional<G4double> theta_delta_;
+  OPT_DOUBLE r_inner_;
+  OPT_DOUBLE r_delta_;
+  OPT_DOUBLE r_outer_;
+  G4double   phi_start_   = 0;
+  OPT_DOUBLE phi_end_;
+  OPT_DOUBLE phi_delta_;
+  G4double   theta_start_ = 0;
+  OPT_DOUBLE theta_end_;
+  OPT_DOUBLE theta_delta_;
   const static constexpr G4double   phi_full = 360 * deg;
   const static constexpr G4double theta_full = 180 * deg;
 };
+
+struct tubs {
+  tubs(G4String name) : name{name} {}
+
+  tubs& r_inner     (G4double x) { r_inner_     = x  ; return *this; };
+  tubs& r           (G4double x) { r_outer_     = x  ; return *this; };
+  tubs& r_delta     (G4double x) { r_delta_     = x  ; return *this; };
+  tubs& phi_start   (G4double x) { phi_start_   = x  ; return *this; };
+  tubs& phi_end     (G4double x) { phi_end_     = x  ; return *this; };
+  tubs& phi_delta   (G4double x) { phi_delta_   = x  ; return *this; };
+  tubs& half_l      (G4double x) { half_l_      = x  ; return *this; };
+  tubs& l           (G4double x) { half_l_      = x/2; return *this; };
+
+  G4Tubs* solid() const;
+  G4LogicalVolume* logical(G4Material* material) const;
+
+private:
+  G4String name;
+  OPT_DOUBLE r_inner_;
+  OPT_DOUBLE r_delta_;
+  OPT_DOUBLE r_outer_;
+  G4double   phi_start_   = 0;
+  OPT_DOUBLE phi_end_;
+  OPT_DOUBLE phi_delta_;
+  G4double   half_l_;
+}
+
+#undef OPT_DOUBLE
 
 }; // namespace nain4
 

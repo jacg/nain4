@@ -15,16 +15,16 @@ G4double compute_angle_delta(G4String name, const opt_double& delta, const opt_d
   return delta.value_or(end.value_or(full) - start);
 }
 
-static const G4String sphere_r_usage = "Usage:\n"
+static const G4String r_usage = "Usage:\n"
 ".r      (...)\n"
 ".r_inner(...).r      (...)\n"
 ".r_inner(...).r_delta(...)\n"
 ".r      (...).r_delta(...)\n"
 ".r_delta(...)\n";
 
-void fail0(){ throw "You must provide some information about the sphere radius. \n" + sphere_r_usage; }
-void fail3(){ throw "You may not provide more than two sphere radius parameters.\n" + sphere_r_usage; }
-void faili(){ throw "You provided only inner radius, also need outer or delta.  \n" + sphere_r_usage; }
+void fail0(){ throw "You must provide some information about the radius. \n" + r_usage; }
+void fail3(){ throw "You may not provide more than two radius parameters.\n" + r_usage; }
+void faili(){ throw "You provided only inner radius, also need outer or delta.  \n" + r_usage; }
 
 std::tuple<G4double, G4double> compùte_r_range(opt_double min, opt_double max, opt_double del) {
   // Disallowed cases
