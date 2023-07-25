@@ -12,8 +12,8 @@ G4double xxx(G4String name, const std::optional<G4double>& delta, const std::opt
       name;
       // TODO error
   }
-  if (!delta.has_value() && !end.has_value()) { return full; }
-  return delta.value_or(end.value() - start);
+  if (!delta.has_value() && !end.has_value()) { return full - start; }
+
   // Option 1
   // return delta.value_or(end.value_or(0.) - start);
 
