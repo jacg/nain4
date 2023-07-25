@@ -1,5 +1,6 @@
 #include "nain4.hh"
 #include "test_utils.hh"
+#include "n4-volumes.hh"
 
 // Solids
 #include <G4Box.hh>
@@ -159,6 +160,42 @@ TEST_CASE("nain material", "[nain][material]") {
     CHECK(std::accumulate(fracs, fracs + lyso->GetNumberOfElements(), 0.0) == Approx(1));
 
   }
+}
+
+TEST_CASE("nain box", "[nain][box]") {
+  // nain4::box is a more convenient interface for constructing G4VSolids and
+  // G4LogicalVolumes based on G4Box
+  auto water = nain4::material("G4_WATER");
+  auto lx = 1 * m;
+  auto ly = 2 * m;
+  auto lz = 3 * m;
+  auto box_h = n4::box("box_h").half_x(lx/2).half_y(ly/2).half_z(lz/2).solid();
+  auto box_s = n4::box("box_s")     .x(lx  )     .y(ly  )     .z(lz  ).solid();
+  auto box_l = n4::box("box_l")     .x(lx  )     .y(ly  )     .z(lz  ).logical(water);
+  CHECK(box_h -> GetCubicVolume() / m3 == box_s -> GetCubicVolume() / m3);
+  CHECK(box_h -> GetSurfaceArea() / m2 == box_s -> GetSurfaceArea() / m2);
+
+  auto density = water -> GetDensity();
+  CHECK(box_l -> TotalVolumeEntities() == 1);
+  CHECK(box_l -> GetMass() / kg        == Approx(lx * ly * lz * density / kg));
+  CHECK(box_l -> GetMaterial()         == water);
+  CHECK(box_l -> GetName()             == "box_l");
+
+  auto solid = box_l -> GetSolid();
+  CHECK(solid -> GetCubicVolume() / m3 == Approx(     lx    * ly    * lz     / m3));
+  CHECK(solid -> GetSurfaceArea() / m2 == Approx(2 * (lx*ly + ly*lz + lz*lx) / m2));
+  CHECK(solid -> GetName()             == "box_l");
+
+  CHECK(box_s -> GetCubicVolume() / m3 == solid -> GetCubicVolume() / m3);
+  CHECK(box_s -> GetSurfaceArea() / m2 == solid -> GetSurfaceArea() / m2);
+  CHECK(box_s -> GetName()             == "box_s");
+
+  auto small_cube = n4::box("small_cube").cube_size     (lz).solid();
+  auto   big_cube = n4::box(  "big_cube").cube_half_size(lz).solid();
+  CHECK(big_cube -> GetCubicVolume() / m3 == 8 * small_cube -> GetCubicVolume() / m3);
+  CHECK(big_cube -> GetSurfaceArea() / m2 == 4 * small_cube -> GetSurfaceArea() / m2);
+  CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetYHalfLength() / m );
+  CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetZHalfLength() / m );
 }
 
 TEST_CASE("nain volume", "[nain][volume]") {
