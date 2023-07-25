@@ -217,48 +217,78 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
 
   using CLHEP::twopi;
   auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
-  auto phi_s  = n4::sphere("phi_s" ).phi_start(start) /*.end(360)*/   .solid(); // 1/8 - 8/8    7/8
-  auto phi_se = n4::sphere("phi_se").phi_start(start).phi_end  (end  ).solid(); // 1/8 - 4/8    3/8
-  auto phi_sd = n4::sphere("phi_sd").phi_start(start).phi_delta(delta).solid(); // 1/8 - 3/8    2/8
-  auto phi_es = n4::sphere("phi_es").phi_end  (end  ).phi_start(start).solid(); // 1/8 - 4/8    3/8
-  auto phi_ds = n4::sphere("phi_ds").phi_delta(delta).phi_start(start).solid(); // 1/8 - 3/8    2/8
-  auto phi_e  = n4::sphere("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid(); // 0/8 - 4/8    4/8
-  auto phi_d  = n4::sphere("phi_d" ).phi_delta(delta) /* .start(0) */ .solid(); // 0/8 - 2/8    2/8
+  auto phi_s  = n4::sphere("phi_s" ).r(1).phi_start(start) /*.end(360)*/   .solid();
+  auto phi_se = n4::sphere("phi_se").r(1).phi_start(start).phi_end  (end  ).solid();
+  auto phi_sd = n4::sphere("phi_sd").r(1).phi_start(start).phi_delta(delta).solid();
+  auto phi_es = n4::sphere("phi_es").r(1).phi_end  (end  ).phi_start(start).solid();
+  auto phi_ds = n4::sphere("phi_ds").r(1).phi_delta(delta).phi_start(start).solid();
+  auto phi_e  = n4::sphere("phi_e" ).r(1).phi_end  (end  ) /* .start(0) */ .solid();
+  auto phi_d  = n4::sphere("phi_d" ).r(1).phi_delta(delta) /* .start(0) */ .solid();
 
   auto check_phi = [] (auto solid, auto start, auto delta) {
       CHECK( solid -> GetStartPhiAngle() == start);
       CHECK( solid -> GetDeltaPhiAngle() == delta);
   };
-  check_phi(phi_s , start, twopi - start);
-  check_phi(phi_se, start,   end - start);
-  check_phi(phi_sd, start, delta);
-  check_phi(phi_es, start,   end - start);
-  check_phi(phi_ds, start, delta);
-  check_phi(phi_e ,     0,   end);
-  check_phi(phi_d ,     0, delta);
+  check_phi(phi_s , start, twopi - start );
+  check_phi(phi_se, start,   end - start );
+  check_phi(phi_sd, start, delta         );
+  check_phi(phi_es, start,   end - start );
+  check_phi(phi_ds, start, delta         );
+  check_phi(phi_e ,     0,   end         );
+  check_phi(phi_d ,     0, delta         );
 
   using CLHEP::pi;
   start = pi/8; end = pi/2; delta = pi/4;
-  auto theta_s  = n4::sphere("theta_s" ).theta_start(start) /*.end(180)*/     .solid(); // 1/8 - 8/8    7/8
-  auto theta_se = n4::sphere("theta_se").theta_start(start).theta_end  (end  ).solid(); // 1/8 - 4/8    3/8
-  auto theta_sd = n4::sphere("theta_sd").theta_start(start).theta_delta(delta).solid(); // 1/8 - 3/8    2/8
-  auto theta_es = n4::sphere("theta_es").theta_end  (end  ).theta_start(start).solid(); // 1/8 - 4/8    3/8
-  auto theta_ds = n4::sphere("theta_ds").theta_delta(delta).theta_start(start).solid(); // 1/8 - 3/8    2/8
-  auto theta_e  = n4::sphere("theta_e" ).theta_end  (end  ) /* .start(0) */  .solid();  // 0/8 - 4/8    4/8
-  auto theta_d  = n4::sphere("theta_d" ).theta_delta(delta) /* .start(0) */  .solid();  // 0/8 - 2/8    2/8
+  auto theta_s  = n4::sphere("theta_s" ).r(1).theta_start(start) /*.end(180)*/     .solid();
+  auto theta_se = n4::sphere("theta_se").r(1).theta_start(start).theta_end  (end  ).solid();
+  auto theta_sd = n4::sphere("theta_sd").r(1).theta_start(start).theta_delta(delta).solid();
+  auto theta_es = n4::sphere("theta_es").r(1).theta_end  (end  ).theta_start(start).solid();
+  auto theta_ds = n4::sphere("theta_ds").r(1).theta_delta(delta).theta_start(start).solid();
+  auto theta_e  = n4::sphere("theta_e" ).r(1).theta_end  (end  ) /* .start(0) */   .solid();
+  auto theta_d  = n4::sphere("theta_d" ).r(1).theta_delta(delta) /* .start(0) */   .solid();
 
   auto check_theta = [] (auto solid, auto start, auto delta) {
       CHECK( solid -> GetStartThetaAngle() == start);
       CHECK( solid -> GetDeltaThetaAngle() == delta);
   };
 
-  check_theta(theta_s , start,    pi - start);
-  check_theta(theta_se, start,   end - start);
-  check_theta(theta_sd, start, delta);
-  check_theta(theta_es, start,   end - start);
-  check_theta(theta_ds, start, delta);
-  check_theta(theta_e ,     0,   end);
-  check_theta(theta_d ,     0, delta);
+  check_theta(theta_s , start,    pi - start );
+  check_theta(theta_se, start,   end - start );
+  check_theta(theta_sd, start, delta         );
+  check_theta(theta_es, start,   end - start );
+  check_theta(theta_ds, start, delta         );
+  check_theta(theta_e ,     0,   end         );
+  check_theta(theta_d ,     0, delta         );
+
+  start = m/8; end = m/2; delta = m/4;
+  //  auto r_s  = n4::sphere("r_s" ).r_inner(start) /*.end(180)*/     .solid(); // 1/8 - 8/8    7/8
+  auto r_se = n4::sphere("r_se").r_inner(start).r      (end  ).solid();
+  auto r_sd = n4::sphere("r_sd").r_inner(start).r_delta(delta).solid();
+  auto r_ed = n4::sphere("r_ed").r      (end  ).r_delta(delta).solid();
+  auto r_es = n4::sphere("r_es").r      (end  ).r_inner(start).solid();
+  auto r_ds = n4::sphere("r_ds").r_delta(delta).r_inner(start).solid();
+  auto r_de = n4::sphere("r_de").r_delta(delta).r      (end  ).solid();
+  auto r_e  = n4::sphere("r_e" ).r      (end  )/*.r_inner(0)*/.solid();
+  auto r_d  = n4::sphere("r_d" ).r_delta(delta)/*.r_inner(0)*/.solid();
+
+  auto check_r = [] (auto solid, auto inner, auto outer) {
+      CHECK( solid -> GetInnerRadius() == inner);
+      CHECK( solid -> GetOuterRadius() == outer);
+  };
+
+  // check_r(r_s , start,    pi - start); // Shouldn't work
+  check_r(r_se,       start,   end         );
+  check_r(r_es,       start,   end         );
+
+  check_r(r_sd,       start, start + delta );
+  check_r(r_ds,       start, start + delta );
+
+  check_r(r_ed, end - delta,   end         );
+  check_r(r_de, end - delta,   end         );
+
+  check_r(r_e ,           0,   end         );
+
+  check_r(r_d ,           0, delta         );
 }
 
 TEST_CASE("nain volume", "[nain][volume]") {
