@@ -224,17 +224,41 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto phi_ds = n4::sphere("phi_ds").phi_delta(delta).phi_start(start).solid(); // 1/8 - 3/8    2/8
   auto phi_e  = n4::sphere("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid(); // 0/8 - 4/8    4/8
   auto phi_d  = n4::sphere("phi_d" ).phi_delta(delta) /* .start(0) */ .solid(); // 0/8 - 2/8    2/8
-  auto check_angles = [] (auto solid, auto start, auto delta) {
+
+  auto check_phi = [] (auto solid, auto start, auto delta) {
       CHECK( solid -> GetStartPhiAngle() == start);
       CHECK( solid -> GetDeltaPhiAngle() == delta);
   };
-  check_angles(phi_s , start, twopi - start);
-  check_angles(phi_se, start,   end - start);
-  check_angles(phi_sd, start, delta);
-  check_angles(phi_es, start,   end - start);
-  check_angles(phi_ds, start, delta);
-  check_angles(phi_e ,     0,   end);
-  check_angles(phi_d ,     0, delta);
+  check_phi(phi_s , start, twopi - start);
+  check_phi(phi_se, start,   end - start);
+  check_phi(phi_sd, start, delta);
+  check_phi(phi_es, start,   end - start);
+  check_phi(phi_ds, start, delta);
+  check_phi(phi_e ,     0,   end);
+  check_phi(phi_d ,     0, delta);
+
+  using CLHEP::pi;
+  start = pi/8; end = pi/2; delta = pi/4;
+  auto theta_s  = n4::sphere("theta_s" ).theta_start(start) /*.end(180)*/     .solid(); // 1/8 - 8/8    7/8
+  auto theta_se = n4::sphere("theta_se").theta_start(start).theta_end  (end  ).solid(); // 1/8 - 4/8    3/8
+  auto theta_sd = n4::sphere("theta_sd").theta_start(start).theta_delta(delta).solid(); // 1/8 - 3/8    2/8
+  auto theta_es = n4::sphere("theta_es").theta_end  (end  ).theta_start(start).solid(); // 1/8 - 4/8    3/8
+  auto theta_ds = n4::sphere("theta_ds").theta_delta(delta).theta_start(start).solid(); // 1/8 - 3/8    2/8
+  auto theta_e  = n4::sphere("theta_e" ).theta_end  (end  ) /* .start(0) */  .solid();  // 0/8 - 4/8    4/8
+  auto theta_d  = n4::sphere("theta_d" ).theta_delta(delta) /* .start(0) */  .solid();  // 0/8 - 2/8    2/8
+
+  auto check_theta = [] (auto solid, auto start, auto delta) {
+      CHECK( solid -> GetStartThetaAngle() == start);
+      CHECK( solid -> GetDeltaThetaAngle() == delta);
+  };
+
+  check_theta(theta_s , start,    pi - start);
+  check_theta(theta_se, start,   end - start);
+  check_theta(theta_sd, start, delta);
+  check_theta(theta_es, start,   end - start);
+  check_theta(theta_ds, start, delta);
+  check_theta(theta_e ,     0,   end);
+  check_theta(theta_d ,     0, delta);
 }
 
 TEST_CASE("nain volume", "[nain][volume]") {
