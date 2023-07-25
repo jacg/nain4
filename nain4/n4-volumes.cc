@@ -7,10 +7,11 @@
 #include <G4VGraphicsScene.hh>
 
 
-G4double xxx(G4String name, std::optional<G4double> delta, std::optional<G4double> end, G4double start, G4double full) {
+using opt_double = std::optional<G4double>;
+
+G4double compute_angle_delta(G4String name, const opt_double& delta, const opt_double& end, G4double start, G4double full) {
   if (delta.has_value() && end.has_value()) {
-      name;
-      // TODO error
+    throw "You cannot provide both end-angle and angle-delta for the " + name + " coordinate.";
   }
   return delta.value_or(end.value_or(full) - start);
 }
@@ -26,7 +27,7 @@ void fail0(){ throw "You must provide some information about the sphere radius. 
 void fail3(){ throw "You may not provide more than two sphere radius parameters.\n" + sphere_r_usage; }
 void faili(){ throw "You provided only inner radius, also need outer or delta.  \n" + sphere_r_usage; }
 
-std::tuple<G4double, G4double> yyy(std::optional<G4double> min, std::optional<G4double> max, std::optional<G4double> del) {
+std::tuple<G4double, G4double> compùte_r_range(opt_double min, opt_double max, opt_double del) {
   // Disallowed cases
   if ( min.has_value() &&  max.has_value() &&  del.has_value()) { fail3(); }
   if (!min.has_value() && !max.has_value() && !del.has_value()) { fail0(); }
@@ -46,9 +47,9 @@ std::tuple<G4double, G4double> yyy(std::optional<G4double> min, std::optional<G4
 namespace nain4 {
 
 G4Sphere* sphere::solid() const {
-  auto [r_inner, r_outer] = yyy(r_inner_, r_outer_, r_delta_);
-  auto   phi_delta = xxx("phi"  ,   phi_delta_,   phi_end_,   phi_start_,   phi_full);
-  auto theta_delta = xxx("theta", theta_delta_, theta_end_, theta_start_, theta_full);
+  auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
+  auto   phi_delta = compute_angle_delta("phi"  ,   phi_delta_,   phi_end_,   phi_start_,   phi_full);
+  auto theta_delta = compute_angle_delta("theta", theta_delta_, theta_end_, theta_start_, theta_full);
   return new G4Sphere{name, r_inner, r_outer, phi_start_, phi_delta, theta_start_, theta_delta};
 }
 
