@@ -7,7 +7,7 @@ set(Nain4_DIR "$ENV{NAIN4_INSTALL}/lib/cmake/Nain4/")
 find_package(Nain4 REQUIRED)
 # ANCHOR_END: find_package
 
-find_package(Geant4 REQUIRED)
+find_package(Geant4 REQUIRED ui_all vis_all)
 include(${Geant4_USE_FILE})
 
 add_executable(client_exe main.cc)
