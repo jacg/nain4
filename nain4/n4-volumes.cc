@@ -12,18 +12,7 @@ G4double xxx(G4String name, std::optional<G4double> delta, std::optional<G4doubl
       name;
       // TODO error
   }
-  // Options 1 and 2
-  // if (!delta.has_value() && !end.has_value()) { return full - start; }
-
-  // Option 2
-  if (!delta.has_value() && !end.has_value()) { end = full; }
-
-
-  // Option 1
-  // return delta.value_or(end.value_or(0.) - start);
-
-  // Option 2
-  return delta.has_value() ? delta.value() : end.value() - start;
+  return delta.value_or(end.value_or(full) - start);
 }
 
 namespace nain4 {
