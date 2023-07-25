@@ -7,12 +7,17 @@
 #include <G4VGraphicsScene.hh>
 
 
-G4double xxx(G4String name, const std::optional<G4double>& delta, const std::optional<G4double>& end, G4double start, G4double full) {
+G4double xxx(G4String name, std::optional<G4double> delta, std::optional<G4double> end, G4double start, G4double full) {
   if (delta.has_value() && end.has_value()) {
       name;
       // TODO error
   }
-  if (!delta.has_value() && !end.has_value()) { return full - start; }
+  // Options 1 and 2
+  // if (!delta.has_value() && !end.has_value()) { return full - start; }
+
+  // Option 2
+  if (!delta.has_value() && !end.has_value()) { end = full; }
+
 
   // Option 1
   // return delta.value_or(end.value_or(0.) - start);
