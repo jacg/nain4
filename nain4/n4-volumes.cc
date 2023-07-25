@@ -60,7 +60,4 @@ G4Sphere* sphere::solid() const {
 
 G4Box* box::solid() const { return new G4Box(name, half_x_, half_y_, half_z_); }
 
-box& box::     cube(G4double l) { return this ->      x(l)     .y(l)     .z(l); }
-box& box::half_cube(G4double l) { return this -> half_x(l).half_y(l).half_z(l); }
-
 } // namespace nain4

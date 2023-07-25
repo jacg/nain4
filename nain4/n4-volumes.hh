@@ -33,8 +33,8 @@ struct box {
   box& half_x(G4D l) { half_x_ = l    ; return *this; }
   box& half_y(G4D l) { half_y_ = l    ; return *this; }
   box& half_z(G4D l) { half_z_ = l    ; return *this; }
-  box&      cube(G4D l);
-  box& half_cube(G4D l);
+  box&      cube(G4double l) { return this ->      xyz(l,l,l); }
+  box& half_cube(G4double l) { return this -> half_xyz(l,l,l); }
   box&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); }
   box& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
   G4Box* solid() const;
