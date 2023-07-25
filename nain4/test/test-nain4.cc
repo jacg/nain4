@@ -197,6 +197,15 @@ TEST_CASE("nain box", "[nain][box]") {
   CHECK(big_cube -> GetSurfaceArea() / m2 == 4 * small_cube -> GetSurfaceArea() / m2);
   CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetYHalfLength() / m );
   CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetZHalfLength() / m );
+
+  auto hmm = [lx, ly, lz] (auto box) {
+    CHECK(box -> GetXHalfLength() / m  == lx / 2 / m);
+    CHECK(box -> GetYHalfLength() / m  == ly / 2 / m);
+    CHECK(box -> GetZHalfLength() / m  == lz / 2 / m);
+  };
+
+  hmm(n4::box("box_xyz")     .     xyz(lx  , ly  , lz  ).solid());
+  hmm(n4::box("box_half_xyz").half_xyz(lx/2, ly/2, lz/2).solid());
 }
 
 TEST_CASE("nain sphere", "[nain][sphere]") {
