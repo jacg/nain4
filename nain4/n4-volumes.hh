@@ -11,6 +11,7 @@
 #include <G4Types.hh>
 #include <G4Box.hh>
 #include <G4Sphere.hh>
+#include <G4Tubs.hh>
 #include <G4VGraphicsScene.hh>
 
 #include <optional>
@@ -72,28 +73,28 @@ private:
 struct tubs {
   tubs(G4String name) : name{name} {}
 
-  tubs& r_inner     (G4double x) { r_inner_     = x  ; return *this; };
-  tubs& r           (G4double x) { r_outer_     = x  ; return *this; };
-  tubs& r_delta     (G4double x) { r_delta_     = x  ; return *this; };
-  tubs& phi_start   (G4double x) { phi_start_   = x  ; return *this; };
-  tubs& phi_end     (G4double x) { phi_end_     = x  ; return *this; };
-  tubs& phi_delta   (G4double x) { phi_delta_   = x  ; return *this; };
-  tubs& half_l      (G4double x) { half_l_      = x  ; return *this; };
-  tubs& l           (G4double x) { half_l_      = x/2; return *this; };
+  tubs& r_inner  (G4double x) { r_inner_   = x  ; return *this; };
+  tubs& r        (G4double x) { r_outer_   = x  ; return *this; };
+  tubs& r_delta  (G4double x) { r_delta_   = x  ; return *this; };
+  tubs& phi_start(G4double x) { phi_start_ = x  ; return *this; };
+  tubs& phi_end  (G4double x) { phi_end_   = x  ; return *this; };
+  tubs& phi_delta(G4double x) { phi_delta_ = x  ; return *this; };
+  tubs& half_z   (G4double x) { half_z_    = x  ; return *this; };
+  tubs& z        (G4double x) { half_z_    = x/2; return *this; };
 
   G4Tubs* solid() const;
-  G4LogicalVolume* logical(G4Material* material) const;
-
+  LOGICAL
 private:
   G4String name;
   OPT_DOUBLE r_inner_;
   OPT_DOUBLE r_delta_;
   OPT_DOUBLE r_outer_;
-  G4double   phi_start_   = 0;
+  G4double   phi_start_ = 0;
   OPT_DOUBLE phi_end_;
   OPT_DOUBLE phi_delta_;
-  G4double   half_l_;
-}
+  G4double   half_z_;
+  const static constexpr G4double phi_full = 360 * deg;
+};
 
 #undef OPT_DOUBLE
 

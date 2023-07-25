@@ -52,6 +52,12 @@ G4Sphere* sphere::solid() const {
   return new G4Sphere{name, r_inner, r_outer, phi_start_, phi_delta, theta_start_, theta_delta};
 }
 
+ G4Tubs* tubs::solid() const {
+  auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
+  auto phi_delta = compute_angle_delta("phi", phi_delta_, phi_end_, phi_start_, phi_full);
+  return new G4Tubs{name, r_inner, r_outer, half_z_, phi_start_, phi_delta};
+}
+
 G4Box* box::solid() const { return new G4Box(name, half_x_, half_y_, half_z_); }
 
 box& box::cube_size     (G4double l) { return this ->      x(l)     .y(l)     .z(l); }
