@@ -1,15 +1,22 @@
 #ifndef N4_VOLUMES_HH
 #define N4_VOLUMES_HH
 
+#include "nain4.hh"
+
 #include <G4LogicalVolume.hh>
 #include <G4Material.hh>
 #include <G4PVPlacement.hh>
 #include <G4String.hh>
 #include <G4SystemOfUnits.hh>
 #include <G4Types.hh>
+#include <G4Box.hh>
+#include <G4Sphere.hh>
 #include <G4VGraphicsScene.hh>
 
 #include <optional>
+
+#define LOGICAL inline G4LogicalVolume* logical(G4Material* material) const \
+  { return n4::logical(solid(), material); }
 
 namespace nain4 {
 
@@ -24,7 +31,7 @@ struct box {
   box& cube_size(G4double l);
   box& cube_half_size(G4double l);
   G4Box* solid() const;
-  G4LogicalVolume* logical(G4Material* material) const;
+  LOGICAL
 private:
   G4String name;
   G4double half_x_;
@@ -44,7 +51,7 @@ struct sphere {
   sphere& theta_end   (G4double x) { theta_end_   = x; return *this; };
   sphere& theta_delta (G4double x) { theta_delta_ = x; return *this; };
   G4Sphere* solid() const;
-  G4LogicalVolume* logical(G4Material* material) const;
+  LOGICAL
 private:
   G4String name;
   std::optional<G4double> r_inner_;
