@@ -171,9 +171,14 @@ TEST_CASE("nain box", "[nain][box]") {
   auto lx = 1 * m;
   auto ly = 2 * m;
   auto lz = 3 * m;
+  auto xc = 4 * m;
+  auto yc = 5 * m;
+  auto zc = 6 * m;
   auto box_h = n4::box("box_h").half_x(lx/2).half_y(ly/2).half_z(lz/2).solid();
   auto box_s = n4::box("box_s")     .x(lx  )     .y(ly  )     .z(lz  ).solid();
   auto box_l = n4::box("box_l")     .x(lx  )     .y(ly  )     .z(lz  ).logical(water);
+  auto box_p = n4::box("box_p")     .x(lx  )     .y(ly  )     .z(lz  ).place  (water).at(xc, yc, zc).now();
+
   CHECK(box_h -> GetCubicVolume() / m3 == box_s -> GetCubicVolume() / m3);
   CHECK(box_h -> GetSurfaceArea() / m2 == box_s -> GetSurfaceArea() / m2);
 
@@ -190,6 +195,10 @@ TEST_CASE("nain box", "[nain][box]") {
   CHECK(box_s -> GetCubicVolume() / m3 == solid -> GetCubicVolume() / m3);
   CHECK(box_s -> GetSurfaceArea() / m2 == solid -> GetSurfaceArea() / m2);
   CHECK(box_s -> GetName()             == "box_s");
+
+  CHECK(box_p -> GetTranslation() . x() / m == xc / m);
+  CHECK(box_p -> GetTranslation() . y() / m == yc / m);
+  CHECK(box_p -> GetTranslation() . z() / m == zc / m);
 
   auto small_cube = n4::box("small_cube").cube     (lz).solid();
   auto   big_cube = n4::box(  "big_cube").half_cube(lz).solid();
@@ -212,9 +221,13 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   // nain4::sphere is a more convenient interface for constructing G4VSolids and
   // G4LogicalVolumes based on G4Sphere
   auto water = nain4::material("G4_WATER"); auto density = water -> GetDensity();
-  auto r = 2*m;
+  auto r  = 2*m;
+  auto xc = 4*m;
+  auto yc = 5*m;
+  auto zc = 6*m;
   auto sphere_s = n4::sphere("sphere_s").r(r).solid();
   auto sphere_l = n4::sphere("sphere_l").r(r).logical(water);
+  auto sphere_p = n4::sphere("sphere_p").r(r).place  (water).at(xc, yc, zc).now();
 
   using CLHEP::pi;
   CHECK(sphere_l -> TotalVolumeEntities() == 1);
@@ -224,6 +237,10 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
 
   CHECK(sphere_s -> GetCubicVolume() / m3 == Approx(4 * pi / 3 * r * r * r / m3));
   CHECK(sphere_s -> GetSurfaceArea() / m2 == Approx(4 * pi     * r * r     / m2));
+
+  CHECK(sphere_p -> GetTranslation() . x() / m == xc / m);
+  CHECK(sphere_p -> GetTranslation() . y() / m == yc / m);
+  CHECK(sphere_p -> GetTranslation() . z() / m == zc / m);
 
   using CLHEP::twopi;
   auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
@@ -305,10 +322,14 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   // nain4::tubs is a more convenient interface for constructing G4VSolids and
   // G4LogicalVolumes based on G4Tubs
   auto water = nain4::material("G4_WATER"); auto density = water -> GetDensity();
-  auto r = 2*m;
-  auto z = 1*m;
+  auto r  = 2*m;
+  auto z  = 1*m;
+  auto xc = 4*m;
+  auto yc = 5*m;
+  auto zc = 6*m;
   auto tubs_s = n4::tubs("tubs_s").r(r).z(z).solid();
   auto tubs_l = n4::tubs("tubs_l").r(r).z(z).logical(water);
+  auto tubs_p = n4::tubs("tubs_p").r(r).z(z).place  (water).at(xc, yc, zc).now();
 
   using CLHEP::pi;
   CHECK(tubs_l -> TotalVolumeEntities() == 1);
@@ -318,6 +339,10 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
 
   CHECK(tubs_s -> GetCubicVolume() / m3 == Approx(     pi * r * r * z               / m3));
   CHECK(tubs_s -> GetSurfaceArea() / m2 == Approx((2 * pi * r * z + 2 * pi * r * r) / m2));
+
+  CHECK(tubs_p -> GetTranslation() . x() / m == xc / m);
+  CHECK(tubs_p -> GetTranslation() . y() / m == yc / m);
+  CHECK(tubs_p -> GetTranslation() . z() / m == zc / m);
 
   using CLHEP::twopi;
   auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
