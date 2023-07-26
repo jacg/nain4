@@ -104,6 +104,8 @@ private:
   const static constexpr G4D phi_full = 360 * deg;
 };
 
+#undef LOGICAL
+#undef PLACE
 #undef OPT_DOUBLE
 #undef G4D
 
