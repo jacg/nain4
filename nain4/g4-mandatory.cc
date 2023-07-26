@@ -28,19 +28,10 @@ void generator::geantino_along_x(G4Event* event) {
 }
 // --------------------------------------------------------------------------------
 // definition of sensitive_detector
-sensitive_detector::sensitive_detector(G4String name, process_hits_fn process_hits, end_of_event_fn end_of_event)
+sensitive_detector::sensitive_detector(G4String name, process_hits_fn process_hits)
 : G4VSensitiveDetector{name}
-, process_hits{process_hits}
-, end_of_event{end_of_event} {
+, process_hits{process_hits} {
   fully_activate_sensitive_detector(this);
-}
-
-G4bool sensitive_detector::ProcessHits(G4Step* step, G4TouchableHistory*) {
-  return process_hits ? process_hits(step) : true;  // TODO what does true mean?
-}
-
-void sensitive_detector::EndOfEvent (G4HCofThisEvent* hc) {
-  if (end_of_event) { end_of_event(hc); }
 }
 
 } // namespace nain4

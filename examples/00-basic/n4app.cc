@@ -42,7 +42,7 @@ auto my_geometry() {
     return true;
   };
 
-  auto sd = new n4::sensitive_detector{"/foo/bar/baz", process_hits, [](auto) {}};
+  auto sd = new n4::sensitive_detector{"/foo/bar/baz", process_hits};
 
   auto water  = n4::material("G4_WATER");
   auto air    = n4::material("G4_AIR");
