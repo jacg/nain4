@@ -64,13 +64,13 @@ using std::make_optional;
 using std::nullopt;
 using std::optional;
 
-inline auto logical(G4VSolid* solid, G4Material* material) { return new G4LogicalVolume{solid, material, solid->GetName()}; }
+inline auto volume(G4VSolid* solid, G4Material* material) { return new G4LogicalVolume{solid, material, solid->GetName()}; }
 
 // Create logical volume from solid and material
 template<class SOLID, class NAME, class... ArgTypes>
 G4LogicalVolume* volume(NAME name, G4Material* material, ArgTypes&&... args) {
   auto solid = new SOLID{std::forward<NAME>(name), std::forward<ArgTypes>(args)...};
-  return logical(solid, material);
+  return volume(solid, material);
 }
 // --------------------------------------------------------------------------------
 // Utilies for concisely retrieving things from stores

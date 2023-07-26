@@ -15,7 +15,7 @@
 #include <optional>
 
 #define VOLUME inline G4LogicalVolume* volume(G4Material* material) const \
-  { return n4::logical(solid(), material); }
+  { return n4::volume(solid(), material); }
 
 #define PLACE inline n4::place place(G4Material* material) const       \
   { return n4::place(volume(material)); }
