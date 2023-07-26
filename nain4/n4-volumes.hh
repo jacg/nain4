@@ -19,6 +19,9 @@
 #define LOGICAL inline G4LogicalVolume* logical(G4Material* material) const \
   { return n4::logical(solid(), material); }
 
+#define PLACE inline n4::place place(G4Material* material) const       \
+  { return n4::place(logical(material)); }
+
 #define G4D G4double
 
 namespace nain4 {
@@ -39,6 +42,7 @@ struct box {
   box& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
   G4Box* solid() const;
   LOGICAL
+  PLACE
 private:
   G4String name;
   G4D half_x_;
@@ -59,6 +63,7 @@ struct sphere {
   sphere& theta_delta (G4D x) { theta_delta_ = x; return *this; };
   G4Sphere* solid() const;
   LOGICAL
+  PLACE
 private:
   G4String name;
   OPT_DOUBLE r_inner_;
@@ -88,6 +93,7 @@ struct tubs {
 
   G4Tubs* solid() const;
   LOGICAL
+  PLACE
 private:
   G4String name;
   OPT_DOUBLE r_inner_;
