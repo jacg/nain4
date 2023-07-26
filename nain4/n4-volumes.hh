@@ -14,11 +14,11 @@
 
 #include <optional>
 
-#define LOGICAL inline G4LogicalVolume* logical(G4Material* material) const \
-  { return n4::logical(solid(), material); }
+#define VOLUME inline G4LogicalVolume* volume(G4Material* material) const \
+  { return n4::volume(solid(), material); }
 
 #define PLACE inline n4::place place(G4Material* material) const       \
-  { return n4::place(logical(material)); }
+  { return n4::place(volume(material)); }
 
 #define G4D G4double
 
@@ -39,7 +39,7 @@ struct box {
   box&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); }
   box& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
   G4Box* solid() const;
-  LOGICAL
+  VOLUME
   PLACE
 private:
   G4String name;
@@ -60,7 +60,7 @@ struct sphere {
   sphere& theta_end   (G4D x) { theta_end_   = x; return *this; };
   sphere& theta_delta (G4D x) { theta_delta_ = x; return *this; };
   G4Sphere* solid() const;
-  LOGICAL
+  VOLUME
   PLACE
 private:
   G4String name;
@@ -90,7 +90,7 @@ struct tubs {
   tubs& z        (G4D x) { half_z_    = x/2; return *this; };
 
   G4Tubs* solid() const;
-  LOGICAL
+  VOLUME
   PLACE
 private:
   G4String name;
@@ -104,7 +104,7 @@ private:
   const static constexpr G4D phi_full = 360 * deg;
 };
 
-#undef LOGICAL
+#undef VOLUME
 #undef PLACE
 #undef OPT_DOUBLE
 #undef G4D
