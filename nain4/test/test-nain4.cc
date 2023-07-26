@@ -176,7 +176,7 @@ TEST_CASE("nain box", "[nain][box]") {
   auto zc = 6 * m;
   auto box_h = n4::box("box_h").half_x(lx/2).half_y(ly/2).half_z(lz/2).solid();
   auto box_s = n4::box("box_s")     .x(lx  )     .y(ly  )     .z(lz  ).solid();
-  auto box_l = n4::box("box_l")     .x(lx  )     .y(ly  )     .z(lz  ).logical(water);
+  auto box_l = n4::box("box_l")     .x(lx  )     .y(ly  )     .z(lz  ).volume(water);
   auto box_p = n4::box("box_p")     .x(lx  )     .y(ly  )     .z(lz  ).place  (water).at(xc, yc, zc).now();
 
   CHECK(box_h -> GetCubicVolume() / m3 == box_s -> GetCubicVolume() / m3);
@@ -226,7 +226,7 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto yc = 5*m;
   auto zc = 6*m;
   auto sphere_s = n4::sphere("sphere_s").r(r).solid();
-  auto sphere_l = n4::sphere("sphere_l").r(r).logical(water);
+  auto sphere_l = n4::sphere("sphere_l").r(r).volume(water);
   auto sphere_p = n4::sphere("sphere_p").r(r).place  (water).at(xc, yc, zc).now();
 
   using CLHEP::pi;
@@ -328,7 +328,7 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   auto yc = 5*m;
   auto zc = 6*m;
   auto tubs_s = n4::tubs("tubs_s").r(r).z(z).solid();
-  auto tubs_l = n4::tubs("tubs_l").r(r).z(z).logical(water);
+  auto tubs_l = n4::tubs("tubs_l").r(r).z(z).volume(water);
   auto tubs_p = n4::tubs("tubs_p").r(r).z(z).place  (water).at(xc, yc, zc).now();
 
   using CLHEP::pi;
