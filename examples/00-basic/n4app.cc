@@ -29,11 +29,29 @@ void verify_number_of_args(int argc){
 
 // ANCHOR: my_geometry
 auto my_geometry() {
+
+  n4::sensitive_detector::process_hits_fn process_hits = [] (G4Step* step) {
+    auto pt = step -> GetPreStepPoint();
+    auto pos = pt -> GetPosition();
+    auto sd = pt -> GetSensitiveDetector();
+    auto sd_name = sd -> GetName();
+    auto sd_path = sd -> GetPathName();
+    auto sd_full_path = sd -> GetFullPathName();
+    auto volume_name = pt -> GetTouchable() -> GetVolume() -> GetName();
+    std::cout << sd_path << ' ' << sd_full_path << ' ' << sd_name << " " << volume_name << " " << pos << std::endl;
+    return true;
+  };
+
+  auto sd = new n4::sensitive_detector{"/foo/bar/baz", process_hits, [](auto) {}};
+
   auto water  = n4::material("G4_WATER");
   auto air    = n4::material("G4_AIR");
   auto world  = n4::box("world").cube(2*m).x(3*m).volume(water);
-  n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
-  n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).place(air).in(world)                        .now();
+
+  auto bubble = n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
+  auto straw  = n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).place(air).in(world).at(0.2*m, 0    , 0    ).now();
+  bubble -> GetLogicalVolume() -> SetSensitiveDetector(sd);
+  straw  -> GetLogicalVolume() -> SetSensitiveDetector(sd);
   return n4::place(world).now();
 }
 // ANCHOR_END: my_geometry
