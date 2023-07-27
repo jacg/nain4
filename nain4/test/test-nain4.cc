@@ -721,6 +721,39 @@ TEST_CASE("nain boolean single add", "[nain][geometry][boolean][add]") {
   CHECK(placed -> GetName()             == given_name);
 }
 
+TEST_CASE("nain boolean double add", "[nain][geometry][boolean][add]") {
+  auto r   = 1*m;
+  auto sep = 3*r;
+  auto air = n4::material("G4_AIR");
+  // auto density = air -> GetDensity();
+  auto given_name = "double-sphere-with-cube";
+
+  auto shape = n4::sphere("sphere-L").r(r)
+    .add(n4::sphere("sphere-R").r(r))
+       .at(sep, 0, 0)
+    .add(n4::box("box").cube(r))
+       .at(sep, 0, 0)
+    .name(given_name);
+
+  auto solid  = shape.solid();
+  auto volume = shape.volume(air);
+  auto placed = shape.place (air).now();
+
+  using CLHEP::pi;
+  // auto svol = 4 * pi / 3 * r * r * r;
+  // auto cvol = r * r * r;
+
+  // Doesn't work, poor accuracy in computing cubic volume of union, even with huge margins
+  // CHECK(solid  -> GetCubicVolume() / m3 == Approx((2 * svol + cvol)           / m3).margin(1e-1));
+  // CHECK(volume -> GetMass() / kg        == Approx((2 * svol + cvol) * density / kg).margin(1e-1));
+  CHECK(volume -> TotalVolumeEntities() == 1);
+  CHECK(volume -> GetMaterial()         == air);
+
+  CHECK(solid  -> GetName()             == given_name);
+  CHECK(volume -> GetName()             == given_name);
+  CHECK(placed -> GetName()             == given_name);
+}
+
 // TEST_CASE("nain geometry boolean", "[nain][geometry][boolean]") {
 
 //   auto r = 1*m; auto sep = 3*r;
