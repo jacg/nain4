@@ -1,15 +1,17 @@
 #include "n4-volumes.hh"
 
 #include "nain4.hh"
+#include <G4CSGSolid.hh>
 #include <G4LogicalVolume.hh>
 #include <G4String.hh>
 #include <G4VGraphicsScene.hh>
-
+#include <G4VPVParameterisation.hh>
+#include <G4Orb.hh>
 
 using opt_double = std::optional<G4double>;
 
 G4double compute_angle_delta(G4String name, const opt_double& delta, const opt_double& end, G4double start, G4double full) {
-  if (delta.has_value() && end.has_value()) {
+  if (delta.has_value() && end.has_value()) { // TODO consider allowing angle_delta together with angle_end
     throw "You cannot provide both end-angle and angle-delta for the " + name + " coordinate.";
   }
   return delta.value_or(end.value_or(full) - start);
@@ -45,10 +47,13 @@ std::tuple<G4double, G4double> compùte_r_range(opt_double min, opt_double max, 
 
 namespace nain4 {
 
-G4Sphere* sphere::solid() const {
+G4CSGSolid* sphere::solid() const {
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
   auto   phi_delta = compute_angle_delta("phi"  ,   phi_delta_,   phi_end_,   phi_start_,   phi_full);
   auto theta_delta = compute_angle_delta("theta", theta_delta_, theta_end_, theta_start_, theta_full);
+  if (r_inner == 0 && phi_delta == phi_full && theta_delta == theta_full) {
+      return new G4Orb{name, r_outer};
+  }
   return new G4Sphere{name, r_inner, r_outer, phi_start_, phi_delta, theta_start_, theta_delta};
 }
 

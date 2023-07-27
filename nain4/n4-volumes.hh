@@ -59,7 +59,7 @@ struct sphere {
   sphere& theta_start (G4D x) { theta_start_ = x; return *this; };
   sphere& theta_end   (G4D x) { theta_end_   = x; return *this; };
   sphere& theta_delta (G4D x) { theta_delta_ = x; return *this; };
-  G4Sphere* solid() const;
+  G4CSGSolid* solid() const;
   VOLUME
   PLACE
 private:
