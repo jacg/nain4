@@ -4,9 +4,11 @@
 #include <G4CSGSolid.hh>
 #include <G4LogicalVolume.hh>
 #include <G4String.hh>
+#include <G4UnionSolid.hh>
 #include <G4VGraphicsScene.hh>
 #include <G4VPVParameterisation.hh>
 #include <G4Orb.hh>
+#include <G4VSolid.hh>
 
 using opt_double = std::optional<G4double>;
 
@@ -69,6 +71,10 @@ G4LogicalVolume* shape::volume(G4Material* material) const {
   auto vol = n4::volume(solid(), material);
   if (sd.has_value()) { vol -> SetSensitiveDetector(sd.value()); }
   return vol;
+}
+
+G4VSolid* boolean_shape::solid() const {
+  if (op == BOOL_OP::ADD) { return new G4UnionSolid{a -> GetName(), a, b, transformation}; }
 }
 
 } // namespace nain4

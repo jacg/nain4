@@ -9,10 +9,12 @@
 #include <G4SystemOfUnits.hh>
 #include <G4Types.hh>
 #include <G4Box.hh>
+#include <G4VSolid.hh>
 #include <G4Sphere.hh>
 #include <G4Tubs.hh>
 
 #include <G4VSensitiveDetector.hh>
+#include <G4VSolid.hh>
 #include <optional>
 
 #define G4D G4double
@@ -23,13 +25,34 @@ namespace nain4 {
 
 #define SENSITIVE(TYPE) TYPE& sensitive(G4VSensitiveDetector* s) { sd = s; return *this; }
 
+enum class BOOL_OP { ADD, SUB, INTERSECT, UNION };
+
 struct shape {
-  G4LogicalVolume*   volume(G4Material* material) const;
-  n4::place           place(G4Material* material) const { return n4::place(volume(material)); }
-  virtual G4CSGSolid* solid(                    ) const = 0;
+  G4LogicalVolume*  volume(G4Material* material) const;
+  n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
+  virtual G4VSolid*  solid(                    ) const = 0;
   virtual ~shape() {}
+
+  // boolean operations
+  void add(n4::shape& shape) { return add(shape.solid()); }
+  void add(G4VSolid*  solid) {
+    return boolean_shape{this -> solid(), solid, BOOL_OP::ADD };
+  }
 protected:
   std::optional<G4VSensitiveDetector*> sd;
+  std::optional<BooleanData>         bool;
+};
+
+
+struct boolean_shape : shape {
+  friend shape;
+  G4VSolid* solid() const override;
+private:
+  boolean_shape(G4VSolid* a, G4VSolid* b, BOOL_OP op) : a{a}, b{b}, op{op} {}
+  BOOL_OP   op;
+  G4VSolid* a;
+  G4VSolid* b;
+  G4Transform3D transformation = HepGeom::Transform3D::Identity;
 };
 
 struct box : shape {
@@ -65,7 +88,7 @@ struct sphere : shape {
   sphere& theta_end   (G4D x) { theta_end_   = x; return *this; };
   sphere& theta_delta (G4D x) { theta_delta_ = x; return *this; };
   SENSITIVE(sphere)
-  G4CSGSolid* solid() const;
+  G4VSolid* solid() const;
 private:
   G4String name;
   OPT_DOUBLE r_inner_;
@@ -105,6 +128,8 @@ private:
   G4D   half_z_;
   const static constexpr G4D phi_full = 360 * deg;
 };
+
+struct boolean
 
 #undef OPT_DOUBLE
 #undef G4D
