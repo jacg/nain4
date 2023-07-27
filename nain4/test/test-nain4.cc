@@ -687,34 +687,64 @@ void error_if_do_not_like_type(T) {
 }
 
 
-TEST_CASE("static assert int", "[static][int]") {  error_if_do_not_like_type(2); }
+//TEST_CASE("static assert int", "[static][int]") {  error_if_do_not_like_type(2); }
 //TEST_CASE("static assert string", "[static][string]") {  error_if_do_not_like_type(std::string{"bla"}); }
 //TEST_CASE("static assert double", "[static][double]") {  error_if_do_not_like_type(3.2); }
 
-TEST_CASE("nain geometry boolean", "[nain][geometry][boolean]") {
-
-  auto r = 1*m; auto sep = 3*r;
+TEST_CASE("nain boolean single add", "[nain][geometry][boolean][add]") {
+  auto r   = 1*m;
+  auto sep = 3*r;
   auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "double-sphere";
 
-  auto shape = n4::sphere("mihuevo-L").r(1*m)
-    .add(n4::sphere("mihuevo-R").r(1*m))  // G4VSolid*  n4::shape&
-       .at(1*m)
-       .name("mishuevos")
-//    .add(...).rotate().at()
-    .solid();
-    //.subtract()...
-
-  // .solid()   sphere box tubs
-
-  // .solid()   sphere box tubs   bool+sphere  bool+box bool+tubs
+  auto shape = n4::sphere("sphere-L").r(r)
+    .add(n4::sphere("sphere-R").r(r))
+       .at(sep, 0, 0)
+    .name(given_name);
 
   auto solid  = shape.solid();
   auto volume = shape.volume(air);
-  auto placed = shape.place (air);
+  auto placed = shape.place (air).now();
 
   using CLHEP::pi;
-  auto vol = 4 * pi / 3 * r * r;
-  CHECK(solid -> GetCubicVolume() / m3 == 2 * vol / m3);
+  auto vol = 4 * pi / 3 * r * r * r;
+
+  // Doesn't work, poor accuracy in computing cubic volume of union, so we give huge margins
+  CHECK(solid  -> GetCubicVolume() / m3 == Approx(2 * vol           / m3).margin(1e-1));
+  CHECK(volume -> GetMass() / kg        == Approx(2 * vol * density / kg).margin(1e-1));
+  CHECK(volume -> TotalVolumeEntities() == 1);
+  CHECK(volume -> GetMaterial()         == air);
+
+  CHECK(solid  -> GetName()             == given_name);
+  CHECK(volume -> GetName()             == given_name);
+  CHECK(placed -> GetName()             == given_name);
+}
+
+// TEST_CASE("nain geometry boolean", "[nain][geometry][boolean]") {
+
+//   auto r = 1*m; auto sep = 3*r;
+//   auto air = n4::material("G4_AIR");
+
+//   auto shape = n4::sphere("mihuevo-L").r(1*m)
+//     .add(n4::sphere("mihuevo-R").r(1*m))  // G4VSolid*  n4::shape&
+//        .at(1*m)
+//        .name("mishuevos")
+// //    .add(...).rotate().at()
+//     .solid();
+//     //.subtract()...
+
+//   // .solid()   sphere box tubs
+
+//   // .solid()   sphere box tubs   bool+sphere  bool+box bool+tubs
+
+//   auto solid  = shape.solid();
+//   auto volume = shape.volume(air);
+//   auto placed = shape.place (air);
+
+//   using CLHEP::pi;
+//   auto vol = 4 * pi / 3 * r * r;
+//   CHECK(solid -> GetCubicVolume() / m3 == 2 * vol / m3);
 
   // n4::sphere("mihuevo-L").r(1*m)
   //   .add  <G4Orb>("mihuevo-R", 1*m).at(1*m)
@@ -727,7 +757,7 @@ TEST_CASE("nain geometry boolean", "[nain][geometry][boolean]") {
 
   // n4::shape base class gets all boolean ops (.add(), .subtract() etc.)?
 
-}
+// }
 
   // n4::      {solid, volume, place, boolean};
   // n4::solid.{solid, volume, place, boolean};
