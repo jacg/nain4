@@ -11,7 +11,7 @@
 using opt_double = std::optional<G4double>;
 
 G4double compute_angle_delta(G4String name, const opt_double& delta, const opt_double& end, G4double start, G4double full) {
-  if (delta.has_value() && end.has_value()) {
+  if (delta.has_value() && end.has_value()) { // TODO consider allowing angle_delta together with angle_end
     throw "You cannot provide both end-angle and angle-delta for the " + name + " coordinate.";
   }
   return delta.value_or(end.value_or(full) - start);

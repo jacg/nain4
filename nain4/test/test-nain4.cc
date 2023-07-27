@@ -6,6 +6,7 @@
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Box.hh>
 #include <G4Cons.hh>
+#include <G4Orb.hh>
 #include <G4Sphere.hh>
 #include <G4Trd.hh>
 
@@ -318,6 +319,47 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   check_r(r_e ,           0,   end         );
 
   check_r(r_d ,           0, delta         );
+}
+
+TEST_CASE("nain sphere orb", "[nain][sphere][ord]") {
+  using CLHEP::twopi;
+  auto is_sphere = [](auto thing) { CHECK(dynamic_cast<G4Sphere*>(thing)); };
+  auto is_orb    = [](auto thing) { CHECK(dynamic_cast<G4Orb   *>(thing)); };
+
+  is_sphere(n4::sphere("r_inner"            ).r_inner(1).r      (2).solid());
+  is_orb   (n4::sphere("r_inner_full"       ).r_inner(0).r      (2).solid());
+  is_sphere(n4::sphere("r_delta"            ).r_delta(1).r      (2).solid());
+  is_orb   (n4::sphere("r_delta_full"       ).r_delta(2).r      (2).solid());
+  is_sphere(n4::sphere("r_delta_innner"     ).r_delta(2).r_inner(1).solid());
+  is_orb   (n4::sphere("r_delta_innner_full").r_delta(2).r_inner(0).solid());
+
+  auto full = twopi; auto half = twopi/2; auto more = full + half;
+  is_sphere(n4::sphere("phi_start"           ).r(1).phi_start(half)                .solid());
+  is_orb   (n4::sphere("phi_start_zero"      ).r(1).phi_start( 0.0)                .solid());
+  is_sphere(n4::sphere("phi_start_end"       ).r(1).phi_start(half).phi_end  (full).solid());
+  is_orb   (n4::sphere("phi_start_end_full"  ).r(1).phi_start(half).phi_end  (more).solid());
+  is_sphere(n4::sphere("phi_delta"           ).r(1).phi_delta(half)                .solid());
+  is_orb   (n4::sphere("phi_delta_full"      ).r(1).phi_delta(full)                .solid());
+  is_sphere(n4::sphere("phi_delta_start"     ).r(1).phi_delta(half).phi_start(half).solid());
+  is_orb   (n4::sphere("phi_delta_start_full").r(1).phi_delta(full).phi_start(half).solid());
+  is_sphere(n4::sphere("phi_end"             ).r(1).phi_end  (half)                .solid());
+  is_orb   (n4::sphere("phi_end_full"        ).r(1).phi_end  (full)                .solid());
+
+  // TODO implement these (and others) if we ever allow providing angle_delta with angle_end
+  // is_sphere(n4::sphere("phi_delta_end"       ).r(1).phi_delta(half).phi_end(full).solid());
+  // is_orb   (n4::sphere("phi_delta_end"       ).r(1).phi_delta(full).phi_end(half).solid());
+
+  full = twopi/2; half = twopi/4; more = full + half;
+  is_sphere(n4::sphere("theta_start"           ).r(1).theta_start(half)                  .solid());
+  is_orb   (n4::sphere("theta_start_zero"      ).r(1).theta_start( 0.0)                  .solid());
+  is_sphere(n4::sphere("theta_start_end"       ).r(1).theta_start(half).theta_end  (full).solid());
+  is_orb   (n4::sphere("theta_start_end_full"  ).r(1).theta_start(half).theta_end  (more).solid());
+  is_sphere(n4::sphere("theta_delta"           ).r(1).theta_delta(half)                  .solid());
+  is_orb   (n4::sphere("theta_delta_full"      ).r(1).theta_delta(full)                  .solid());
+  is_sphere(n4::sphere("theta_delta_start"     ).r(1).theta_delta(half).theta_start(half).solid());
+  is_orb   (n4::sphere("theta_delta_start_full").r(1).theta_delta(full).theta_start(half).solid());
+  is_sphere(n4::sphere("theta_end"             ).r(1).theta_end  (half)                  .solid());
+  is_orb   (n4::sphere("theta_end_full"        ).r(1).theta_end  (full)                  .solid());
 }
 
 TEST_CASE("nain tubs", "[nain][tubs]") {
