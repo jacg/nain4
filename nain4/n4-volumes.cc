@@ -65,4 +65,10 @@ G4CSGSolid* sphere::solid() const {
 
 G4Box* box::solid() const { return new G4Box(name, half_x_, half_y_, half_z_); }
 
+G4LogicalVolume* shape::volume(G4Material* material) const {
+  auto vol = n4::volume(solid(), material);
+  if (sd.has_value()) { vol -> SetSensitiveDetector(sd.value()); }
+  return vol;
+}
+
 } // namespace nain4
