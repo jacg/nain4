@@ -1,5 +1,6 @@
 #ifndef nain4_g4_mandatory_hh
 #define nain4_g4_mandatory_hh
+#include <G4HCofThisEvent.hh>
 #include <G4SDManager.hh>
 
 #include <G4Box.hh>
@@ -153,19 +154,24 @@ private:
 };
 
 // --------------------------------------------------------------------------------
-// TODO make a builder for this (if more methods are added?)
 // TODO: needs tests
 class sensitive_detector : public G4VSensitiveDetector {
 public:
   using process_hits_fn = std::function<bool(G4Step*)>;
+  using initialize_fn   = std::function<void(G4HCofThisEvent*)>;
   using end_of_event_fn = std::function<void(G4HCofThisEvent*)>;
 
-  sensitive_detector(G4String name, process_hits_fn process_hits, end_of_event_fn end_of_event);
-  G4bool ProcessHits(G4Step* step, G4TouchableHistory*) override;
-  void   EndOfEvent (G4HCofThisEvent* hc)               override;
+  sensitive_detector* initialize  (initialize_fn   f) { init = f; return this; }
+  sensitive_detector* end_of_event(end_of_event_fn f) { eoev = f; return this; }
+
+  sensitive_detector(G4String name, process_hits_fn process_hits);
+  bool ProcessHits(G4Step* step, G4TouchableHistory*) override { return process_hits(step); };
+  void Initialize (G4HCofThisEvent* hc)               override {        init        (hc  ); };
+  void EndOfEvent (G4HCofThisEvent* hc)               override {        eoev        (hc  ); };
 private:
   process_hits_fn process_hits;
-  end_of_event_fn end_of_event;
+  initialize_fn   init = [] (auto) {};
+  end_of_event_fn eoev = [] (auto) {};
 };
 // --------------------------------------------------------------------------------
 template<class SENSITIVE>
