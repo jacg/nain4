@@ -49,7 +49,23 @@ std::tuple<G4double, G4double> compùte_r_range(opt_double min, opt_double max, 
 
 namespace nain4 {
 
-G4CSGSolid* sphere::solid() const {
+
+  boolean_shape shape::add(n4::shape& shape) {
+    return add(shape.solid());
+  }
+
+  boolean_shape shape::add(G4VSolid* solid) {
+    return boolean_shape{this -> solid(), solid, BOOL_OP::ADD};
+  }
+
+
+  G4VSolid* boolean_shape::solid() const {
+    auto name = name_.value_or(a -> GetName());
+    if (op == BOOL_OP::ADD) { return new G4UnionSolid{name, a, b, transformation}; }
+    return nullptr;
+  }
+
+  G4VSolid* sphere::solid() const {
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
   auto   phi_delta = compute_angle_delta("phi"  ,   phi_delta_,   phi_end_,   phi_start_,   phi_full);
   auto theta_delta = compute_angle_delta("theta", theta_delta_, theta_end_, theta_start_, theta_full);
@@ -73,8 +89,5 @@ G4LogicalVolume* shape::volume(G4Material* material) const {
   return vol;
 }
 
-G4VSolid* boolean_shape::solid() const {
-  if (op == BOOL_OP::ADD) { return new G4UnionSolid{a -> GetName(), a, b, transformation}; }
-}
 
 } // namespace nain4

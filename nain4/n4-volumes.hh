@@ -27,6 +27,8 @@ namespace nain4 {
 
 enum class BOOL_OP { ADD, SUB, INTERSECT, UNION };
 
+struct boolean_shape;
+
 struct shape {
   G4LogicalVolume*  volume(G4Material* material) const;
   n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
@@ -34,24 +36,28 @@ struct shape {
   virtual ~shape() {}
 
   // boolean operations
-  void add(n4::shape& shape) { return add(shape.solid()); }
-  void add(G4VSolid*  solid) {
-    return boolean_shape{this -> solid(), solid, BOOL_OP::ADD };
-  }
+  boolean_shape add(n4::shape& shape);
+  boolean_shape add(G4VSolid*  solid);
+
 protected:
   std::optional<G4VSensitiveDetector*> sd;
-  std::optional<BooleanData>         bool;
 };
 
 
 struct boolean_shape : shape {
   friend shape;
   G4VSolid* solid() const override;
+
+  boolean_shape& rotate(G4RotationMatrix& rot)    { transformation = HepGeom::Rotate3D{rot}      * transformation; return *this; }
+  boolean_shape& at(double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this; }
+  boolean_shape& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
+  boolean_shape& name(G4String name)              { name_ = name; return *this; }
 private:
   boolean_shape(G4VSolid* a, G4VSolid* b, BOOL_OP op) : a{a}, b{b}, op{op} {}
-  BOOL_OP   op;
   G4VSolid* a;
   G4VSolid* b;
+  BOOL_OP   op;
+  std::optional<G4String> name_;
   G4Transform3D transformation = HepGeom::Transform3D::Identity;
 };
 
@@ -129,7 +135,6 @@ private:
   const static constexpr G4D phi_full = 360 * deg;
 };
 
-struct boolean
 
 #undef OPT_DOUBLE
 #undef G4D
