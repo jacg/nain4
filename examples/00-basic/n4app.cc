@@ -27,40 +27,6 @@ void verify_number_of_args(int argc){
 }
 // ANCHOR_END: print_usage
 
-auto sensitive(unsigned& n_event) {
-
-  n4::sensitive_detector::process_hits_fn process_hits = [] (G4Step* step) {
-    auto pt = step -> GetPreStepPoint();
-    auto pos = pt -> GetPosition();
-    auto sd = pt -> GetSensitiveDetector();
-    auto sd_name = sd -> GetName();
-    auto sd_path = sd -> GetPathName();
-    auto sd_full_path = sd -> GetFullPathName();
-    auto volume_name = pt -> GetTouchable() -> GetVolume() -> GetName();
-    std::cout << sd_path << ' ' << sd_full_path << ' ' << sd_name << " " << volume_name << " " << pos << std::endl;
-    return true;
-  };
-
-  return (new n4::sensitive_detector{"/foo/bar/baz", process_hits})
-    -> initialize  ([&n_event](auto){ n_event++; })
-    -> end_of_event([&n_event](auto){ std::cout << "end of event " << n_event << std::endl; });
-}
-
-// ANCHOR: my_geometry
-auto my_geometry(unsigned& n_event) {
-
-  auto water  = n4::material("G4_WATER");
-  auto air    = n4::material("G4_AIR");
-  auto world  = n4::box("world").cube(2*m).x(3*m).volume(water);
-
-  auto sd = sensitive(n_event);
-
-  n4::sphere("bubble").r(0.2*m)         .sensitive(sd).place(air).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
-  n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).sensitive(sd).place(air).in(world).at(0.2*m, 0    , 0    ).now();
-  return n4::place(world).now();
-}
-// ANCHOR_END: my_geometry
-
 // ANCHOR: my_generator
 void my_generator(G4Event* event) {
   auto geantino = n4::find_particle("geantino");
@@ -71,10 +37,43 @@ void my_generator(G4Event* event) {
 }
 // ANCHOR_END: my_generator
 
+n4::actions* create_actions(unsigned& n_event) {
+  auto my_stepping_action = [&] (const G4Step* step) {
+    auto pt = step -> GetPreStepPoint();
+    auto volume_name = pt -> GetTouchable() -> GetVolume() -> GetName();
+    if (volume_name == "straw" || volume_name == "bubble") {
+      auto pos = pt -> GetPosition();
+      std::cout << volume_name << " " << pos << std::endl;
+    }
+  };
+
+  auto my_event_action = [&] (const G4Event*) {
+     n_event++;
+     std::cout << "end of event " << n_event << std::endl;
+  };
+
+  return (new n4::        actions{      my_generator})
+ -> set( (new n4::   event_action{                  }) -> end(my_event_action) )
+ -> set(  new n4::stepping_action{my_stepping_action} );
+}
+
+
+// ANCHOR: my_geometry
+auto my_geometry() {
+
+  auto water  = n4::material("G4_WATER");
+  auto air    = n4::material("G4_AIR");
+  auto world  = n4::box("world").cube(2*m).x(3*m).volume(water);
+
+  n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
+  n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).place(air).in(world).at(0.2*m, 0    , 0    ).now();
+  return n4::place(world).now();
+}
+// ANCHOR_END: my_geometry
+
 // ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
   // ANCHOR_END: pick_cli_arguments
-
   unsigned n_event = 0;
 
   // ANCHOR: create_run_manager
@@ -84,8 +83,8 @@ int main(int argc, char* argv[]) {
   // ANCHOR: build_minimal_framework
   // Important! physics list has to be set before the generator!
   .physics<FTFP_BERT>(0) // version 0
-    .geometry([&] {return my_geometry(n_event);})
-  .actions(my_generator);
+  .geometry(my_geometry)
+    .actions([&] {return create_actions(n_event); });
   // ANCHOR_END: build_minimal_framework
 
   // ANCHOR: run
