@@ -55,9 +55,16 @@ auto my_geometry(unsigned& n_event) {
 
   auto sd = sensitive(n_event);
 
-  auto bubble = n4::sphere("bubble").r(0.2*m)         .volume_sensitive(air, sd).place(air).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
-  auto straw  = n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).volume_sensitive(air, sd).place(air).in(world).at(0.2*m, 0    , 0    ).now();
+  auto bubble = n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
+  auto straw  = n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).place(air).in(world).at(0.2*m, 0    , 0    ).now();
 
+  // 1  auto b = n4::sphere("bubble").r(0.2*m)                      .sensitive(sd).place(air).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
+  // 2a auto b = n4::sphere("bubble").r(0.2*m).volume          (air).sensitive(sd).place(   ).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
+  // 2b auto b = n4::sphere("bubble").r(0.2*m).volume_sensitive(air,           sd).place(   ).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
+  // 3  auto b = n4::sphere("bubble").r(0.2*m).place           (air).sensitive(sd)           .in(world).at(1.3*m, 0.8*m, 0.3*m).now();
+
+  bubble -> GetLogicalVolume() -> SetSensitiveDetector(sd);
+  straw  -> GetLogicalVolume() -> SetSensitiveDetector(sd);
   return n4::place(world).now();
 }
 // ANCHOR_END: my_geometry

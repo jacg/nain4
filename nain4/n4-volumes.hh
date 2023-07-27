@@ -17,12 +17,6 @@
 #define VOLUME inline G4LogicalVolume* volume(G4Material* material) const \
   { return n4::volume(solid(), material); }
 
-#define VOLUME_SENSITIVE inline G4LogicalVolume* volume_sensitive(G4Material* material, G4VSensitiveDetector* sd) const { \
-  auto vol = this -> volume(material);                                                                                    \
-  vol -> SetSensitiveDetector(sd);                                                                                        \
-  return vol;                                                                                                             \
-}
-
 #define PLACE inline n4::place place(G4Material* material) const       \
   { return n4::place(volume(material)); }
 
@@ -46,7 +40,6 @@ struct box {
   box& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
   G4Box* solid() const;
   VOLUME
-  VOLUME_SENSITIVE
   PLACE
 private:
   G4String name;
@@ -68,7 +61,6 @@ struct sphere {
   sphere& theta_delta (G4D x) { theta_delta_ = x; return *this; };
   G4CSGSolid* solid() const;
   VOLUME
-  VOLUME_SENSITIVE
   PLACE
 private:
   G4String name;
@@ -99,7 +91,6 @@ struct tubs {
 
   G4Tubs* solid() const;
   VOLUME
-  VOLUME_SENSITIVE
   PLACE
 private:
   G4String name;
