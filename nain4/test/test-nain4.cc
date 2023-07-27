@@ -24,6 +24,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <type_traits>
 
 using Catch::Approx;
 
@@ -672,3 +673,20 @@ TEST_CASE("nain geometry iterator", "[nain][geometry][iterator]") {
   CHECK(found == expected);
 
 }
+
+template<class T>
+void error_if_do_not_like_type(T) {
+  static_assert(
+    std::negation_v<std::is_same<T, int>>,
+    "\n\n\n\nWe do not like `int`s\n\n\n\n\n"
+  );
+  static_assert(
+    std::negation_v<std::is_same<T, std::string>>,
+    "\n\n\n\n\n`std::string`s NOT welcome\n\n\n\n"
+  );
+}
+
+
+TEST_CASE("static assert int", "[static][int]") {  error_if_do_not_like_type(2); }
+TEST_CASE("static assert string", "[static][string]") {  error_if_do_not_like_type(std::string{"bla"}); }
+TEST_CASE("static assert double", "[static][double]") {  error_if_do_not_like_type(3.2); }
