@@ -252,9 +252,11 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto phi_e  = n4::sphere("phi_e" ).r(1).phi_end  (end  ) /* .start(0) */ .solid();
   auto phi_d  = n4::sphere("phi_d" ).r(1).phi_delta(delta) /* .start(0) */ .solid();
 
-  auto check_phi = [] (auto solid, auto start, auto delta) {
-      CHECK( solid -> GetStartPhiAngle() == start);
-      CHECK( solid -> GetDeltaPhiAngle() == delta);
+  auto down = [] (auto g4vsolid) { return dynamic_cast<G4Sphere*>(g4vsolid); };
+
+  auto check_phi = [&down] (auto solid, auto start, auto delta) {
+      CHECK( down(solid) -> GetStartPhiAngle() == start);
+      CHECK( down(solid) -> GetDeltaPhiAngle() == delta);
   };
   check_phi(phi_s , start, twopi - start );
   check_phi(phi_se, start,   end - start );
@@ -274,9 +276,9 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto theta_e  = n4::sphere("theta_e" ).r(1).theta_end  (end  ) /* .start(0) */   .solid();
   auto theta_d  = n4::sphere("theta_d" ).r(1).theta_delta(delta) /* .start(0) */   .solid();
 
-  auto check_theta = [] (auto solid, auto start, auto delta) {
-      CHECK( solid -> GetStartThetaAngle() == start);
-      CHECK( solid -> GetDeltaThetaAngle() == delta);
+  auto check_theta = [&down] (auto solid, auto start, auto delta) {
+      CHECK( down(solid) -> GetStartThetaAngle() == start);
+      CHECK( down(solid) -> GetDeltaThetaAngle() == delta);
   };
 
   check_theta(theta_s , start,    pi - start );
@@ -295,12 +297,12 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto r_es = n4::sphere("r_es").r      (end  ).r_inner(start).solid();
   auto r_ds = n4::sphere("r_ds").r_delta(delta).r_inner(start).solid();
   auto r_de = n4::sphere("r_de").r_delta(delta).r      (end  ).solid();
-  auto r_e  = n4::sphere("r_e" ).r      (end  )/*.r_inner(0)*/.solid();
-  auto r_d  = n4::sphere("r_d" ).r_delta(delta)/*.r_inner(0)*/.solid();
+  auto r_e  = n4::sphere("r_e" ).r      (end  )/*.r_inner(0)*/.phi_delta(1).solid(); // phi_delta to avoid creating G4Orb
+  auto r_d  = n4::sphere("r_d" ).r_delta(delta)/*.r_inner(0)*/.phi_delta(1).solid();
 
-  auto check_r = [] (auto solid, auto inner, auto outer) {
-      CHECK( solid -> GetInnerRadius() == inner);
-      CHECK( solid -> GetOuterRadius() == outer);
+  auto check_r = [&down] (auto solid, auto inner, auto outer) {
+      CHECK( down(solid) -> GetInnerRadius() == inner);
+      CHECK( down(solid) -> GetOuterRadius() == outer);
   };
 
   // check_r(r_s , start,    pi - start); // Shouldn't work
