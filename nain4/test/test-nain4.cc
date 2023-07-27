@@ -754,6 +754,38 @@ TEST_CASE("nain boolean double add", "[nain][geometry][boolean][add]") {
   CHECK(placed -> GetName()             == given_name);
 }
 
+// Should previous tests use boxes?
+// Accuracy might be better in those cases
+TEST_CASE("nain boolean add overlap", "[nain][geometry][boolean][add]") {
+  auto l   = 1*m;
+  auto sep = l/2;
+  auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "two-boxes-ovelap";
+
+  auto shape = n4::box("box-L").cube(l)
+    .add(n4::box("box-R").cube(l))
+       .at(sep, sep, sep) // Overlapping 1/8th
+    .name(given_name);
+
+  auto solid  = shape.solid();
+  auto volume = shape.volume(air);
+  auto placed = shape.place (air).now();
+
+  using CLHEP::pi;
+  auto vol = l * l * l;
+
+  // Doesn't work, poor accuracy in computing cubic volume of union, even with huge margins
+  CHECK(solid  -> GetCubicVolume() / m3 == Approx(15 * vol / 8           / m3));//.margin(1e-1));
+  CHECK(volume -> GetMass() / kg        == Approx(15 * vol / 8 * density / kg));//.margin(1e-1));
+  CHECK(volume -> TotalVolumeEntities() == 1);
+  CHECK(volume -> GetMaterial()         == air);
+
+  CHECK(solid  -> GetName()             == given_name);
+  CHECK(volume -> GetName()             == given_name);
+  CHECK(placed -> GetName()             == given_name);
+}
+
 // TEST_CASE("nain geometry boolean", "[nain][geometry][boolean]") {
 
 //   auto r = 1*m; auto sep = 3*r;
