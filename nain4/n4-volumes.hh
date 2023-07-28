@@ -37,10 +37,10 @@ struct shape {
 
   // boolean operations
   boolean_shape add      (n4::shape& shape);
-  boolean_shape add      (G4VSolid*  solid);
   boolean_shape subtract (n4::shape& shape);
-  boolean_shape subtract (G4VSolid*  solid);
   boolean_shape intersect(n4::shape& shape);
+  boolean_shape add      (G4VSolid*  solid);
+  boolean_shape subtract (G4VSolid*  solid);
   boolean_shape intersect(G4VSolid*  solid);
 
   // Alternative names

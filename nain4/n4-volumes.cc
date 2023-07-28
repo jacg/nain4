@@ -51,39 +51,38 @@ std::tuple<G4double, G4double> compùte_r_range(opt_double min, opt_double max, 
 
 namespace nain4 {
 
+boolean_shape shape::add      (n4::shape& shape) { return add      (shape.solid()); }
+boolean_shape shape::subtract (n4::shape& shape) { return subtract (shape.solid()); }
+boolean_shape shape::intersect(n4::shape& shape) { return intersect(shape.solid()); }
 
-  boolean_shape shape::add      (n4::shape& shape) { return add      (shape.solid()); }
-  boolean_shape shape::subtract (n4::shape& shape) { return subtract (shape.solid()); }
-  boolean_shape shape::intersect(n4::shape& shape) { return intersect(shape.solid()); }
+boolean_shape shape::add      (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::ADD}; }
+boolean_shape shape::subtract (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::SUB}; }
+boolean_shape shape::intersect(G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::INT}; }
 
-  boolean_shape shape::add      (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::ADD}; }
-  boolean_shape shape::subtract (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::SUB}; }
-  boolean_shape shape::intersect(G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::INT}; }
+G4VSolid* boolean_shape::solid() const {
+  auto name = name_.value_or(a -> GetName());
+  if (op == BOOL_OP::ADD) { return new G4UnionSolid       {name, a, b, transformation}; }
+  if (op == BOOL_OP::SUB) { return new G4SubtractionSolid {name, a, b, transformation}; }
+  if (op == BOOL_OP::INT) { return new G4IntersectionSolid{name, a, b, transformation}; }
+  // Unreachable
+  return nullptr;
+}
 
-  G4VSolid* boolean_shape::solid() const {
-    auto name = name_.value_or(a -> GetName());
-    if (op == BOOL_OP::ADD) { return new G4UnionSolid       {name, a, b, transformation}; }
-    if (op == BOOL_OP::SUB) { return new G4SubtractionSolid {name, a, b, transformation}; }
-    if (op == BOOL_OP::INT) { return new G4IntersectionSolid{name, a, b, transformation}; }
-    // Unreachable
-    return nullptr;
-  }
+template<class S> boolean_shape join (S shape){ return add      (shape); }
+template<class S> boolean_shape sub  (S shape){ return subtract (shape); }
+template<class S> boolean_shape inter(S shape){ return intersect(shape); }
 
-  template<class S> boolean_shape join (S shape){ return add      (shape); }
-  template<class S> boolean_shape sub  (S shape){ return subtract (shape); }
-  template<class S> boolean_shape inter(S shape){ return intersect(shape); }
-
-  G4VSolid* sphere::solid() const {
+G4VSolid* sphere::solid() const {
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
   auto   phi_delta = compute_angle_delta("phi"  ,   phi_delta_,   phi_end_,   phi_start_,   phi_full);
   auto theta_delta = compute_angle_delta("theta", theta_delta_, theta_end_, theta_start_, theta_full);
   if (r_inner == 0 && phi_delta == phi_full && theta_delta == theta_full) {
-      return new G4Orb{name, r_outer};
+    return new G4Orb{name, r_outer};
   }
   return new G4Sphere{name, r_inner, r_outer, phi_start_, phi_delta, theta_start_, theta_delta};
 }
 
- G4Tubs* tubs::solid() const {
+G4Tubs* tubs::solid() const {
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
   auto phi_delta = compute_angle_delta("phi", phi_delta_, phi_end_, phi_start_, phi_full);
   return new G4Tubs{name, r_inner, r_outer, half_z_, phi_start_, phi_delta};
