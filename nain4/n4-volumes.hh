@@ -70,6 +70,10 @@ private:
   G4Transform3D transformation = HepGeom::Transform3D::Identity;
 };
 
+template<class S> boolean_shape shape::join (S shape){ return add      (shape); }
+template<class S> boolean_shape shape::sub  (S shape){ return subtract (shape); }
+template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); }
+
 
 struct box : shape {
   box(G4String name) : name{name} {}

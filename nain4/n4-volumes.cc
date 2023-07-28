@@ -68,10 +68,6 @@ G4VSolid* boolean_shape::solid() const {
   return nullptr;
 }
 
-template<class S> boolean_shape join (S shape){ return add      (shape); }
-template<class S> boolean_shape sub  (S shape){ return subtract (shape); }
-template<class S> boolean_shape inter(S shape){ return intersect(shape); }
-
 G4VSolid* sphere::solid() const {
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
   auto   phi_delta = compute_angle_delta("phi"  ,   phi_delta_,   phi_end_,   phi_start_,   phi_full);
