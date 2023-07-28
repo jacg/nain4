@@ -27,6 +27,7 @@ struct shape {
   G4LogicalVolume*   volume(G4Material* material) const;
   n4::place           place(G4Material* material) const { return n4::place(volume(material)); }
   virtual G4CSGSolid* solid(                    ) const = 0;
+  virtual ~shape() {}
 protected:
   std::optional<G4VSensitiveDetector*> sd;
 };
