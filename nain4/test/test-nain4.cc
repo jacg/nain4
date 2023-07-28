@@ -809,6 +809,37 @@ TEST_CASE("nain boolean single sub", "[nain][geometry][boolean][sub]") {
 }
 
 
+TEST_CASE("nain boolean double sub", "[nain][geometry][boolean][sub]") {
+  auto l   = 1*m;
+  auto sep = 0.5*l;
+  auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "double-cube";
+
+  auto shape = n4::box("cube-L").cube(l)
+    .subtract(n4::box("cube-R").cube(l))
+      .at(sep, 0, 0) // Overlapping 1/2 of the volume
+    .subtract(n4::box("cube-T").cube(l))
+      .at(  0, sep, 0) // Overlapping 1/2 of the volume
+    .name(given_name);
+
+  auto solid  = shape.solid();
+  auto volume = shape.volume(air);
+  auto placed = shape.place (air).now();
+
+  auto vol = l * l * l;
+
+  CHECK(solid  -> GetCubicVolume() / m3 == Approx(0.25 * vol           / m3).margin(1e-2));
+        CHECK(volume -> GetMass() / kg        == Approx(0.25 * vol * density / kg).margin(1e-2));
+  CHECK(volume -> TotalVolumeEntities() == 1);
+  CHECK(volume -> GetMaterial()         == air);
+
+  CHECK(solid  -> GetName()             == given_name);
+  CHECK(volume -> GetName()             == given_name);
+  CHECK(placed -> GetName()             == given_name);
+}
+
+
 // TEST_CASE("nain geometry boolean", "[nain][geometry][boolean]") {
 
 //   auto r = 1*m; auto sep = 3*r;
