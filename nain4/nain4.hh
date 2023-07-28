@@ -159,6 +159,18 @@ private:
 };
 
 // --------------------------------------------------------------------------------
+class boolean {
+  // operations
+  void add();
+  void subtract();
+  // etc.
+  // positions
+  void at();
+  void rotate();
+  void transform(); // later
+};
+
+// --------------------------------------------------------------------------------
 // Utility for creating a vector of physical quantity data, without having to
 // repeat the physical unit in each element.
 

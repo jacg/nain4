@@ -6,7 +6,9 @@
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Box.hh>
 #include <G4Cons.hh>
+#include <G4LogicalVolume.hh>
 #include <G4Orb.hh>
+#include <G4PVPlacement.hh>
 #include <G4Sphere.hh>
 #include <G4Trd.hh>
 
@@ -24,6 +26,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <type_traits>
 
 using Catch::Approx;
 
@@ -671,4 +674,250 @@ TEST_CASE("nain geometry iterator", "[nain][geometry][iterator]") {
   std::vector<G4VPhysicalVolume*> expected{p, p1, p2, p11, p21, p22};
   CHECK(found == expected);
 
+}
+
+template<class T>
+void error_if_do_not_like_type(T) {
+  static_assert(
+    std::negation_v<std::is_same<T, int>>,
+    "\n\n\n\nWe do not like `int`s\n\n\n\n\n"
+  );
+  static_assert(
+    std::negation_v<std::is_same<T, std::string>>,
+    "\n\n\n\n\n`std::string`s NOT welcome\n\n\n\n"
+  );
+}
+
+
+//TEST_CASE("static assert int", "[static][int]") {  error_if_do_not_like_type(2); }
+//TEST_CASE("static assert string", "[static][string]") {  error_if_do_not_like_type(std::string{"bla"}); }
+//TEST_CASE("static assert double", "[static][double]") {  error_if_do_not_like_type(3.2); }
+
+void check_solid_volume_placed_equivalence(G4VSolid* solid, G4LogicalVolume* volume, G4PVPlacement* placed, double tol=0) {
+  CHECK(volume -> GetMass()        / kg ==  Approx(placed -> GetLogicalVolume() -> GetMass()        / kg).margin(tol));
+  CHECK(solid  -> GetCubicVolume() / m3 ==  Approx(volume -> GetSolid        () -> GetCubicVolume() / m3).margin(tol));
+}
+
+auto check_properties (n4::boolean_shape& shape, G4Material* mat, G4String name, double vol, double density) {
+  auto solid  = shape.solid();
+  auto volume = shape.volume(mat);
+  auto placed = shape.place (mat).now();
+  check_solid_volume_placed_equivalence(solid, volume, placed, 1e-4);
+
+  CHECK(solid  -> GetCubicVolume() / m3 == Approx(vol           / m3));
+  CHECK(volume -> GetMass() / kg        == Approx(vol * density / kg));
+  CHECK(volume -> TotalVolumeEntities() == 1);
+  CHECK(volume -> GetMaterial()         == mat);
+
+  CHECK(solid  -> GetName()             == name);
+  CHECK(volume -> GetName()             == name);
+  CHECK(placed -> GetName()             == name);
+};
+
+
+TEST_CASE("nain boolean single add", "[nain][geometry][boolean][add]") {
+  auto l   = 1*m;
+  auto sep = 3*l;
+  auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "double-cube";
+  auto vol = l * l * l;
+
+#define VARIANT(NAME, METHOD, EXTRA)                     \
+  auto NAME = n4::box("cube-L").cube(l)                  \
+                 .METHOD(n4::box("cube-R").cube(l)EXTRA) \
+                 .at(sep, 0, 0)                          \
+                 .name(given_name);
+
+  VARIANT(shape_long_val , join,         )
+  VARIANT(shape_long_ptr , join, .solid())
+  VARIANT(shape_short_val, add ,         )
+  VARIANT(shape_short_ptr, add , .solid())
+#undef VARIANT
+
+#define CHECKP(shape) check_properties(shape, air, given_name, 2 * vol, density);
+  CHECKP(shape_long_val)
+  CHECKP(shape_long_ptr)
+  CHECKP(shape_short_val)
+  CHECKP(shape_short_ptr)
+#undef CHECKP
+}
+
+TEST_CASE("nain boolean double add", "[nain][geometry][boolean][add]") {
+  auto l   = 1*m;
+  auto sep = 3*l;
+  auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "triple-cube";
+  auto vol = l * l * l;
+
+#define VARIANT(NAME, METHOD, EXTRA)                     \
+  auto NAME = n4::box("cube").cube(l)                    \
+                 .METHOD(n4::box("cube-R").cube(l)EXTRA) \
+                 .at( sep,   0, 0)                       \
+                 .METHOD(n4::box("cube-L").cube(l)EXTRA) \
+                 .at(-sep,   0, 0)                       \
+                 .name(given_name);
+
+  VARIANT(shape_long_val , join,         )
+  VARIANT(shape_long_ptr , join, .solid())
+  VARIANT(shape_short_val, add ,         )
+  VARIANT(shape_short_ptr, add , .solid())
+#undef VARIANT
+
+#define CHECKP(shape) check_properties(shape, air, given_name, 3 * vol, density);
+  CHECKP(shape_long_val)
+  CHECKP(shape_long_ptr)
+  CHECKP(shape_short_val)
+  CHECKP(shape_short_ptr)
+#undef CHECKP
+}
+
+
+TEST_CASE("nain boolean add overlap", "[nain][geometry][boolean][add]") {
+  auto l   = 1*m;
+  auto sep = l/2;
+  auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "two-boxes-ovelap";
+  auto vol = l * l * l;
+
+#define VARIANT(NAME, METHOD, EXTRA)                        \
+  auto NAME = n4::box("cube-L").cube(l)                     \
+                 .METHOD(n4::box("cube-R").cube(l)EXTRA)    \
+                 .at(sep, sep, sep) /* Overlapping 1/8th */ \
+                 .name(given_name);
+
+  VARIANT(shape_long_val , join,         )
+  VARIANT(shape_long_ptr , join, .solid())
+  VARIANT(shape_short_val, add ,         )
+  VARIANT(shape_short_ptr, add , .solid())
+#undef VARIANT
+
+#define CHECKP(shape) check_properties(shape, air, given_name, vol * 15 / 8, density);
+  CHECKP(shape_long_val)
+  CHECKP(shape_long_ptr)
+  CHECKP(shape_short_val)
+  CHECKP(shape_short_ptr)
+#undef CHECKP
+}
+
+
+TEST_CASE("nain boolean single subtract", "[nain][geometry][boolean][subtract]") {
+  auto l   = 1*m;
+  auto sep = 0.5*l;
+  auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "double-cube";
+  auto vol = l * l * l;
+
+#define VARIANT(NAME, METHOD, EXTRA)                        \
+  auto NAME = n4::box("cube-L").cube(l)                     \
+                 .METHOD(n4::box("cube-R").cube(l)EXTRA)    \
+                 .at(sep, 0, 0) /* Overlapping 1/2 vol */   \
+                 .name(given_name);
+
+  VARIANT(shape_long_val , subtract,         )
+  VARIANT(shape_long_ptr , subtract, .solid())
+  VARIANT(shape_short_val, sub     ,         )
+  VARIANT(shape_short_ptr, sub     , .solid())
+#undef VARIANT
+
+#define CHECKP(shape) check_properties(shape, air, given_name, vol / 2, density);
+  CHECKP(shape_long_val)
+  CHECKP(shape_long_ptr)
+  CHECKP(shape_short_val)
+  CHECKP(shape_short_ptr)
+#undef CHECKP
+}
+
+
+TEST_CASE("nain boolean double sub", "[nain][geometry][boolean][sub]") {
+  auto l   = 1*m;
+  auto sep = 0.75*l;
+  auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "double-cube";
+  auto vol = l * l * l;
+
+#define VARIANT(NAME, METHOD, EXTRA)                     \
+  auto NAME = n4::box("cube").cube(l)                    \
+                 .METHOD(n4::box("cube-R").cube(l)EXTRA) \
+                 .at( sep, 0, 0) /* Overlapping 1/4th */ \
+                 .METHOD(n4::box("cube-L").cube(l)EXTRA) \
+                 .at(-sep, 0, 0) /* Overlapping 1/4th */ \
+                 .name(given_name);
+
+  VARIANT(shape_long_val , subtract,         )
+  VARIANT(shape_long_ptr , subtract, .solid())
+  VARIANT(shape_short_val, sub     ,         )
+  VARIANT(shape_short_ptr, sub     , .solid())
+#undef VARIANT
+
+#define CHECKP(shape) check_properties(shape, air, given_name, vol / 2, density);
+  CHECKP(shape_long_val)
+  CHECKP(shape_long_ptr)
+  CHECKP(shape_short_val)
+  CHECKP(shape_short_ptr)
+#undef CHECKP
+}
+
+
+TEST_CASE("nain boolean single intersect", "[nain][geometry][boolean][intersect]") {
+  auto l   = 1*m;
+  auto sep = 0.75*l;
+  auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "double-cube";
+  auto vol = l * l * l;
+
+#define VARIANT(NAME, METHOD, EXTRA)                     \
+  auto NAME = n4::box("cube-L").cube(l)                  \
+                 .METHOD(n4::box("cube-R").cube(l)EXTRA) \
+                 .at(sep, 0, 0) /* Overlapping 1/4th */  \
+                 .name(given_name);
+
+  VARIANT(shape_long_val , intersect,         )
+  VARIANT(shape_long_ptr , intersect, .solid())
+  VARIANT(shape_short_val, inter    ,         )
+  VARIANT(shape_short_ptr, inter    , .solid())
+#undef VARIANT
+
+#define CHECKP(shape) check_properties(shape, air, given_name, vol / 4, density);
+  CHECKP(shape_long_val)
+  CHECKP(shape_long_ptr)
+  CHECKP(shape_short_val)
+  CHECKP(shape_short_ptr)
+#undef CHECKP
+}
+
+
+TEST_CASE("nain boolean double intersect", "[nain][geometry][boolean][intersect]") {
+  auto l   = 1*m;
+  auto sep = 0.75*l;
+  auto air = n4::material("G4_AIR");
+  auto density = air -> GetDensity();
+  auto given_name = "triple-cube";
+  auto vol = l * l * l;
+
+#define VARIANT(NAME, METHOD, EXTRA)                      \
+  auto NAME = n4::box("cube-L").cube(l)                   \
+                 .METHOD(n4::box("cube-R").cube(l)EXTRA)  \
+                 .at(sep,   0, 0) /* Overlapping 1/4th */ \
+                 .METHOD(n4::box("cube-T").cube(l)EXTRA)  \
+                 .at(sep, sep, 0) /* Overlapping 1/4th */ \
+                 .name(given_name);
+
+  VARIANT(shape_long_val , intersect,         )
+  VARIANT(shape_long_ptr , intersect, .solid())
+  VARIANT(shape_short_val, inter    ,         )
+  VARIANT(shape_short_ptr, inter    , .solid())
+#undef VARIANT
+
+#define CHECKP(shape) check_properties(shape, air, given_name, vol / 16, density);
+  CHECKP(shape_long_val)
+  CHECKP(shape_long_ptr)
+  CHECKP(shape_short_val)
+  CHECKP(shape_short_ptr)
+#undef CHECKP
 }
