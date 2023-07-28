@@ -168,6 +168,18 @@ TEST_CASE("nain material", "[nain][material]") {
   }
 }
 
+TEST_CASE("nain shape name", "[nain][shape][name]") {
+  auto name1  = "fulanito";
+  auto name2  = "menganito";
+  auto box    = n4::box{name1}.cube(1*m); // proto-solid
+  auto solid1 = box            .solid();  // real  solid
+  auto solid2 = box.name(name2).solid();  // real  solid
+
+  CHECK( solid1 -> GetName() == name1 );
+  CHECK( solid2 -> GetName() == name2 );
+
+}
+
 TEST_CASE("nain box", "[nain][box]") {
   // nain4::box is a more convenient interface for constructing G4VSolids and
   // G4LogicalVolumes based on G4Box

@@ -32,6 +32,7 @@ struct boolean_shape;
 struct shape {
   G4LogicalVolume*  volume(G4Material* material) const;
   n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
+  shape&             name (G4String    name    ) { name_ = name; return *this; }
   virtual G4VSolid*  solid(                    ) const = 0;
   virtual ~shape() {}
 
@@ -49,7 +50,9 @@ struct shape {
   template<class S> boolean_shape inter(S shape);
 
 protected:
+  shape(G4String name) : name_{name} {}
   std::optional<G4VSensitiveDetector*> sd;
+  G4String                             name_;
 };
 
 
@@ -62,11 +65,10 @@ struct boolean_shape : shape {
   boolean_shape& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
   boolean_shape& name(G4String name)              { name_ = name; return *this; }
 private:
-  boolean_shape(G4VSolid* a, G4VSolid* b, BOOL_OP op) : a{a}, b{b}, op{op} {}
+  boolean_shape(G4VSolid* a, G4VSolid* b, BOOL_OP op) : shape{a -> GetName()}, a{a}, b{b}, op{op}  {}
   G4VSolid* a;
   G4VSolid* b;
   BOOL_OP   op;
-  std::optional<G4String> name_;
   G4Transform3D transformation = HepGeom::Transform3D::Identity;
 };
 
@@ -76,7 +78,7 @@ template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); 
 
 
 struct box : shape {
-  box(G4String name) : name{name} {}
+  box(G4String name) : shape{name} {}
   box&      x(G4D l) { half_x_ = l / 2; return *this; }
   box&      y(G4D l) { half_y_ = l / 2; return *this; }
   box&      z(G4D l) { half_z_ = l / 2; return *this; }
@@ -90,14 +92,13 @@ struct box : shape {
   SENSITIVE(box)
   G4Box* solid() const;
 private:
-  G4String name;
   G4D half_x_;
   G4D half_y_;
   G4D half_z_;
 };
 
 struct sphere : shape {
-  sphere(G4String name) : name{name} {}
+  sphere(G4String name) : shape{name} {}
   sphere& r_inner     (G4D x) { r_inner_     = x; return *this; };
   sphere& r           (G4D x) { r_outer_     = x; return *this; };
   sphere& r_delta     (G4D x) { r_delta_     = x; return *this; };
@@ -110,7 +111,6 @@ struct sphere : shape {
   SENSITIVE(sphere)
   G4VSolid* solid() const;
 private:
-  G4String name;
   OPT_DOUBLE r_inner_;
   OPT_DOUBLE r_delta_;
   OPT_DOUBLE r_outer_;
@@ -125,7 +125,7 @@ private:
 };
 
 struct tubs : shape {
-  tubs(G4String name) : name{name} {}
+  tubs(G4String name) : shape{name} {}
 
   tubs& r_inner  (G4D x) { r_inner_   = x  ; return *this; };
   tubs& r        (G4D x) { r_outer_   = x  ; return *this; };
@@ -138,7 +138,6 @@ struct tubs : shape {
   SENSITIVE(tubs)
   G4Tubs* solid() const;
 private:
-  G4String name;
   OPT_DOUBLE r_inner_;
   OPT_DOUBLE r_delta_;
   OPT_DOUBLE r_outer_;

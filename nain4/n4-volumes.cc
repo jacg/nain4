@@ -60,10 +60,9 @@ boolean_shape shape::subtract (G4VSolid* solid) { return boolean_shape{this -> s
 boolean_shape shape::intersect(G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::INT}; }
 
 G4VSolid* boolean_shape::solid() const {
-  auto name = name_.value_or(a -> GetName());
-  if (op == BOOL_OP::ADD) { return new G4UnionSolid       {name, a, b, transformation}; }
-  if (op == BOOL_OP::SUB) { return new G4SubtractionSolid {name, a, b, transformation}; }
-  if (op == BOOL_OP::INT) { return new G4IntersectionSolid{name, a, b, transformation}; }
+  if (op == BOOL_OP::ADD) { return new G4UnionSolid       {name_, a, b, transformation}; }
+  if (op == BOOL_OP::SUB) { return new G4SubtractionSolid {name_, a, b, transformation}; }
+  if (op == BOOL_OP::INT) { return new G4IntersectionSolid{name_, a, b, transformation}; }
   // Unreachable
   return nullptr;
 }
@@ -73,18 +72,18 @@ G4VSolid* sphere::solid() const {
   auto   phi_delta = compute_angle_delta("phi"  ,   phi_delta_,   phi_end_,   phi_start_,   phi_full);
   auto theta_delta = compute_angle_delta("theta", theta_delta_, theta_end_, theta_start_, theta_full);
   if (r_inner == 0 && phi_delta == phi_full && theta_delta == theta_full) {
-    return new G4Orb{name, r_outer};
+    return new G4Orb{name_, r_outer};
   }
-  return new G4Sphere{name, r_inner, r_outer, phi_start_, phi_delta, theta_start_, theta_delta};
+  return new G4Sphere{name_, r_inner, r_outer, phi_start_, phi_delta, theta_start_, theta_delta};
 }
 
 G4Tubs* tubs::solid() const {
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
   auto phi_delta = compute_angle_delta("phi", phi_delta_, phi_end_, phi_start_, phi_full);
-  return new G4Tubs{name, r_inner, r_outer, half_z_, phi_start_, phi_delta};
+  return new G4Tubs{name_, r_inner, r_outer, half_z_, phi_start_, phi_delta};
 }
 
-G4Box* box::solid() const { return new G4Box(name, half_x_, half_y_, half_z_); }
+G4Box* box::solid() const { return new G4Box(name_, half_x_, half_y_, half_z_); }
 
 G4LogicalVolume* shape::volume(G4Material* material) const {
   auto vol = n4::volume(solid(), material);
