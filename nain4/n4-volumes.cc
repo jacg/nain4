@@ -5,6 +5,8 @@
 #include <G4LogicalVolume.hh>
 #include <G4String.hh>
 #include <G4UnionSolid.hh>
+#include <G4SubtractionSolid.hh>
+#include <G4IntersectionSolid.hh>
 #include <G4VGraphicsScene.hh>
 #include <G4VPVParameterisation.hh>
 #include <G4Orb.hh>
@@ -50,20 +52,26 @@ std::tuple<G4double, G4double> compùte_r_range(opt_double min, opt_double max, 
 namespace nain4 {
 
 
-  boolean_shape shape::add(n4::shape& shape) {
-    return add(shape.solid());
-  }
+  boolean_shape shape::add      (n4::shape& shape) { return add      (shape.solid()); }
+  boolean_shape shape::subtract (n4::shape& shape) { return subtract (shape.solid()); }
+  boolean_shape shape::intersect(n4::shape& shape) { return intersect(shape.solid()); }
 
-  boolean_shape shape::add(G4VSolid* solid) {
-    return boolean_shape{this -> solid(), solid, BOOL_OP::ADD};
-  }
-
+  boolean_shape shape::add      (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::ADD}; }
+  boolean_shape shape::subtract (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::SUB}; }
+  boolean_shape shape::intersect(G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::INT}; }
 
   G4VSolid* boolean_shape::solid() const {
     auto name = name_.value_or(a -> GetName());
-    if (op == BOOL_OP::ADD) { return new G4UnionSolid{name, a, b, transformation}; }
+    if (op == BOOL_OP::ADD) { return new G4UnionSolid       {name, a, b, transformation}; }
+    if (op == BOOL_OP::SUB) { return new G4SubtractionSolid {name, a, b, transformation}; }
+    if (op == BOOL_OP::INT) { return new G4IntersectionSolid{name, a, b, transformation}; }
+    // Unreachable
     return nullptr;
   }
+
+  template<class S> boolean_shape join (S shape){ return add      (shape); }
+  template<class S> boolean_shape sub  (S shape){ return subtract (shape); }
+  template<class S> boolean_shape inter(S shape){ return intersect(shape); }
 
   G4VSolid* sphere::solid() const {
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);

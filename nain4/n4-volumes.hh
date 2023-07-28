@@ -25,7 +25,7 @@ namespace nain4 {
 
 #define SENSITIVE(TYPE) TYPE& sensitive(G4VSensitiveDetector* s) { sd = s; return *this; }
 
-enum class BOOL_OP { ADD, SUB, INTERSECT, UNION };
+enum class BOOL_OP { ADD, SUB, INT };
 
 struct boolean_shape;
 
@@ -36,8 +36,17 @@ struct shape {
   virtual ~shape() {}
 
   // boolean operations
-  boolean_shape add(n4::shape& shape);
-  boolean_shape add(G4VSolid*  solid);
+  boolean_shape add      (n4::shape& shape);
+  boolean_shape add      (G4VSolid*  solid);
+  boolean_shape subtract (n4::shape& shape);
+  boolean_shape subtract (G4VSolid*  solid);
+  boolean_shape intersect(n4::shape& shape);
+  boolean_shape intersect(G4VSolid*  solid);
+
+  // Alternative names
+  template<class S> boolean_shape join (S shape);
+  template<class S> boolean_shape sub  (S shape);
+  template<class S> boolean_shape inter(S shape);
 
 protected:
   std::optional<G4VSensitiveDetector*> sd;
@@ -60,6 +69,7 @@ private:
   std::optional<G4String> name_;
   G4Transform3D transformation = HepGeom::Transform3D::Identity;
 };
+
 
 struct box : shape {
   box(G4String name) : name{name} {}
