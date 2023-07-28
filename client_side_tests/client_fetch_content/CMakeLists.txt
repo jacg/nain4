@@ -19,7 +19,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Nain4)
 # ANCHOR_END: fetch
 
-find_package(Geant4 REQUIRED)
+find_package(Geant4 REQUIRED ui_all vis_all)
 include(${Geant4_USE_FILE})
 
 add_executable(client_exe main.cc)
