@@ -30,6 +30,7 @@
 
 #include <cmath>
 #include <type_traits>
+#include <cmath>
 
 using Catch::Approx;
 
@@ -741,6 +742,50 @@ TEST_CASE("nain place", "[nain][place]") {
       }
       std::cout << std::endl;
     }
+  }
+
+  SECTION("rotations") {
+    auto water = nain4::material("G4_WATER");
+    auto box   = nain4::volume<G4Box>("box", water, 0.3*m, 0.2*m, 0.1*m);
+
+    auto sign      = GENERATE(-1, 1);
+    auto angle_deg = GENERATE(0, 12.345, 30, 45, 60, 90, 180);
+    auto angle     = sign * angle_deg * deg;
+
+    auto   xrot = nain4::place(box).rotate_x(angle)                                .now();
+    auto   yrot = nain4::place(box).rotate_y(angle)                                .now();
+    auto   zrot = nain4::place(box).rotate_z(angle)                                .now();
+    auto  xyrot = nain4::place(box).rotate_x(angle).rotate_y(angle)                .now();
+    auto  xzrot = nain4::place(box).rotate_x(angle).rotate_z(angle)                .now();
+    auto  yzrot = nain4::place(box).rotate_y(angle).rotate_z(angle)                .now();
+    auto xyzrot = nain4::place(box).rotate_x(angle).rotate_y(angle).rotate_z(angle).now();
+
+    auto rotmat  = [&] (auto x, auto y, auto z){
+       auto rm = G4RotationMatrix();
+       rm.rotateX(x);
+       rm.rotateY(y);
+       rm.rotateZ(z);
+       return rm;
+    };
+
+    CHECK(*  xrot -> GetObjectRotation() == rotmat(angle,     0,     0));
+    CHECK(*  yrot -> GetObjectRotation() == rotmat(    0, angle,     0));
+    CHECK(*  zrot -> GetObjectRotation() == rotmat(    0,     0, angle));
+    CHECK(* xyrot -> GetObjectRotation() == rotmat(angle, angle,     0));
+    CHECK(* xzrot -> GetObjectRotation() == rotmat(angle,     0, angle));
+    CHECK(* yzrot -> GetObjectRotation() == rotmat(    0, angle, angle));
+    CHECK(*xyzrot -> GetObjectRotation() == rotmat(angle, angle, angle));
+
+// Tried to measure tait-bryan angles, but it was too complicated and probably as clear
+// #define CHECK_ANGLE(PVP, METHOD, MOD)                            \
+//     CHECK(         std::fmod(PVP -> GetObjectRotation() -> METHOD(), MOD) == \
+//           Approx(  std::fmod(                      sign * angle, MOD))   \
+//          );
+
+//     CHECK_ANGLE(xrot, thetaZ, twopi)
+//     CHECK_ANGLE(yrot, thetaZ, twopi)
+//     CHECK_ANGLE(zrot, theta , twopi)
+// #undef  CHECK_ANGLE
   }
 }
 
