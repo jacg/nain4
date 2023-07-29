@@ -131,6 +131,14 @@ public:                                                                \
 private:                                                               \
   G4D half_y ## N ## _;
 
+#define HAS_XY(TYPE, N)                                                     \
+  HAS_X(TYPE, N)                                                            \
+  HAS_Y(TYPE, N)                                                            \
+public:                                                                     \
+  TYPE&      xy ## N(G4D l) {      x ## N(l);      y ##N(l); return *this;} \
+  TYPE& half_xy ## N(G4D l) { half_x ## N(l); half_y ##N(l); return *this;}
+
+
 #define HAS_Z(TYPE, N)                                                  \
 public:                                                                 \
   TYPE&      z ## N (G4D l) { half_z ## N ## _ = l / 2; return *this; } \
@@ -193,6 +201,7 @@ public:
 #undef HAS_X
 #undef HAS_Y
 #undef HAS_Z
+#undef HAS_XY
 #undef HAS_XYZ
 
 }; // namespace nain4
