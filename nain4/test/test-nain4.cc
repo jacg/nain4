@@ -388,7 +388,7 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   auto zc = 6*m;
   auto tubs_s = n4::tubs("tubs_s").r(r).z(z).solid();
   auto tubs_l = n4::tubs("tubs_l").r(r).z(z).volume(water);
-  auto tubs_p = n4::tubs("tubs_p").r(r).z(z).place  (water).at(xc, yc, zc).now();
+  auto tubs_p = n4::tubs("tubs_p").r(r).z(z).place (water).at(xc, yc, zc).now();
 
   using CLHEP::pi;
   CHECK(tubs_l -> TotalVolumeEntities() == 1);
