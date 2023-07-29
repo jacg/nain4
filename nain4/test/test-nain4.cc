@@ -1171,9 +1171,9 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   auto without_rot_xy = box_along_x.subtract(box_along_y).                 name("without_rot_xy").solid();
   auto without_rot_zx = box_along_z.subtract(box_along_x).                 name("without_rot_zx").solid();
   auto without_rot_yz = box_along_y.subtract(box_along_z).                 name("without_rot_yz").solid();
-  auto with_z_rot     = box_along_x.subtract(box_along_y).rotate_z(90*deg).name("with_z_rot"    ).solid();
-  auto with_y_rot     = box_along_z.subtract(box_along_x).rotate_y(90*deg).name("with_y_rot"    ).solid();
-  auto with_x_rot     = box_along_y.subtract(box_along_z).rotate_x(90*deg).name("with_x_rot"    ).solid();
+  auto    with_rot_z  = box_along_x.subtract(box_along_y).rotate_z(90*deg).name(   "with_rot_z" ).solid();
+  auto    with_rot_y  = box_along_z.subtract(box_along_x).rotate_y(90*deg).name(   "with_rot_y" ).solid();
+  auto    with_rot_x  = box_along_y.subtract(box_along_z).rotate_x(90*deg).name(   "with_rot_x" ).solid();
 
   // When rotated, the volumes overlap perfectly, resulting in a null volume
   // Cannot use GetCubicVolume because gives nonsense
@@ -1182,7 +1182,7 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   CHECK( without_rot_xy -> EstimateCubicVolume(n, eps) >  0 );
   CHECK( without_rot_zx -> EstimateCubicVolume(n, eps) >  0 );
   CHECK( without_rot_yz -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK( with_x_rot     -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK( with_y_rot     -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK( with_z_rot     -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(    with_rot_x  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(    with_rot_y  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(    with_rot_z  -> EstimateCubicVolume(n, eps) == 0 );
 }
