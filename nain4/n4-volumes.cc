@@ -93,6 +93,8 @@ G4Cons* cons::solid() const {
   return new G4Cons{name_, r1_inner, r1_outer, r2_inner, r2_outer, half_z_, phi_start_, phi_delta};
 }
 
+G4Trd* trd::solid() const { return new G4Trd(name_, half_x1_, half_x2_, half_y1_, half_y2_, half_z_); }
+
 G4LogicalVolume* shape::volume(G4Material* material) const {
   auto vol = n4::volume(solid(), material);
   if (sd.has_value()) { vol -> SetSensitiveDetector(sd.value()); }

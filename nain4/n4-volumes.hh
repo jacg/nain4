@@ -10,6 +10,7 @@
 #include <G4Types.hh>
 #include <G4Box.hh>
 #include <G4Cons.hh>
+#include <G4Trd.hh>
 #include <G4VSolid.hh>
 #include <G4Sphere.hh>
 #include <G4Tubs.hh>
@@ -189,6 +190,14 @@ public:
   // 1e3 * G4GeometryTolerance::GetInstance() -> GetRadialTolerance(); which is one nm
   const static constexpr G4double eps = 1 * CLHEP::nm;
 };
+
+struct trd : shape {
+  COMMON(trd, G4Trd)
+  HAS_XY(trd, 1)
+  HAS_XY(trd, 2)
+  HAS_Z (trd,  )
+};
+
 
 // ---- Ensure that local macros don't leak out -------------------------------------------------------
 #undef G4D
