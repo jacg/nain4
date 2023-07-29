@@ -592,15 +592,15 @@ TEST_CASE("nain trd", "[nain][trd]") {
   auto xc = 7 * m;
   auto yc = 8 * m;
   auto zc = 9 * m;
-  auto trd_h = n4::trd("trd_h" ).half_x1(lx1/2).half_y1(ly1/2).half_x2(lx2/2).half_y2(ly2/2).half_z(lz/2).solid();
-  auto trd_s = n4::trd("trd_s" )     .x1(lx1  )     .y1(ly1  ).     x2(lx2  )     .y2(ly2  )     .z(lz  ).solid();
-  auto trd_l = n4::trd("trd_l" )     .x1(lx1  )     .y1(ly1  ).     x2(lx2  )     .y2(ly2  )     .z(lz  ).volume(water);
-  auto trd_p = n4::trd("trd_p" )     .x1(lx1  )     .y1(ly1  ).     x2(lx2  )     .y2(ly2  )     .z(lz  ).place (water).at(xc, yc, zc).now();
+  auto trd_h = n4::trd("trd_h").half_x1(lx1/2).half_y1(ly1/2).half_x2(lx2/2).half_y2(ly2/2).half_z(lz/2).solid();
+  auto trd_s = n4::trd("trd_s")     .x1(lx1  )     .y1(ly1  ).     x2(lx2  )     .y2(ly2  )     .z(lz  ).solid();
+  auto trd_l = n4::trd("trd_l")     .x1(lx1  )     .y1(ly1  ).     x2(lx2  )     .y2(ly2  )     .z(lz  ).volume(water);
+  auto trd_p = n4::trd("trd_p")     .x1(lx1  )     .y1(ly1  ).     x2(lx2  )     .y2(ly2  )     .z(lz  ).place (water).at(xc, yc, zc).now();
 
   auto lxy1 = 10 * m;
   auto lxy2 = 11 * m;
   auto trd_xy      = n4::trd("trd_xy").     xy1(lxy1  ).     xy2(lxy2).z(lz).solid();
-  auto trd_half_xy  =n4::trd("trd_xy").half_xy1(lxy1/2).half_xy2(lxy2).z(lz).solid();
+  auto trd_half_xy = n4::trd("trd_xy").half_xy1(lxy1/2).half_xy2(lxy2).z(lz).solid();
 
   CHECK(trd_xy      -> GetXHalfLength1()   ==   trd_xy      -> GetYHalfLength1());
   CHECK(trd_xy      -> GetXHalfLength2()   ==   trd_xy      -> GetYHalfLength2());
