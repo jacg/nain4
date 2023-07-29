@@ -198,6 +198,31 @@ TEST_CASE("nain box", "[nain][box]") {
   auto box_l = n4::box("box_l")     .x(lx  )     .y(ly  )     .z(lz  ).volume(water);
   auto box_p = n4::box("box_p")     .x(lx  )     .y(ly  )     .z(lz  ).place  (water).at(xc, yc, zc).now();
 
+  auto lxy = 7 * m;
+  auto lxz = 8 * m;
+  auto lyz = 9 * m;
+  auto box_xy = n4::box("box_xy").xy(lxy).z(lz).solid();
+  auto box_xz = n4::box("box_xz").xz(lxz).y(ly).solid();
+  auto box_yz = n4::box("box_yz").yz(lyz).x(lx).solid();
+
+  auto box_half_xy = n4::box("box_xy").half_xy(lxy).z(lz).solid();
+  auto box_half_xz = n4::box("box_xz").half_xz(lxz).y(ly).solid();
+  auto box_half_yz = n4::box("box_yz").half_yz(lyz).x(lx).solid();
+
+  CHECK(box_xy      -> GetXHalfLength()   ==   box_xy      -> GetYHalfLength());
+  CHECK(box_xy      -> GetXHalfLength()   !=   box_xy      -> GetZHalfLength());
+  CHECK(box_xz      -> GetXHalfLength()   ==   box_xz      -> GetZHalfLength());
+  CHECK(box_xz      -> GetXHalfLength()   !=   box_xz      -> GetYHalfLength());
+  CHECK(box_yz      -> GetYHalfLength()   ==   box_yz      -> GetZHalfLength());
+  CHECK(box_yz      -> GetYHalfLength()   !=   box_yz      -> GetXHalfLength());
+
+  CHECK(box_half_xy -> GetXHalfLength()   ==   box_half_xy -> GetYHalfLength());
+  CHECK(box_half_xy -> GetXHalfLength()   !=   box_half_xy -> GetZHalfLength());
+  CHECK(box_half_xz -> GetXHalfLength()   ==   box_half_xz -> GetZHalfLength());
+  CHECK(box_half_xz -> GetXHalfLength()   !=   box_half_xz -> GetYHalfLength());
+  CHECK(box_half_yz -> GetYHalfLength()   ==   box_half_yz -> GetZHalfLength());
+  CHECK(box_half_yz -> GetYHalfLength()   !=   box_half_yz -> GetXHalfLength());
+
   CHECK(box_h -> GetCubicVolume() / m3 == box_s -> GetCubicVolume() / m3);
   CHECK(box_h -> GetSurfaceArea() / m2 == box_s -> GetSurfaceArea() / m2);
 
@@ -226,14 +251,14 @@ TEST_CASE("nain box", "[nain][box]") {
   CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetYHalfLength() / m );
   CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetZHalfLength() / m );
 
-  auto hmm = [lx, ly, lz] (auto box) {
+  auto check_dimensions = [lx, ly, lz] (auto box) {
     CHECK(box -> GetXHalfLength() / m  == lx / 2 / m);
     CHECK(box -> GetYHalfLength() / m  == ly / 2 / m);
     CHECK(box -> GetZHalfLength() / m  == lz / 2 / m);
   };
 
-  hmm(n4::box("box_xyz")     .     xyz(lx  , ly  , lz  ).solid());
-  hmm(n4::box("box_half_xyz").half_xyz(lx/2, ly/2, lz/2).solid());
+  check_dimensions(n4::box("box_xyz")     .     xyz(lx  , ly  , lz  ).solid());
+  check_dimensions(n4::box("box_half_xyz").half_xyz(lx/2, ly/2, lz/2).solid());
 }
 
 TEST_CASE("nain sphere", "[nain][sphere]") {

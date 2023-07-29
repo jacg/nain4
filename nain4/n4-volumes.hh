@@ -157,6 +157,12 @@ struct box : shape {
 public:
   box&      cube(G4double l) { return this ->      xyz(l,l,l); }
   box& half_cube(G4double l) { return this -> half_xyz(l,l,l); }
+  box&      xy  (G4double l) {      x(l);      y(l); return *this;}
+  box& half_xy  (G4double l) { half_x(l); half_y(l); return *this;}
+  box&      xz  (G4double l) {      x(l);      z(l); return *this;}
+  box& half_xz  (G4double l) { half_x(l); half_z(l); return *this;}
+  box&      yz  (G4double l) {      y(l);      z(l); return *this;}
+  box& half_yz  (G4double l) { half_y(l); half_z(l); return *this;}
 };
 
 struct sphere : shape {
