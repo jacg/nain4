@@ -775,17 +775,6 @@ TEST_CASE("nain place", "[nain][place]") {
     CHECK(* xzrot -> GetObjectRotation() == rotmat(angle,     0, angle));
     CHECK(* yzrot -> GetObjectRotation() == rotmat(    0, angle, angle));
     CHECK(*xyzrot -> GetObjectRotation() == rotmat(angle, angle, angle));
-
-// Tried to measure tait-bryan angles, but it was too complicated and probably as clear
-// #define CHECK_ANGLE(PVP, METHOD, MOD)                            \
-//     CHECK(         std::fmod(PVP -> GetObjectRotation() -> METHOD(), MOD) == \
-//           Approx(  std::fmod(                      sign * angle, MOD))   \
-//          );
-
-//     CHECK_ANGLE(xrot, thetaZ, twopi)
-//     CHECK_ANGLE(yrot, thetaZ, twopi)
-//     CHECK_ANGLE(zrot, theta , twopi)
-// #undef  CHECK_ANGLE
   }
 }
 
