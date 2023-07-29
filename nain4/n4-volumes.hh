@@ -76,6 +76,15 @@ template<class S> boolean_shape shape::join (S shape){ return add      (shape); 
 template<class S> boolean_shape shape::sub  (S shape){ return subtract (shape); }
 template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); }
 
+#define HAS_R(TYPE)                                          \
+public:                                                      \
+  TYPE& r_inner     (G4D x) { r_inner_ = x; return *this; }; \
+  TYPE& r           (G4D x) { r_outer_ = x; return *this; }; \
+  TYPE& r_delta     (G4D x) { r_delta_ = x; return *this; }; \
+private:                                                     \
+  OPT_DOUBLE r_inner_;                                       \
+  OPT_DOUBLE r_delta_;                                       \
+  OPT_DOUBLE r_outer_;
 
 struct box : shape {
   box(G4String name) : shape{name} {}
@@ -99,9 +108,8 @@ private:
 
 struct sphere : shape {
   sphere(G4String name) : shape{name} {}
-  sphere& r_inner     (G4D x) { r_inner_     = x; return *this; };
-  sphere& r           (G4D x) { r_outer_     = x; return *this; };
-  sphere& r_delta     (G4D x) { r_delta_     = x; return *this; };
+  HAS_R(sphere)
+public:
   sphere& phi_start   (G4D x) { phi_start_   = x; return *this; };
   sphere& phi_end     (G4D x) { phi_end_     = x; return *this; };
   sphere& phi_delta   (G4D x) { phi_delta_   = x; return *this; };
@@ -111,9 +119,6 @@ struct sphere : shape {
   SENSITIVE(sphere)
   G4VSolid* solid() const;
 private:
-  OPT_DOUBLE r_inner_;
-  OPT_DOUBLE r_delta_;
-  OPT_DOUBLE r_outer_;
   G4D   phi_start_   = 0;
   OPT_DOUBLE phi_end_;
   OPT_DOUBLE phi_delta_;
@@ -151,6 +156,7 @@ private:
 
 #undef OPT_DOUBLE
 #undef G4D
+#undef HAS_R
 
 }; // namespace nain4
 
