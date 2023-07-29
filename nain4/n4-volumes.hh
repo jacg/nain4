@@ -132,14 +132,6 @@ public:                                                                \
 private:                                                               \
   G4D half_y ## N ## _;
 
-#define HAS_XY(TYPE, N)                                                     \
-  HAS_X(TYPE, N)                                                            \
-  HAS_Y(TYPE, N)                                                            \
-public:                                                                     \
-  TYPE&      xy ## N(G4D l) {      x ## N(l);      y ##N(l); return *this;} \
-  TYPE& half_xy ## N(G4D l) { half_x ## N(l); half_y ##N(l); return *this;}
-
-
 #define HAS_Z(TYPE, N)                                                  \
 public:                                                                 \
   TYPE&      z ## N (G4D l) { half_z ## N ## _ = l / 2; return *this; } \
@@ -193,9 +185,16 @@ public:
 
 struct trd : shape {
   COMMON(trd, G4Trd)
-  HAS_XY(trd, 1)
-  HAS_XY(trd, 2)
+  HAS_X (trd, 1)
+  HAS_X (trd, 2)
+  HAS_Y (trd, 1)
+  HAS_Y (trd, 2)
   HAS_Z (trd,  )
+public:
+  trd&      xy1(G4D l) {      x1(l);      y1(l); return *this;}
+  trd&      xy2(G4D l) {      x2(l);      y2(l); return *this;}
+  trd& half_xy1(G4D l) { half_x1(l); half_y1(l); return *this;}
+  trd& half_xy2(G4D l) { half_x2(l); half_y2(l); return *this;}
 };
 
 
@@ -210,7 +209,6 @@ struct trd : shape {
 #undef HAS_X
 #undef HAS_Y
 #undef HAS_Z
-#undef HAS_XY
 #undef HAS_XYZ
 
 }; // namespace nain4
