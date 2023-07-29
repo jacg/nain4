@@ -126,21 +126,21 @@ public:                                                                \
   TYPE&      x ## N(G4D l) { half_x ## N ## _ = l / 2; return *this; } \
   TYPE& half_x ## N(G4D l) { half_x ## N ## _ = l    ; return *this; } \
 private:                                                               \
-  G4D half_x ## N ## _;
+  OPT_DOUBLE half_x ## N ## _;
 
 #define HAS_Y(TYPE, N)                                                 \
 public:                                                                \
   TYPE&      y ## N(G4D l) { half_y ## N ## _ = l / 2; return *this; } \
   TYPE& half_y ## N(G4D l) { half_y ## N ## _ = l    ; return *this; } \
 private:                                                               \
-  G4D half_y ## N ## _;
+  OPT_DOUBLE half_y ## N ## _;
 
 #define HAS_Z(TYPE, N)                                                  \
 public:                                                                 \
   TYPE&      z ## N (G4D l) { half_z ## N ## _ = l / 2; return *this; } \
   TYPE& half_z ## N (G4D l) { half_z ## N ## _ = l    ; return *this; } \
 private:                                                                \
-  G4D half_z ## N ## _;
+  OPT_DOUBLE half_z ## N ## _;
 
 #define HAS_XYZ(TYPE)                                                        \
   HAS_X(TYPE,)                                                               \
