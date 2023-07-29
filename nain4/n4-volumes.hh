@@ -79,6 +79,11 @@ template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); 
 
 // ---- Macros for reuse of members and setters of orthogonal directions ------------------------------
 
+#define COMMON(N4_TYPE, G4_TYPE)          \
+public:                                   \
+  N4_TYPE(G4String name) : shape{name} {} \
+  G4_TYPE* solid() const;
+
 #define HAS_R(TYPE, N)                                                         \
 public:                                                                        \
   TYPE& r ## N ## _inner     (G4D x) { r ## N ## _inner_ = x; return *this; }; \
@@ -142,36 +147,33 @@ public:                                                                      \
 
 // ---- Interfaces for specific G4VSolids -------------------------------------------------------------
 struct box : shape {
-  box(G4String name) : shape{name} {}
+  COMMON(box, G4Box)
   HAS_XYZ(box)
 public:
   box&      cube(G4double l) { return this ->      xyz(l,l,l); }
   box& half_cube(G4double l) { return this -> half_xyz(l,l,l); }
-  G4Box* solid() const;
 };
 
 struct sphere : shape {
-  sphere(G4String name) : shape{name} {}
+  COMMON(sphere, G4VSolid)
   HAS_R    (sphere,)
   HAS_PHI  (sphere,)
   HAS_THETA(sphere,)
-public:
-  G4VSolid* solid() const;
 };
 
 struct tubs : shape {
-  tubs(G4String name) : shape{name} {}
+  COMMON(tubs, G4Tubs)
   HAS_R  (tubs,)
   HAS_PHI(tubs,)
   HAS_Z  (tubs,)
-public:
-  G4Tubs* solid() const;
+};
 };
 
 // ---- Ensure that local macros don't leak out -------------------------------------------------------
 #undef G4D
 #undef G4SensDet
 #undef OPT_DOUBLE
+#undef COMMON
 #undef HAS_R
 #undef HAS_PHI
 #undef HAS_THETA
