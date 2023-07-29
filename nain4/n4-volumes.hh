@@ -97,6 +97,18 @@ private:                                                         \
   OPT_DOUBLE phi_delta_;                                         \
   const static constexpr G4D phi_full = 360 * deg;
 
+#define HAS_THETA(TYPE)                                          \
+public:                                                          \
+  TYPE& theta_start (G4D x) { theta_start_ = x; return *this; }; \
+  TYPE& theta_end   (G4D x) { theta_end_   = x; return *this; }; \
+  TYPE& theta_delta (G4D x) { theta_delta_ = x; return *this; }; \
+private:                                                         \
+  G4D   theta_start_ = 0;                                        \
+  OPT_DOUBLE theta_end_;                                         \
+  OPT_DOUBLE theta_delta_;                                       \
+  const static constexpr G4D theta_full = 180 * deg;
+
+
 struct box : shape {
   box(G4String name) : shape{name} {}
   box&      x(G4D l) { half_x_ = l / 2; return *this; }
@@ -119,19 +131,12 @@ private:
 
 struct sphere : shape {
   sphere(G4String name) : shape{name} {}
-  HAS_R  (sphere)
-  HAS_PHI(sphere)
+  HAS_R    (sphere)
+  HAS_PHI  (sphere)
+  HAS_THETA(sphere)
 public:
-  sphere& theta_start (G4D x) { theta_start_ = x; return *this; };
-  sphere& theta_end   (G4D x) { theta_end_   = x; return *this; };
-  sphere& theta_delta (G4D x) { theta_delta_ = x; return *this; };
   SENSITIVE(sphere)
   G4VSolid* solid() const;
-private:
-  G4D   theta_start_ = 0;
-  OPT_DOUBLE theta_end_;
-  OPT_DOUBLE theta_delta_;
-  const static constexpr G4D theta_full = 180 * deg;
 };
 
 struct tubs : shape {
@@ -152,6 +157,7 @@ private:
 #undef G4D
 #undef HAS_R
 #undef HAS_PHI
+#undef HAS_THETA
 
 }; // namespace nain4
 
