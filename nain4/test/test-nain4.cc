@@ -432,7 +432,7 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   CHECK(z_full -> GetZHalfLength() == z/2);
 
   start = m/8; end = m/2; delta = m/4;
-  //  auto r_s  = n4::tubs("r_s" ).r_inner(start) /*.end(180)*/     .solid(); // 1/8 - 8/8    7/8
+  //  Meaningless case: auto r_s  = n4::tubs("r_s" ).r_inner(start) /*.end(180)*/ .solid();
   auto r_se = n4::tubs("r_se").r_inner(start).r      (end  ).solid();
   auto r_sd = n4::tubs("r_sd").r_inner(start).r_delta(delta).solid();
   auto r_ed = n4::tubs("r_ed").r      (end  ).r_delta(delta).solid();
