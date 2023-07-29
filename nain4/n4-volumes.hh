@@ -111,31 +111,31 @@ private:                                                                        
   OPT_DOUBLE theta ## N ## _delta_;                                                \
   const static constexpr G4D theta ## N ## _full = 180 * deg;
 
-#define HAS_X(TYPE)                                      \
-public:                                                  \
-  TYPE&      x(G4D l) { half_x_ = l / 2; return *this; } \
-  TYPE& half_x(G4D l) { half_x_ = l    ; return *this; } \
-private:                                                 \
-  G4D half_x_;
+#define HAS_X(TYPE, N)                                                 \
+public:                                                                \
+  TYPE&      x ## N(G4D l) { half_x ## N ## _ = l / 2; return *this; } \
+  TYPE& half_x ## N(G4D l) { half_x ## N ## _ = l    ; return *this; } \
+private:                                                               \
+  G4D half_x ## N ## _;
 
-#define HAS_Y(TYPE)                                      \
-public:                                                  \
-  TYPE&      y(G4D l) { half_y_ = l / 2; return *this; } \
-  TYPE& half_y(G4D l) { half_y_ = l    ; return *this; } \
-private:                                                 \
-  G4D half_y_;
+#define HAS_Y(TYPE, N)                                                 \
+public:                                                                \
+  TYPE&      y ## N(G4D l) { half_y ## N ## _ = l / 2; return *this; } \
+  TYPE& half_y ## N(G4D l) { half_y ## N ## _ = l    ; return *this; } \
+private:                                                               \
+  G4D half_y ## N ## _;
 
-#define HAS_Z(TYPE)                                      \
-public:                                                  \
-  TYPE&      z(G4D l) { half_z_ = l / 2; return *this; } \
-  TYPE& half_z(G4D l) { half_z_ = l    ; return *this; } \
-private:                                                 \
-  G4D half_z_;
+#define HAS_Z(TYPE, N)                                                  \
+public:                                                                 \
+  TYPE&      z ## N (G4D l) { half_z ## N ## _ = l / 2; return *this; } \
+  TYPE& half_z ## N (G4D l) { half_z ## N ## _ = l    ; return *this; } \
+private:                                                                \
+  G4D half_z ## N ## _;
 
 #define HAS_XYZ(TYPE)                                                        \
-  HAS_X(TYPE)                                                                \
-  HAS_Y(TYPE)                                                                \
-  HAS_Z(TYPE)                                                                \
+  HAS_X(TYPE,)                                                               \
+  HAS_Y(TYPE,)                                                               \
+  HAS_Z(TYPE,)                                                               \
 public:                                                                      \
   TYPE&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); } \
   TYPE& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
@@ -163,7 +163,7 @@ struct tubs : shape {
   tubs(G4String name) : shape{name} {}
   HAS_R  (tubs,)
   HAS_PHI(tubs,)
-  HAS_Z  (tubs)
+  HAS_Z  (tubs,)
 public:
   G4Tubs* solid() const;
 };
