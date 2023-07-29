@@ -1160,3 +1160,30 @@ TEST_CASE("nain boolean double intersect", "[nain][geometry][boolean][intersect]
   CHECKP(shape_short_ptr)
 #undef CHECKP
 }
+
+TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
+  auto l1  = 3*m;
+  auto l2  = 1*m;
+
+  auto box_along_x = n4::box("along-x").xyz(l2, l1, l1);
+  auto box_along_y = n4::box("along-y").xyz(l1, l2, l1);
+  auto box_along_z = n4::box("along-z").xyz(l1, l1, l2);
+
+  auto without_rot_xy = box_along_x.subtract(box_along_y).                 name("without_rot_xy").solid();
+  auto without_rot_zx = box_along_z.subtract(box_along_x).                 name("without_rot_zx").solid();
+  auto without_rot_yz = box_along_y.subtract(box_along_z).                 name("without_rot_yz").solid();
+  auto with_z_rot     = box_along_x.subtract(box_along_y).rotate_z(90*deg).name("with_z_rot"    ).solid();
+  auto with_y_rot     = box_along_z.subtract(box_along_x).rotate_y(90*deg).name("with_y_rot"    ).solid();
+  auto with_x_rot     = box_along_y.subtract(box_along_z).rotate_x(90*deg).name("with_x_rot"    ).solid();
+
+  // When rotated, the volumes overlap perfectly, resulting in a null volume
+  // Cannot use GetCubicVolume because gives nonsense
+  auto n   = 100000;
+  auto eps = 1e-3;
+  CHECK( without_rot_xy -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK( without_rot_zx -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK( without_rot_yz -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK( with_x_rot     -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK( with_y_rot     -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK( with_z_rot     -> EstimateCubicVolume(n, eps) == 0 );
+}
