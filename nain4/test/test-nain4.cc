@@ -461,14 +461,15 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
 
   start = m/8; end = m/2; delta = m/4;
   //  Meaningless case: auto r_s  = n4::tubs("r_s" ).r_inner(start) /*.end(180)*/ .solid();
-  auto r_se = n4::tubs("r_se").r_inner(start).r      (end  ).solid();
-  auto r_sd = n4::tubs("r_sd").r_inner(start).r_delta(delta).solid();
-  auto r_ed = n4::tubs("r_ed").r      (end  ).r_delta(delta).solid();
-  auto r_es = n4::tubs("r_es").r      (end  ).r_inner(start).solid();
-  auto r_ds = n4::tubs("r_ds").r_delta(delta).r_inner(start).solid();
-  auto r_de = n4::tubs("r_de").r_delta(delta).r      (end  ).solid();
-  auto r_e  = n4::tubs("r_e" ).r      (end  )/*.r_inner(0)*/.solid();
-  auto r_d  = n4::tubs("r_d" ).r_delta(delta)/*.r_inner(0)*/.solid();
+  auto tubsz = [&] (auto name) { return n4::tubs(name).z(1); };
+  auto r_se  = tubsz("r_se").r_inner(start).r      (end  ).solid();
+  auto r_sd  = tubsz("r_sd").r_inner(start).r_delta(delta).solid();
+  auto r_ed  = tubsz("r_ed").r      (end  ).r_delta(delta).solid();
+  auto r_es  = tubsz("r_es").r      (end  ).r_inner(start).solid();
+  auto r_ds  = tubsz("r_ds").r_delta(delta).r_inner(start).solid();
+  auto r_de  = tubsz("r_de").r_delta(delta).r      (end  ).solid();
+  auto r_e   = tubsz("r_e" ).r      (end  )/*.r_inner(0)*/.solid();
+  auto r_d   = tubsz("r_d" ).r_delta(delta)/*.r_inner(0)*/.solid();
 
   auto check_r = [] (auto solid, auto inner, auto outer) {
       CHECK( solid -> GetInnerRadius() == inner);
@@ -554,8 +555,8 @@ TEST_CASE("nain cons", "[nain][cons]") {
   start = m/8; end = m/2; delta = m/4;
   // r1 = 0 would be meaningless
 
-  auto cons1 = [] (auto name) { return n4::cons(name).r1_inner(0.1).r1(1); };
-  auto cons2 = [] (auto name) { return n4::cons(name).r2_inner(0.1).r2(1); };
+  auto cons1 = [] (auto name) { return n4::cons(name).r1_inner(0.1).r1(1).z(1); };
+  auto cons2 = [] (auto name) { return n4::cons(name).r2_inner(0.1).r2(1).z(1); };
 
   auto r2_se = cons1("r2_se").r2_inner(start).r2      (end  ).solid();
   auto r2_sd = cons1("r2_sd").r2_inner(start).r2_delta(delta).solid();
