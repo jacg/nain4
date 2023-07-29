@@ -118,24 +118,33 @@ public:                                                  \
 private:                                                 \
   G4D half_x_;
 
+#define HAS_Y(TYPE)                                      \
+public:                                                  \
+  TYPE&      y(G4D l) { half_y_ = l / 2; return *this; } \
+  TYPE& half_y(G4D l) { half_y_ = l    ; return *this; } \
+private:                                                 \
+  G4D half_y_;
+
+#define HAS_Z(TYPE)                                      \
+public:                                                  \
+  TYPE&      z(G4D l) { half_z_ = l / 2; return *this; } \
+  TYPE& half_z(G4D l) { half_z_ = l    ; return *this; } \
+private:                                                 \
+  G4D half_z_;
+
 
 // ---- Interfaces for specific G4VSolids -------------------------------------------------------------
 struct box : shape {
   box(G4String name) : shape{name} {}
   HAS_X(box)
+  HAS_Y(box)
+  HAS_Z(box)
 public:
-  box&      y(G4D l) { half_y_ = l / 2; return *this; }
-  box&      z(G4D l) { half_z_ = l / 2; return *this; }
-  box& half_y(G4D l) { half_y_ = l    ; return *this; }
-  box& half_z(G4D l) { half_z_ = l    ; return *this; }
   box&      cube(G4double l) { return this ->      xyz(l,l,l); }
   box& half_cube(G4double l) { return this -> half_xyz(l,l,l); }
   box&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); }
   box& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
   G4Box* solid() const;
-private:
-  G4D half_y_;
-  G4D half_z_;
 };
 
 struct sphere : shape {
@@ -167,6 +176,8 @@ private:
 #undef HAS_PHI
 #undef HAS_THETA
 #undef HAS_X
+#undef HAS_Y
+#undef HAS_Z
 
 }; // namespace nain4
 
