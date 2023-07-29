@@ -132,18 +132,21 @@ public:                                                  \
 private:                                                 \
   G4D half_z_;
 
+#define HAS_XYZ(TYPE)                                                        \
+  HAS_X(TYPE)                                                                \
+  HAS_Y(TYPE)                                                                \
+  HAS_Z(TYPE)                                                                \
+public:                                                                      \
+  TYPE&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); } \
+  TYPE& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
 
 // ---- Interfaces for specific G4VSolids -------------------------------------------------------------
 struct box : shape {
   box(G4String name) : shape{name} {}
-  HAS_X(box)
-  HAS_Y(box)
-  HAS_Z(box)
+  HAS_XYZ(box)
 public:
   box&      cube(G4double l) { return this ->      xyz(l,l,l); }
   box& half_cube(G4double l) { return this -> half_xyz(l,l,l); }
-  box&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); }
-  box& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
   G4Box* solid() const;
 };
 
@@ -178,6 +181,7 @@ private:
 #undef HAS_X
 #undef HAS_Y
 #undef HAS_Z
+#undef HAS_XYZ
 
 }; // namespace nain4
 
