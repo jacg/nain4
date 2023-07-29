@@ -365,7 +365,7 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   check_r(r_d ,           0, delta         );
 }
 
-TEST_CASE("nain sphere orb", "[nain][sphere][ord]") {
+TEST_CASE("nain sphere orb", "[nain][sphere][orb]") {
   using CLHEP::twopi;
   auto is_sphere = [](auto thing) { CHECK(dynamic_cast<G4Sphere*>(thing)); };
   auto is_orb    = [](auto thing) { CHECK(dynamic_cast<G4Orb   *>(thing)); };
