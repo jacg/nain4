@@ -86,6 +86,17 @@ private:                                                     \
   OPT_DOUBLE r_delta_;                                       \
   OPT_DOUBLE r_outer_;
 
+#define HAS_PHI(TYPE)                                            \
+public:                                                          \
+  TYPE& phi_start   (G4D x) { phi_start_   = x; return *this; }; \
+  TYPE& phi_end     (G4D x) { phi_end_     = x; return *this; }; \
+  TYPE& phi_delta   (G4D x) { phi_delta_   = x; return *this; }; \
+private:                                                         \
+  G4D        phi_start_ = 0;                                     \
+  OPT_DOUBLE phi_end_;                                           \
+  OPT_DOUBLE phi_delta_;                                         \
+  const static constexpr G4D phi_full = 360 * deg;
+
 struct box : shape {
   box(G4String name) : shape{name} {}
   box&      x(G4D l) { half_x_ = l / 2; return *this; }
@@ -108,50 +119,39 @@ private:
 
 struct sphere : shape {
   sphere(G4String name) : shape{name} {}
-  HAS_R(sphere)
+  HAS_R  (sphere)
+  HAS_PHI(sphere)
 public:
-  sphere& phi_start   (G4D x) { phi_start_   = x; return *this; };
-  sphere& phi_end     (G4D x) { phi_end_     = x; return *this; };
-  sphere& phi_delta   (G4D x) { phi_delta_   = x; return *this; };
   sphere& theta_start (G4D x) { theta_start_ = x; return *this; };
   sphere& theta_end   (G4D x) { theta_end_   = x; return *this; };
   sphere& theta_delta (G4D x) { theta_delta_ = x; return *this; };
   SENSITIVE(sphere)
   G4VSolid* solid() const;
 private:
-  G4D   phi_start_   = 0;
-  OPT_DOUBLE phi_end_;
-  OPT_DOUBLE phi_delta_;
   G4D   theta_start_ = 0;
   OPT_DOUBLE theta_end_;
   OPT_DOUBLE theta_delta_;
-  const static constexpr G4D   phi_full = 360 * deg;
   const static constexpr G4D theta_full = 180 * deg;
 };
 
 struct tubs : shape {
   tubs(G4String name) : shape{name} {}
-  HAS_R(tubs)
+  HAS_R  (tubs)
+  HAS_PHI(tubs)
 public:
-  tubs& phi_start(G4D x) { phi_start_ = x  ; return *this; };
-  tubs& phi_end  (G4D x) { phi_end_   = x  ; return *this; };
-  tubs& phi_delta(G4D x) { phi_delta_ = x  ; return *this; };
   tubs& half_z   (G4D x) { half_z_    = x  ; return *this; };
   tubs& z        (G4D x) { half_z_    = x/2; return *this; };
   SENSITIVE(tubs)
   G4Tubs* solid() const;
 private:
-  G4D   phi_start_ = 0;
-  OPT_DOUBLE phi_end_;
-  OPT_DOUBLE phi_delta_;
   G4D   half_z_;
-  const static constexpr G4D phi_full = 360 * deg;
 };
 
 
 #undef OPT_DOUBLE
 #undef G4D
 #undef HAS_R
+#undef HAS_PHI
 
 }; // namespace nain4
 
