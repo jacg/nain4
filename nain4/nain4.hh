@@ -139,15 +139,18 @@ public:
   place(G4LogicalVolume* child)  : child(child ? make_optional(child) : nullopt) {}
   place(place const&) = default;
 
-  place& rotate(G4RotationMatrix& rot)     { transformation = HepGeom::Rotate3D{rot}      * transformation; return *this; }
-  place& at(double x, double y, double z)  { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this; }
-  place& at(G4ThreeVector    p)            { return at(p.x(), p.y(), p.z()); }
-  place& copy_no(int         n)            { copy_number = n      ; return *this; }
-  place& in(G4LogicalVolume* parent_)      { parent      = parent_; return *this; }
-  place& name(G4String       label_)       { label       = label_ ; return *this; }
+  place& rotate_x(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta);             return rotate(rot);}
+  place& rotate_y(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateY(delta);             return rotate(rot);}
+  place& rotate_z(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateZ(delta);             return rotate(rot);}
+  place& rotate  (G4RotationMatrix& rot)  { transformation = HepGeom::Rotate3D{rot}      * transformation; return *this;      }
+  place& at(double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this;      }
+  place& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
+  place& copy_no(int         n)           { copy_number = n      ; return *this; }
+  place& in(G4LogicalVolume* parent_)     { parent      = parent_; return *this; }
+  place& name(G4String       label_)      { label       = label_ ; return *this; }
 
-  place  clone() const                                            { return *this; }
-  G4PVPlacement* operator()()                                     { return now(); }
+  place  clone() const                                           { return *this; }
+  G4PVPlacement* operator()()                                    { return now(); }
   G4PVPlacement* now();
 
 private:

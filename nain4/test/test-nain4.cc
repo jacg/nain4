@@ -742,6 +742,39 @@ TEST_CASE("nain place", "[nain][place]") {
       std::cout << std::endl;
     }
   }
+
+  SECTION("rotations") {
+    auto water = nain4::material("G4_WATER");
+    auto box   = nain4::volume<G4Box>("box", water, 0.3*m, 0.2*m, 0.1*m);
+
+    auto sign      = GENERATE(-1, 1);
+    auto angle_deg = GENERATE(0, 12.345, 30, 45, 60, 90, 180);
+    auto angle     = sign * angle_deg * deg;
+
+    auto   xrot = nain4::place(box).rotate_x(angle)                                .now();
+    auto   yrot = nain4::place(box).rotate_y(angle)                                .now();
+    auto   zrot = nain4::place(box).rotate_z(angle)                                .now();
+    auto  xyrot = nain4::place(box).rotate_x(angle).rotate_y(angle)                .now();
+    auto  xzrot = nain4::place(box).rotate_x(angle).rotate_z(angle)                .now();
+    auto  yzrot = nain4::place(box).rotate_y(angle).rotate_z(angle)                .now();
+    auto xyzrot = nain4::place(box).rotate_x(angle).rotate_y(angle).rotate_z(angle).now();
+
+    auto rotmat  = [&] (auto x, auto y, auto z){
+       auto rm = G4RotationMatrix();
+       rm.rotateX(x);
+       rm.rotateY(y);
+       rm.rotateZ(z);
+       return rm;
+    };
+
+    CHECK(*  xrot -> GetObjectRotation() == rotmat(angle,     0,     0));
+    CHECK(*  yrot -> GetObjectRotation() == rotmat(    0, angle,     0));
+    CHECK(*  zrot -> GetObjectRotation() == rotmat(    0,     0, angle));
+    CHECK(* xyrot -> GetObjectRotation() == rotmat(angle, angle,     0));
+    CHECK(* xzrot -> GetObjectRotation() == rotmat(angle,     0, angle));
+    CHECK(* yzrot -> GetObjectRotation() == rotmat(    0, angle, angle));
+    CHECK(*xyzrot -> GetObjectRotation() == rotmat(angle, angle, angle));
+  }
 }
 
 TEST_CASE("nain scale_by", "[nain][scale_by]") {
@@ -1125,4 +1158,31 @@ TEST_CASE("nain boolean double intersect", "[nain][geometry][boolean][intersect]
   CHECKP(shape_short_val)
   CHECKP(shape_short_ptr)
 #undef CHECKP
+}
+
+TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
+  auto l1  = 3*m;
+  auto l2  = 1*m;
+
+  auto box_along_x = n4::box("along-x").xyz(l2, l1, l1);
+  auto box_along_y = n4::box("along-y").xyz(l1, l2, l1);
+  auto box_along_z = n4::box("along-z").xyz(l1, l1, l2);
+
+  auto without_rot_xy = box_along_x.subtract(box_along_y).                 name("without_rot_xy").solid();
+  auto without_rot_zx = box_along_z.subtract(box_along_x).                 name("without_rot_zx").solid();
+  auto without_rot_yz = box_along_y.subtract(box_along_z).                 name("without_rot_yz").solid();
+  auto    with_rot_z  = box_along_x.subtract(box_along_y).rotate_z(90*deg).name(   "with_rot_z" ).solid();
+  auto    with_rot_y  = box_along_z.subtract(box_along_x).rotate_y(90*deg).name(   "with_rot_y" ).solid();
+  auto    with_rot_x  = box_along_y.subtract(box_along_z).rotate_x(90*deg).name(   "with_rot_x" ).solid();
+
+  // When rotated, the volumes overlap perfectly, resulting in a null volume
+  // Cannot use GetCubicVolume because gives nonsense
+  auto n   = 100000;
+  auto eps = 1e-3;
+  CHECK( without_rot_xy -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK( without_rot_zx -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK( without_rot_yz -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK(    with_rot_x  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(    with_rot_y  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(    with_rot_z  -> EstimateCubicVolume(n, eps) == 0 );
 }

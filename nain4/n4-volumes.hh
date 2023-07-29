@@ -63,6 +63,9 @@ struct boolean_shape : shape {
   friend shape;
   G4VSolid* solid() const override;
 
+  boolean_shape& rotate_x(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta);             return rotate(rot);}
+  boolean_shape& rotate_y(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateY(delta);             return rotate(rot);}
+  boolean_shape& rotate_z(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateZ(delta);             return rotate(rot);}
   boolean_shape& rotate(G4RotationMatrix& rot)    { transformation = HepGeom::Rotate3D{rot}      * transformation; return *this; }
   boolean_shape& at(double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this; }
   boolean_shape& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
