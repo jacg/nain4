@@ -153,8 +153,9 @@ private:
 };
 
 
-#undef OPT_DOUBLE
 #undef G4D
+#undef OPT_DOUBLE
+#undef SENSITIVE
 #undef HAS_R
 #undef HAS_PHI
 #undef HAS_THETA
