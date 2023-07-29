@@ -9,6 +9,7 @@
 #include <G4SystemOfUnits.hh>
 #include <G4Types.hh>
 #include <G4Box.hh>
+#include <G4Cons.hh>
 #include <G4VSolid.hh>
 #include <G4Sphere.hh>
 #include <G4Tubs.hh>
@@ -79,99 +80,113 @@ template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); 
 
 // ---- Macros for reuse of members and setters of orthogonal directions ------------------------------
 
-#define HAS_R(TYPE)                                          \
-public:                                                      \
-  TYPE& r_inner     (G4D x) { r_inner_ = x; return *this; }; \
-  TYPE& r           (G4D x) { r_outer_ = x; return *this; }; \
-  TYPE& r_delta     (G4D x) { r_delta_ = x; return *this; }; \
-private:                                                     \
-  OPT_DOUBLE r_inner_;                                       \
-  OPT_DOUBLE r_delta_;                                       \
-  OPT_DOUBLE r_outer_;
+#define COMMON(N4_TYPE, G4_TYPE)          \
+public:                                   \
+  N4_TYPE(G4String name) : shape{name} {} \
+  G4_TYPE* solid() const;
 
-#define HAS_PHI(TYPE)                                            \
-public:                                                          \
-  TYPE& phi_start   (G4D x) { phi_start_   = x; return *this; }; \
-  TYPE& phi_end     (G4D x) { phi_end_     = x; return *this; }; \
-  TYPE& phi_delta   (G4D x) { phi_delta_   = x; return *this; }; \
-private:                                                         \
-  G4D        phi_start_ = 0;                                     \
-  OPT_DOUBLE phi_end_;                                           \
-  OPT_DOUBLE phi_delta_;                                         \
-  const static constexpr G4D phi_full = 360 * deg;
+#define HAS_R(TYPE, N)                                                         \
+public:                                                                        \
+  TYPE& r ## N ## _inner     (G4D x) { r ## N ## _inner_ = x; return *this; }; \
+  TYPE& r ## N               (G4D x) { r ## N ## _outer_ = x; return *this; }; \
+  TYPE& r ## N ## _delta     (G4D x) { r ## N ## _delta_ = x; return *this; }; \
+private:                                                                       \
+  OPT_DOUBLE r ## N ## _inner_;                                                \
+  OPT_DOUBLE r ## N ## _delta_;                                                \
+  OPT_DOUBLE r ## N ## _outer_;
 
-#define HAS_THETA(TYPE)                                          \
-public:                                                          \
-  TYPE& theta_start (G4D x) { theta_start_ = x; return *this; }; \
-  TYPE& theta_end   (G4D x) { theta_end_   = x; return *this; }; \
-  TYPE& theta_delta (G4D x) { theta_delta_ = x; return *this; }; \
-private:                                                         \
-  G4D   theta_start_ = 0;                                        \
-  OPT_DOUBLE theta_end_;                                         \
-  OPT_DOUBLE theta_delta_;                                       \
-  const static constexpr G4D theta_full = 180 * deg;
+#define HAS_PHI(TYPE, N)                                                           \
+public:                                                                            \
+  TYPE& phi ## N ## _start   (G4D x) { phi ## N ## _start_   = x; return *this; }; \
+  TYPE& phi ## N ## _end     (G4D x) { phi ## N ## _end_     = x; return *this; }; \
+  TYPE& phi ## N ## _delta   (G4D x) { phi ## N ## _delta_   = x; return *this; }; \
+private:                                                                           \
+  G4D        phi ## N ## _start_ = 0;                                              \
+  OPT_DOUBLE phi ## N ## _end_;                                                    \
+  OPT_DOUBLE phi ## N ## _delta_;                                                  \
+  const static constexpr G4D phi ## N ## _full = 360 * deg;
 
-#define HAS_X(TYPE)                                      \
-public:                                                  \
-  TYPE&      x(G4D l) { half_x_ = l / 2; return *this; } \
-  TYPE& half_x(G4D l) { half_x_ = l    ; return *this; } \
-private:                                                 \
-  G4D half_x_;
+#define HAS_THETA(TYPE, N)                                                         \
+public:                                                                            \
+  TYPE& theta ## N ## _start (G4D x) { theta ## N ## _start_ = x; return *this; }; \
+  TYPE& theta ## N ## _end   (G4D x) { theta ## N ## _end_   = x; return *this; }; \
+  TYPE& theta ## N ## _delta (G4D x) { theta ## N ## _delta_ = x; return *this; }; \
+private:                                                                           \
+  G4D   theta ## N ## _start_ = 0;                                                 \
+  OPT_DOUBLE theta ## N ## _end_;                                                  \
+  OPT_DOUBLE theta ## N ## _delta_;                                                \
+  const static constexpr G4D theta ## N ## _full = 180 * deg;
 
-#define HAS_Y(TYPE)                                      \
-public:                                                  \
-  TYPE&      y(G4D l) { half_y_ = l / 2; return *this; } \
-  TYPE& half_y(G4D l) { half_y_ = l    ; return *this; } \
-private:                                                 \
-  G4D half_y_;
+#define HAS_X(TYPE, N)                                                 \
+public:                                                                \
+  TYPE&      x ## N(G4D l) { half_x ## N ## _ = l / 2; return *this; } \
+  TYPE& half_x ## N(G4D l) { half_x ## N ## _ = l    ; return *this; } \
+private:                                                               \
+  G4D half_x ## N ## _;
 
-#define HAS_Z(TYPE)                                      \
-public:                                                  \
-  TYPE&      z(G4D l) { half_z_ = l / 2; return *this; } \
-  TYPE& half_z(G4D l) { half_z_ = l    ; return *this; } \
-private:                                                 \
-  G4D half_z_;
+#define HAS_Y(TYPE, N)                                                 \
+public:                                                                \
+  TYPE&      y ## N(G4D l) { half_y ## N ## _ = l / 2; return *this; } \
+  TYPE& half_y ## N(G4D l) { half_y ## N ## _ = l    ; return *this; } \
+private:                                                               \
+  G4D half_y ## N ## _;
+
+#define HAS_Z(TYPE, N)                                                  \
+public:                                                                 \
+  TYPE&      z ## N (G4D l) { half_z ## N ## _ = l / 2; return *this; } \
+  TYPE& half_z ## N (G4D l) { half_z ## N ## _ = l    ; return *this; } \
+private:                                                                \
+  G4D half_z ## N ## _;
 
 #define HAS_XYZ(TYPE)                                                        \
-  HAS_X(TYPE)                                                                \
-  HAS_Y(TYPE)                                                                \
-  HAS_Z(TYPE)                                                                \
+  HAS_X(TYPE,)                                                               \
+  HAS_Y(TYPE,)                                                               \
+  HAS_Z(TYPE,)                                                               \
 public:                                                                      \
   TYPE&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); } \
   TYPE& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
 
 // ---- Interfaces for specific G4VSolids -------------------------------------------------------------
 struct box : shape {
-  box(G4String name) : shape{name} {}
+  COMMON(box, G4Box)
   HAS_XYZ(box)
 public:
   box&      cube(G4double l) { return this ->      xyz(l,l,l); }
   box& half_cube(G4double l) { return this -> half_xyz(l,l,l); }
-  G4Box* solid() const;
 };
 
 struct sphere : shape {
-  sphere(G4String name) : shape{name} {}
-  HAS_R    (sphere)
-  HAS_PHI  (sphere)
-  HAS_THETA(sphere)
-public:
-  G4VSolid* solid() const;
+  COMMON(sphere, G4VSolid)
+  HAS_R    (sphere,)
+  HAS_PHI  (sphere,)
+  HAS_THETA(sphere,)
 };
 
 struct tubs : shape {
-  tubs(G4String name) : shape{name} {}
-  HAS_R  (tubs)
-  HAS_PHI(tubs)
-  HAS_Z  (tubs)
+  COMMON(tubs, G4Tubs)
+  HAS_R  (tubs,)
+  HAS_PHI(tubs,)
+  HAS_Z  (tubs,)
+};
+
+// TODO: give n4::cons a default value of 0 for r1 ???
+struct cons : shape {
+  COMMON(cons, G4Cons)
+  HAS_R  (cons, 1)
+  HAS_R  (cons, 2)
+  HAS_Z  (cons,  )
+  HAS_PHI(cons,  )
 public:
-  G4Tubs* solid() const;
+  // G4 disallows the inner radius of a G4Cons to be less than this value.
+  // 1e3 * G4GeometryTolerance::GetInstance() -> GetRadialTolerance(); which is one nm
+  const static constexpr G4double eps = 1 * CLHEP::nm;
 };
 
 // ---- Ensure that local macros don't leak out -------------------------------------------------------
 #undef G4D
 #undef G4SensDet
 #undef OPT_DOUBLE
+#undef COMMON
 #undef HAS_R
 #undef HAS_PHI
 #undef HAS_THETA
