@@ -6,6 +6,7 @@
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Box.hh>
 #include <G4Cons.hh>
+#include <G4GeometryTolerance.hh>
 #include <G4LogicalVolume.hh>
 #include <G4Orb.hh>
 #include <G4PVPlacement.hh>
@@ -26,6 +27,8 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/catch_test_macros.hpp>
+
+#include <cmath>
 #include <type_traits>
 
 using Catch::Approx;
@@ -460,6 +463,125 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   check_r(r_e ,           0,   end         );
 
   check_r(r_d ,           0, delta         );
+}
+
+TEST_CASE("nain cons", "[nain][cons]") {
+  // nain4::cons is a more convenient interface for constructing G4VSolids and
+  // G4LogicalVolumes based on G4Cons
+  auto water = nain4::material("G4_WATER"); auto density = water -> GetDensity();
+  auto r1 = 2*m; auto r2 = 3*m;
+  auto z  = 4*m;
+  auto xc = 5*m; auto yc = 6*m; auto zc = 7*m;
+  auto cons_s = n4::cons("cons_s").r1(r1).r2(r2).z(z).solid();
+  auto cons_l = n4::cons("cons_l").r1(r1).r2(r2).z(z).volume(water);
+  auto cons_p = n4::cons("cons_p").r1(r1).r2(r2).z(z).place (water).at(xc, yc, zc).now();
+
+  using CLHEP::pi;
+  // V = (1/3) * π * h * (r² + r * R + R²)
+  auto volume = pi * 1/3 * z * (r1*r1 + r1*r2 + r2*r2);
+
+  // s = √((R - r)² + h²).  Lateral = π × (R + r) × s
+  auto dr = (r2 - r1);
+  auto slant_height = std::sqrt(dr*dr + z*z);
+  auto area         = pi * (r1+r2) * slant_height
+                    + pi * (r1*r1 + r2*r2);
+
+  CHECK(cons_l -> TotalVolumeEntities() == 1);
+  CHECK(cons_l -> GetMass() / kg        == Approx(volume * density / kg));
+  CHECK(cons_l -> GetMaterial()         == water);
+  CHECK(cons_l -> GetName()             == "cons_l");
+
+  CHECK(cons_s -> GetCubicVolume() / m3 == Approx(volume / m3));
+  CHECK(cons_s -> GetSurfaceArea() / m2 == Approx(area   / m2));
+
+  CHECK(cons_p -> GetTranslation() . x() / m == xc / m);
+  CHECK(cons_p -> GetTranslation() . y() / m == yc / m);
+  CHECK(cons_p -> GetTranslation() . z() / m == zc / m);
+
+  using CLHEP::twopi;
+  auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
+  auto phi_s  = n4::cons("phi_s" ).r1(1).r2(1).z(1).phi_start(start) /*.end(360)*/   .solid();
+  auto phi_se = n4::cons("phi_se").r1(1).r2(1).z(1).phi_start(start).phi_end  (end  ).solid();
+  auto phi_sd = n4::cons("phi_sd").r1(1).r2(1).z(1).phi_start(start).phi_delta(delta).solid();
+  auto phi_es = n4::cons("phi_es").r1(1).r2(1).z(1).phi_end  (end  ).phi_start(start).solid();
+  auto phi_ds = n4::cons("phi_ds").r1(1).r2(1).z(1).phi_delta(delta).phi_start(start).solid();
+  auto phi_e  = n4::cons("phi_e" ).r1(1).r2(1).z(1).phi_end  (end  ) /* .start(0) */ .solid();
+  auto phi_d  = n4::cons("phi_d" ).r1(1).r2(1).z(1).phi_delta(delta) /* .start(0) */ .solid();
+
+  auto check_phi = [] (auto solid, auto start, auto delta) {
+      CHECK( solid -> GetStartPhiAngle() == start);
+      CHECK( solid -> GetDeltaPhiAngle() == delta);
+  };
+  check_phi(phi_s , start, twopi - start );
+  check_phi(phi_se, start,   end - start );
+  check_phi(phi_sd, start, delta         );
+  check_phi(phi_es, start,   end - start );
+  check_phi(phi_ds, start, delta         );
+  check_phi(phi_e ,     0,   end         );
+  check_phi(phi_d ,     0, delta         );
+
+  auto z_full = n4::cons("z_full").r1(1).r2(1).     z(z  ).solid();
+  auto z_half = n4::cons("z_half").r1(1).r2(1).half_z(z/2).solid();
+
+  CHECK(z_full -> GetZHalfLength() == z_half -> GetZHalfLength());
+  CHECK(z_full -> GetZHalfLength() == z/2);
+
+  start = m/8; end = m/2; delta = m/4;
+  // r1 = 0 would be meaningless
+
+  auto cons1 = [] (auto name) { return n4::cons(name).r1_inner(0.1).r1(1); };
+  auto cons2 = [] (auto name) { return n4::cons(name).r2_inner(0.1).r2(1); };
+
+  auto r2_se = cons1("r2_se").r2_inner(start).r2      (end  ).solid();
+  auto r2_sd = cons1("r2_sd").r2_inner(start).r2_delta(delta).solid();
+  auto r2_ed = cons1("r2_ed").r2      (end  ).r2_delta(delta).solid();
+  auto r2_es = cons1("r2_es").r2      (end  ).r2_inner(start).solid();
+  auto r2_ds = cons1("r2_ds").r2_delta(delta).r2_inner(start).solid();
+  auto r2_de = cons1("r2_de").r2_delta(delta).r2      (end  ).solid();
+  auto r2_e  = cons1("r2_e" ).r2      (end  )/*.r2_inner(0)*/.solid();
+  auto r2_d  = cons1("r2_d" ).r2_delta(delta)/*.r2_inner(0)*/.solid();
+
+  auto r1_se = cons2("r1_se").r1_inner(start).r1      (end  ).solid();
+  auto r1_sd = cons2("r1_sd").r1_inner(start).r1_delta(delta).solid();
+  auto r1_ed = cons2("r1_ed").r1      (end  ).r1_delta(delta).solid();
+  auto r1_es = cons2("r1_es").r1      (end  ).r1_inner(start).solid();
+  auto r1_ds = cons2("r1_ds").r1_delta(delta).r1_inner(start).solid();
+  auto r1_de = cons2("r1_de").r1_delta(delta).r1      (end  ).solid();
+  auto r1_e  = cons2("r1_e" ).r1      (end  )/*.r1_inner(0)*/.solid();
+  auto r1_d  = cons2("r1_d" ).r1_delta(delta)/*.r1_inner(0)*/.solid();
+
+  auto check_r2 = [] (auto solid, auto inner, auto outer) {
+      CHECK( solid -> GetInnerRadiusPlusZ() == inner);
+      CHECK( solid -> GetOuterRadiusPlusZ() == outer);
+  };
+  auto check_r1 = [] (auto solid, auto inner, auto outer) {
+      CHECK( solid -> GetInnerRadiusMinusZ() == inner);
+      CHECK( solid -> GetOuterRadiusMinusZ() == outer);
+  };
+
+  // G4 disallows the inner radius of a G4Cons to be less than this value.
+  auto eps = 1e3 * G4GeometryTolerance::GetInstance() -> GetRadialTolerance();
+
+  // check_r2(r2_s , start,    pi - start); // Shouldn't work
+  check_r1(r1_se,       start,   end         );
+  check_r1(r1_es,       start,   end         );
+  check_r1(r1_sd,       start, start + delta );
+  check_r1(r1_ds,       start, start + delta );
+  check_r1(r1_ed, end - delta,   end         );
+  check_r1(r1_de, end - delta,   end         );
+  check_r1(r1_e ,         eps,   end         );
+  check_r1(r1_d ,         eps, delta         );
+
+  // check_r2(r2_s , start,    pi - start); // Shouldn't work
+  check_r2(r2_se,       start,   end         );
+  check_r2(r2_es,       start,   end         );
+  check_r2(r2_sd,       start, start + delta );
+  check_r2(r2_ds,       start, start + delta );
+  check_r2(r2_ed, end - delta,   end         );
+  check_r2(r2_de, end - delta,   end         );
+  check_r2(r2_e ,         eps,   end         );
+  check_r2(r2_d ,         eps, delta         );
+
 }
 
 TEST_CASE("nain volume", "[nain][volume]") {

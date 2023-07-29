@@ -2,6 +2,7 @@
 
 #include "nain4.hh"
 #include <G4CSGSolid.hh>
+#include <G4Cons.hh>
 #include <G4LogicalVolume.hh>
 #include <G4String.hh>
 #include <G4UnionSolid.hh>
@@ -83,6 +84,13 @@ G4Tubs* tubs::solid() const {
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
   auto phi_delta = compute_angle_delta("phi", phi_delta_, phi_end_, phi_start_, phi_full);
   return new G4Tubs{name_, r_inner, r_outer, half_z_, phi_start_, phi_delta};
+}
+
+G4Cons* cons::solid() const {
+  auto [r1_inner, r1_outer] = compùte_r_range(r1_inner_, r1_outer_, r1_delta_);
+  auto [r2_inner, r2_outer] = compùte_r_range(r2_inner_, r2_outer_, r2_delta_);
+  auto phi_delta = compute_angle_delta("phi", phi_delta_, phi_end_, phi_start_, phi_full);
+  return new G4Cons{name_, r1_inner, r1_outer, r2_inner, r2_outer, half_z_, phi_start_, phi_delta};
 }
 
 G4LogicalVolume* shape::volume(G4Material* material) const {

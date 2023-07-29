@@ -9,6 +9,7 @@
 #include <G4SystemOfUnits.hh>
 #include <G4Types.hh>
 #include <G4Box.hh>
+#include <G4Cons.hh>
 #include <G4VSolid.hh>
 #include <G4Sphere.hh>
 #include <G4Tubs.hh>
@@ -167,6 +168,14 @@ struct tubs : shape {
   HAS_PHI(tubs,)
   HAS_Z  (tubs,)
 };
+
+// TODO: give n4::cons a default value of 0 for r1 ???
+struct cons : shape {
+  COMMON(cons, G4Cons)
+  HAS_R  (cons, 1)
+  HAS_R  (cons, 2)
+  HAS_Z  (cons,  )
+  HAS_PHI(cons,  )
 };
 
 // ---- Ensure that local macros don't leak out -------------------------------------------------------
