@@ -193,21 +193,21 @@ TEST_CASE("nain box", "[nain][box]") {
   auto xc = 4 * m;
   auto yc = 5 * m;
   auto zc = 6 * m;
-  auto box_h = n4::box("box_h" ).half_x(lx/2).half_y(ly/2).half_z(lz/2).solid();
-  auto box_s = n4::box("box_s" )     .x(lx  )     .y(ly  )     .z(lz  ).solid();
-  auto box_l = n4::box("box_l" )     .x(lx  )     .y(ly  )     .z(lz  ).volume(water);
-  auto box_p = n4::box("box_p" )     .x(lx  )     .y(ly  )     .z(lz  ).place  (water).at(xc, yc, zc).now();
+  auto box_h = n4::box("box_h").half_x(lx/2).half_y(ly/2).half_z(lz/2).solid();
+  auto box_s = n4::box("box_s")     .x(lx  )     .y(ly  )     .z(lz  ).solid();
+  auto box_l = n4::box("box_l")     .x(lx  )     .y(ly  )     .z(lz  ).volume(water);
+  auto box_p = n4::box("box_p")     .x(lx  )     .y(ly  )     .z(lz  ).place  (water).at(xc, yc, zc).now();
 
   auto lxy = 7 * m;
   auto lxz = 8 * m;
   auto lyz = 9 * m;
-  auto box_xy =n4::box("box_xy").xy(lxy).z(lz).solid();
-  auto box_xz =n4::box("box_xz").xz(lxz).y(ly).solid();
-  auto box_yz =n4::box("box_yz").yz(lyz).x(lx).solid();
+  auto box_xy = n4::box("box_xy").xy(lxy).z(lz).solid();
+  auto box_xz = n4::box("box_xz").xz(lxz).y(ly).solid();
+  auto box_yz = n4::box("box_yz").yz(lyz).x(lx).solid();
 
-  auto box_half_xy =n4::box("box_xy").half_xy(lxy).z(lz).solid();
-  auto box_half_xz =n4::box("box_xz").half_xz(lxz).y(ly).solid();
-  auto box_half_yz =n4::box("box_yz").half_yz(lyz).x(lx).solid();
+  auto box_half_xy = n4::box("box_xy").half_xy(lxy).z(lz).solid();
+  auto box_half_xz = n4::box("box_xz").half_xz(lxz).y(ly).solid();
+  auto box_half_yz = n4::box("box_yz").half_yz(lyz).x(lx).solid();
 
   CHECK(box_xy      -> GetXHalfLength()   ==   box_xy      -> GetYHalfLength());
   CHECK(box_xy      -> GetXHalfLength()   !=   box_xy      -> GetZHalfLength());
