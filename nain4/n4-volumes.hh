@@ -29,6 +29,7 @@ enum class BOOL_OP { ADD, SUB, INT };
 
 struct boolean_shape;
 
+// ---- Base class for interfaces to G4VSolids --------------------------------------------------------
 struct shape {
   G4LogicalVolume*  volume(G4Material* material) const;
   n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
@@ -55,7 +56,7 @@ protected:
   G4String                             name_;
 };
 
-
+// ---- Interface for constructing G4 boolean solids --------------------------------------------------
 struct boolean_shape : shape {
   friend shape;
   G4VSolid* solid() const override;
@@ -75,6 +76,8 @@ private:
 template<class S> boolean_shape shape::join (S shape){ return add      (shape); }
 template<class S> boolean_shape shape::sub  (S shape){ return subtract (shape); }
 template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); }
+
+// ---- Macros for reuse of members and setters of orthogonal directions ------------------------------
 
 #define HAS_R(TYPE)                                          \
 public:                                                      \
@@ -108,7 +111,7 @@ private:                                                         \
   OPT_DOUBLE theta_delta_;                                       \
   const static constexpr G4D theta_full = 180 * deg;
 
-
+// ---- Interfaces for specific G4VSolids -------------------------------------------------------------
 struct box : shape {
   box(G4String name) : shape{name} {}
   box&      x(G4D l) { half_x_ = l / 2; return *this; }
@@ -152,7 +155,7 @@ private:
   G4D   half_z_;
 };
 
-
+// ---- Ensure that local macros don't leak out -------------------------------------------------------
 #undef G4D
 #undef OPT_DOUBLE
 #undef SENSITIVE
