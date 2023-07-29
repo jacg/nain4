@@ -131,10 +131,8 @@ private:
 
 struct tubs : shape {
   tubs(G4String name) : shape{name} {}
-
-  tubs& r_inner  (G4D x) { r_inner_   = x  ; return *this; };
-  tubs& r        (G4D x) { r_outer_   = x  ; return *this; };
-  tubs& r_delta  (G4D x) { r_delta_   = x  ; return *this; };
+  HAS_R(tubs)
+public:
   tubs& phi_start(G4D x) { phi_start_ = x  ; return *this; };
   tubs& phi_end  (G4D x) { phi_end_   = x  ; return *this; };
   tubs& phi_delta(G4D x) { phi_delta_ = x  ; return *this; };
@@ -143,9 +141,6 @@ struct tubs : shape {
   SENSITIVE(tubs)
   G4Tubs* solid() const;
 private:
-  OPT_DOUBLE r_inner_;
-  OPT_DOUBLE r_delta_;
-  OPT_DOUBLE r_outer_;
   G4D   phi_start_ = 0;
   OPT_DOUBLE phi_end_;
   OPT_DOUBLE phi_delta_;
