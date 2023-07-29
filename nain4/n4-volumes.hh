@@ -163,12 +163,9 @@ struct tubs : shape {
   tubs(G4String name) : shape{name} {}
   HAS_R  (tubs)
   HAS_PHI(tubs)
+  HAS_Z  (tubs)
 public:
-  tubs& half_z   (G4D x) { half_z_    = x  ; return *this; };
-  tubs& z        (G4D x) { half_z_    = x/2; return *this; };
   G4Tubs* solid() const;
-private:
-  G4D   half_z_;
 };
 
 // ---- Ensure that local macros don't leak out -------------------------------------------------------
