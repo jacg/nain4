@@ -30,7 +30,6 @@
 
 #include <cmath>
 #include <type_traits>
-#include <cmath>
 
 using Catch::Approx;
 
