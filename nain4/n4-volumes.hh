@@ -18,21 +18,22 @@
 #include <optional>
 
 #define G4D G4double
+#define G4SensDet G4VSensitiveDetector
 
 namespace nain4 {
 
 #define OPT_DOUBLE std::optional<G4double>
 
-#define SENSITIVE(TYPE) TYPE& sensitive(G4VSensitiveDetector* s) { sd = s; return *this; }
-
 enum class BOOL_OP { ADD, SUB, INT };
 
 struct boolean_shape;
 
+// ---- Base class for interfaces to G4VSolids --------------------------------------------------------
 struct shape {
   G4LogicalVolume*  volume(G4Material* material) const;
   n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
-  shape&             name (G4String    name    ) { name_ = name; return *this; }
+  shape&              name(G4String    name    ) { name_ = name; return *this; }
+  shape&         sensitive(G4SensDet*  s       ) { sd    = s   ; return *this; }
   virtual G4VSolid*  solid(                    ) const = 0;
   virtual ~shape() {}
 
@@ -55,7 +56,7 @@ protected:
   G4String                             name_;
 };
 
-
+// ---- Interface for constructing G4 boolean solids --------------------------------------------------
 struct boolean_shape : shape {
   friend shape;
   G4VSolid* solid() const override;
@@ -76,81 +77,108 @@ template<class S> boolean_shape shape::join (S shape){ return add      (shape); 
 template<class S> boolean_shape shape::sub  (S shape){ return subtract (shape); }
 template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); }
 
+// ---- Macros for reuse of members and setters of orthogonal directions ------------------------------
 
+#define HAS_R(TYPE)                                          \
+public:                                                      \
+  TYPE& r_inner     (G4D x) { r_inner_ = x; return *this; }; \
+  TYPE& r           (G4D x) { r_outer_ = x; return *this; }; \
+  TYPE& r_delta     (G4D x) { r_delta_ = x; return *this; }; \
+private:                                                     \
+  OPT_DOUBLE r_inner_;                                       \
+  OPT_DOUBLE r_delta_;                                       \
+  OPT_DOUBLE r_outer_;
+
+#define HAS_PHI(TYPE)                                            \
+public:                                                          \
+  TYPE& phi_start   (G4D x) { phi_start_   = x; return *this; }; \
+  TYPE& phi_end     (G4D x) { phi_end_     = x; return *this; }; \
+  TYPE& phi_delta   (G4D x) { phi_delta_   = x; return *this; }; \
+private:                                                         \
+  G4D        phi_start_ = 0;                                     \
+  OPT_DOUBLE phi_end_;                                           \
+  OPT_DOUBLE phi_delta_;                                         \
+  const static constexpr G4D phi_full = 360 * deg;
+
+#define HAS_THETA(TYPE)                                          \
+public:                                                          \
+  TYPE& theta_start (G4D x) { theta_start_ = x; return *this; }; \
+  TYPE& theta_end   (G4D x) { theta_end_   = x; return *this; }; \
+  TYPE& theta_delta (G4D x) { theta_delta_ = x; return *this; }; \
+private:                                                         \
+  G4D   theta_start_ = 0;                                        \
+  OPT_DOUBLE theta_end_;                                         \
+  OPT_DOUBLE theta_delta_;                                       \
+  const static constexpr G4D theta_full = 180 * deg;
+
+#define HAS_X(TYPE)                                      \
+public:                                                  \
+  TYPE&      x(G4D l) { half_x_ = l / 2; return *this; } \
+  TYPE& half_x(G4D l) { half_x_ = l    ; return *this; } \
+private:                                                 \
+  G4D half_x_;
+
+#define HAS_Y(TYPE)                                      \
+public:                                                  \
+  TYPE&      y(G4D l) { half_y_ = l / 2; return *this; } \
+  TYPE& half_y(G4D l) { half_y_ = l    ; return *this; } \
+private:                                                 \
+  G4D half_y_;
+
+#define HAS_Z(TYPE)                                      \
+public:                                                  \
+  TYPE&      z(G4D l) { half_z_ = l / 2; return *this; } \
+  TYPE& half_z(G4D l) { half_z_ = l    ; return *this; } \
+private:                                                 \
+  G4D half_z_;
+
+#define HAS_XYZ(TYPE)                                                        \
+  HAS_X(TYPE)                                                                \
+  HAS_Y(TYPE)                                                                \
+  HAS_Z(TYPE)                                                                \
+public:                                                                      \
+  TYPE&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); } \
+  TYPE& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
+
+// ---- Interfaces for specific G4VSolids -------------------------------------------------------------
 struct box : shape {
   box(G4String name) : shape{name} {}
-  box&      x(G4D l) { half_x_ = l / 2; return *this; }
-  box&      y(G4D l) { half_y_ = l / 2; return *this; }
-  box&      z(G4D l) { half_z_ = l / 2; return *this; }
-  box& half_x(G4D l) { half_x_ = l    ; return *this; }
-  box& half_y(G4D l) { half_y_ = l    ; return *this; }
-  box& half_z(G4D l) { half_z_ = l    ; return *this; }
+  HAS_XYZ(box)
+public:
   box&      cube(G4double l) { return this ->      xyz(l,l,l); }
   box& half_cube(G4double l) { return this -> half_xyz(l,l,l); }
-  box&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); }
-  box& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
-  SENSITIVE(box)
   G4Box* solid() const;
-private:
-  G4D half_x_;
-  G4D half_y_;
-  G4D half_z_;
 };
 
 struct sphere : shape {
   sphere(G4String name) : shape{name} {}
-  sphere& r_inner     (G4D x) { r_inner_     = x; return *this; };
-  sphere& r           (G4D x) { r_outer_     = x; return *this; };
-  sphere& r_delta     (G4D x) { r_delta_     = x; return *this; };
-  sphere& phi_start   (G4D x) { phi_start_   = x; return *this; };
-  sphere& phi_end     (G4D x) { phi_end_     = x; return *this; };
-  sphere& phi_delta   (G4D x) { phi_delta_   = x; return *this; };
-  sphere& theta_start (G4D x) { theta_start_ = x; return *this; };
-  sphere& theta_end   (G4D x) { theta_end_   = x; return *this; };
-  sphere& theta_delta (G4D x) { theta_delta_ = x; return *this; };
-  SENSITIVE(sphere)
+  HAS_R    (sphere)
+  HAS_PHI  (sphere)
+  HAS_THETA(sphere)
+public:
   G4VSolid* solid() const;
-private:
-  OPT_DOUBLE r_inner_;
-  OPT_DOUBLE r_delta_;
-  OPT_DOUBLE r_outer_;
-  G4D   phi_start_   = 0;
-  OPT_DOUBLE phi_end_;
-  OPT_DOUBLE phi_delta_;
-  G4D   theta_start_ = 0;
-  OPT_DOUBLE theta_end_;
-  OPT_DOUBLE theta_delta_;
-  const static constexpr G4D   phi_full = 360 * deg;
-  const static constexpr G4D theta_full = 180 * deg;
 };
 
 struct tubs : shape {
   tubs(G4String name) : shape{name} {}
-
-  tubs& r_inner  (G4D x) { r_inner_   = x  ; return *this; };
-  tubs& r        (G4D x) { r_outer_   = x  ; return *this; };
-  tubs& r_delta  (G4D x) { r_delta_   = x  ; return *this; };
-  tubs& phi_start(G4D x) { phi_start_ = x  ; return *this; };
-  tubs& phi_end  (G4D x) { phi_end_   = x  ; return *this; };
-  tubs& phi_delta(G4D x) { phi_delta_ = x  ; return *this; };
-  tubs& half_z   (G4D x) { half_z_    = x  ; return *this; };
-  tubs& z        (G4D x) { half_z_    = x/2; return *this; };
-  SENSITIVE(tubs)
+  HAS_R  (tubs)
+  HAS_PHI(tubs)
+  HAS_Z  (tubs)
+public:
   G4Tubs* solid() const;
-private:
-  OPT_DOUBLE r_inner_;
-  OPT_DOUBLE r_delta_;
-  OPT_DOUBLE r_outer_;
-  G4D   phi_start_ = 0;
-  OPT_DOUBLE phi_end_;
-  OPT_DOUBLE phi_delta_;
-  G4D   half_z_;
-  const static constexpr G4D phi_full = 360 * deg;
 };
 
-
-#undef OPT_DOUBLE
+// ---- Ensure that local macros don't leak out -------------------------------------------------------
 #undef G4D
+#undef G4SensDet
+#undef OPT_DOUBLE
+#undef HAS_R
+#undef HAS_PHI
+#undef HAS_THETA
+#undef HAS_X
+#undef HAS_Y
+#undef HAS_Z
+#undef HAS_XYZ
 
 }; // namespace nain4
 
