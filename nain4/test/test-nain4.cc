@@ -559,9 +559,7 @@ TEST_CASE("nain cons", "[nain][cons]") {
       CHECK( solid -> GetOuterRadiusMinusZ() == outer);
   };
 
-  // G4 disallows the inner radius of a G4Cons to be less than this value.
-  auto eps = 1e3 * G4GeometryTolerance::GetInstance() -> GetRadialTolerance();
-
+  auto eps = n4::cons::eps;
   // check_r2(r2_s , start,    pi - start); // Shouldn't work
   check_r1(r1_se,       start,   end         );
   check_r1(r1_es,       start,   end         );
