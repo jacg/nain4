@@ -582,6 +582,79 @@ TEST_CASE("nain cons", "[nain][cons]") {
 
 }
 
+TEST_CASE("nain trd", "[nain][trd]") {
+  // nain4::trd is a more convenient interface for constructing G4VSolids and
+  // G4LogicalVolumes based on G4Trd
+  auto water = nain4::material("G4_WATER"); auto density = water -> GetDensity();
+  auto lx1 = 1 * m; auto lx2 = 4 * m;
+  auto ly1 = 2 * m; auto ly2 = 5 * m;
+  auto lz  = 3 * m;
+  auto xc = 7 * m;
+  auto yc = 8 * m;
+  auto zc = 9 * m;
+  auto trd_h = n4::trd("trd_h").half_x1(lx1/2).half_y1(ly1/2).half_x2(lx2/2).half_y2(ly2/2).half_z(lz/2).solid();
+  auto trd_s = n4::trd("trd_s")     .x1(lx1  )     .y1(ly1  ).     x2(lx2  )     .y2(ly2  )     .z(lz  ).solid();
+  auto trd_l = n4::trd("trd_l")     .x1(lx1  )     .y1(ly1  ).     x2(lx2  )     .y2(ly2  )     .z(lz  ).volume(water);
+  auto trd_p = n4::trd("trd_p")     .x1(lx1  )     .y1(ly1  ).     x2(lx2  )     .y2(ly2  )     .z(lz  ).place (water).at(xc, yc, zc).now();
+
+  auto lxy1 = 10 * m;
+  auto lxy2 = 11 * m;
+  auto trd_xy      = n4::trd("trd_xy").     xy1(lxy1  ).     xy2(lxy2).z(lz).solid();
+  auto trd_half_xy = n4::trd("trd_xy").half_xy1(lxy1/2).half_xy2(lxy2).z(lz).solid();
+
+  CHECK(trd_xy      -> GetXHalfLength1()   ==   trd_xy      -> GetYHalfLength1());
+  CHECK(trd_xy      -> GetXHalfLength2()   ==   trd_xy      -> GetYHalfLength2());
+  CHECK(trd_xy      -> GetXHalfLength1()   !=   trd_xy      -> GetZHalfLength ());
+  CHECK(trd_xy      -> GetXHalfLength2()   !=   trd_xy      -> GetZHalfLength ());
+  CHECK(trd_half_xy -> GetXHalfLength1()   ==   trd_half_xy -> GetYHalfLength1());
+  CHECK(trd_half_xy -> GetXHalfLength2()   ==   trd_half_xy -> GetYHalfLength2());
+  CHECK(trd_half_xy -> GetXHalfLength1()   !=   trd_half_xy -> GetZHalfLength ());
+
+  auto dlx     = lx2 - lx1;
+  auto dly     = ly2 - ly1;
+  auto slx     = lx2 + lx1;
+  auto sly     = ly2 + ly1;
+
+  auto volume  = ( slx * sly + dlx * dly / 3 ) * lz / 4;
+  auto surface = lx1 * ly1 + lx2 * ly2
+               + sly * std::sqrt(lz*lz + dlx * dlx / 4)
+               + slx * std::sqrt(lz*lz + dly * dly / 4);
+
+  CHECK(trd_h -> GetCubicVolume() / m3 == trd_s -> GetCubicVolume() / m3);
+  CHECK(trd_h -> GetSurfaceArea() / m2 == trd_s -> GetSurfaceArea() / m2);
+
+  CHECK(trd_l -> TotalVolumeEntities() == 1);
+  CHECK(trd_l -> GetMass() / kg        == Approx(volume * density / kg));
+  CHECK(trd_l -> GetMaterial()         == water);
+  CHECK(trd_l -> GetName()             == "trd_l");
+
+  auto solid = trd_l -> GetSolid();
+  CHECK(solid -> GetCubicVolume() / m3 == Approx(volume  / m3));
+  CHECK(solid -> GetSurfaceArea() / m2 == Approx(surface / m2));
+  CHECK(solid -> GetName()             == "trd_l");
+
+  CHECK(trd_s -> GetCubicVolume() / m3 == solid -> GetCubicVolume() / m3);
+  CHECK(trd_s -> GetSurfaceArea() / m2 == solid -> GetSurfaceArea() / m2);
+  CHECK(trd_s -> GetName()             == "trd_s");
+
+  CHECK(trd_p -> GetTranslation() . x() / m == xc / m);
+  CHECK(trd_p -> GetTranslation() . y() / m == yc / m);
+  CHECK(trd_p -> GetTranslation() . z() / m == zc / m);
+
+  auto check_dimensions = [&] (auto trd) {
+    CHECK(trd -> GetXHalfLength1() / m  == lxy1 / 2 / m);
+    CHECK(trd -> GetYHalfLength1() / m  == lxy1 / 2 / m);
+    CHECK(trd -> GetXHalfLength2() / m  == lxy2 / 2 / m);
+    CHECK(trd -> GetYHalfLength2() / m  == lxy2 / 2 / m);
+    CHECK(trd -> GetZHalfLength () / m  == lz   / 2 / m);
+  };
+
+  check_dimensions(n4::trd("trd_xyz")     .     xy1(lxy1  ).     xy2(lxy2  ).z(lz).solid());
+  check_dimensions(n4::trd("trd_half_xyz").half_xy1(lxy1/2).half_xy2(lxy2/2).z(lz).solid());
+}
+
+
+
 TEST_CASE("nain volume", "[nain][volume]") {
   // nain4::volume produces objects with sensible sizes, masses, etc.
   auto water = nain4::material("G4_WATER"); auto density = water->GetDensity();
