@@ -111,13 +111,21 @@ private:                                                         \
   OPT_DOUBLE theta_delta_;                                       \
   const static constexpr G4D theta_full = 180 * deg;
 
+#define HAS_X(TYPE)                                      \
+public:                                                  \
+  TYPE&      x(G4D l) { half_x_ = l / 2; return *this; } \
+  TYPE& half_x(G4D l) { half_x_ = l    ; return *this; } \
+private:                                                 \
+  G4D half_x_;
+
+
 // ---- Interfaces for specific G4VSolids -------------------------------------------------------------
 struct box : shape {
   box(G4String name) : shape{name} {}
-  box&      x(G4D l) { half_x_ = l / 2; return *this; }
+  HAS_X(box)
+public:
   box&      y(G4D l) { half_y_ = l / 2; return *this; }
   box&      z(G4D l) { half_z_ = l / 2; return *this; }
-  box& half_x(G4D l) { half_x_ = l    ; return *this; }
   box& half_y(G4D l) { half_y_ = l    ; return *this; }
   box& half_z(G4D l) { half_z_ = l    ; return *this; }
   box&      cube(G4double l) { return this ->      xyz(l,l,l); }
@@ -126,7 +134,6 @@ struct box : shape {
   box& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
   G4Box* solid() const;
 private:
-  G4D half_x_;
   G4D half_y_;
   G4D half_z_;
 };
@@ -159,6 +166,7 @@ private:
 #undef HAS_R
 #undef HAS_PHI
 #undef HAS_THETA
+#undef HAS_X
 
 }; // namespace nain4
 
