@@ -18,12 +18,11 @@
 #include <optional>
 
 #define G4D G4double
+#define G4SensDet G4VSensitiveDetector
 
 namespace nain4 {
 
 #define OPT_DOUBLE std::optional<G4double>
-
-#define SENSITIVE(TYPE) TYPE& sensitive(G4VSensitiveDetector* s) { sd = s; return *this; }
 
 enum class BOOL_OP { ADD, SUB, INT };
 
@@ -33,7 +32,8 @@ struct boolean_shape;
 struct shape {
   G4LogicalVolume*  volume(G4Material* material) const;
   n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
-  shape&             name (G4String    name    ) { name_ = name; return *this; }
+  shape&              name(G4String    name    ) { name_ = name; return *this; }
+  shape&         sensitive(G4SensDet*  s       ) { sd    = s   ; return *this; }
   virtual G4VSolid*  solid(                    ) const = 0;
   virtual ~shape() {}
 
@@ -124,7 +124,6 @@ struct box : shape {
   box& half_cube(G4double l) { return this -> half_xyz(l,l,l); }
   box&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); }
   box& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
-  SENSITIVE(box)
   G4Box* solid() const;
 private:
   G4D half_x_;
@@ -138,7 +137,6 @@ struct sphere : shape {
   HAS_PHI  (sphere)
   HAS_THETA(sphere)
 public:
-  SENSITIVE(sphere)
   G4VSolid* solid() const;
 };
 
@@ -149,7 +147,6 @@ struct tubs : shape {
 public:
   tubs& half_z   (G4D x) { half_z_    = x  ; return *this; };
   tubs& z        (G4D x) { half_z_    = x/2; return *this; };
-  SENSITIVE(tubs)
   G4Tubs* solid() const;
 private:
   G4D   half_z_;
@@ -157,8 +154,8 @@ private:
 
 // ---- Ensure that local macros don't leak out -------------------------------------------------------
 #undef G4D
+#undef G4SensDet
 #undef OPT_DOUBLE
-#undef SENSITIVE
 #undef HAS_R
 #undef HAS_PHI
 #undef HAS_THETA
