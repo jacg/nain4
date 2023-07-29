@@ -193,10 +193,35 @@ TEST_CASE("nain box", "[nain][box]") {
   auto xc = 4 * m;
   auto yc = 5 * m;
   auto zc = 6 * m;
-  auto box_h = n4::box("box_h").half_x(lx/2).half_y(ly/2).half_z(lz/2).solid();
-  auto box_s = n4::box("box_s")     .x(lx  )     .y(ly  )     .z(lz  ).solid();
-  auto box_l = n4::box("box_l")     .x(lx  )     .y(ly  )     .z(lz  ).volume(water);
-  auto box_p = n4::box("box_p")     .x(lx  )     .y(ly  )     .z(lz  ).place  (water).at(xc, yc, zc).now();
+  auto box_h = n4::box("box_h" ).half_x(lx/2).half_y(ly/2).half_z(lz/2).solid();
+  auto box_s = n4::box("box_s" )     .x(lx  )     .y(ly  )     .z(lz  ).solid();
+  auto box_l = n4::box("box_l" )     .x(lx  )     .y(ly  )     .z(lz  ).volume(water);
+  auto box_p = n4::box("box_p" )     .x(lx  )     .y(ly  )     .z(lz  ).place  (water).at(xc, yc, zc).now();
+
+  auto lxy = 7 * m;
+  auto lxz = 8 * m;
+  auto lyz = 9 * m;
+  auto box_xy =n4::box("box_xy").xy(lxy).z(lz).solid();
+  auto box_xz =n4::box("box_xz").xz(lxz).y(ly).solid();
+  auto box_yz =n4::box("box_yz").yz(lyz).x(lx).solid();
+
+  auto box_half_xy =n4::box("box_xy").half_xy(lxy).z(lz).solid();
+  auto box_half_xz =n4::box("box_xz").half_xz(lxz).y(ly).solid();
+  auto box_half_yz =n4::box("box_yz").half_yz(lyz).x(lx).solid();
+
+  CHECK(box_xy      -> GetXHalfLength()   ==   box_xy      -> GetYHalfLength());
+  CHECK(box_xy      -> GetXHalfLength()   !=   box_xy      -> GetZHalfLength());
+  CHECK(box_xz      -> GetXHalfLength()   ==   box_xz      -> GetZHalfLength());
+  CHECK(box_xz      -> GetXHalfLength()   !=   box_xz      -> GetYHalfLength());
+  CHECK(box_yz      -> GetYHalfLength()   ==   box_yz      -> GetZHalfLength());
+  CHECK(box_yz      -> GetYHalfLength()   !=   box_yz      -> GetXHalfLength());
+
+  CHECK(box_half_xy -> GetXHalfLength()   ==   box_half_xy -> GetYHalfLength());
+  CHECK(box_half_xy -> GetXHalfLength()   !=   box_half_xy -> GetZHalfLength());
+  CHECK(box_half_xz -> GetXHalfLength()   ==   box_half_xz -> GetZHalfLength());
+  CHECK(box_half_xz -> GetXHalfLength()   !=   box_half_xz -> GetYHalfLength());
+  CHECK(box_half_yz -> GetYHalfLength()   ==   box_half_yz -> GetZHalfLength());
+  CHECK(box_half_yz -> GetYHalfLength()   !=   box_half_yz -> GetXHalfLength());
 
   CHECK(box_h -> GetCubicVolume() / m3 == box_s -> GetCubicVolume() / m3);
   CHECK(box_h -> GetSurfaceArea() / m2 == box_s -> GetSurfaceArea() / m2);
