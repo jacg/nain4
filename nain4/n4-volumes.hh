@@ -20,11 +20,11 @@
 #include <optional>
 
 #define G4D G4double
+#define OPT_DOUBLE std::optional<G4double>
 #define G4SensDet G4VSensitiveDetector
 
 namespace nain4 {
 
-#define OPT_DOUBLE std::optional<G4double>
 
 enum class BOOL_OP { ADD, SUB, INT };
 
@@ -209,8 +209,8 @@ public:
 
 // ---- Ensure that local macros don't leak out -------------------------------------------------------
 #undef G4D
-#undef G4SensDet
 #undef OPT_DOUBLE
+#undef G4SensDet
 #undef COMMON
 #undef HAS_R
 #undef HAS_PHI
