@@ -1,6 +1,7 @@
 #include "nain4.hh"
 #include "test_utils.hh"
 #include "n4-volumes.hh"
+#include "n4-utils.hh"
 
 // Solids
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -1216,4 +1217,30 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   CHECK(    with_rot_x  -> EstimateCubicVolume(n, eps) == 0 );
   CHECK(    with_rot_y  -> EstimateCubicVolume(n, eps) == 0 );
   CHECK(    with_rot_z  -> EstimateCubicVolume(n, eps) == 0 );
+}
+
+TEST_CASE("enumerate", "[utils][enumerate]") {
+  // NB, const is ignored and by-reference is implicit!
+  SECTION("primitives") {
+    std::vector<unsigned> stuff {5, 4, 3, 2, 1};
+    for (const auto [n, el] : enumerate(stuff)) {
+      CHECK(el == 5 - n);
+      el++;
+    }
+    CHECK(stuff[0] == 6);
+  }
+  SECTION("objects") {
+    struct Foo {
+      Foo(unsigned n): n{n} {}
+      unsigned n;
+    };
+    std::vector<Foo> stuff {2, 8};
+    for (auto [n, el] : enumerate(stuff)) {
+      if (n == 0) { CHECK(el.n == 2); }
+      else        { CHECK(el.n == 8); }
+      el.n += 1000;
+    }
+    CHECK(stuff[0].n == 1002);
+    CHECK(stuff[1].n == 1008);
+  }
 }
