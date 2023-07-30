@@ -287,14 +287,15 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   CHECK(sphere_p -> GetTranslation() . z() / m == zc / m);
 
   using CLHEP::twopi;
-  auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
-  auto phi_s  = n4::sphere("phi_s" ).r(1).phi_start(start) /*.end(360)*/   .solid();
-  auto phi_se = n4::sphere("phi_se").r(1).phi_start(start).phi_end  (end  ).solid();
-  auto phi_sd = n4::sphere("phi_sd").r(1).phi_start(start).phi_delta(delta).solid();
-  auto phi_es = n4::sphere("phi_es").r(1).phi_end  (end  ).phi_start(start).solid();
-  auto phi_ds = n4::sphere("phi_ds").r(1).phi_delta(delta).phi_start(start).solid();
-  auto phi_e  = n4::sphere("phi_e" ).r(1).phi_end  (end  ) /* .start(0) */ .solid();
-  auto phi_d  = n4::sphere("phi_d" ).r(1).phi_delta(delta) /* .start(0) */ .solid();
+  auto start   = twopi/8; auto end = twopi/2; auto delta = twopi/4;
+  auto spherer = [&] (auto name) { return n4::sphere(name).r(1); };
+  auto phi_s   = spherer("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
+  auto phi_se  = spherer("phi_se").phi_start(start).phi_end  (end  ).solid();
+  auto phi_sd  = spherer("phi_sd").phi_start(start).phi_delta(delta).solid();
+  auto phi_es  = spherer("phi_es").phi_end  (end  ).phi_start(start).solid();
+  auto phi_ds  = spherer("phi_ds").phi_delta(delta).phi_start(start).solid();
+  auto phi_e   = spherer("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid();
+  auto phi_d   = spherer("phi_d" ).phi_delta(delta) /* .start(0) */ .solid();
 
   auto down = [] (auto g4vsolid) { return dynamic_cast<G4Sphere*>(g4vsolid); };
 
@@ -312,13 +313,13 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
 
   using CLHEP::pi;
   start = pi/8; end = pi/2; delta = pi/4;
-  auto theta_s  = n4::sphere("theta_s" ).r(1).theta_start(start) /*.end(180)*/     .solid();
-  auto theta_se = n4::sphere("theta_se").r(1).theta_start(start).theta_end  (end  ).solid();
-  auto theta_sd = n4::sphere("theta_sd").r(1).theta_start(start).theta_delta(delta).solid();
-  auto theta_es = n4::sphere("theta_es").r(1).theta_end  (end  ).theta_start(start).solid();
-  auto theta_ds = n4::sphere("theta_ds").r(1).theta_delta(delta).theta_start(start).solid();
-  auto theta_e  = n4::sphere("theta_e" ).r(1).theta_end  (end  ) /* .start(0) */   .solid();
-  auto theta_d  = n4::sphere("theta_d" ).r(1).theta_delta(delta) /* .start(0) */   .solid();
+  auto theta_s  = spherer("theta_s" ).theta_start(start) /*.end(180)*/     .solid();
+  auto theta_se = spherer("theta_se").theta_start(start).theta_end  (end  ).solid();
+  auto theta_sd = spherer("theta_sd").theta_start(start).theta_delta(delta).solid();
+  auto theta_es = spherer("theta_es").theta_end  (end  ).theta_start(start).solid();
+  auto theta_ds = spherer("theta_ds").theta_delta(delta).theta_start(start).solid();
+  auto theta_e  = spherer("theta_e" ).theta_end  (end  ) /* .start(0) */   .solid();
+  auto theta_d  = spherer("theta_d" ).theta_delta(delta) /* .start(0) */   .solid();
 
   auto check_theta = [&down] (auto solid, auto start, auto delta) {
       CHECK( down(solid) -> GetStartThetaAngle() == start);
@@ -364,7 +365,7 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   check_r(r_d ,           0, delta         );
 }
 
-TEST_CASE("nain sphere orb", "[nain][sphere][ord]") {
+TEST_CASE("nain sphere orb", "[nain][sphere][orb]") {
   using CLHEP::twopi;
   auto is_sphere = [](auto thing) { CHECK(dynamic_cast<G4Sphere*>(thing)); };
   auto is_orb    = [](auto thing) { CHECK(dynamic_cast<G4Orb   *>(thing)); };
@@ -376,33 +377,35 @@ TEST_CASE("nain sphere orb", "[nain][sphere][ord]") {
   is_sphere(n4::sphere("r_delta_innner"     ).r_delta(2).r_inner(1).solid());
   is_orb   (n4::sphere("r_delta_innner_full").r_delta(2).r_inner(0).solid());
 
-  auto full = twopi; auto half = twopi/2; auto more = full + half;
-  is_sphere(n4::sphere("phi_start"           ).r(1).phi_start(half)                .solid());
-  is_orb   (n4::sphere("phi_start_zero"      ).r(1).phi_start( 0.0)                .solid());
-  is_sphere(n4::sphere("phi_start_end"       ).r(1).phi_start(half).phi_end  (full).solid());
-  is_orb   (n4::sphere("phi_start_end_full"  ).r(1).phi_start(half).phi_end  (more).solid());
-  is_sphere(n4::sphere("phi_delta"           ).r(1).phi_delta(half)                .solid());
-  is_orb   (n4::sphere("phi_delta_full"      ).r(1).phi_delta(full)                .solid());
-  is_sphere(n4::sphere("phi_delta_start"     ).r(1).phi_delta(half).phi_start(half).solid());
-  is_orb   (n4::sphere("phi_delta_start_full").r(1).phi_delta(full).phi_start(half).solid());
-  is_sphere(n4::sphere("phi_end"             ).r(1).phi_end  (half)                .solid());
-  is_orb   (n4::sphere("phi_end_full"        ).r(1).phi_end  (full)                .solid());
+  auto full    = twopi; auto half = twopi/2; auto more = full + half;
+  auto spherer = [&] (auto name) { return n4::sphere(name).r(1); };
+
+  is_sphere(spherer("phi_start"           ).phi_start(half)                .solid());
+  is_orb   (spherer("phi_start_zero"      ).phi_start( 0.0)                .solid());
+  is_sphere(spherer("phi_start_end"       ).phi_start(half).phi_end  (full).solid());
+  is_orb   (spherer("phi_start_end_full"  ).phi_start(half).phi_end  (more).solid());
+  is_sphere(spherer("phi_delta"           ).phi_delta(half)                .solid());
+  is_orb   (spherer("phi_delta_full"      ).phi_delta(full)                .solid());
+  is_sphere(spherer("phi_delta_start"     ).phi_delta(half).phi_start(half).solid());
+  is_orb   (spherer("phi_delta_start_full").phi_delta(full).phi_start(half).solid());
+  is_sphere(spherer("phi_end"             ).phi_end  (half)                .solid());
+  is_orb   (spherer("phi_end_full"        ).phi_end  (full)                .solid());
 
   // TODO implement these (and others) if we ever allow providing angle_delta with angle_end
   // is_sphere(n4::sphere("phi_delta_end"       ).r(1).phi_delta(half).phi_end(full).solid());
   // is_orb   (n4::sphere("phi_delta_end"       ).r(1).phi_delta(full).phi_end(half).solid());
 
   full = twopi/2; half = twopi/4; more = full + half;
-  is_sphere(n4::sphere("theta_start"           ).r(1).theta_start(half)                  .solid());
-  is_orb   (n4::sphere("theta_start_zero"      ).r(1).theta_start( 0.0)                  .solid());
-  is_sphere(n4::sphere("theta_start_end"       ).r(1).theta_start(half).theta_end  (full).solid());
-  is_orb   (n4::sphere("theta_start_end_full"  ).r(1).theta_start(half).theta_end  (more).solid());
-  is_sphere(n4::sphere("theta_delta"           ).r(1).theta_delta(half)                  .solid());
-  is_orb   (n4::sphere("theta_delta_full"      ).r(1).theta_delta(full)                  .solid());
-  is_sphere(n4::sphere("theta_delta_start"     ).r(1).theta_delta(half).theta_start(half).solid());
-  is_orb   (n4::sphere("theta_delta_start_full").r(1).theta_delta(full).theta_start(half).solid());
-  is_sphere(n4::sphere("theta_end"             ).r(1).theta_end  (half)                  .solid());
-  is_orb   (n4::sphere("theta_end_full"        ).r(1).theta_end  (full)                  .solid());
+  is_sphere(spherer("theta_start"           ).theta_start(half)                  .solid());
+  is_orb   (spherer("theta_start_zero"      ).theta_start( 0.0)                  .solid());
+  is_sphere(spherer("theta_start_end"       ).theta_start(half).theta_end  (full).solid());
+  is_orb   (spherer("theta_start_end_full"  ).theta_start(half).theta_end  (more).solid());
+  is_sphere(spherer("theta_delta"           ).theta_delta(half)                  .solid());
+  is_orb   (spherer("theta_delta_full"      ).theta_delta(full)                  .solid());
+  is_sphere(spherer("theta_delta_start"     ).theta_delta(half).theta_start(half).solid());
+  is_orb   (spherer("theta_delta_start_full").theta_delta(full).theta_start(half).solid());
+  is_sphere(spherer("theta_end"             ).theta_end  (half)                  .solid());
+  is_orb   (spherer("theta_end_full"        ).theta_end  (full)                  .solid());
 }
 
 TEST_CASE("nain tubs", "[nain][tubs]") {
@@ -432,14 +435,15 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   CHECK(tubs_p -> GetTranslation() . z() / m == zc / m);
 
   using CLHEP::twopi;
-  auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
-  auto phi_s  = n4::tubs("phi_s" ).r(1).z(1).phi_start(start) /*.end(360)*/   .solid();
-  auto phi_se = n4::tubs("phi_se").r(1).z(1).phi_start(start).phi_end  (end  ).solid();
-  auto phi_sd = n4::tubs("phi_sd").r(1).z(1).phi_start(start).phi_delta(delta).solid();
-  auto phi_es = n4::tubs("phi_es").r(1).z(1).phi_end  (end  ).phi_start(start).solid();
-  auto phi_ds = n4::tubs("phi_ds").r(1).z(1).phi_delta(delta).phi_start(start).solid();
-  auto phi_e  = n4::tubs("phi_e" ).r(1).z(1).phi_end  (end  ) /* .start(0) */ .solid();
-  auto phi_d  = n4::tubs("phi_d" ).r(1).z(1).phi_delta(delta) /* .start(0) */ .solid();
+  auto start  = twopi/8; auto end = twopi/2; auto delta = twopi/4;
+  auto tubsrz = [&] (auto name) { return n4::tubs(name).r(1).z(1); };
+  auto phi_s  = tubsrz("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
+  auto phi_se = tubsrz("phi_se").phi_start(start).phi_end  (end  ).solid();
+  auto phi_sd = tubsrz("phi_sd").phi_start(start).phi_delta(delta).solid();
+  auto phi_es = tubsrz("phi_es").phi_end  (end  ).phi_start(start).solid();
+  auto phi_ds = tubsrz("phi_ds").phi_delta(delta).phi_start(start).solid();
+  auto phi_e  = tubsrz("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid();
+  auto phi_d  = tubsrz("phi_d" ).phi_delta(delta) /* .start(0) */ .solid();
 
   auto check_phi = [] (auto solid, auto start, auto delta) {
       CHECK( solid -> GetStartPhiAngle() == start);
@@ -461,14 +465,15 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
 
   start = m/8; end = m/2; delta = m/4;
   //  Meaningless case: auto r_s  = n4::tubs("r_s" ).r_inner(start) /*.end(180)*/ .solid();
-  auto r_se = n4::tubs("r_se").r_inner(start).r      (end  ).solid();
-  auto r_sd = n4::tubs("r_sd").r_inner(start).r_delta(delta).solid();
-  auto r_ed = n4::tubs("r_ed").r      (end  ).r_delta(delta).solid();
-  auto r_es = n4::tubs("r_es").r      (end  ).r_inner(start).solid();
-  auto r_ds = n4::tubs("r_ds").r_delta(delta).r_inner(start).solid();
-  auto r_de = n4::tubs("r_de").r_delta(delta).r      (end  ).solid();
-  auto r_e  = n4::tubs("r_e" ).r      (end  )/*.r_inner(0)*/.solid();
-  auto r_d  = n4::tubs("r_d" ).r_delta(delta)/*.r_inner(0)*/.solid();
+  auto tubsz = [&] (auto name) { return n4::tubs(name).z(1); };
+  auto r_se  = tubsz("r_se").r_inner(start).r      (end  ).solid();
+  auto r_sd  = tubsz("r_sd").r_inner(start).r_delta(delta).solid();
+  auto r_ed  = tubsz("r_ed").r      (end  ).r_delta(delta).solid();
+  auto r_es  = tubsz("r_es").r      (end  ).r_inner(start).solid();
+  auto r_ds  = tubsz("r_ds").r_delta(delta).r_inner(start).solid();
+  auto r_de  = tubsz("r_de").r_delta(delta).r      (end  ).solid();
+  auto r_e   = tubsz("r_e" ).r      (end  )/*.r_inner(0)*/.solid();
+  auto r_d   = tubsz("r_d" ).r_delta(delta)/*.r_inner(0)*/.solid();
 
   auto check_r = [] (auto solid, auto inner, auto outer) {
       CHECK( solid -> GetInnerRadius() == inner);
@@ -524,14 +529,15 @@ TEST_CASE("nain cons", "[nain][cons]") {
   CHECK(cons_p -> GetTranslation() . z() / m == zc / m);
 
   using CLHEP::twopi;
-  auto start = twopi/8; auto end = twopi/2; auto delta = twopi/4;
-  auto phi_s  = n4::cons("phi_s" ).r1(1).r2(1).z(1).phi_start(start) /*.end(360)*/   .solid();
-  auto phi_se = n4::cons("phi_se").r1(1).r2(1).z(1).phi_start(start).phi_end  (end  ).solid();
-  auto phi_sd = n4::cons("phi_sd").r1(1).r2(1).z(1).phi_start(start).phi_delta(delta).solid();
-  auto phi_es = n4::cons("phi_es").r1(1).r2(1).z(1).phi_end  (end  ).phi_start(start).solid();
-  auto phi_ds = n4::cons("phi_ds").r1(1).r2(1).z(1).phi_delta(delta).phi_start(start).solid();
-  auto phi_e  = n4::cons("phi_e" ).r1(1).r2(1).z(1).phi_end  (end  ) /* .start(0) */ .solid();
-  auto phi_d  = n4::cons("phi_d" ).r1(1).r2(1).z(1).phi_delta(delta) /* .start(0) */ .solid();
+  auto start  = twopi/8; auto end = twopi/2; auto delta = twopi/4;
+  auto consrz = [&] (auto name) { return n4::cons(name).r1(1).r2(2).z(1); };
+  auto phi_s  = consrz("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
+  auto phi_se = consrz("phi_se").phi_start(start).phi_end  (end  ).solid();
+  auto phi_sd = consrz("phi_sd").phi_start(start).phi_delta(delta).solid();
+  auto phi_es = consrz("phi_es").phi_end  (end  ).phi_start(start).solid();
+  auto phi_ds = consrz("phi_ds").phi_delta(delta).phi_start(start).solid();
+  auto phi_e  = consrz("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid();
+  auto phi_d  = consrz("phi_d" ).phi_delta(delta) /* .start(0) */ .solid();
 
   auto check_phi = [] (auto solid, auto start, auto delta) {
       CHECK( solid -> GetStartPhiAngle() == start);
@@ -554,8 +560,8 @@ TEST_CASE("nain cons", "[nain][cons]") {
   start = m/8; end = m/2; delta = m/4;
   // r1 = 0 would be meaningless
 
-  auto cons1 = [] (auto name) { return n4::cons(name).r1_inner(0.1).r1(1); };
-  auto cons2 = [] (auto name) { return n4::cons(name).r2_inner(0.1).r2(1); };
+  auto cons1 = [] (auto name) { return n4::cons(name).r1_inner(0.1).r1(1).z(1); };
+  auto cons2 = [] (auto name) { return n4::cons(name).r2_inner(0.1).r2(1).z(1); };
 
   auto r2_se = cons1("r2_se").r2_inner(start).r2      (end  ).solid();
   auto r2_sd = cons1("r2_sd").r2_inner(start).r2_delta(delta).solid();

@@ -20,11 +20,11 @@
 #include <optional>
 
 #define G4D G4double
+#define OPT_DOUBLE std::optional<G4double>
 #define G4SensDet G4VSensitiveDetector
 
 namespace nain4 {
 
-#define OPT_DOUBLE std::optional<G4double>
 
 enum class BOOL_OP { ADD, SUB, INT };
 
@@ -126,21 +126,21 @@ public:                                                                \
   TYPE&      x ## N(G4D l) { half_x ## N ## _ = l / 2; return *this; } \
   TYPE& half_x ## N(G4D l) { half_x ## N ## _ = l    ; return *this; } \
 private:                                                               \
-  G4D half_x ## N ## _;
+  OPT_DOUBLE half_x ## N ## _;
 
 #define HAS_Y(TYPE, N)                                                 \
 public:                                                                \
   TYPE&      y ## N(G4D l) { half_y ## N ## _ = l / 2; return *this; } \
   TYPE& half_y ## N(G4D l) { half_y ## N ## _ = l    ; return *this; } \
 private:                                                               \
-  G4D half_y ## N ## _;
+  OPT_DOUBLE half_y ## N ## _;
 
 #define HAS_Z(TYPE, N)                                                  \
 public:                                                                 \
   TYPE&      z ## N (G4D l) { half_z ## N ## _ = l / 2; return *this; } \
   TYPE& half_z ## N (G4D l) { half_z ## N ## _ = l    ; return *this; } \
 private:                                                                \
-  G4D half_z ## N ## _;
+  OPT_DOUBLE half_z ## N ## _;
 
 #define HAS_XYZ(TYPE)                                                        \
   HAS_X(TYPE,)                                                               \
@@ -209,8 +209,8 @@ public:
 
 // ---- Ensure that local macros don't leak out -------------------------------------------------------
 #undef G4D
-#undef G4SensDet
 #undef OPT_DOUBLE
+#undef G4SensDet
 #undef COMMON
 #undef HAS_R
 #undef HAS_PHI

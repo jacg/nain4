@@ -13,6 +13,8 @@
 #include <G4Orb.hh>
 #include <G4VSolid.hh>
 
+#include <cstdlib>
+
 using opt_double = std::optional<G4double>;
 
 G4double compute_angle_delta(G4String name, const opt_double& delta, const opt_double& end, G4double start, G4double full) {
@@ -68,7 +70,25 @@ G4VSolid* boolean_shape::solid() const {
   return nullptr;
 }
 
-G4Box* box::solid() const { return new G4Box(name_, half_x_, half_y_, half_z_); }
+template<class... Args>
+void check_mandatory_args(G4String type, G4String name, Args&&... args) {
+  for(const auto arg : {args...}) {
+    if (!arg.has_value()) {
+      std::cerr << "Attempted to construct an instance of n4::"
+                << type
+                << " with name "
+                << name
+                << " without specifying all arguments."
+                << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+}
+
+G4Box* box::solid() const {
+  check_mandatory_args("box", name_, half_x_, half_y_, half_z_);
+  return new G4Box(name_, half_x_.value(), half_y_.value(), half_z_.value());
+}
 
 G4VSolid* sphere::solid() const {
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
@@ -81,19 +101,24 @@ G4VSolid* sphere::solid() const {
 }
 
 G4Tubs* tubs::solid() const {
+  check_mandatory_args("tubs", name_, half_z_);
   auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
   auto phi_delta = compute_angle_delta("phi", phi_delta_, phi_end_, phi_start_, phi_full);
-  return new G4Tubs{name_, r_inner, r_outer, half_z_, phi_start_, phi_delta};
+  return new G4Tubs{name_, r_inner, r_outer, half_z_.value(), phi_start_, phi_delta};
 }
 
 G4Cons* cons::solid() const {
+  check_mandatory_args("cons", name_, half_z_);
   auto [r1_inner, r1_outer] = compùte_r_range(r1_inner_, r1_outer_, r1_delta_);
   auto [r2_inner, r2_outer] = compùte_r_range(r2_inner_, r2_outer_, r2_delta_);
   auto phi_delta = compute_angle_delta("phi", phi_delta_, phi_end_, phi_start_, phi_full);
-  return new G4Cons{name_, r1_inner, r1_outer, r2_inner, r2_outer, half_z_, phi_start_, phi_delta};
+  return new G4Cons{name_, r1_inner, r1_outer, r2_inner, r2_outer, half_z_.value(), phi_start_, phi_delta};
 }
 
-G4Trd* trd::solid() const { return new G4Trd(name_, half_x1_, half_x2_, half_y1_, half_y2_, half_z_); }
+G4Trd* trd::solid() const {
+  check_mandatory_args("trd", name_, half_x1_, half_x2_, half_y1_, half_y2_, half_z_);
+  return new G4Trd(name_, half_x1_.value(), half_x2_.value(), half_y1_.value(), half_y2_.value(), half_z_.value());
+}
 
 G4LogicalVolume* shape::volume(G4Material* material) const {
   auto vol = n4::volume(solid(), material);
