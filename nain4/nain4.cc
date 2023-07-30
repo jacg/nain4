@@ -16,6 +16,8 @@
 
 namespace nain4 {
 
+bool place::global_check_overlaps_ = false;
+
 G4PVPlacement* place::now() {
   // ----- Name --------------------------------------------------
   // + By default, the name is copied from the child volume.
@@ -34,7 +36,6 @@ G4PVPlacement* place::now() {
   }
   // TODO: Think about these later
   bool WTF_is_pMany   = false;
-  bool check_overlaps = false;
 
   return new G4PVPlacement{transformation,
                            child.value(),
@@ -42,7 +43,7 @@ G4PVPlacement* place::now() {
                            parent.value_or(nullptr),
                            WTF_is_pMany,
                            copy_number.value_or(0),
-                           check_overlaps};
+                           global_check_overlaps_ || local_check_overlaps_};
 }
 
 std::vector<G4double> scale_by(G4double factor, std::initializer_list<G4double> const& data) {

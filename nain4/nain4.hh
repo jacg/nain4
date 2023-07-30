@@ -149,6 +149,10 @@ public:
   place& in(G4LogicalVolume* parent_)     { parent      = parent_; return *this; }
   place& name(G4String       label_)      { label       = label_ ; return *this; }
 
+  place&      check_overlaps           () {  local_check_overlaps_ = true ; return *this; }
+  void static check_overlaps_switch_on () { global_check_overlaps_ = true ; }
+  void static check_overlaps_switch_off() { global_check_overlaps_ = false; }
+
   place  clone() const                                           { return *this; }
   G4PVPlacement* operator()()                                    { return now(); }
   G4PVPlacement* now();
@@ -159,6 +163,8 @@ private:
   optional<G4String>          label;
   optional<int>               copy_number;
   G4Transform3D               transformation = HepGeom::Transform3D::Identity;
+  bool         local_check_overlaps_ = false;
+  static bool global_check_overlaps_;
 };
 
 // --------------------------------------------------------------------------------

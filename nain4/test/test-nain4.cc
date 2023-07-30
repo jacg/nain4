@@ -1244,3 +1244,45 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
     CHECK(stuff[1].n == 1008);
   }
 }
+
+
+// TODO can the overlap check tests be automated? G4 raises an exception when an
+// overlap is detected, and we do not know how to observe that in Catch2
+
+// TEST_CASE("nain overlap", "[nain][overlap]") {
+
+//   auto material = n4::material("G4_AIR");
+//   auto box   = n4::box("box").cube(1*m);
+//   auto outer = n4::box("outer").cube(10*m).volume(material);
+//   auto one   = box.place(material).name("one").at( 0.4*m,0,0);
+//   auto two   = box.place(material).name("two").at(-0.4*m,0,0);
+
+//   SECTION("checks off by default") {
+//     one.in(outer).now();
+//     two.in(outer).now();
+//   }
+
+//   SECTION("checks off explicitly globally") {
+//     n4::place::check_overlaps_switch_off();
+//     one.in(outer).now();
+//     two.in(outer).now();
+//   }
+
+//   SECTION("checks on explicitly globally") {
+//     n4::place::check_overlaps_switch_on();
+//     one.in(outer).now();
+//     two.in(outer).now();
+//   }
+
+//   SECTION("checks on explicitly locally") {
+//     one.in(outer).now();
+//     two.in(outer).check_overlaps().now();
+//   }
+
+//   SECTION("checks on locally override off globally") {
+//     n4::place::check_overlaps_switch_off();
+//     one.in(outer).now();
+//     two.in(outer).check_overlaps().now();
+//   }
+
+// }
