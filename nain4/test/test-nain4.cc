@@ -11,6 +11,7 @@
 #include <G4LogicalVolume.hh>
 #include <G4Orb.hh>
 #include <G4PVPlacement.hh>
+#include <G4RotationMatrix.hh>
 #include <G4Sphere.hh>
 #include <G4Trd.hh>
 
@@ -783,13 +784,20 @@ TEST_CASE("nain place", "[nain][place]") {
     auto angle_deg = GENERATE(0, 12.345, 30, 45, 60, 90, 180);
     auto angle     = sign * angle_deg * deg;
 
-    auto   xrot = nain4::place(box).rotate_x(angle)                                .now();
-    auto   yrot = nain4::place(box).rotate_y(angle)                                .now();
-    auto   zrot = nain4::place(box).rotate_z(angle)                                .now();
-    auto  xyrot = nain4::place(box).rotate_x(angle).rotate_y(angle)                .now();
-    auto  xzrot = nain4::place(box).rotate_x(angle).rotate_z(angle)                .now();
-    auto  yzrot = nain4::place(box).rotate_y(angle).rotate_z(angle)                .now();
-    auto xyzrot = nain4::place(box).rotate_x(angle).rotate_y(angle).rotate_z(angle).now();
+    auto rotate_x   = nain4::place(box).rotate_x(angle)                                .now();
+    auto rotate_y   = nain4::place(box).rotate_y(angle)                                .now();
+    auto rotate_z   = nain4::place(box).rotate_z(angle)                                .now();
+    auto rotate_xy  = nain4::place(box).rotate_x(angle).rotate_y(angle)                .now();
+    auto rotate_xz  = nain4::place(box).rotate_x(angle).rotate_z(angle)                .now();
+    auto rotate_yz  = nain4::place(box).rotate_y(angle).rotate_z(angle)                .now();
+    auto rotate_xyz = nain4::place(box).rotate_x(angle).rotate_y(angle).rotate_z(angle).now();
+    auto rot_x      = nain4::place(box).rot_x   (angle)                                .now();
+    auto rot_y      = nain4::place(box).rot_y   (angle)                                .now();
+    auto rot_z      = nain4::place(box).rot_z   (angle)                                .now();
+    auto rot_xy     = nain4::place(box).rot_x   (angle).rotate_y(angle)                .now();
+    auto rot_xz     = nain4::place(box).rot_x   (angle).rotate_z(angle)                .now();
+    auto rot_yz     = nain4::place(box).rot_y   (angle).rotate_z(angle)                .now();
+    auto rot_xyz    = nain4::place(box).rot_x   (angle).rotate_y(angle).rotate_z(angle).now();
 
     auto rotmat  = [&] (auto x, auto y, auto z){
        auto rm = G4RotationMatrix();
@@ -799,13 +807,27 @@ TEST_CASE("nain place", "[nain][place]") {
        return rm;
     };
 
-    CHECK(*  xrot -> GetObjectRotation() == rotmat(angle,     0,     0));
-    CHECK(*  yrot -> GetObjectRotation() == rotmat(    0, angle,     0));
-    CHECK(*  zrot -> GetObjectRotation() == rotmat(    0,     0, angle));
-    CHECK(* xyrot -> GetObjectRotation() == rotmat(angle, angle,     0));
-    CHECK(* xzrot -> GetObjectRotation() == rotmat(angle,     0, angle));
-    CHECK(* yzrot -> GetObjectRotation() == rotmat(    0, angle, angle));
-    CHECK(*xyzrot -> GetObjectRotation() == rotmat(angle, angle, angle));
+    auto manyrot = rotmat(angle, angle, angle);
+    auto rotate  = nain4::place(box).rotate(manyrot).now();
+    auto rot     = nain4::place(box).rot   (manyrot).now();
+
+    CHECK(* rotate     -> GetObjectRotation() == manyrot);
+    CHECK(* rot        -> GetObjectRotation() == manyrot);
+
+    CHECK(* rotate_x   -> GetObjectRotation() == rotmat(angle,     0,     0));
+    CHECK(* rotate_y   -> GetObjectRotation() == rotmat(    0, angle,     0));
+    CHECK(* rotate_z   -> GetObjectRotation() == rotmat(    0,     0, angle));
+    CHECK(* rotate_xy  -> GetObjectRotation() == rotmat(angle, angle,     0));
+    CHECK(* rotate_xz  -> GetObjectRotation() == rotmat(angle,     0, angle));
+    CHECK(* rotate_yz  -> GetObjectRotation() == rotmat(    0, angle, angle));
+    CHECK(* rotate_xyz -> GetObjectRotation() == rotmat(angle, angle, angle));
+    CHECK(* rot_x      -> GetObjectRotation() == rotmat(angle,     0,     0));
+    CHECK(* rot_y      -> GetObjectRotation() == rotmat(    0, angle,     0));
+    CHECK(* rot_z      -> GetObjectRotation() == rotmat(    0,     0, angle));
+    CHECK(* rot_xy     -> GetObjectRotation() == rotmat(angle, angle,     0));
+    CHECK(* rot_xz     -> GetObjectRotation() == rotmat(angle,     0, angle));
+    CHECK(* rot_yz     -> GetObjectRotation() == rotmat(    0, angle, angle));
+    CHECK(* rot_xyz    -> GetObjectRotation() == rotmat(angle, angle, angle));
   }
 }
 
@@ -1200,23 +1222,35 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   auto box_along_y = n4::box("along-y").xyz(l1, l2, l1);
   auto box_along_z = n4::box("along-z").xyz(l1, l1, l2);
 
-  auto without_rot_xy = box_along_x.subtract(box_along_y).                 name("without_rot_xy").solid();
-  auto without_rot_zx = box_along_z.subtract(box_along_x).                 name("without_rot_zx").solid();
-  auto without_rot_yz = box_along_y.subtract(box_along_z).                 name("without_rot_yz").solid();
-  auto    with_rot_z  = box_along_x.subtract(box_along_y).rotate_z(90*deg).name(   "with_rot_z" ).solid();
-  auto    with_rot_y  = box_along_z.subtract(box_along_x).rotate_y(90*deg).name(   "with_rot_y" ).solid();
-  auto    with_rot_x  = box_along_y.subtract(box_along_z).rotate_x(90*deg).name(   "with_rot_x" ).solid();
+  auto without_rot_xy   = box_along_x.subtract(box_along_y).                 name("without_rot_xy").solid();
+  auto without_rot_zx   = box_along_z.subtract(box_along_x).                 name("without_rot_zx").solid();
+  auto without_rot_yz   = box_along_y.subtract(box_along_z).                 name("without_rot_yz").solid();
+  auto    with_rotate_z = box_along_x.subtract(box_along_y).rotate_z(90*deg).name("with_rotate_z" ).solid();
+  auto    with_rotate_y = box_along_z.subtract(box_along_x).rotate_y(90*deg).name("with_rotate_y" ).solid();
+  auto    with_rotate_x = box_along_y.subtract(box_along_z).rotate_x(90*deg).name("with_rotate_x" ).solid();
+  auto    with_rot_z    = box_along_x.subtract(box_along_y).rot_z   (90*deg).name("with_rot_z"    ).solid();
+  auto    with_rot_y    = box_along_z.subtract(box_along_x).rot_y   (90*deg).name("with_rot_y"    ).solid();
+  auto    with_rot_x    = box_along_y.subtract(box_along_z).rot_x   (90*deg).name("with_rot_x"    ).solid();
+
+  auto rotation         = G4RotationMatrix{}; rotation.rotateX(90*deg);
+  auto with_rotate      = box_along_y.subtract(box_along_z).rotate(rotation).name("with_rotate"   ).solid();
+  auto with_rot         = box_along_y.subtract(box_along_z).rot   (rotation).name("with_rot"      ).solid();
 
   // When rotated, the volumes overlap perfectly, resulting in a null volume
   // Cannot use GetCubicVolume because gives nonsense
   auto n   = 100000;
   auto eps = 1e-3;
-  CHECK( without_rot_xy -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK( without_rot_zx -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK( without_rot_yz -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK(    with_rot_x  -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(    with_rot_y  -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(    with_rot_z  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(without_rot_xy -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK(without_rot_zx -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK(without_rot_yz -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK(with_rotate_x  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rotate_y  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rotate_z  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rotate    -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot_x     -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot_y     -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot_z     -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot       -> EstimateCubicVolume(n, eps) == 0 );
 }
 
 TEST_CASE("nain envelope_of", "[nain][envelope_of]") {
