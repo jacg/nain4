@@ -44,6 +44,8 @@ namespace nain4 {
 // geometry to commute with actions and physics. However our
 // constraint imposes no loss of generality.
 
+void check_for_multiple_world_volumes();
+
 class run_manager {
   using RM = std::unique_ptr<G4RunManager>;
 
@@ -104,7 +106,9 @@ public:
     using gn_type = std::function<n4::generator*()>;
     using ac_type = std::function<n4::actions  *()>;
   private: // To reduce the possibility of instantiating generator before setting physics
-    NEXT_STATE_BASIC(run_manager, actions, G4VUserActionInitialization, manager -> Initialize())
+    NEXT_STATE_BASIC( run_manager, actions, G4VUserActionInitialization
+                    , manager -> Initialize();
+                      check_for_multiple_world_volumes())
   public:
     NEXT_CONSTRUCT  (run_manager, actions)
     NEXT_BUILD_FN   (run_manager, actions, fn_type, new n4::actions{new n4::generator{build}})
