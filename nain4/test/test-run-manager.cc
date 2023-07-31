@@ -82,6 +82,9 @@ TEST_CASE("nain run_manager get", "[nain][run_manager]") {
   CHECK(&rm_value == &rm_reference);
 }
 
+// These tests are commented out because we still don't know how to get Catch2
+// to assert failures.
+
 // TEST_CASE("nain run_manager no_world_volume", "[nain][run_manager]") {
 //   auto my_geometry = [] {
 //     auto air = n4::material("G4_AIR");
