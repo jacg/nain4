@@ -1219,6 +1219,22 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   CHECK(    with_rot_z  -> EstimateCubicVolume(n, eps) == 0 );
 }
 
+TEST_CASE("nain envelope_of", "[nain][envelope_of]") {
+  auto material_1 = n4::material("G4_Fe");
+  auto material_2 = n4::material("G4_Au");
+  auto a = n4::box("box")  .cube(1* m).volume(material_1);
+  n4::         box("inner").cube(1*cm).place (material_2).in(a).now();
+  auto c = n4::envelope_of(a);
+
+  CHECK(a != c);
+
+  CHECK(a -> GetName() + "-cloned" == c -> GetName()        );
+  CHECK(a -> GetMaterial()         == c -> GetMaterial()    );
+  CHECK(a -> GetSolid()            == c -> GetSolid()       );
+  CHECK(a -> GetMass()             != c -> GetMass()        );
+  CHECK(a -> GetNoDaughters()      != c -> GetNoDaughters() );
+}
+
 TEST_CASE("enumerate", "[utils][enumerate]") {
   // NB, const is ignored and by-reference is implicit!
   SECTION("primitives") {
