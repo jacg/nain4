@@ -1221,12 +1221,16 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   auto box_along_y = n4::box("along-y").xyz(l1, l2, l1);
   auto box_along_z = n4::box("along-z").xyz(l1, l1, l2);
 
-  auto without_rot_xy = box_along_x.subtract(box_along_y).                 name("without_rot_xy").solid();
-  auto without_rot_zx = box_along_z.subtract(box_along_x).                 name("without_rot_zx").solid();
-  auto without_rot_yz = box_along_y.subtract(box_along_z).                 name("without_rot_yz").solid();
-  auto    with_rot_z  = box_along_x.subtract(box_along_y).rotate_z(90*deg).name(   "with_rot_z" ).solid();
-  auto    with_rot_y  = box_along_z.subtract(box_along_x).rotate_y(90*deg).name(   "with_rot_y" ).solid();
-  auto    with_rot_x  = box_along_y.subtract(box_along_z).rotate_x(90*deg).name(   "with_rot_x" ).solid();
+  auto without_rot_xy   = box_along_x.subtract(box_along_y).                 name("without_rot_xy").solid();
+  auto without_rot_zx   = box_along_z.subtract(box_along_x).                 name("without_rot_zx").solid();
+  auto without_rot_yz   = box_along_y.subtract(box_along_z).                 name("without_rot_yz").solid();
+  auto    with_rotate_z = box_along_x.subtract(box_along_y).rotate_z(90*deg).name("with_rotate_z" ).solid();
+  auto    with_rotate_y = box_along_z.subtract(box_along_x).rotate_y(90*deg).name("with_rotate_y" ).solid();
+  auto    with_rotate_x = box_along_y.subtract(box_along_z).rotate_x(90*deg).name("with_rotate_x" ).solid();
+  auto    with_rot_z    = box_along_x.subtract(box_along_y).rot_z   (90*deg).name("with_rot_z"    ).solid();
+  auto    with_rot_y    = box_along_z.subtract(box_along_x).rot_y   (90*deg).name("with_rot_y"    ).solid();
+  auto    with_rot_x    = box_along_y.subtract(box_along_z).rot_x   (90*deg).name("with_rot_x"    ).solid();
+
 
   // When rotated, the volumes overlap perfectly, resulting in a null volume
   // Cannot use GetCubicVolume because gives nonsense
@@ -1235,9 +1239,12 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   CHECK( without_rot_xy -> EstimateCubicVolume(n, eps) >  0 );
   CHECK( without_rot_zx -> EstimateCubicVolume(n, eps) >  0 );
   CHECK( without_rot_yz -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK(    with_rot_x  -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(    with_rot_y  -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(    with_rot_z  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rotate_x   -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rotate_y   -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rotate_z   -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot_x      -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot_y      -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot_z      -> EstimateCubicVolume(n, eps) == 0 );
 }
 
 TEST_CASE("nain envelope_of", "[nain][envelope_of]") {
