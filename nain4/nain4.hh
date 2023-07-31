@@ -144,10 +144,14 @@ public:
   place(G4LogicalVolume* child)  : child(child ? make_optional(child) : nullopt) {}
   place(place const&) = default;
 
-  place& rotate_x(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta);             return rotate(rot);}
-  place& rotate_y(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateY(delta);             return rotate(rot);}
-  place& rotate_z(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateZ(delta);             return rotate(rot);}
-  place& rotate  (G4RotationMatrix& rot)  { transformation = HepGeom::Rotate3D{rot}      * transformation; return *this;      }
+  place& rotate_x(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta);             return rotate(rot);}
+  place& rotate_y(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateY(delta);             return rotate(rot);}
+  place& rotate_z(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateZ(delta);             return rotate(rot);}
+  place& rotate  (G4RotationMatrix& r)  { transformation = HepGeom::Rotate3D{r}          * transformation; return *this;      }
+  place& rot     (G4RotationMatrix& r)  { return rotate      (r); }
+  place& rot_x   (double delta       )  { return rotate_x(delta); }
+  place& rot_y   (double delta       )  { return rotate_y(delta); }
+  place& rot_z   (double delta       )  { return rotate_z(delta); }
   place& at(double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this;      }
   place& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
   place& copy_no(int         n)           { copy_number = n      ; return *this; }

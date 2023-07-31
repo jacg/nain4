@@ -783,13 +783,20 @@ TEST_CASE("nain place", "[nain][place]") {
     auto angle_deg = GENERATE(0, 12.345, 30, 45, 60, 90, 180);
     auto angle     = sign * angle_deg * deg;
 
-    auto   xrot = nain4::place(box).rotate_x(angle)                                .now();
-    auto   yrot = nain4::place(box).rotate_y(angle)                                .now();
-    auto   zrot = nain4::place(box).rotate_z(angle)                                .now();
-    auto  xyrot = nain4::place(box).rotate_x(angle).rotate_y(angle)                .now();
-    auto  xzrot = nain4::place(box).rotate_x(angle).rotate_z(angle)                .now();
-    auto  yzrot = nain4::place(box).rotate_y(angle).rotate_z(angle)                .now();
-    auto xyzrot = nain4::place(box).rotate_x(angle).rotate_y(angle).rotate_z(angle).now();
+    auto rotate_x   = nain4::place(box).rotate_x(angle)                                .now();
+    auto rotate_y   = nain4::place(box).rotate_y(angle)                                .now();
+    auto rotate_z   = nain4::place(box).rotate_z(angle)                                .now();
+    auto rotate_xy  = nain4::place(box).rotate_x(angle).rotate_y(angle)                .now();
+    auto rotate_xz  = nain4::place(box).rotate_x(angle).rotate_z(angle)                .now();
+    auto rotate_yz  = nain4::place(box).rotate_y(angle).rotate_z(angle)                .now();
+    auto rotate_xyz = nain4::place(box).rotate_x(angle).rotate_y(angle).rotate_z(angle).now();
+    auto rot_x      = nain4::place(box).rot_x   (angle)                                .now();
+    auto rot_y      = nain4::place(box).rot_y   (angle)                                .now();
+    auto rot_z      = nain4::place(box).rot_z   (angle)                                .now();
+    auto rot_xy     = nain4::place(box).rot_x   (angle).rotate_y(angle)                .now();
+    auto rot_xz     = nain4::place(box).rot_x   (angle).rotate_z(angle)                .now();
+    auto rot_yz     = nain4::place(box).rot_y   (angle).rotate_z(angle)                .now();
+    auto rot_xyz    = nain4::place(box).rot_x   (angle).rotate_y(angle).rotate_z(angle).now();
 
     auto rotmat  = [&] (auto x, auto y, auto z){
        auto rm = G4RotationMatrix();
@@ -799,13 +806,20 @@ TEST_CASE("nain place", "[nain][place]") {
        return rm;
     };
 
-    CHECK(*  xrot -> GetObjectRotation() == rotmat(angle,     0,     0));
-    CHECK(*  yrot -> GetObjectRotation() == rotmat(    0, angle,     0));
-    CHECK(*  zrot -> GetObjectRotation() == rotmat(    0,     0, angle));
-    CHECK(* xyrot -> GetObjectRotation() == rotmat(angle, angle,     0));
-    CHECK(* xzrot -> GetObjectRotation() == rotmat(angle,     0, angle));
-    CHECK(* yzrot -> GetObjectRotation() == rotmat(    0, angle, angle));
-    CHECK(*xyzrot -> GetObjectRotation() == rotmat(angle, angle, angle));
+    CHECK(* rotate_x   -> GetObjectRotation() == rotmat(angle,     0,     0));
+    CHECK(* rotate_y   -> GetObjectRotation() == rotmat(    0, angle,     0));
+    CHECK(* rotate_z   -> GetObjectRotation() == rotmat(    0,     0, angle));
+    CHECK(* rotate_xy  -> GetObjectRotation() == rotmat(angle, angle,     0));
+    CHECK(* rotate_xz  -> GetObjectRotation() == rotmat(angle,     0, angle));
+    CHECK(* rotate_yz  -> GetObjectRotation() == rotmat(    0, angle, angle));
+    CHECK(* rotate_xyz -> GetObjectRotation() == rotmat(angle, angle, angle));
+    CHECK(* rot_x      -> GetObjectRotation() == rotmat(angle,     0,     0));
+    CHECK(* rot_y      -> GetObjectRotation() == rotmat(    0, angle,     0));
+    CHECK(* rot_z      -> GetObjectRotation() == rotmat(    0,     0, angle));
+    CHECK(* rot_xy     -> GetObjectRotation() == rotmat(angle, angle,     0));
+    CHECK(* rot_xz     -> GetObjectRotation() == rotmat(angle,     0, angle));
+    CHECK(* rot_yz     -> GetObjectRotation() == rotmat(    0, angle, angle));
+    CHECK(* rot_xyz    -> GetObjectRotation() == rotmat(angle, angle, angle));
   }
 }
 
