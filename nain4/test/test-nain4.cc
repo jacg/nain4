@@ -806,6 +806,13 @@ TEST_CASE("nain place", "[nain][place]") {
        return rm;
     };
 
+    auto manyrot = rotmat(angle, angle, angle);
+    auto rotate  = nain4::place(box).rotate(manyrot).now();
+    auto rot     = nain4::place(box).rot   (manyrot).now();
+
+    CHECK(* rotate     -> GetObjectRotation() == manyrot);
+    CHECK(* rot        -> GetObjectRotation() == manyrot);
+
     CHECK(* rotate_x   -> GetObjectRotation() == rotmat(angle,     0,     0));
     CHECK(* rotate_y   -> GetObjectRotation() == rotmat(    0, angle,     0));
     CHECK(* rotate_z   -> GetObjectRotation() == rotmat(    0,     0, angle));
