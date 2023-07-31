@@ -118,3 +118,22 @@ TEST_CASE("nain run_manager too_many_world_volumes", "[nain][run_manager]") {
      .actions(do_nothing);
 
 }
+
+
+TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
+  auto my_geometry = [] {
+    auto air = n4::material("G4_AIR");
+    auto box_daughter = n4::box{"daughter"}.cube(1).volume(air);
+    auto box_world    = n4::box{"world"   }.cube(1).volume(air);
+
+    // No `.in` call defaults to world volume
+           n4::place(box_daughter).in(box_world).now();
+    return n4::place(box_world   ).now();
+  };
+
+  n4::run_manager::create()
+     .physics<FTFP_BERT>(0)
+     .geometry(my_geometry)
+     .actions(do_nothing);
+
+}
