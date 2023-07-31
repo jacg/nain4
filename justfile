@@ -10,3 +10,6 @@ test-examples:
 
 test-client-side:
     just client_side_tests/test-all
+
+test-compile-time:
+    just compile-time-tests/test-all
