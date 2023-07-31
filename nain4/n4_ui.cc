@@ -48,6 +48,7 @@ void ui(int argc, char** argv) {
     if (n.has_value()) { beam_on  (n        ); }
     else               { run_macro(file_name); }
   }
+  // 2 arguments on CLI: <MACRO-FILE> <ARGUMENT-FOR-BEAM-ON>
   if (argc == 3) {
     auto n         = parse_unsigned(argv[2]);
     auto file_name =                argv[1] ;
