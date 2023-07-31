@@ -11,6 +11,7 @@
 #include <G4LogicalVolume.hh>
 #include <G4Orb.hh>
 #include <G4PVPlacement.hh>
+#include <G4RotationMatrix.hh>
 #include <G4Sphere.hh>
 #include <G4Trd.hh>
 
@@ -1231,20 +1232,25 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   auto    with_rot_y    = box_along_z.subtract(box_along_x).rot_y   (90*deg).name("with_rot_y"    ).solid();
   auto    with_rot_x    = box_along_y.subtract(box_along_z).rot_x   (90*deg).name("with_rot_x"    ).solid();
 
+  auto rotation         = G4RotationMatrix{}; rotation.rotateX(90*deg);
+  auto with_rotate      = box_along_y.subtract(box_along_z).rotate(rotation).name("with_rotate"   ).solid();
+  auto with_rot         = box_along_y.subtract(box_along_z).rot   (rotation).name("with_rot"      ).solid();
 
   // When rotated, the volumes overlap perfectly, resulting in a null volume
   // Cannot use GetCubicVolume because gives nonsense
   auto n   = 100000;
   auto eps = 1e-3;
-  CHECK( without_rot_xy -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK( without_rot_zx -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK( without_rot_yz -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK(with_rotate_x   -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rotate_y   -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rotate_z   -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rot_x      -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rot_y      -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rot_z      -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(without_rot_xy -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK(without_rot_zx -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK(without_rot_yz -> EstimateCubicVolume(n, eps) >  0 );
+  CHECK(with_rotate_x  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rotate_y  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rotate_z  -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rotate    -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot_x     -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot_y     -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot_z     -> EstimateCubicVolume(n, eps) == 0 );
+  CHECK(with_rot       -> EstimateCubicVolume(n, eps) == 0 );
 }
 
 TEST_CASE("nain envelope_of", "[nain][envelope_of]") {
