@@ -95,6 +95,7 @@ TEST_CASE("nain run_manager no_world_volume", "[nain][run_manager]") {
     //     n4::place(box_mother  ).             .now();
   };
 
+  auto hush = n4::silence{std::cout};
   n4::run_manager::create()
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
@@ -112,6 +113,7 @@ TEST_CASE("nain run_manager too_many_world_volumes", "[nain][run_manager]") {
     return n4::place(box_world_2).now();
   };
 
+  auto hush = n4::silence{std::cout};
   n4::run_manager::create()
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
@@ -131,6 +133,7 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
     return n4::place(box_world   ).now();
   };
 
+  auto hush = n4::silence{std::cout};
   n4::run_manager::create()
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
