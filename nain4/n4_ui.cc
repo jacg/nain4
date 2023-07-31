@@ -49,13 +49,20 @@ void ui(int argc, char** argv) {
     else               { run_macro(file_name); }
   }
   // 2 arguments on CLI: <MACRO-FILE> <ARGUMENT-FOR-BEAM-ON>
-  if (argc == 3) {
+  else if (argc == 3) {
     auto n         = parse_unsigned(argv[2]);
     auto file_name =                argv[1] ;
     if (n.has_value()) {
       run_macro(file_name);
       beam_on  (n        );
     }
+  } else {
+    std::cerr << "Usage:\n\n"
+              << argv[0] << "              # run GUI with macs/vis.mac\n"
+              << argv[0] << " N            # batch mode: /run/beamOn N\n"
+              << argv[0] << " MACRO-FILE   # batch mode: excecute MACRO-FILE\n"
+              << argv[0] << " MACRO-FILE N # batch mode: excecute MACRO-FILE then /run/beamOn N\n"
+              << std::endl;
   }
 }
 } // namespace nain4
