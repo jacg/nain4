@@ -1225,14 +1225,21 @@ TEST_CASE("nain envelope_of", "[nain][envelope_of]") {
   auto a = n4::box("box")  .cube(1* m).volume(material_1);
   n4::         box("inner").cube(1*cm).place (material_2).in(a).now();
   auto c = n4::envelope_of(a);
+  auto d = n4::envelope_of(a, "New-name");
 
   CHECK(a != c);
-
   CHECK(a -> GetName() + "-cloned" == c -> GetName()        );
   CHECK(a -> GetMaterial()         == c -> GetMaterial()    );
   CHECK(a -> GetSolid()            == c -> GetSolid()       );
   CHECK(a -> GetMass()             != c -> GetMass()        );
   CHECK(a -> GetNoDaughters()      != c -> GetNoDaughters() );
+
+  CHECK(a != d);
+  CHECK("New-name"                 == d -> GetName()        );
+  CHECK(a -> GetMaterial()         == d -> GetMaterial()    );
+  CHECK(a -> GetSolid()            == d -> GetSolid()       );
+  CHECK(a -> GetMass()             != d -> GetMass()        );
+  CHECK(a -> GetNoDaughters()      != d -> GetNoDaughters() );
 }
 
 TEST_CASE("enumerate", "[utils][enumerate]") {

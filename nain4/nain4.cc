@@ -136,10 +136,14 @@ G4VPhysicalVolume* combine_geometries(G4VPhysicalVolume* phantom, G4VPhysicalVol
 }
 
 G4LogicalVolume* envelope_of(G4LogicalVolume* original) {
+  return envelope_of(original, original -> GetName() + "-cloned");
+}
+
+G4LogicalVolume* envelope_of(G4LogicalVolume* original, G4String name) {
   return new G4LogicalVolume(
     original -> GetSolid(),
     original -> GetMaterial(),
-    original -> GetName() + "-cloned");
+    name);
 }
 
 } // namespace nain4
