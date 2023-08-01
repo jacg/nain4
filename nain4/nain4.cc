@@ -61,7 +61,7 @@ material_properties& material_properties::add(G4String const& key, vec const& en
 }
 
 material_properties& material_properties::add(G4String const& key, vec const& energies, G4double   value ) {
-  return add(key, energies, vec(energies.size(), value));
+  return add(key, {energies.front(), energies.back()}, {value, value});
 }
 
 material_properties& material_properties::add(G4String const& key, G4double value) {
