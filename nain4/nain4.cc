@@ -69,6 +69,20 @@ material_properties& material_properties::add(G4String const& key, G4double valu
   return *this;
 }
 
+material_properties& material_properties::NEW(G4String const& key, vec const& energies, vec const& values) {
+  table -> AddProperty(key, energies, values, true); // es-vs size equality assertion done in AddProperty
+  return *this;
+}
+
+material_properties& material_properties::NEW(G4String const& key, vec const& energies, G4double   value ) {
+  return NEW(key, {energies.front(), energies.back()}, {value, value});
+}
+
+material_properties& material_properties::NEW(G4String const& key, G4double value) {
+  table->AddConstProperty(key, value, true);
+  return *this;
+}
+
 // --------------------------------------------------------------------------------
 // stream redirection utilities
 
