@@ -91,6 +91,7 @@ template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); 
 public:                                                        \
   N4_TYPE(G4String name) : shape{name} {}                      \
   G4_TYPE* solid() const;                                      \
+  N4_TYPE  clone() const  { return *this; }                    \
   N4_TYPE& name(G4String name) { name_ = name; return *this; }
 
 #define HAS_R(TYPE, N)                                                         \
