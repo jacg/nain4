@@ -261,6 +261,9 @@ TEST_CASE("nain box", "[nain][box]") {
 
   check_dimensions(n4::box("box_xyz")     .     xyz(lx  , ly  , lz  ).solid());
   check_dimensions(n4::box("box_half_xyz").half_xyz(lx/2, ly/2, lz/2).solid());
+
+  // Compile-time check: concrete shape methods available after .name()
+  auto renamed_box = n4::box("old").name("new").cube(1*m);
 }
 
 TEST_CASE("nain sphere", "[nain][sphere]") {

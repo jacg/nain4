@@ -34,7 +34,6 @@ struct boolean_shape;
 struct shape {
   G4LogicalVolume*  volume(G4Material* material) const;
   n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
-  shape&              name(G4String    name    ) { name_ = name; return *this; }
   shape&         sensitive(G4SensDet*  s       ) { sd    = s   ; return *this; }
   virtual G4VSolid*  solid(                    ) const = 0;
   virtual ~shape() {}
@@ -88,10 +87,11 @@ template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); 
 
 // ---- Macros for reuse of members and setters of orthogonal directions ------------------------------
 
-#define COMMON(N4_TYPE, G4_TYPE)          \
-public:                                   \
-  N4_TYPE(G4String name) : shape{name} {} \
-  G4_TYPE* solid() const;
+#define COMMON(N4_TYPE, G4_TYPE)                               \
+public:                                                        \
+  N4_TYPE(G4String name) : shape{name} {}                      \
+  G4_TYPE* solid() const;                                      \
+  N4_TYPE& name(G4String name) { name_ = name; return *this; }
 
 #define HAS_R(TYPE, N)                                                         \
 public:                                                                        \
