@@ -1300,6 +1300,21 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
     CHECK(stuff[0].n == 1002);
     CHECK(stuff[1].n == 1008);
   }
+  SECTION("literal braces primitives") {
+    for (const auto [n, el] : enumerate({7,6,5,4})) {
+      CHECK(static_cast<unsigned>(el) == 7 - n);
+    }
+  }
+  SECTION("literal braces objects") {
+    struct Foo {
+      Foo(unsigned n): n{n} {}
+      unsigned n;
+    };
+    for (auto [n, el] : enumerate({Foo{4}, Foo{2}})) {
+      if (n == 0) { CHECK(el.n == 4); }
+      else        { CHECK(el.n == 2); }
+    }
+  }
 }
 
 

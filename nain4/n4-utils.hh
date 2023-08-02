@@ -5,6 +5,7 @@
 #include <Randomize.hh>
 #include <G4Types.hh>
 
+#include <initializer_list>
 #include <iterator>
 #include <tuple>
 #include <vector>
@@ -26,6 +27,23 @@ constexpr auto enumerate(T&& iterable) {
     auto end  () { return iterator{0, std::  end(iterable)}; }
   };
   return iterable_wrapper{ std::forward<T>(iterable) };
+}
+
+template <typename T>
+constexpr auto enumerate(const std::initializer_list<T>& data) {
+  struct iterator {
+    size_t i;
+    decltype(std::begin(std::vector<T>())) iter;
+    bool operator != (const iterator& other) const { return this->iter != other.iter; }
+    void operator ++ ()       {               ++i; ++iter; }
+    auto operator *  () const { return std::tie(i,  *iter); }
+  };
+  struct iterable_wrapper {
+    std::vector<T> iterable;
+    auto begin() { return iterator{0, std::begin(iterable)}; }
+    auto end  () { return iterator{0, std::  end(iterable)}; }
+  };
+  return iterable_wrapper{ data };
 }
 
 namespace nain4 {
