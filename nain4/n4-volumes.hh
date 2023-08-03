@@ -70,7 +70,10 @@ struct boolean_shape : shape {
   boolean_shape& rot_x   (double delta         )  { return rotate_x(delta); }
   boolean_shape& rot_y   (double delta         )  { return rotate_y(delta); }
   boolean_shape& rot_z   (double delta         )  { return rotate_z(delta); }
-  boolean_shape& at(double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this; }
+  boolean_shape& at  (double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this; }
+  boolean_shape& at_x(double x                    ) { return at(x, 0, 0); }
+  boolean_shape& at_y(          double y          ) { return at(0, y, 0); }
+  boolean_shape& at_z(                    double z) { return at(0, 0, z); }
   boolean_shape& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
   boolean_shape& name(G4String name)              { name_ = name; return *this; }
 private:
