@@ -1375,6 +1375,15 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
 }
 
 
+TEST_CASE("nain linspace", "[nain][linspace]") {
+  auto start     = 0.;
+  auto stop      = 5.;
+  auto n_entries = 11 ;
+
+  auto values = n4::linspace(start, stop, n_entries);
+  CHECK( values == std::vector<double>{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5} );
+}
+
 // TODO can the overlap check tests be automated? G4 raises an exception when an
 // overlap is detected, and we do not know how to observe that in Catch2
 

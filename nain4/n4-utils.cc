@@ -5,6 +5,17 @@
 #include <stack>
 
 namespace nain4 {
+
+
+std::vector<G4double> linspace(G4double start, G4double stop, size_t n_entries) {
+  auto step = (stop - start) / (n_entries - 1);
+  std::vector<G4double> output(n_entries);
+
+  std::generate(begin(output), end(output), [start, step, i=0] () mutable { return start + i++ * step; } );
+
+  return output;
+}
+
 namespace random {
 
 // Going with rejection sampling, for now

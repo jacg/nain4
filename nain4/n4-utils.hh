@@ -5,6 +5,7 @@
 #include <Randomize.hh>
 #include <G4Types.hh>
 
+#include <algorithm>
 #include <initializer_list>
 #include <iterator>
 #include <tuple>
@@ -47,6 +48,9 @@ constexpr auto enumerate(const std::initializer_list<T>& data) {
 }
 
 namespace nain4 {
+
+std::vector<G4double> linspace(G4double start, G4double stop, size_t n_entries);
+
 namespace random {
 
 // Random result generation utilities
