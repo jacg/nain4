@@ -857,6 +857,11 @@ TEST_CASE("nain scale_by", "[nain][scale_by]") {
   CHECK(nain4::scale_by(cm, {6, 7})        == std::vector<G4double>{6*cm, 7*cm});
 }
 
+TEST_CASE("nain factor_over", "[nain][factor_over]") {
+  CHECK(nain4::factor_over(2*3*4, {2., 3., 4.}) == std::vector<G4double>{3*4, 2*4, 2*3});
+  CHECK(nain4::factor_over(   1., {10, 100})    == std::vector<G4double>{0.1, 0.01});
+}
+
 TEST_CASE("nain vis_attributes", "[nain][vis_attributes]") {
   // Utility for more convenient configuration of G4VisAttributes
   // TODO could do with more extensive testing

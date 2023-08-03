@@ -53,6 +53,13 @@ std::vector<G4double> scale_by(G4double factor, std::initializer_list<G4double> 
   return out;
 }
 
+std::vector<G4double> factor_over(G4double factor, std::initializer_list<G4double> const& data) {
+  std::vector<G4double> out;
+  out.reserve(data.size());
+  std::transform(begin(data), end(data), back_inserter(out), [factor](auto d){ return factor/d; });
+  return out;
+}
+
 // --------------------------------------------------------------------------------
 // definition of material_properties
 material_properties& material_properties::add(G4String const& key, vec const& energies, vec const& values) {
