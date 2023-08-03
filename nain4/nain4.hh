@@ -152,7 +152,10 @@ public:
   place& rot_x   (double delta       )  { return rotate_x(delta); }
   place& rot_y   (double delta       )  { return rotate_y(delta); }
   place& rot_z   (double delta       )  { return rotate_z(delta); }
-  place& at(double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this;      }
+  place& at  (double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this;      }
+  place& at_x(double x                    ) { return at(x, 0, 0); }
+  place& at_y(          double y          ) { return at(0, y, 0); }
+  place& at_z(                    double z) { return at(0, 0, z); }
   place& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
   place& copy_no(int         n)           { copy_number = n      ; return *this; }
   place& in(G4LogicalVolume* parent_)     { parent      = parent_; return *this; }

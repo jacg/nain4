@@ -746,6 +746,24 @@ TEST_CASE("nain place", "[nain][place]") {
     CHECK(world->GetObjectTranslation() == G4ThreeVector{4,5,6});
   }
 
+  SECTION("at 1-arg") {
+    auto place_x   = nain4::place(outer).at_x( 1)                  .now(); // 1-arg version  of at()
+    auto place_y   = nain4::place(outer)         .at_y( 2)         .now(); // 1-arg version  of at()
+    auto place_z   = nain4::place(outer)                  .at_z( 3).now(); // 1-arg version  of at()
+    auto place_xy  = nain4::place(outer).at_x( 4).at_y( 5)         .now(); // 1-arg versions of at()
+    auto place_xz  = nain4::place(outer).at_x( 6)         .at_z( 7).now(); // 1-arg versions of at()
+    auto place_yz  = nain4::place(outer)         .at_y( 8).at_z( 9).now(); // 1-arg versions of at()
+    auto place_xyz = nain4::place(outer).at_x(10).at_y(11).at_z(12).now(); // 1-arg versions of at()
+
+    CHECK(place_x   -> GetObjectTranslation() == G4ThreeVector{ 1, 0, 0});
+    CHECK(place_y   -> GetObjectTranslation() == G4ThreeVector{ 0, 2, 0});
+    CHECK(place_z   -> GetObjectTranslation() == G4ThreeVector{ 0, 0, 3});
+    CHECK(place_xy  -> GetObjectTranslation() == G4ThreeVector{ 4, 5, 0});
+    CHECK(place_xz  -> GetObjectTranslation() == G4ThreeVector{ 6, 0, 7});
+    CHECK(place_yz  -> GetObjectTranslation() == G4ThreeVector{ 0, 8, 9});
+    CHECK(place_xyz -> GetObjectTranslation() == G4ThreeVector{10,11,12});
+  }
+
   // The in() option creates correct mother/daughter relationship
   SECTION("in") {
     auto water = nain4::material("G4_WATER");
