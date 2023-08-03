@@ -1,6 +1,7 @@
 #include "nain4.hh"
 
 #include <G4EmStandardPhysics_option4.hh>
+#include <G4MaterialPropertyVector.hh>
 #include <G4OpticalPhysics.hh>
 #include <G4Box.hh>
 #include <FTFP_BERT.hh>
@@ -72,7 +73,12 @@ material_properties& material_properties::add(G4String const& key, vec const& en
 }
 
 material_properties& material_properties::add(G4String const& key, G4double value) {
-  table->AddConstProperty(key, value);
+  table -> AddConstProperty(key, value);
+  return *this;
+}
+
+material_properties& material_properties::add(G4String const& key, G4MaterialPropertyVector* value) {
+  table -> AddProperty(key, value);
   return *this;
 }
 
@@ -86,7 +92,11 @@ material_properties& material_properties::NEW(G4String const& key, vec const& en
 }
 
 material_properties& material_properties::NEW(G4String const& key, G4double value) {
-  table->AddConstProperty(key, value, true);
+  table -> AddConstProperty(key, value, true);
+  return *this;
+}
+material_properties& material_properties::NEW(G4String const& key, G4MaterialPropertyVector* value) {
+  table -> AddProperty(key, value, true);
   return *this;
 }
 

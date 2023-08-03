@@ -234,10 +234,12 @@ public:
   material_properties& add(G4String const& key, vec const& energies, vec const& values);
   material_properties& add(G4String const& key, vec const& energies, G4double   value );
   material_properties& add(G4String const& key, G4double value);
+  material_properties& add(G4String const& key, G4MaterialPropertyVector* value);
   // Quick hack to get around Itsaso's complilation problems. Need to implement a proper interface for this
   material_properties& NEW(G4String const& key, vec const& energies, vec const& values);
   material_properties& NEW(G4String const& key, vec const& energies, G4double   value );
   material_properties& NEW(G4String const& key, G4double value);
+  material_properties& NEW(G4String const& key, G4MaterialPropertyVector* value);
   G4MaterialPropertiesTable* done() { return table; }
 private:
   G4MaterialPropertiesTable* table = new G4MaterialPropertiesTable;
