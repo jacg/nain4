@@ -7,6 +7,7 @@
 
 #include <G4LogicalVolumeStore.hh>
 #include <G4Material.hh>
+#include <G4MaterialPropertiesTable.hh>
 #include <G4NistManager.hh>
 #include <G4PVPlacement.hh>
 #include <G4ParticleTable.hh>
@@ -240,6 +241,8 @@ public:
   material_properties& NEW(G4String const& key, vec const& energies, G4double   value );
   material_properties& NEW(G4String const& key, G4double value);
   material_properties& NEW(G4String const& key, G4MaterialPropertyVector* value);
+  material_properties& copy_from    (G4MaterialPropertiesTable const * const other, std::vector<std::string> const& keys);
+  material_properties& copy_NEW_from(G4MaterialPropertiesTable const * const other, std::vector<std::string> const& keys);
   G4MaterialPropertiesTable* done() { return table; }
 private:
   G4MaterialPropertiesTable* table = new G4MaterialPropertiesTable;

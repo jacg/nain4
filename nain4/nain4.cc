@@ -100,6 +100,22 @@ material_properties& material_properties::NEW(G4String const& key, G4MaterialPro
   return *this;
 }
 
+material_properties& material_properties::copy_from(
+  G4MaterialPropertiesTable const * const other,
+  std::vector<std::string> const& keys
+) {
+  for (auto key : keys) { add(key, other -> GetProperty(key)); }
+  return *this;
+}
+
+material_properties& material_properties::copy_NEW_from(
+  G4MaterialPropertiesTable const * const other,
+  std::vector<std::string> const& keys
+) {
+  for (auto key : keys) { NEW(key, other -> GetProperty(key)); }
+  return *this;
+}
+
 // --------------------------------------------------------------------------------
 // stream redirection utilities
 
