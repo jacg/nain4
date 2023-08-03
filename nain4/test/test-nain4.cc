@@ -1235,6 +1235,37 @@ TEST_CASE("nain boolean double intersect", "[nain][geometry][boolean][intersect]
 #undef CHECKP
 }
 
+
+TEST_CASE("nain boolean at", "[nain][geometry][boolean][at]") {
+  auto lx = 1*m;
+  auto ly = 2*m;
+  auto lz = 3*m;
+
+  auto box = n4::box("box").xyz(lx, ly, lz);
+
+  auto at_full = box.intersect(box).at  (lx,      ly,      lz).solid();
+  auto at_x    = box.intersect(box).at_x(lx)                  .solid();
+  auto at_y    = box.intersect(box)         .at_y(ly)         .solid();
+  auto at_z    = box.intersect(box)                  .at_z(lz).solid();
+  auto at_xy   = box.intersect(box).at_x(lx).at_y(ly)         .solid();
+  auto at_xz   = box.intersect(box).at_x(lx)         .at_z(lz).solid();
+  auto at_yz   = box.intersect(box)         .at_y(ly).at_z(lz).solid();
+  auto at_xyz  = box.intersect(box).at_x(lx).at_y(ly).at_z(lz).solid();
+  auto n   = 10000;
+  auto eps = 1e-3;
+
+  // When displaced, the volumes do not overlap at all, resulting in a null volume
+  // Cannot use GetCubicVolume because gives nonsense
+  CHECK(at_full -> EstimateCubicVolume(n, eps) == Approx(0));
+  CHECK(at_x    -> EstimateCubicVolume(n, eps) == Approx(0));
+  CHECK(at_y    -> EstimateCubicVolume(n, eps) == Approx(0));
+  CHECK(at_z    -> EstimateCubicVolume(n, eps) == Approx(0));
+  CHECK(at_xy   -> EstimateCubicVolume(n, eps) == Approx(0));
+  CHECK(at_xz   -> EstimateCubicVolume(n, eps) == Approx(0));
+  CHECK(at_yz   -> EstimateCubicVolume(n, eps) == Approx(0));
+  CHECK(at_xyz  -> EstimateCubicVolume(n, eps) == Approx(0));
+}
+
 TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   auto l1  = 3*m;
   auto l2  = 1*m;
