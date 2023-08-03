@@ -51,6 +51,12 @@ namespace nain4 {
 
 std::vector<G4double> linspace(G4double start, G4double stop, size_t n_entries);
 
+template<class O, class I, class F> std::vector<O> map(F f, I const& input) {
+  std::vector<O> output(std::distance(begin(input), end(input)));
+  std::transform(begin(input), end(input), begin(output), f);
+  return output;
+}
+
 namespace random {
 
 // Random result generation utilities

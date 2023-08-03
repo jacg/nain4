@@ -1384,6 +1384,22 @@ TEST_CASE("nain linspace", "[nain][linspace]") {
   CHECK( values == std::vector<double>{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5} );
 }
 
+int ff(int x) {
+  return x + 27;
+}
+
+TEST_CASE("nain map", "[nain][map]") {
+  int a=9, b=5, c=1, d=7;
+  std::vector<int> input_x = {a, b, c, d};
+  auto f = [] (auto x) { return x + 27; };
+  auto mapped_lambda    = n4::map<int>( f, input_x);
+  auto mapped_fn        = n4::map<int>(ff, input_x);
+
+  CHECK( mapped_lambda    == std::vector<int>{ f(a),  f(b),  f(c),  f(d)} );
+  CHECK( mapped_fn        == std::vector<int>{ff(a), ff(b), ff(c), ff(d)} );
+
+}
+
 // TODO can the overlap check tests be automated? G4 raises an exception when an
 // overlap is detected, and we do not know how to observe that in Catch2
 
