@@ -352,18 +352,6 @@ TEST_CASE("nain material_properties", "[nain][material_properties]") {
   }
 }
 
-
-
-//     .add("RINDEX",      ri_energy,       rIndex)                                                              |5d696f3 * Nanify some G4Tubs                                                                              Jacek Generowicz   12 hours
-// .add("ABSLENGTH"                 , optPhotRangeE_, noAbsLength_)                                                              |2811bdd * Remove pointless dots and braces                                                                Jacek Generowicz   12 hours
-// .add("SCINTILLATIONCOMPONENT1"   , sc_energy_Ar  , intensity_Ar)                                                              |0ee9072 * Remove pointless underscores                                                                    Jacek Generowicz   12 hours
-// .add("SCINTILLATIONCOMPONENT2"   , sc_energy_Ar  , intensity_Ar)                                                              |13f9305 * Explore easier visualization of sub-geometry                                                    Jacek Generowicz   16 hours
-// .NEW("ELSPECTRUM"                , sc_energy_Ar  , intensity_Ar)                                                              |fd03e01 * Extract parameter initialization from geometry()                                                Jacek Generowicz   16 hours
-// .add("SCINTILLATIONYIELD"        ,                   sc_yield  )                                                              |398bb20 * Better visualization                                                                            Gonzalo Martinez …  1 day
-// .add("SCINTILLATIONTIMECONSTANT1",                      6. * ns) //
-
-
-
 TEST_CASE("nain shape name", "[nain][shape][name]") {
   auto name1  = "fulanito";
   auto name2  = "menganito";
@@ -373,7 +361,6 @@ TEST_CASE("nain shape name", "[nain][shape][name]") {
 
   CHECK( solid1 -> GetName() == name1 );
   CHECK( solid2 -> GetName() == name2 );
-
 }
 
 TEST_CASE("nain box", "[nain][box]") {
