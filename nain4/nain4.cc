@@ -9,6 +9,7 @@
 #include <G4String.hh>
 
 #include <algorithm>
+#include <initializer_list>
 #include <iterator>
 
 #pragma GCC diagnostic push
@@ -104,7 +105,7 @@ material_properties& material_properties::copy_from(
   G4MaterialPropertiesTable const * const other,
   std::vector<std::string> const& keys
 ) {
-  for (auto key : keys) { add(key, other -> GetProperty(key)); }
+  for (auto key : keys) { copy_from(other, key); }
   return *this;
 }
 
@@ -112,7 +113,41 @@ material_properties& material_properties::copy_NEW_from(
   G4MaterialPropertiesTable const * const other,
   std::vector<std::string> const& keys
 ) {
-  for (auto key : keys) { NEW(key, other -> GetProperty(key)); }
+  for (auto key : keys) { copy_NEW_from(other, key); }
+  return *this;
+}
+
+material_properties& material_properties::copy_from(
+  G4MaterialPropertiesTable const * const other,
+  std::initializer_list<std::string> const& keys
+) {
+  for (auto key : keys) { copy_from(other, key); }
+  return *this;
+}
+
+material_properties& material_properties::copy_NEW_from(
+  G4MaterialPropertiesTable const * const other,
+  std::initializer_list<std::string> const& keys
+) {
+  for (auto key : keys) { copy_NEW_from(other, key); }
+  return *this;
+}
+
+material_properties& material_properties::copy_from(
+  G4MaterialPropertiesTable const * const other,
+  std::string const& key
+) {
+  if (other -> ConstPropertyExists(key)) { add(key, other -> GetConstProperty(key)); }
+  else                                   { add(key, other ->      GetProperty(key)); }
+  return *this;
+}
+
+material_properties& material_properties::copy_NEW_from(
+  G4MaterialPropertiesTable const * const other,
+  std::string const& key
+) {
+  if (other -> ConstPropertyExists(key)) { NEW(key, other -> GetConstProperty(key)); }
+  else                                   { NEW(key, other ->      GetProperty(key)); }
   return *this;
 }
 

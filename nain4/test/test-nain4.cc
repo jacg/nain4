@@ -173,6 +173,185 @@ TEST_CASE("nain material", "[nain][material]") {
   }
 }
 
+TEST_CASE("nain material_properties", "[nain][material_properties]") {
+  SECTION("add") {
+    auto key_1         = "RINDEX";
+    auto key_2         = "ABSLENGTH";
+    auto key_3         = "SCINTILLATIONTIMECONSTANT1";
+
+    auto energies_1    = std::vector<G4double>{1 , 4 , 6};
+    auto energies_2    = std::vector<G4double>{2 ,     7};
+
+    auto   values_1    = std::vector<G4double>{3., 5., 8.};
+    auto const_value_2 = CLHEP::pi;
+    auto const_value_3 = 42.0;
+
+    auto mp = n4::material_properties()
+      .add(key_1, energies_1,      values_1) // vec vec
+      .add(key_2, energies_2, const_value_2) // vec const
+      .add(key_3,             const_value_3) //     const
+      .done();
+
+    auto property_1 = mp -> GetProperty(key_1);
+    for (auto i=0; i<3; i++) {
+      auto e1 = energies_1[i];
+      CHECK( property_1 -> Energy(i)  == e1);
+      CHECK( property_1 -> Value (e1) == values_1[i]);
+    }
+
+    auto property_2 = mp -> GetProperty(key_2);
+    for (auto i=0; i<2; i++){
+      auto e2 = energies_2[i];
+      CHECK( property_2 -> Energy(i)  == e2);
+      CHECK( property_2 -> Value (e2) == const_value_2);
+    }
+
+    CHECK( mp ->    ConstPropertyExists(key_3)                );
+    CHECK( mp -> GetConstProperty      (key_3) == const_value_3 );
+  }
+
+  SECTION("initializer lists") {
+    auto key      = "RINDEX";
+    auto energies = {3., 4., 5.};
+    auto values   = {6., 7., 8.};
+    auto mp       = n4::material_properties() .add(key, energies, values) .done();
+
+    auto property = mp -> GetProperty("RINDEX");
+    for (auto i=0; i<3; i++) {
+      auto e = 3 + i;
+      CHECK( property -> Energy(i) == 3 + i );
+      CHECK( property -> Value (e) == 6 + i );
+    }
+  }
+
+  SECTION("NEW") {
+    auto key_1 = "SOMETHING_THAT_DID_NOT_EXIST_BEFORE_VEC_VEC";
+    auto key_2 = "SOMETHING_THAT_DID_NOT_EXIST_BEFORE_VEC_CONST";
+    auto key_3 = "SOMETHING_THAT_DID_NOT_EXIST_BEFORE_CONST";
+
+    auto energies_1 = std::vector<G4double>{1., 3., 4.};
+    auto energies_2 = std::vector<G4double>{2.,     5.};
+
+    auto      values_1 = std::vector<G4double>{7., 8., 9.};
+    auto const_value_2 = CLHEP::pi;
+    auto const_value_3 = 42.;
+
+    auto mp = n4::material_properties()
+      .NEW(key_1, energies_1,      values_1)
+      .NEW(key_2, energies_2, const_value_2)
+      .NEW(key_3,             const_value_3)
+      .done();
+
+    auto property_1 = mp -> GetProperty(key_1);
+    for (auto i=0; i<3; i++){
+      auto e1 = energies_1[i];
+      CHECK( property_1 -> Energy(i)  == e1);
+      CHECK( property_1 -> Value (e1) == values_1[i]);
+    }
+
+    auto property_2 = mp -> GetProperty(key_2);
+    for (auto i=0; i<2; i++){
+      auto e2 = energies_2[i];
+      CHECK( property_2 -> Energy(i)  == e2);
+      CHECK( property_2 -> Value (e2) == const_value_2);
+    }
+
+    CHECK( mp ->    ConstPropertyExists(key_3)                  );
+    CHECK( mp -> GetConstProperty      (key_3) == const_value_3 );
+  }
+
+
+  SECTION("copy another mpt's values by hand") {
+    auto key_1 = "RINDEX";
+    auto key_2 = "ABSLENGTH";
+    auto key_3 = "SCINTILLATIONTIMECONSTANT1";
+    auto key_4 = "SOMETHING_THAT_DID_NOT_EXIST_BEFORE_VEC_VEC";
+    auto key_5 = "SOMETHING_THAT_DID_NOT_EXIST_BEFORE_VEC_CONST";
+    auto key_6 = "SOMETHING_THAT_DID_NOT_EXIST_BEFORE_CONST";
+
+    auto energies_1 = std::vector<G4double>{1., 5.,  7.};
+    auto energies_2 = std::vector<G4double>{2.,      8.};
+    auto energies_4 = std::vector<G4double>{3., 6.,  9.};
+    auto energies_5 = std::vector<G4double>{4.,     10.};
+
+    auto      values_1 = std::vector<G4double>{11., 12., 13.};
+    auto const_value_2 = CLHEP::pi;
+    auto const_value_3 = 42.;
+    auto      values_4 = std::vector<G4double>{14., 15., 16.};
+    auto const_value_5 = CLHEP::twopi;
+    auto const_value_6 = 42. * 42.;
+
+    auto mp1 = n4::material_properties()
+      .add(key_1, energies_1,      values_1)
+      .add(key_2, energies_2, const_value_2)
+      .add(key_3,             const_value_3)
+      .NEW(key_4, energies_4,      values_4)
+      .NEW(key_5, energies_5, const_value_5)
+      .NEW(key_6,             const_value_6)
+      .done();
+
+    auto mp2 = n4::material_properties()
+      .add(key_1, mp1 -> GetProperty(key_1))
+      .add(key_2, mp1 -> GetProperty(key_2))
+      .add(key_3, mp1 -> GetConstProperty(key_3)) // Must use Const!!!!
+      .NEW(key_4, mp1 -> GetProperty(key_4))
+      .NEW(key_5, mp1 -> GetProperty(key_5))
+      .NEW(key_6, mp1 -> GetProperty(key_6))
+      .done();
+
+    CHECK( mp2 -> GetProperty(key_1)  ==  mp1 -> GetProperty(key_1) );
+    CHECK( mp2 -> GetProperty(key_2)  ==  mp1 -> GetProperty(key_2) );
+    CHECK( mp2 -> GetProperty(key_3)  ==  mp1 -> GetProperty(key_3) );
+    CHECK( mp2 -> GetProperty(key_4)  ==  mp1 -> GetProperty(key_4) );
+    CHECK( mp2 -> GetProperty(key_5)  ==  mp1 -> GetProperty(key_5) );
+    CHECK( mp2 -> GetProperty(key_6)  ==  mp1 -> GetProperty(key_6) );
+  }
+
+  SECTION("copy another mpt's values by key") {
+    auto key_1 = "RINDEX";
+    auto key_2 = "ABSLENGTH";
+    auto key_3 = "SCINTILLATIONTIMECONSTANT1";
+    auto key_4 = "SOMETHING_THAT_DID_NOT_EXIST_BEFORE_VEC_VEC";
+    auto key_5 = "SOMETHING_THAT_DID_NOT_EXIST_BEFORE_VEC_CONST";
+    auto key_6 = "SOMETHING_THAT_DID_NOT_EXIST_BEFORE_CONST";
+
+    auto energies_1 = std::vector<G4double>{1., 5.,  7.};
+    auto energies_2 = std::vector<G4double>{2.,      8.};
+    auto energies_4 = std::vector<G4double>{3., 6.,  9.};
+    auto energies_5 = std::vector<G4double>{4.,     10.};
+
+    auto      values_1 = std::vector<G4double>{11., 12., 13.};
+    auto const_value_2 = CLHEP::pi;
+    auto const_value_3 = 42.;
+    auto      values_4 = std::vector<G4double>{14., 15., 16.};
+    auto const_value_5 = CLHEP::twopi;
+    auto const_value_6 = 42. * 42.;
+
+    auto mp1 = n4::material_properties()
+      .add(key_1, energies_1,      values_1)
+      .add(key_2, energies_2, const_value_2)
+      .add(key_3,             const_value_3)
+      .NEW(key_4, energies_4,      values_4)
+      .NEW(key_5, energies_5, const_value_5)
+      .NEW(key_6,             const_value_6)
+      .done();
+
+    auto mp2 = n4::material_properties()
+      .copy_from    (mp1,  key_1        ) // single key
+      .copy_from    (mp1, {key_2, key_3}) // multiple keys
+      .copy_NEW_from(mp1,  key_4        ) // single key
+      .copy_NEW_from(mp1, {key_5, key_6}) // multiple keys
+      .done();
+
+    CHECK( mp2 -> GetProperty(key_1)  ==  mp1 -> GetProperty(key_1) );
+    CHECK( mp2 -> GetProperty(key_2)  ==  mp1 -> GetProperty(key_2) );
+    CHECK( mp2 -> GetProperty(key_3)  ==  mp1 -> GetProperty(key_3) );
+    CHECK( mp2 -> GetProperty(key_4)  ==  mp1 -> GetProperty(key_4) );
+    CHECK( mp2 -> GetProperty(key_5)  ==  mp1 -> GetProperty(key_5) );
+    CHECK( mp2 -> GetProperty(key_6)  ==  mp1 -> GetProperty(key_6) );
+  }
+}
+
 TEST_CASE("nain shape name", "[nain][shape][name]") {
   auto name1  = "fulanito";
   auto name2  = "menganito";
@@ -182,7 +361,6 @@ TEST_CASE("nain shape name", "[nain][shape][name]") {
 
   CHECK( solid1 -> GetName() == name1 );
   CHECK( solid2 -> GetName() == name2 );
-
 }
 
 TEST_CASE("nain box", "[nain][box]") {
