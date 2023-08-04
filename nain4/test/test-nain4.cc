@@ -316,7 +316,6 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   check_phi(phi_e ,     0,   end         );
   check_phi(phi_d ,     0, delta         );
 
-  using CLHEP::pi;
   start = pi/8; end = pi/2; delta = pi/4;
   auto theta_s  = spherer("theta_s" ).theta_start(start) /*.end(180)*/     .solid();
   auto theta_se = spherer("theta_se").theta_start(start).theta_end  (end  ).solid();
