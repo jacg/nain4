@@ -243,6 +243,8 @@ public:
   material_properties& NEW(G4String const& key, G4MaterialPropertyVector* value);
   material_properties& copy_from    (G4MaterialPropertiesTable const * const other, std::vector<std::string> const& keys);
   material_properties& copy_NEW_from(G4MaterialPropertiesTable const * const other, std::vector<std::string> const& keys);
+  material_properties& copy_from    (G4MaterialPropertiesTable const * const other, std::initializer_list<std::string> const& keys);
+  material_properties& copy_NEW_from(G4MaterialPropertiesTable const * const other, std::initializer_list<std::string> const& keys);
   material_properties& copy_from    (G4MaterialPropertiesTable const * const other,             std::string  const& key );
   material_properties& copy_NEW_from(G4MaterialPropertiesTable const * const other,             std::string  const& key );
   G4MaterialPropertiesTable* done() { return table; }
