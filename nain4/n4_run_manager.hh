@@ -105,7 +105,6 @@ public:
     using fn_type = n4::generator::function;
     using gn_type = std::function<n4::generator*()>;
     using ac_type = std::function<n4::actions  *()>;
-  private: // To reduce the possibility of instantiating generator before setting physics
     NEXT_STATE_BASIC( run_manager, actions, G4VUserActionInitialization
                     , manager -> Initialize();
                       check_for_multiple_world_volumes())
