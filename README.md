@@ -42,19 +42,21 @@ auto bone   = n4::material("G4_BONE_COMPACT_ICRU");
 // ...
 
 // Volumes
-auto world     = n4::box ("World"   ).xy(world_sizeXY).z(world_sizeZ)         .volume(air);
-auto envelope  = n4::box ("Envelope").xy(  env_sizeXY).z(  env_sizeZ)         .volume(water);
-auto cone      = n4::cons("Tissue"  ).r1(cone_rmaxa).r2(cone_rmaxb).z(cone_hz).volume(tissue);
-auto trapezoid = n4::trd ("Bone"    ).x1(trd_dxa).x2(trd_dxb).y1(trd_dya).y2(trd_dyb).z(trd_dz).volume(bone);
+auto world     = n4::box ("World"   ).xy(world_sizeXY).z(world_sizeZ)  .volume(air);
+auto envelope  = n4::box ("Envelope").xy(  env_sizeXY).z(  env_sizeZ)  .volume(water);
+auto trapezoid = n4::trd ("Bone"    ).x1(trd_dxa).x2(trd_dxb)
+                                     .y1(trd_dya).y2(trd_dyb).z(trd_dz).volume(bone);
+
+// If no handle is needed for a logical volume, it can be placed immediately
+n4::cons("Tissue").r1(cone_rmaxa).r2(cone_rmaxb).z(cone_hz).place(tissue).in(envelope).at_yz(2*cm, -7*cm).now();
 
 // Set Trapezoid as scoring volume
 this -> fScoringVolume = trapezoid;
 
 // Placement
-n4::       place(envelope) .in(world)                       .now();
-n4::       place(cone)     .in(envelope).at(0,  2*cm, -7*cm).now();
-n4::       place(trapezoid).in(envelope).at(0, -1*cm,  7*cm).now();
-return n4::place(world)                                     .now();
+n4::       place(envelope) .in(world)                      .now();
+n4::       place(trapezoid).in(envelope).at_yz(-1*cm, 7*cm).now();
+return n4::place(world)                                    .now();
 ```
 This is the complete (except for setting of the values like `world_sizeXYZ`) `nain4` implementation of `DetectorConstruction::Construct()`. 
 
