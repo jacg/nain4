@@ -42,23 +42,29 @@ auto bone   = n4::material("G4_BONE_COMPACT_ICRU");
 // ...
 
 // Volumes
-auto world     = n4::volume<G4Box> ("World"   , air   , world_sizeXY/2, world_sizeXY/2, world_sizeZ/2);
-auto envelope  = n4::volume<G4Box> ("Envelope", water ,   env_sizeXY/2,   env_sizeXY/2,   env_sizeZ/2);
-auto cone      = n4::volume<G4Cons>("Tissue"  , tissue, cone_rmina, cone_rmaxa, cone_rminb, cone_rmaxb, cone_hz, cone_phimin, cone_phimax);
-auto trapezoid = n4::volume<G4Trd> ("Bone"    , bone  , trd_dxa/2, trd_dxb/2, trd_dya/2, trd_dyb/2, trd_dz/2);
+auto world     = n4::box ("World"   ).xy(world_sizeXY).z(world_sizeZ)  .volume(air);
+auto envelope  = n4::box ("Envelope").xy(  env_sizeXY).z(  env_sizeZ)  .volume(water);
+auto trapezoid = n4::trd ("Bone"    ).x1(trd_dxa).x2(trd_dxb)
+                                     .y1(trd_dya).y2(trd_dyb).z(trd_dz).volume(bone);
+
+// If no handle is needed for a logical volume, it can be placed immediately
+n4::cons("Tissue").r1(cone_rmaxa).r2(cone_rmaxb).z(cone_hz).place(tissue).in(envelope).at_yz(2*cm, -7*cm).now();
 
 // Set Trapezoid as scoring volume
 this -> fScoringVolume = trapezoid;
 
 // Placement
-n4::       place(envelope) .in(world)                       .now();
-n4::       place(cone)     .in(envelope).at(0,  2*cm, -7*cm).now();
-n4::       place(trapezoid).in(envelope).at(0, -1*cm,  7*cm).now();
-return n4::place(world)                                     .now();
+n4::       place(envelope) .in(world)                      .now();
+n4::       place(trapezoid).in(envelope).at_yz(-1*cm, 7*cm).now();
+return n4::place(world)                                    .now();
 ```
 This is the complete (except for setting of the values like `world_sizeXYZ`) `nain4` implementation of `DetectorConstruction::Construct()`. 
 
 These 13 lines of code (without comments or blank lines) correspond to 62 lines in the original example.
+
+In Geant4's interfaces, you have to remember (or look up) the order of the parameters of the shape constructors, and you must provide values for each parameter, even when you want to use an obvious default value (such as inner `radius` being zero, or `phi` covering `2π`); in `nain4` the parameters have clear names and can be provided in any order that you find convenient; obvious default values can be omitted.
+
+Geant4 obliges you to express everything in (frequently annoying) half-lengths; `nain4` gives you the choice: `.x` vs `.half_x`.
 
 # The Nix flake
 
