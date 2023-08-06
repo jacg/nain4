@@ -41,7 +41,7 @@ If you need to do this as two separate steps
 ```c++
 auto copper     = n4::material("G4_Cu");
 auto ball_solid = n4::sphere("ball").r(1.2*m).solid();
-auto ball       = // TODO do we support this ?
+auto ball       = n4::volume(ball_solid, copper);
 ```
 
 Not all `G4VSolid`s are supported by the `nain4::shape` interface, yet. In such cases `n4::volume` lets you combine the construction of a solid and corresponding logical volume in a single step. Here is how you could do it if `n4::sphere` did not exist:
