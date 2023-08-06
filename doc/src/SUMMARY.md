@@ -7,3 +7,5 @@
   - [How to build a minimal `nain4` app](./how-to/build-a-minimal-nain4-app.md)
 - [Explanation](./explanation.md)
 - [Reference](./reference.md)
+  - [Constructing solids and logical volumes](./n4-shape.md)
+  - [Placement of physical volumes](./n4-place.md)
