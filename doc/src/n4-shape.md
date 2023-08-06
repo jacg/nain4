@@ -10,7 +10,7 @@ Header: `<n4-volumes.hh>`
 auto ball = n4::sphere("ball").r(1.2*m).solid();
 ```
 <details>
-  <summary>See equivalent in pure Geant4</summary>
+  <summary>Click to see equivalent in pure Geant4</summary>
 
   ```c++
   auto ball = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
@@ -27,7 +27,7 @@ auto copper = n4::material("G4_Cu");
 auto ball   = n4::sphere("ball").r(1.2*m).volume(copper);
 ```
 <details>
-  <summary>See equivalent in pure Geant4</summary>
+  <summary>Click to see equivalent in pure Geant4</summary>
 
   ```c++
   auto copper = G4NistManager::Instance() -> FindOrBuildMaterial("G4_Cu");
@@ -60,7 +60,7 @@ auto gold = n4::material("G4_Au");
 n4::box("nugget").cube(2*cm).place(gold).in(safe).now();
 ```
 <details>
-  <summary>See equivalent in pure Geant4</summary>
+  <summary>Click to see equivalent in pure Geant4</summary>
 
   ```c++
   auto safe = ...
