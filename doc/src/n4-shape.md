@@ -13,7 +13,7 @@ auto ball = n4::sphere("ball").r(1.2*m).solid();
   <summary>See equivalent in pure Geant4</summary>
 
   ```c++
-  auto ball = new G4Sphere("ball", 0, radius, 0, CLHEP::pi, 0, CLHEP::twopi);
+  auto ball = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
   ```
   <font size=-2>(In this specific example, `n4::sphere` notices that it would be more efficient to create a `G4Orb` instead of a `G4Sphere` and does that for you automatically.)</font>
 </details>
@@ -31,7 +31,7 @@ auto ball   = n4::sphere("ball").r(1.2*m).volume(copper);
 
   ```c++
   auto copper = G4NistManager::Instance() -> FindOrBuildMaterial("G4_Cu");
-  auto ball_solid = new G4Sphere("ball", 0, radius, 0, CLHEP::pi, 0, CLHEP::twopi);
+  auto ball_solid = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
   auto ball = new G4VLogicalVolume(ball_solid, copper, "ball");
   ```
 </details>
@@ -48,7 +48,7 @@ Not all `G4VSolid`s are supported by the `nain4::shape` interface, yet. In such 
 
 ```c++
 auto copper = n4::material("G4_Cu");
-auto ball   = n4::volume<G4Sphere>("ball", copper, 0, radius, 0, CLHEP::pi, 0, CLHEP::twopi);
+auto ball   = n4::volume<G4Sphere>("ball", copper, 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
 ```
 The arguments passed after the name and material, are forwarded to the specified `G4VSolid`'s constructor.
 
