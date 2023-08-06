@@ -63,13 +63,21 @@ std::tuple<G4double, G4double> compute_r_range(opt_double min, opt_double max, o
 
 namespace nain4 {
 
-boolean_shape shape::add      (n4::shape& shape) { return add      (shape.solid()); }
-boolean_shape shape::subtract (n4::shape& shape) { return subtract (shape.solid()); }
-boolean_shape shape::intersect(n4::shape& shape) { return intersect(shape.solid()); }
+boolean_shape shape::add_      (n4::shape& shape) { return add_      (shape.solid()); }
+boolean_shape shape::subtract_ (n4::shape& shape) { return subtract_ (shape.solid()); }
+boolean_shape shape::intersect_(n4::shape& shape) { return intersect_(shape.solid()); }
 
-boolean_shape shape::add      (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::ADD}; }
-boolean_shape shape::subtract (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::SUB}; }
-boolean_shape shape::intersect(G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::INT}; }
+boolean_shape shape::add_      (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::ADD}; }
+boolean_shape shape::subtract_ (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::SUB}; }
+boolean_shape shape::intersect_(G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::INT}; }
+
+boolean_shape shape::join_ (n4::shape& shape) { return add_      (shape); }
+boolean_shape shape::sub_  (n4::shape& shape) { return subtract_ (shape); }
+boolean_shape shape::inter_(n4::shape& shape) { return intersect_(shape); }
+
+boolean_shape shape::join_ (G4VSolid* solid) { return add_      (solid); }
+boolean_shape shape::sub_  (G4VSolid* solid) { return subtract_ (solid); }
+boolean_shape shape::inter_(G4VSolid* solid) { return intersect_(solid); }
 
 G4VSolid* boolean_shape::solid() const {
   if (op == BOOL_OP::ADD) { return new G4UnionSolid       {name_, a, b, transformation}; }
