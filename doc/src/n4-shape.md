@@ -223,15 +223,25 @@ Valid combinations of these methods are
 
 ## Available Shapes
 
-
 ### `n4::box`
 
+Returns `G4Box*`: cuboid with side lengths `x`, `y` and `z`, centred on the origin with sides parallel to the `x`/`y`/`z` axes.
 
-Again, the last setting overrides previous ones, hence the following three cases are equivalent
+Methods:
+
+All these methods take a full (as opposed to half-) length.
++ `x(lx)`, `y(ly)`, `z(ly)`: set one dimension.
++ `xy(l)`, `xz(l)`, `yz(l)`: set two dimensions to the same value.
++ `cube(l)`: set all dimensions to the same value.
++ `xyz(lx, ly, lz)` (SUBJECT TO CHANGE) set all dimensions by providing a value for each.
+
+All the above methods have alternatives which accept half-lengths: `half_x(lx/2)`, `half_cube(l/2)`, `half_xy(lx/2, ly/2)`, etc.
+
+If any value is specified more than once, the last setting overrides any earlier ones. Thus, the following three lines are equivalent. 
 
 ```c++
 .cube(1*m          ).z(2*m)
-.xyz (1*m, 1*m, 1*m).z(2*m)
+.xyz (1*m, 1*m, 1*m).z(2*m) // TODO xyz is being revised
 .xy  (1*m          ).z(2*m)
 ```
 While the first two work, the last one states the intent most clearly.
