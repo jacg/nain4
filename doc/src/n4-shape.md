@@ -227,7 +227,21 @@ Valid combinations of these methods are
 
 Returns `G4Box*`: cuboid with side lengths `x`, `y` and `z`, centred on the origin with sides parallel to the `x`/`y`/`z` axes.
 
-Methods:
+#### Example
+```c++
+auto cross_section_length = 10*cm, y_length = 50*cm;
+G4Box* box = n4::box("box").xz(cross_section_length).y(y_length).solid();
+```
+<details>
+  <summary>Click to show/hide equivalent in pure Geant4</summary>
+
+  ```c++
+  auto cross_section_length = 10*cm, y_length = 50*cm;
+  G4Box* box = new G4Box("box", cross_section_length/2, y_length/2, cross_section_length/2);
+  ```
+</details>
+
+#### Methods
 
 All these methods take a full (as opposed to half-) length.
 + `x(lx)`, `y(ly)`, `z(ly)`: set one dimension.
