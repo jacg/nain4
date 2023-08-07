@@ -188,6 +188,39 @@ Valid combinations of these methods are
 
 ### Polar angle: `θ`
 
+Three methods are provided for specifying polar angles:
+
++ `theta_start`
++ `theta_delta`
++ `theta_end`
+
+Valid combinations of these methods are
+
+<style>
+.thick {
+    border-left-width: 8px;
+    border-left-colour: #888;
+  }
+</style>
+
+<table>
+  <tr>
+    <th colspan="3">Methods used</th>
+    <th colspan="3">Implied value</th>
+  </tr>
+  <tr>
+    <td colspan="3"></td><td class="thick">theta_start</td><td>theta_delta</td><td>theta_end</td>
+  </tr>
+  <tr><td>           </td><td>           </td><td>         </td>  <td class="thick">0      </td><td>π          </td><td>π        </td></tr>
+  <tr><td>theta_start</td><td>           </td><td>         </td>  <td class="thick">       </td><td>π - start </td><td>π        </td></tr>
+  <tr><td>           </td><td>theta_delta</td><td>         </td>  <td class="thick">0      </td><td>           </td><td>δ        </td></tr>
+  <tr><td>           </td><td>           </td><td>theta_end</td>  <td class="thick">0      </td><td>end        </td><td>         </td></tr>
+  <tr><td>           </td><td>theta_delta</td><td>theta_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td><td>TODO</td></tr>
+  <tr><td>theta_start</td><td>           </td><td>theta_end</td>  <td class="thick">       </td><td>end - start</td><td>         </td></tr>
+  <tr><td>theta_start</td><td>theta_delta</td><td>         </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
+</table>
+
+
 ## Available Shapes
 
 
