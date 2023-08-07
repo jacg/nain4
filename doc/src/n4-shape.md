@@ -92,5 +92,38 @@ G4PVPlacement   * p = n4::SOLID("name", ...).place (material).in(volume) ... .no
 
 ## Specifying Dimensions
 
+The `G4VSolid`s, and hence also the `n4::shape`s, are parameterized by combinations of four principal types of coordinate
+
+1. Cartesian lengths, `x`, `y` and `z`
+2. Radial length, `r`
+3. Azimuthal angle, `φ`
+4. Polar angle, `θ`
+
+`nain4` provides a consistent set of methods for setting these, in any `n4::shape` that uses them. These methods are described here.
+
+### Cartesian lengths
+
+The principal methods for setting Cartesian lengths are
+
++ `x`
++ `half_x`
+
+and their equivalents for `y` and `z`.
+
+If you set a Cartesian length more than once in the same shape, the last setting overrides previous ones. For example:
+
+```c++
+.x(1*m).half_x(3*m)  // `x` set to 12 m
+.x(1*m).     x(3*m)  // `x` set to  3 m
+```
+
+`n4::shape`s which depend on more than one Cartesian length, typically provide extra methods for setting various combinations, for example `n4::box` offers extra methods `cube`, `xyz`, `xy`, `xz` and `yz` along with their `half_` variants.
+
+### Radial length: `r`
+
+### Azimuthal angle: `φ`
+
+### Polar angle: `θ`
+
 ## Available Shapes
 
