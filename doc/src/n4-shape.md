@@ -245,3 +245,30 @@ If any value is specified more than once, the last setting overrides any earlier
 .xy  (1*m          ).z(2*m)
 ```
 While the first two work, the last one states the intent most clearly.
+
+### `n4::sphere`
+
+Remember orb special case
+
+### `n4::tubs`
+### `n4::trd`
+### `n4::cons`
+
+## Obviously missing shapes
+
+### `n4::torus`
+### `n4::trap`
+### `n4::para`
+### `n4::polycone`
+### `n4::elliptical_tube`
+### `n4::ellipse`
+### `n4::ellipsoid`
+### `n4::elliptical_cone`
+### `n4::tet` (...rahedron)
+### `n4::hype` (...rbolic cone)
+### `n4::twisted_*`
+### `n4::breps` Boundary Represented Solids
+### `n4::tesselated_solids`
+
+
+
