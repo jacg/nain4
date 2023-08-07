@@ -99,7 +99,7 @@ The `G4VSolid`s, and hence also the `n4::shape`s, are parameterized by combinati
 3. Azimuthal angle, `φ`
 4. Polar angle, `θ`
 
-`nain4` provides a consistent set of methods for setting these, in any `n4::shape` that uses them. These methods are described here.
+`nain4` provides a consistent set of methods for setting these, in any `n4::shape` that uses them. These methods are described here, the `n4::shapes` are described in the next section.
 
 ### Cartesian lengths
 
@@ -121,11 +121,11 @@ If you set a Cartesian length more than once in the same shape, the last setting
 
 ### Radial length: `r`
 
-Three methods are provided for specifying radial lengths:
+Three methods are provided for specifying the two degrees of freedom in radial lengths:
 
 + `r`
-+ `r_inner`
 + `r_delta`
++ `r_inner`
 
 Valid combinations of these methods are
 
@@ -154,7 +154,7 @@ Some shapes, such as `n4::cons` (`G4Cons`), have multiple radii. In such cases t
 
 ### Azimuthal angle: `φ`
 
-Three methods are provided for specifying azimuthal angles:
+Three methods are provided for specifying the two degrees of freedom in azimuthal angles:
 
 + `phi_start`
 + `phi_delta`
@@ -188,7 +188,7 @@ Valid combinations of these methods are
 
 ### Polar angle: `θ`
 
-Three methods are provided for specifying polar angles:
+Three methods are provided for specifying the two degrees of freedom in polar angles:
 
 + `theta_start`
 + `theta_delta`
