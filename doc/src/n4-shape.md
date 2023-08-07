@@ -121,9 +121,52 @@ If you set a Cartesian length more than once in the same shape, the last setting
 
 ### Radial length: `r`
 
+Three methods are provided for specifying radial lengths:
+
++ `r`
++ `r_inner`
++ `r_delta`
+
+Valid combinations of these methods are
+
+<style>
+.thick {
+    border-left-width: 8px;
+    border-left-colour: #888;
+  }
+</style>
+
+<table>
+  <tr>
+    <th colspan="3">Methods used</th>
+    <th colspan="3">Implied value</th>
+  </tr>
+  <tr>
+    <td colspan="3"></td><td class="thick">r_inner</td><td>r_delta</td><td>r</td>
+  </tr>
+  <tr><td>       </td><td>       </td><td>r</td>  <td class="thick">0          </td><td>r          </td><td>                 </td></tr>
+  <tr><td>r_inner</td><td>       </td><td>r</td>  <td class="thick">           </td><td>r - r_inner</td><td>                 </td></tr>
+  <tr><td>       </td><td>r_delta</td><td>r</td>  <td class="thick">r - r_delta</td><td>           </td><td>                 </td><td>TODO</td></tr>
+  <tr><td>r_inner</td><td>r_delta</td><td> </td>  <td class="thick">0          </td><td>           </td><td>r_inner + r_delta</td></tr>
+</table>
+
+Some shapes, such as `n4::cons` (`G4Cons`), have multiple radii. In such cases the method names acquire a number, to distinguish between them `r*` -> `r1*`, `r2*`.
+
 ### Azimuthal angle: `φ`
 
 ### Polar angle: `θ`
 
 ## Available Shapes
 
+
+### `n4::box`
+
+
+Again, the last setting overrides previous ones, hence the following three cases are equivalent
+
+```c++
+.cube(1*m          ).z(2*m)
+.xyz (1*m, 1*m, 1*m).z(2*m)
+.xy  (1*m          ).z(2*m)
+```
+While the first two work, the last one states the intent most clearly.
