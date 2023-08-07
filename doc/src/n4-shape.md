@@ -154,6 +154,38 @@ Some shapes, such as `n4::cons` (`G4Cons`), have multiple radii. In such cases t
 
 ### Azimuthal angle: `φ`
 
+Three methods are provided for specifying azimuthal angles:
+
++ `phi_start`
++ `phi_delta`
++ `phi_end`
+
+Valid combinations of these methods are
+
+<style>
+.thick {
+    border-left-width: 8px;
+    border-left-colour: #888;
+  }
+</style>
+
+<table>
+  <tr>
+    <th colspan="3">Methods used</th>
+    <th colspan="3">Implied value</th>
+  </tr>
+  <tr>
+    <td colspan="3"></td><td class="thick">phi_start</td><td>phi_delta</td><td>phi_end</td>
+  </tr>
+  <tr><td>         </td><td>         </td><td>       </td>  <td class="thick">0      </td><td>2π         </td><td>2π       </td></tr>
+  <tr><td>phi_start</td><td>         </td><td>       </td>  <td class="thick">       </td><td>2π - start </td><td>2π       </td></tr>
+  <tr><td>         </td><td>phi_delta</td><td>       </td>  <td class="thick">0      </td><td>           </td><td>δ        </td></tr>
+  <tr><td>         </td><td>         </td><td>phi_end</td>  <td class="thick">0      </td><td>end        </td><td>         </td></tr>
+  <tr><td>         </td><td>phi_delta</td><td>phi_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td><td>TODO</td></tr>
+  <tr><td>phi_start</td><td>         </td><td>phi_end</td>  <td class="thick">       </td><td>end - start</td><td>         </td></tr>
+  <tr><td>phi_start</td><td>phi_delta</td><td>       </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
+</table>
+
 ### Polar angle: `θ`
 
 ## Available Shapes
