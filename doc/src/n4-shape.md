@@ -288,19 +288,23 @@ Constructs `G4Sphere` or `G4Orb`, depending on values provided.
 
 A solid sphere
 ```c++
-G4Orb = n4::sphere("ball").r(1*m).solid()
+G4Orb* ball = n4::sphere("ball").r(1*m).solid();
 ```
 
 <details class="g4"> <summary></summary>
 
   ```c++
-  G4Orb* ball = new G4Orb("ball", 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
+  G4Orb* ball = new G4Orb("ball", 1*m);
+  ```
+  thus `nain4` helps you avoid the common mistake of creating an equivalent (but less efficient) `G4Sphere` instead 
+  ```c++
+  G4Sphere* ball = new G4Sphere("ball", 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
   ```
 </details>
 
 A hollow sphere
 ```c++
-G4Sphere hollow = n4::sphere("hollow").r(2*m).r_delta(10*cm).solid()
+G4Sphere* hollow = n4::sphere("hollow").r(2*m).r_delta(10*cm).solid();
 ```
 <details class="g4"> <summary></summary>
 
@@ -312,7 +316,7 @@ G4Sphere hollow = n4::sphere("hollow").r(2*m).r_delta(10*cm).solid()
 
 A spherical wedge
 ```c++
-G4Sphere wedge = n4::sphere("wedge").r(1*m).phi_start(20*deg).phi_end(30*deg).solid()
+G4Sphere* wedge = n4::sphere("wedge").r(1*m).phi_start(20*deg).phi_end(30*deg).solid();
 ```
 <details class="g4"> <summary></summary>
 
