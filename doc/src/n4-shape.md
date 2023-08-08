@@ -114,7 +114,7 @@ The `G4VSolid`s, and hence also the `n4::shape`s, are parameterized by combinati
 4. Polar angle, `θ`
 
 `nain4` provides a consistent set of methods for setting these, in any `n4::shape` that uses them. These methods are described here, the `n4::shapes` are described in the next section.
-All the methods provided by `nain4` have a short, but explicit name. This removes the need for the user to remember the order of the arguments while highlighting their meaning.
+All the methods provided by `nain4` have short, but explicit names. This removes the need for the user to remember the order of the arguments while highlighting their meaning.
 
 ### Cartesian lengths
 
@@ -123,7 +123,13 @@ The principal methods for setting Cartesian lengths are
 + `x`
 + `half_x`
 
-and their equivalents for `y` and `z`. Unlike Geant4, nain4 favours the use of full lengths instead of half-lengths. Using half-lengths creates noise by either introducing `/2` operations continuously or by defining variables with long names to indicate this subtle detail. For instance, in order to create a cube of side 1 m in pure `G4`:
+and their equivalents for `y` and `z`.
+
+Unlike Geant4, `nain4` favours the use of full lengths instead of half-lengths.
+Using half-lengths creates noise by either introducing `/2` operations
+continuously or by defining variables with long names to indicate the subtle but
+important distinction between half- and full-lengths. For instance, in order to
+create a cube of side 1 m in pure `G4`:
 
 ```c++
 auto box_half_length = 0.5*m;
