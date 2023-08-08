@@ -162,13 +162,6 @@ Three methods are provided for specifying the two degrees of freedom in azimutha
 
 Valid combinations of these methods are
 
-<style>
-.thick {
-    border-left-width: 8px;
-    border-left-colour: #888;
-  }
-</style>
-
 <table>
   <tr>
     <th colspan="3">Methods used</th>
@@ -195,13 +188,6 @@ Three methods are provided for specifying the two degrees of freedom in polar an
 + `theta_end`
 
 Valid combinations of these methods are
-
-<style>
-.thick {
-    border-left-width: 8px;
-    border-left-colour: #888;
-  }
-</style>
 
 <table>
   <tr>
