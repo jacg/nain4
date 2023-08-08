@@ -231,7 +231,7 @@ All `n4::SOLID`s share the following methods:
   - [`.volume(material)`](#constructing-a-g4logicalvolume)
   - [`.place(material)`](#placing-a-volume)
 + [Boolean solid methods](./n4-boolean-solids.md):
-  - `add()` / `join()` / `union()`
+  - `add()` / `join()`
   - `sub()` / `subtract()`
   - `inter()` / `intersect()`
 + Optional logical volume settings:
@@ -267,7 +267,7 @@ All these methods take full (as opposed to half-) lengths:
 + `xyz(lx, ly, lz)`
 + `cube(l)`: set all dimensions to the same value.
 
-Note the, perhaps surprising, difference between `.xyz()` and the `.xy()`-`.xz()`-`.yz()` triumvirate: The latter assign a single value to multiple coordinates; the former accepts a separate value for each coordinate it sets. 
+Note the, perhaps surprising, difference between `.xyz()` and the `.xy()`-`.xz()`-`.yz()` triumvirate: The latter assign a single value to multiple coordinates; the former accepts a separate value for each coordinate it sets.
 
 
 ##### Half-length methods
@@ -301,7 +301,7 @@ G4Orb* ball = n4::sphere("ball").r(1*m).solid();
   ```c++
   G4Orb* ball = new G4Orb("ball", 1*m);
   ```
-  thus `nain4` helps you avoid the common mistake of creating an equivalent (but less efficient) `G4Sphere` instead 
+  thus `nain4` helps you avoid the common mistake of creating an equivalent (but less efficient) `G4Sphere` instead
   ```c++
   G4Sphere* ball = new G4Sphere("ball", 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
   ```
