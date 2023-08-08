@@ -88,8 +88,8 @@ n4::box("nugget").cube(2*cm).place(gold).in(safe).now();
 However, frequently you need to keep a handle to the logical volume, in order to be able to place things into it later. In such cases you would break this into two separate steps:
 
 ```c++
-auto safe = ...
-auto gold = n4::material("G4_Au");
+auto safe   = ...
+auto gold   = n4::material("G4_Au");
 auto nugget = n4::box("nugget").cube(2*cm).volume(gold);
 n4::place(nugget).in(safe).now();
 ```
