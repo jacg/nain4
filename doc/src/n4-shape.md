@@ -137,7 +137,7 @@ Three methods are provided for specifying the two degrees of freedom in radial l
 + `r_delta`
 + `r`
 
-Valid combinations of these methods are
+with the constraint `r = r_inner + r_delta`. Thus valid combinations of these methods are
 
 <style>
 .thick {
@@ -160,6 +160,8 @@ Valid combinations of these methods are
   <tr><td>r_inner</td><td>r_delta</td><td> </td>  <td class="thick">0          </td><td>           </td><td>r_inner + r_delta</td></tr>
 </table>
 
+Providing too few or too many values results in a run-time error.
+
 Some shapes, such as `n4::cons` (`G4Cons`), have multiple radii. In such cases the method names acquire a number, to distinguish between them `r*` -> `r1*`, `r2*`.
 
 ### Azimuthal angle: `φ`
@@ -170,7 +172,7 @@ Three methods are provided for specifying the two degrees of freedom in azimutha
 + `phi_delta`
 + `phi_end`
 
-Valid combinations of these methods are
+with the constraint `phi_end = phi_start + phi_delta`. Thus valid combinations of these methods are
 
 <table>
   <tr>
@@ -189,6 +191,8 @@ Valid combinations of these methods are
   <tr><td>phi_start</td><td>phi_delta</td><td>       </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
 </table>
 
+Providing too few or too many values results in a run-time error.
+
 ### Polar angle: `θ`
 
 Three methods are provided for specifying the two degrees of freedom in polar angles:
@@ -197,7 +201,7 @@ Three methods are provided for specifying the two degrees of freedom in polar an
 + `theta_delta`
 + `theta_end`
 
-Valid combinations of these methods are
+with the constraint `theta_end = theta_start + theta_delta`. Thus valid combinations of these methods are
 
 <table>
   <tr>
@@ -215,6 +219,8 @@ Valid combinations of these methods are
   <tr><td>theta_start</td><td>           </td><td>theta_end</td>  <td class="thick">       </td><td>end - start</td><td>         </td></tr>
   <tr><td>theta_start</td><td>theta_delta</td><td>         </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
 </table>
+
+Providing too few or too many values results in a run-time error.
 
 ## Common methods
 
