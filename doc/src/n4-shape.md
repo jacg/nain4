@@ -25,7 +25,8 @@ auto ball = n4::sphere("ball").r(1.2*m).solid();
 <details class="g4"> <summary></summary>
 
   ```c++
-  auto ball = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
+  auto radius = 1.2*m;
+  auto ball   = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
   ```
   <font size=-2>(In this specific example, `n4::sphere` notices that it would be more efficient to create a `G4Orb` instead of a `G4Sphere` and does that for you automatically.)</font>
 </details>
@@ -60,6 +61,7 @@ Not all `G4VSolid`s are supported by the `nain4::shape` interface, yet. In such 
 
 ```c++
 auto copper = n4::material("G4_Cu");
+auto radius = 1.2*m;
 auto ball   = n4::volume<G4Sphere>("ball", copper, 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
 ```
 The arguments passed after the name and material, are forwarded to the specified `G4VSolid`'s constructor.
@@ -74,6 +76,7 @@ n4::box("nugget").cube(2*cm).place(gold).in(safe).now();
 <details class="g4"> <summary></summary>
 
   ```c++
+  auto safe_solid = ...
   auto safe = ...
   auto gold = G4NistManager::Instance() -> FindOrBuildMaterial("G4_Au");
   auto nugget_solid = new G4Box("nugget", 2*cm/2, 2*cm/2, 2*cm/2);
@@ -359,8 +362,9 @@ G4Tubs* cylinder = n4::tubs("cylinder").r(1*m).z(2*m).solid();
 <details class="g4"> <summary></summary>
 
   ```c++
+  auto radius   = 1*m;
   auto z_length = 2*m;
-  G4Tubs* cylinder = new G4Tubs("cylinder", 0, 1*m, z_length/2, 0, CLHEP::twopi);
+  G4Tubs* cylinder = new G4Tubs("cylinder", 0, radius, z_length/2, 0, CLHEP::twopi);
   ```
 </details>
 
@@ -384,8 +388,8 @@ G4Tubs* wedge = n4::tubs("wedge").r(1*m).z(2*m).phi_start(20*deg).phi_end(30*deg
 <details class="g4"> <summary></summary>
 
   ```c++
-  auto z_length = 2*m, start_phi = 20*deg, end_phi = 30*deg;
-  G4Tubs* wedge = new G4Tubs("wedge", 0, 1*m, z_length/2, start_phi, end_phi - start_phi);
+  auto z_length = 2*m, radius = 1*m, start_phi = 20*deg, end_phi = 30*deg;
+  G4Tubs* wedge = new G4Tubs("wedge", 0, radius, z_length/2, start_phi, end_phi - start_phi);
   ```
 </details>
 
