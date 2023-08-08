@@ -242,7 +242,7 @@ All `n4::SOLID`s share the following methods:
 
 ### `n4::box`
 
-Constructs `G4Box`: cuboid with side lengths `x`, `y` and `z`. Within its frame of reference it is centred on the origin with sides parallel to the `x`/`y`/`z` axes. Further displacements and rotations can be applied with [`.place(material)`](#placing-a-volume).
+Constructs `G4Box`: cuboid with side lengths `x`, `y` and `z`. Within its frame of reference it is centred on the origin with sides parallel to the `x`/`y`/`z` axes. Displacements and rotations can be applied with [`.place(material)`](#placing-a-volume).
 
 #### Example
 ```c++
@@ -286,7 +286,7 @@ While the first two work, the last one states the intent most clearly.
 
 Constructs `G4Sphere` or `G4Orb`, depending on values provided.
 
-+ `G4Sphere`: section of a spherical shell, between specified azimuthal (φ) and polar (θ) angles. Within its frame of reference, φ is measured counterclockwise WRT the x-axis when viewed from positive z; θ is measured WRT positive z. Further displacements and rotations can be applied with [`.place(material)`](#placing-a-volume).
++ `G4Sphere`: section of a spherical shell, between specified azimuthal (φ) and polar (θ) angles. Within its frame of reference, φ is measured counterclockwise WRT the x-axis when viewed from positive z; θ is measured WRT positive z. Displacements and rotations can be applied with [`.place(material)`](#placing-a-volume).
 + `G4Orb`: special case of `G4Sphere`.
 
 #### Examples
@@ -347,7 +347,7 @@ See the sections about setting [radial lengths](#radial-length-r), [azimuthal an
 
 ### `n4::tubs`
 
-Constructs `G4Tubs`: tube or tube segment. Within its frame of reference, it is parallel to and centred on the z-axis; φ is measured counterclockwise WRT the x-axis when viewed from positive z. Further displacements and rotations can be applied with [`.place(material)`](#placing-a-volume).
+Constructs `G4Tubs`: tube or tube segment. Within its frame of reference, it is parallel to and centred on the z-axis; φ is measured counterclockwise WRT the x-axis when viewed from positive z. Displacements and rotations can be applied with [`.place(material)`](#placing-a-volume).
 
 #### Examples
 
