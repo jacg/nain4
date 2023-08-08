@@ -1013,6 +1013,22 @@ TEST_CASE("nain place", "[nain][place]") {
     CHECK(* rot_yz     -> GetObjectRotation() == rotmat(    0, angle, angle));
     CHECK(* rot_xyz    -> GetObjectRotation() == rotmat(angle, angle, angle));
   }
+
+  SECTION("clone") {
+    auto water = n4::material("G4_WATER");
+    auto place_box = n4::box("box").cube(1*mm).place(water).in(outer).at_x(2*mm);
+
+    auto check = [] (auto x, auto expected) {
+      CHECK(x -> GetTranslation().x() / mm == expected);
+    };
+
+    auto a = place_box.clone().at_x(10*mm).now(); check(a, 2 + 10          );
+    auto b = place_box.clone().at_x(20*mm).now(); check(b, 2 + 20          );
+    auto c = place_box        .at_x(30*mm).now(); check(c, 2 + 30          );
+    auto d = place_box        .at_x(40*mm).now(); check(d, 2 + 30 + 40     );
+    auto e = place_box.clone().at_x(50*mm).now(); check(e, 2 + 30 + 40 + 50);
+
+  }
 }
 
 TEST_CASE("nain scale_by", "[nain][scale_by]") {
