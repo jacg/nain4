@@ -123,8 +123,8 @@ and their equivalents for `y` and `z`.
 If you set a Cartesian length more than once in the same shape, the last setting overrides previous ones. For example:
 
 ```c++
-.x(1*m).half_x(3*m)  // `x` set to 12 m
-.x(1*m).     x(3*m)  // `x` set to  3 m
+.x(1*m).half_x(3*m)  // `x` set to 6 m
+.x(1*m).     x(3*m)  // `x` set to 3 m
 ```
 
 `n4::shape`s which depend on more than one Cartesian length, typically provide extra methods for setting various combinations, for example `n4::box` offers extra methods `cube`, `xyz`, `xy`, `xz` and `yz` along with their `half_` variants.
