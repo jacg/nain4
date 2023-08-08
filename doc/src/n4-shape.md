@@ -240,7 +240,7 @@ All `n4::SOLID`s share the following methods:
 
 ### `n4::box`
 
-Returns `G4Box*`: cuboid with side lengths `x`, `y` and `z`, centred on the origin with sides parallel to the `x`/`y`/`z` axes.
+Constructs `G4Box`: cuboid with side lengths `x`, `y` and `z`. Within its frame of reference it is centred on the origin with sides parallel to the `x`/`y`/`z` axes. Further displacements and rotations can be applied with [`.place(material)`](#placing-a-volume). 
 
 #### Example
 ```c++
@@ -264,7 +264,6 @@ All these methods take full (as opposed to half-) lengths:
 + `xy(l)`, `xz(l)`, `yz(l)`: set two dimensions to the same value.
 + `cube(l)`: set all dimensions to the same value.
 + `xyz(lx, ly, lz)` (SUBJECT TO CHANGE) set all dimensions by providing a value for each.
-
 ##### Half-length methods
 All the aforementioned full-length methods have alternatives which accept half-lengths: `half_x(lx/2)`, `half_cube(l/2)`, `half_xy(lx/2, ly/2)`, etc.
 ##### Overriding
@@ -279,9 +278,9 @@ While the first two work, the last one states the intent most clearly.
 
 ### `n4::sphere`
 
-Returns `G4Sphere*` or `G4Orb*`, depending on values provided.
+Constructs `G4Sphere` or `G4Orb`, depending on values provided.
 
-+ `G4Sphere`: section of a spherical shell, between specified azimuthal (φ) and polar (θ) angles.
++ `G4Sphere`: section of a spherical shell, between specified azimuthal (φ) and polar (θ) angles. Within its frame of reference, φ is measured counterclockwise WRT the x-axis when viewed from positive z; θ is measured WRT positive z. Further displacements and rotations can be applied with [`.place(material)`](#placing-a-volume). 
 + `G4Orb`: special case of `G4Sphere`.
 
 #### Examples
