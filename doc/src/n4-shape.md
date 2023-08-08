@@ -125,6 +125,8 @@ The principal methods for setting Cartesian lengths are
 
 and their equivalents for `y` and `z`.
 
+#### Explicit names
+
 Unlike Geant4, `nain4` favours the use of full lengths instead of half-lengths.
 Using half-lengths creates noise by either introducing `/2` operations
 continuously or by defining variables with long names to indicate the subtle but
@@ -144,12 +146,16 @@ In contrast, in `nain4` one can simply write
 auto box = n4::box("box").cube(1*m);
 ```
 
+#### Overriding
+
 If you set a Cartesian length more than once in the same shape, the last setting overrides previous ones. For example:
 
 ```c++
 .x(1*m).half_x(3*m)  // `x` set to 6 m
 .x(1*m).     x(3*m)  // `x` set to 3 m
 ```
+
+#### Convenient alternatives
 
 `n4::shape`s which depend on more than one Cartesian length, typically provide extra methods for setting various combinations, for example `n4::box` offers extra methods `cube`, `xyz`, `xy`, `xz` and `yz` along with their `half_` variants.
 
