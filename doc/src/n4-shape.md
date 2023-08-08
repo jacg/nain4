@@ -6,6 +6,8 @@ Header: `<n4-volumes.hh>`
 
 ### Constructing a `G4VSolid`
 
+<!-- TODO: put this in some common .css -->
+
 <style>
 details.g4 > summary::before {
   font-size: 80%;
