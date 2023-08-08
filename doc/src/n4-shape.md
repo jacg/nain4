@@ -10,7 +10,7 @@ Header: `<n4-volumes.hh>`
 auto ball = n4::sphere("ball").r(1.2*m).solid();
 ```
 <details>
-  <summary>Click to show/hide equivalent in pure Geant4</summary>
+  <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
 
   ```c++
   auto ball = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
@@ -27,7 +27,7 @@ auto copper = n4::material("G4_Cu");
 auto ball   = n4::sphere("ball").r(1.2*m).volume(copper);
 ```
 <details>
-  <summary>Click to show/hide equivalent in pure Geant4</summary>
+  <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
 
   ```c++
   auto copper = G4NistManager::Instance() -> FindOrBuildMaterial("G4_Cu");
@@ -60,7 +60,7 @@ auto gold = n4::material("G4_Au");
 n4::box("nugget").cube(2*cm).place(gold).in(safe).now();
 ```
 <details>
-  <summary>Click to show/hide equivalent in pure Geant4</summary>
+  <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
 
   ```c++
   auto safe = ...
@@ -233,7 +233,7 @@ auto cross_section_length = 10*cm, y_length = 50*cm;
 G4Box* box = n4::box("box").xz(cross_section_length).y(y_length).solid();
 ```
 <details>
-  <summary>Click to show/hide equivalent in pure Geant4</summary>
+  <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
 
   ```c++
   auto cross_section_length = 10*cm, y_length = 50*cm;
@@ -277,7 +277,7 @@ Returns `G4Sphere*` or `G4Orb*`, depending on values provided.
   ```
 
   <details>
-    <summary>Click to show/hide equivalent in pure Geant4</summary>
+    <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
 
     ```c++
     G4Orb* ball = new G4Orb("ball", 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
@@ -289,7 +289,7 @@ Returns `G4Sphere*` or `G4Orb*`, depending on values provided.
   G4Sphere hollow = n4::sphere("hollow").r(2*m).r_delta(10*cm).solid()
   ```
   <details>
-    <summary>Click to show/hide equivalent in pure Geant4</summary>
+    <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
 
     ```c++
     auto outer = 2*m, thickness = 10*cm;
@@ -303,7 +303,7 @@ Returns `G4Sphere*` or `G4Orb*`, depending on values provided.
   G4Sphere wedge = n4::sphere("wedge").r(1*m).phi_start(20*deg).phi_end(30*deg).solid()
   ```
   <details>
-    <summary>Click to show/hide equivalent in pure Geant4</summary>
+    <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
 
     ```c++
     auto start_phi = 20*deg, end_phi = 30*deg;
