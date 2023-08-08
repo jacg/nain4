@@ -123,7 +123,20 @@ The principal methods for setting Cartesian lengths are
 + `x`
 + `half_x`
 
-and their equivalents for `y` and `z`.
+and their equivalents for `y` and `z`. Unlike Geant4, nain4 favours the use of full lengths instead of half-lengths. Using half-lengths creates noise by either introducing `/2` operations continuously or by defining variables with long names to indicate this subtle detail. For instance, in order to create a cube of side 1 m in pure `G4`:
+
+```c++
+auto box_half_length = 0.5*m;
+G4Box* box1 = new G4Box("box", box_half_length,  box_half_length,  box_half_length);
+// or
+auto box_length = 1*m;
+G4Box* box2 = new G4Box("box", box_length/2,  box_length/2,  box_length/2);
+```
+
+In contrast, in `nain4` one can simply write
+```c++
+auto box = n4::box("box").cube(1*m);
+```
 
 If you set a Cartesian length more than once in the same shape, the last setting overrides previous ones. For example:
 
