@@ -240,8 +240,7 @@ Constructs `G4Box`: cuboid with side lengths `x`, `y` and `z`. Within its frame 
 
 #### Example
 ```c++
-auto cross_section_length = 10*cm, y_length = 50*cm;
-G4Box* box = n4::box("box").xz(cross_section_length).y(y_length).solid();
+G4Box* box = n4::box("box").xz(10*cm).y(50*cm).solid();
 ```
 <details class="g4">
 
@@ -268,7 +267,7 @@ Note the, perhaps surprising, difference between `.xyz()` and the `.xy()`-`.xz()
 ##### Half-length methods
 All the aforementioned full-length methods have alternatives which accept half-lengths: `half_x(lx/2)`, `half_cube(l/2)`, `half_xy(lx/2, ly/2)`, etc.
 ##### Overriding
-If any value is specified more than once, the last setting overrides any earlier ones. Thus, the following three lines are equivalent. 
+If any value is specified more than once, the last setting overrides any earlier ones. Thus, the following three lines are equivalent.
 
 ```c++
 .cube(1*m          ).z(2*m)
@@ -341,6 +340,63 @@ G4Sphere* wedge = n4::sphere("wedge").r(1*m).phi_start(20*deg).phi_end(30*deg).s
 See the sections about setting [radial lengths](#radial-length-r), [azimuthal angles](#azimuthal-angle-φ) and [polar angles](#polar-angle-θ) for more details.
 
 ### `n4::tubs`
+
+Constructs `G4Tubs`: tube or tube segment. Within its frame of reference, it is parallel to and centred on the z-axis; φ is measured counterclockwise WRT the x-axis when viewed from positive z. Further displacements and rotations can be applied with [`.place(material)`](#placing-a-volume).
+
+#### Examples
+
+A solid cylinder
+```c++
+G4Tubs* cylinder = n4::tubs("cylinder").r(1*m).z(2*m).solid();
+```
+<details class="g4"> <summary></summary>
+
+  ```c++
+  auto z_length = 2*m;
+  G4Tubs* cylinder = new G4Tubs("cylinder", 0, 1*m, z_length/2, 0, CLHEP::twopi);
+  ```
+</details>
+
+A tube
+```c++
+G4Tubs* tube = n4::tubs("tube").r(1*m).r_delta(10*cm).z(2*m).solid();
+```
+<details class="g4"> <summary></summary>
+
+  ```c++
+  auto z_length = 2*m, outer_radius = 1*m, thickness = 10*cm;
+  G4Tubs* tube = new G4Tubs("tube", outer_radius - thickness, 1*m, z_length/2, 0, CLHEP::twopi);
+  ```
+</details>
+
+
+A cylindrical wedge
+```c++
+G4Tubs* wedge = n4::tubs("wedge").r(1*m).z(2*m).phi_start(20*deg).phi_end(30*deg).solid();
+```
+<details class="g4"> <summary></summary>
+
+  ```c++
+  auto z_length = 2*m, start_phi = 20*deg, end_phi = 30*deg;
+  G4Tubs* wedge = new G4Tubs("wedge", 0, 1*m, z_length/2, start_phi, end_phi - start_phi);
+  ```
+</details>
+
+
+#### Methods
+
++ `z()`
++ `half_z()`
++ `r_inner(l)`
++ `r_delta(l)`
++ `r(l)`
++ `phi_start(a)`
++ `phi_delta(a)`
++ `phi_end(a)`
+
+See the sections about setting [Cartesian lengths](#cartesian-lengths), [radial lengths](#radial-length-r) and [azimuthal angles](#azimuthal-angle-φ) for more details.
+
+
 ### `n4::trd`
 ### `n4::cons`
 
