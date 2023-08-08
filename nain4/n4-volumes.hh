@@ -90,12 +90,10 @@ template<class S> boolean_shape shape::inter(S shape){ return intersect(shape); 
 
 // ---- Macros for reuse of members and setters of orthogonal directions ------------------------------
 
-#define COMMON(N4_TYPE, G4_TYPE)                               \
-public:                                                        \
-  N4_TYPE(G4String name) : shape{name} {}                      \
-  G4_TYPE* solid() const;                                      \
-  N4_TYPE  clone() const  { return *this; }                    \
-  N4_TYPE& name(G4String name) { name_ = name; return *this; }
+#define COMMON(N4_TYPE, G4_TYPE)            \
+public:                                     \
+  N4_TYPE(G4String name) : shape{name} {}   \
+  G4_TYPE* solid() const;
 
 #define HAS_R(TYPE, N)                                                         \
 public:                                                                        \

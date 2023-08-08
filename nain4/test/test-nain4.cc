@@ -352,17 +352,6 @@ TEST_CASE("nain material_properties", "[nain][material_properties]") {
   }
 }
 
-TEST_CASE("nain shape name", "[nain][shape][name]") {
-  auto name1  = "fulanito";
-  auto name2  = "menganito";
-  auto box    = n4::box{name1}.cube(1*m); // proto-solid
-  auto solid1 = box            .solid();  // real  solid
-  auto solid2 = box.name(name2).solid();  // real  solid
-
-  CHECK( solid1 -> GetName() == name1 );
-  CHECK( solid2 -> GetName() == name2 );
-}
-
 TEST_CASE("nain box", "[nain][box]") {
   // nain4::box is a more convenient interface for constructing G4VSolids and
   // G4LogicalVolumes based on G4Box
@@ -439,9 +428,6 @@ TEST_CASE("nain box", "[nain][box]") {
 
   check_dimensions(n4::box("box_xyz")     .     xyz(lx  , ly  , lz  ).solid());
   check_dimensions(n4::box("box_half_xyz").half_xyz(lx/2, ly/2, lz/2).solid());
-
-  // Compile-time check: concrete shape methods available after .name()
-  auto renamed_box = n4::box("old").name("new").cube(1*m);
 }
 
 TEST_CASE("nain sphere", "[nain][sphere]") {
@@ -1026,6 +1012,22 @@ TEST_CASE("nain place", "[nain][place]") {
     CHECK(* rot_xz     -> GetObjectRotation() == rotmat(angle,     0, angle));
     CHECK(* rot_yz     -> GetObjectRotation() == rotmat(    0, angle, angle));
     CHECK(* rot_xyz    -> GetObjectRotation() == rotmat(angle, angle, angle));
+  }
+
+  SECTION("clone") {
+    auto water = n4::material("G4_WATER");
+    auto place_box = n4::box("box").cube(1*mm).place(water).in(outer).at_x(2*mm);
+
+    auto check = [] (auto x, auto expected) {
+      CHECK(x -> GetTranslation().x() / mm == expected);
+    };
+
+    auto a = place_box.clone().at_x(10*mm).now(); check(a, 2 + 10          );
+    auto b = place_box.clone().at_x(20*mm).now(); check(b, 2 + 20          );
+    auto c = place_box        .at_x(30*mm).now(); check(c, 2 + 30          );
+    auto d = place_box        .at_x(40*mm).now(); check(d, 2 + 30 + 40     );
+    auto e = place_box.clone().at_x(50*mm).now(); check(e, 2 + 30 + 40 + 50);
+
   }
 }
 
