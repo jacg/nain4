@@ -220,6 +220,21 @@ Valid combinations of these methods are
   <tr><td>theta_start</td><td>theta_delta</td><td>         </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
 </table>
 
+## Common methods
+
+All `n4::SOLID`s share the following methods:
+
++ Builder methods
+  - [`.solid()`](#constructing-a-g4vsolid)
+  - [`.volume(material)`](#constructing-a-g4logicalvolume)
+  - [`.place(material)`](#placing-a-volume)
++ [Boolean solid methods](./n4-boolean-solids.md):
+  - `add()` / `join()` / `union()`
+  - `sub()` / `subtract()`
+  - `inter()` / `intersect()`
++ Optional logical volume settings:
+  - `sensitive(sensitive-detector)`
+  - TODO maybe field manager, user limits, optimize
 
 ## Available Shapes
 
