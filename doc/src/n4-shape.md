@@ -6,11 +6,23 @@ Header: `<n4-volumes.hh>`
 
 ### Constructing a `G4VSolid`
 
+<style>
+details.g4 > summary::before {
+  font-size: 80%;
+  color: #888;
+  content: "Click to show/hide equivalent in pure Geant4 ";
+}
+details.g4 {
+  border-style: none none none solid;
+  border-color: #888;
+  padding-left: 1em;
+}
+</style>
+
 ```c++
 auto ball = n4::sphere("ball").r(1.2*m).solid();
 ```
-<details>
-  <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
+<details class="g4"> <summary></summary>
 
   ```c++
   auto ball = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
@@ -26,8 +38,7 @@ Frequently, after having made a `G4VSolid` you immediately use it to make a `G4L
 auto copper = n4::material("G4_Cu");
 auto ball   = n4::sphere("ball").r(1.2*m).volume(copper);
 ```
-<details>
-  <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
+<details class="g4"> <summary></summary>
 
   ```c++
   auto copper = G4NistManager::Instance() -> FindOrBuildMaterial("G4_Cu");
@@ -59,8 +70,7 @@ auto safe = ...
 auto gold = n4::material("G4_Au");
 n4::box("nugget").cube(2*cm).place(gold).in(safe).now();
 ```
-<details>
-  <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
+<details class="g4"> <summary></summary>
 
   ```c++
   auto safe = ...
@@ -233,8 +243,9 @@ Constructs `G4Box`: cuboid with side lengths `x`, `y` and `z`. Within its frame 
 auto cross_section_length = 10*cm, y_length = 50*cm;
 G4Box* box = n4::box("box").xz(cross_section_length).y(y_length).solid();
 ```
-<details>
-  <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
+<details class="g4">
+
+  <summary></summary>
 
   ```c++
   auto cross_section_length = 10*cm, y_length = 50*cm;
@@ -271,45 +282,41 @@ Constructs `G4Sphere` or `G4Orb`, depending on values provided.
 
 #### Examples
 
-+ A solid sphere
+A solid sphere
+```c++
+G4Orb = n4::sphere("ball").r(1*m).solid()
+```
+
+<details class="g4"> <summary></summary>
+
   ```c++
-  G4Orb = n4::sphere("ball").r(1*m).solid()
+  G4Orb* ball = new G4Orb("ball", 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
   ```
+</details>
 
-  <details>
-    <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
+A hollow sphere
+```c++
+G4Sphere hollow = n4::sphere("hollow").r(2*m).r_delta(10*cm).solid()
+```
+<details class="g4"> <summary></summary>
 
-    ```c++
-    G4Orb* ball = new G4Orb("ball", 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
-    ```
-  </details>
-
-+ A hollow sphere
   ```c++
-  G4Sphere hollow = n4::sphere("hollow").r(2*m).r_delta(10*cm).solid()
+  auto outer = 2*m, thickness = 10*cm;
+  G4Sphere* hollow = new G4Sphere("hollow", outer - thickness, outer, 0, CLHEP::twopi, 0, CLHEP::pi);
   ```
-  <details>
-    <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
+</details>
 
-    ```c++
-    auto outer = 2*m, thickness = 10*cm;
-    G4Sphere* hollow = new G4Sphere("hollow", outer - thickness, outer, 0, CLHEP::twopi, 0, CLHEP::pi);
-    ```
-  </details>
+A spherical wedge
+```c++
+G4Sphere wedge = n4::sphere("wedge").r(1*m).phi_start(20*deg).phi_end(30*deg).solid()
+```
+<details class="g4"> <summary></summary>
 
-
-+ A spherical wedge
   ```c++
-  G4Sphere wedge = n4::sphere("wedge").r(1*m).phi_start(20*deg).phi_end(30*deg).solid()
+  auto start_phi = 20*deg, end_phi = 30*deg;
+  G4Sphere* wedge = new G4Sphere("wedge", 0, 1*m, start_phi, end_phi - start_phi, 0, CLHEP::pi);
   ```
-  <details>
-    <summary><font size=-2>Click to show/hide equivalent in pure Geant4</font></summary>
-
-    ```c++
-    auto start_phi = 20*deg, end_phi = 30*deg;
-    G4Sphere* wedge = new G4Sphere("wedge", 0, 1*m, start_phi, end_phi - start_phi, 0, CLHEP::pi);
-    ```
-  </details>
+</details>
 
 #### Methods
 
