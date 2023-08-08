@@ -347,3 +347,4 @@ See the sections about setting [radial lengths](#radial-length-r), [azimuthal an
 
 
 
+TODO: document envelope_of
