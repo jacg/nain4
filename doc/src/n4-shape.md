@@ -259,8 +259,12 @@ G4Box* box = n4::box("box").xz(cross_section_length).y(y_length).solid();
 All these methods take full (as opposed to half-) lengths:
 + `x(lx)`, `y(ly)`, `z(ly)`: set one dimension.
 + `xy(l)`, `xz(l)`, `yz(l)`: set two dimensions to the same value.
++ `xyz(lx, ly, lz)`
 + `cube(l)`: set all dimensions to the same value.
-+ `xyz(lx, ly, lz)` (SUBJECT TO CHANGE) set all dimensions by providing a value for each.
+
+Note the, perhaps surprising, difference between `.xyz()` and the `.xy()`-`.xz()`-`.yz()` triumvirate: The latter assign a single value to multiple coordinates; the former accepts a separate value for each coordinate it sets. 
+
+
 ##### Half-length methods
 All the aforementioned full-length methods have alternatives which accept half-lengths: `half_x(lx/2)`, `half_cube(l/2)`, `half_xy(lx/2, ly/2)`, etc.
 ##### Overriding
@@ -268,7 +272,7 @@ If any value is specified more than once, the last setting overrides any earlier
 
 ```c++
 .cube(1*m          ).z(2*m)
-.xyz (1*m, 1*m, 1*m).z(2*m) // TODO xyz is being revised
+.xyz (1*m, 1*m, 1*m).z(2*m)
 .xy  (1*m          ).z(2*m)
 ```
 While the first two work, the last one states the intent most clearly.
