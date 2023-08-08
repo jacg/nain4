@@ -43,7 +43,7 @@
             catch2_3
             just
             gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
-            mdbook
+            mdbook mdbook-admonish
           ];
 
           G4_DIR = "${pkgs.geant4}";

@@ -4,3 +4,14 @@ language = "en"
 multilingual = false
 src = "src"
 title = "nain4"
+
+[preprocessor]
+
+[preprocessor.admonish]
+command = "mdbook-admonish"
+assets_version = "2.0.1" # do not edit: managed by `mdbook-admonish install`
+
+[output]
+
+[output.html]
+additional-css = ["mdbook-admonish.css"]
