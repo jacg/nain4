@@ -25,7 +25,8 @@ auto ball = n4::sphere("ball").r(1.2*m).solid();
 <details class="g4"> <summary></summary>
 
   ```c++
-  auto ball = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
+  auto radius = 1.2*m;
+  auto ball   = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
   ```
   <font size=-2>(In this specific example, `n4::sphere` notices that it would be more efficient to create a `G4Orb` instead of a `G4Sphere` and does that for you automatically.)</font>
 </details>
@@ -42,6 +43,7 @@ auto ball   = n4::sphere("ball").r(1.2*m).volume(copper);
 
   ```c++
   auto copper = G4NistManager::Instance() -> FindOrBuildMaterial("G4_Cu");
+  auto radius = 1.2*m;
   auto ball_solid = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
   auto ball = new G4VLogicalVolume(ball_solid, copper, "ball");
   ```
@@ -59,6 +61,7 @@ Not all `G4VSolid`s are supported by the `nain4::shape` interface, yet. In such 
 
 ```c++
 auto copper = n4::material("G4_Cu");
+auto radius = 1.2*m;
 auto ball   = n4::volume<G4Sphere>("ball", copper, 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
 ```
 The arguments passed after the name and material, are forwarded to the specified `G4VSolid`'s constructor.
@@ -73,6 +76,7 @@ n4::box("nugget").cube(2*cm).place(gold).in(safe).now();
 <details class="g4"> <summary></summary>
 
   ```c++
+  auto safe_solid = ...
   auto safe = ...
   auto gold = G4NistManager::Instance() -> FindOrBuildMaterial("G4_Au");
   auto nugget_solid = new G4Box("nugget", 2*cm/2, 2*cm/2, 2*cm/2);
@@ -84,8 +88,8 @@ n4::box("nugget").cube(2*cm).place(gold).in(safe).now();
 However, frequently you need to keep a handle to the logical volume, in order to be able to place things into it later. In such cases you would break this into two separate steps:
 
 ```c++
-auto safe = ...
-auto gold = n4::material("G4_Au");
+auto safe   = ...
+auto gold   = n4::material("G4_Au");
 auto nugget = n4::box("nugget").cube(2*cm).volume(gold);
 n4::place(nugget).in(safe).now();
 ```
@@ -110,6 +114,7 @@ The `G4VSolid`s, and hence also the `n4::shape`s, are parameterized by combinati
 4. Polar angle, `θ`
 
 `nain4` provides a consistent set of methods for setting these, in any `n4::shape` that uses them. These methods are described here, the `n4::shapes` are described in the next section.
+All the methods provided by `nain4` have short, but explicit names. This removes the need for the user to remember the order of the arguments while highlighting their meaning.
 
 ### Cartesian lengths
 
@@ -120,12 +125,37 @@ The principal methods for setting Cartesian lengths are
 
 and their equivalents for `y` and `z`.
 
+#### Explicit names
+
+Unlike Geant4, `nain4` favours the use of full lengths instead of half-lengths.
+Using half-lengths creates noise by either introducing `/2` operations
+continuously or by defining variables with long names to indicate the subtle but
+important distinction between half- and full-lengths. For instance, in order to
+create a cube of side 1 m in pure `G4`:
+
+```c++
+auto box_half_length = 0.5*m;
+G4Box* box1 = new G4Box("box", box_half_length,  box_half_length,  box_half_length);
+// or
+auto box_length = 1*m;
+G4Box* box2 = new G4Box("box", box_length/2,  box_length/2,  box_length/2);
+```
+
+In contrast, in `nain4` one can simply write
+```c++
+auto box = n4::box("box").cube(1*m);
+```
+
+#### Overriding
+
 If you set a Cartesian length more than once in the same shape, the last setting overrides previous ones. For example:
 
 ```c++
 .x(1*m).half_x(3*m)  // `x` set to 6 m
 .x(1*m).     x(3*m)  // `x` set to 3 m
 ```
+
+#### Convenient alternatives
 
 `n4::shape`s which depend on more than one Cartesian length, typically provide extra methods for setting various combinations, for example `n4::box` offers extra methods `cube`, `xyz`, `xy`, `xz` and `yz` along with their `half_` variants.
 
@@ -231,7 +261,7 @@ All `n4::SOLID`s share the following methods:
   - [`.volume(material)`](#constructing-a-g4logicalvolume)
   - [`.place(material)`](#placing-a-volume)
 + [Boolean solid methods](./n4-boolean-solids.md):
-  - `add()` / `join()` / `union()`
+  - `add()` / `join()`
   - `sub()` / `subtract()`
   - `inter()` / `intersect()`
 + Optional logical volume settings:
@@ -264,10 +294,10 @@ G4Box* box = n4::box("box").xz(10*cm).y(50*cm).solid();
 All these methods take full (as opposed to half-) lengths:
 + `x(lx)`, `y(ly)`, `z(ly)`: set one dimension.
 + `xy(l)`, `xz(l)`, `yz(l)`: set two dimensions to the same value.
-+ `xyz(lx, ly, lz)`
++ `xyz(lx, ly, lz)`: set three dimensions independently
 + `cube(l)`: set all dimensions to the same value.
 
-Note the, perhaps surprising, difference between `.xyz()` and the `.xy()`-`.xz()`-`.yz()` triumvirate: The latter assign a single value to multiple coordinates; the former accepts a separate value for each coordinate it sets. 
+Note the, perhaps surprising, difference between `.xyz()` and the `.xy()`-`.xz()`-`.yz()` triumvirate: The latter assign a single value to multiple coordinates; the former accepts a separate value for each coordinate it sets.
 
 
 ##### Half-length methods
@@ -301,7 +331,7 @@ G4Orb* ball = n4::sphere("ball").r(1*m).solid();
   ```c++
   G4Orb* ball = new G4Orb("ball", 1*m);
   ```
-  thus `nain4` helps you avoid the common mistake of creating an equivalent (but less efficient) `G4Sphere` instead 
+  thus `nain4` helps you avoid the common mistake of creating an equivalent (but less efficient) `G4Sphere` instead
   ```c++
   G4Sphere* ball = new G4Sphere("ball", 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
   ```
@@ -358,8 +388,9 @@ G4Tubs* cylinder = n4::tubs("cylinder").r(1*m).z(2*m).solid();
 <details class="g4"> <summary></summary>
 
   ```c++
+  auto radius   = 1*m;
   auto z_length = 2*m;
-  G4Tubs* cylinder = new G4Tubs("cylinder", 0, 1*m, z_length/2, 0, CLHEP::twopi);
+  G4Tubs* cylinder = new G4Tubs("cylinder", 0, radius, z_length/2, 0, CLHEP::twopi);
   ```
 </details>
 
@@ -383,8 +414,8 @@ G4Tubs* wedge = n4::tubs("wedge").r(1*m).z(2*m).phi_start(20*deg).phi_end(30*deg
 <details class="g4"> <summary></summary>
 
   ```c++
-  auto z_length = 2*m, start_phi = 20*deg, end_phi = 30*deg;
-  G4Tubs* wedge = new G4Tubs("wedge", 0, 1*m, z_length/2, start_phi, end_phi - start_phi);
+  auto z_length = 2*m, radius = 1*m, start_phi = 20*deg, end_phi = 30*deg;
+  G4Tubs* wedge = new G4Tubs("wedge", 0, radius, z_length/2, start_phi, end_phi - start_phi);
   ```
 </details>
 
