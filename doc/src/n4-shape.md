@@ -114,6 +114,7 @@ The `G4VSolid`s, and hence also the `n4::shape`s, are parameterized by combinati
 4. Polar angle, `θ`
 
 `nain4` provides a consistent set of methods for setting these, in any `n4::shape` that uses them. These methods are described here, the `n4::shapes` are described in the next section.
+All the methods provided by `nain4` have a short, but explicit name. This removes the need for the user to remember the order of the arguments while highlighting their meaning.
 
 ### Cartesian lengths
 
