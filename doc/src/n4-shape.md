@@ -123,9 +123,9 @@ If you set a Cartesian length more than once in the same shape, the last setting
 
 Three methods are provided for specifying the two degrees of freedom in radial lengths:
 
-+ `r`
-+ `r_delta`
 + `r_inner`
++ `r_delta`
++ `r`
 
 Valid combinations of these methods are
 
@@ -264,7 +264,66 @@ While the first two work, the last one states the intent most clearly.
 
 ### `n4::sphere`
 
-Remember orb special case
+Returns `G4Sphere*` or `G4Orb*`, depending on values provided.
+
++ `G4Sphere`: section of a spherical shell, between specified azimuthal (φ) and polar (θ) angles.
++ `G4Orb`: special case of `G4Sphere`.
+
+#### Examples
+
++ A solid sphere
+  ```c++
+  G4Orb = n4::sphere("ball").r(1*m).solid()
+  ```
+
+  <details>
+    <summary>Click to show/hide equivalent in pure Geant4</summary>
+
+    ```c++
+    G4Orb* ball = new G4Orb("ball", 0, 1*m, 0, CLHEP::twopi, 0, CLHEP::pi);
+    ```
+  </details>
+
++ A hollow sphere
+  ```c++
+  G4Sphere hollow = n4::sphere("hollow").r(2*m).r_delta(10*cm).solid()
+  ```
+  <details>
+    <summary>Click to show/hide equivalent in pure Geant4</summary>
+
+    ```c++
+    auto outer = 2*m, thickness = 10*cm;
+    G4Sphere* hollow = new G4Sphere("hollow", outer - thickness, outer, 0, CLHEP::twopi, 0, CLHEP::pi);
+    ```
+  </details>
+
+
++ A spherical wedge
+  ```c++
+  G4Sphere wedge = n4::sphere("wedge").r(1*m).phi_start(20*deg).phi_end(30*deg).solid()
+  ```
+  <details>
+    <summary>Click to show/hide equivalent in pure Geant4</summary>
+
+    ```c++
+    auto start_phi = 20*deg, end_phi = 30*deg;
+    G4Sphere* wedge = new G4Sphere("wedge", 0, 1*m, start_phi, end_phi - start_phi, 0, CLHEP::pi);
+    ```
+  </details>
+
+#### Methods
+
++ `r_inner(l)`
++ `r_delta(l)`
++ `r(l)`
++ `phi_start(a)`
++ `phi_delta(a)`
++ `phi_end(a)`
++ `theta_start(a)`
++ `theta_delta(a)`
++ `theta_end(a)`
+
+See the sections about setting [radial lengths](#radial-length-r), [azimuthal angles](#azimuthal-angle-φ) and [polar angles](#polar-angle-θ) for more details.
 
 ### `n4::tubs`
 ### `n4::trd`
