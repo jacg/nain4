@@ -42,6 +42,7 @@ auto ball   = n4::sphere("ball").r(1.2*m).volume(copper);
 
   ```c++
   auto copper = G4NistManager::Instance() -> FindOrBuildMaterial("G4_Cu");
+  auto radius = 1.2*m;
   auto ball_solid = new G4Sphere("ball", 0, radius, 0, CLHEP::twopi, 0, CLHEP::pi);
   auto ball = new G4VLogicalVolume(ball_solid, copper, "ball");
   ```
