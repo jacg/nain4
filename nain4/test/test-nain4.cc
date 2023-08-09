@@ -929,36 +929,83 @@ TEST_CASE("nain place", "[nain][place]") {
 
   // The in() option creates correct mother/daughter relationship
   SECTION("in") {
-    auto water = nain4::material("G4_WATER");
-    auto inner = nain4::volume<G4Box>("inner", water, 0.3*m, 0.2*m, 0.1*m);
+    SECTION("logical mother") {
+      auto water = nain4::material("G4_WATER");
+      auto inner = nain4::volume<G4Box>("inner", water, 0.3*m, 0.2*m, 0.1*m);
 
-    auto inner_placed = nain4::place(inner)
-      .in(outer)
-      .at(0.1*m, 0.2*m, 0.3*m)
-      .now();
+      auto inner_placed = nain4::place(inner)
+        .in(outer)
+        .at(0.1*m, 0.2*m, 0.3*m)
+        .now();
 
-    auto outer_placed = nain4::place(outer).now();
+      auto outer_placed = nain4::place(outer).now();
 
-    CHECK(inner_placed -> GetMotherLogical() == outer);
-    CHECK(outer_placed -> GetLogicalVolume() == outer);
-    CHECK(outer -> GetNoDaughters() == 1);
-    CHECK(outer -> GetDaughter(0) -> GetLogicalVolume() == inner);
+      CHECK(inner_placed -> GetMotherLogical() == outer);
+      CHECK(outer_placed -> GetLogicalVolume() == outer);
+      CHECK(outer -> GetNoDaughters() == 1);
+      CHECK(outer -> GetDaughter(0) -> GetLogicalVolume() == inner);
 
-    // Quick visual check that geometry_iterator works TODO expand
-    SECTION("geometry iterator") {
-      std::cout << std::endl;
-      for (const auto v: outer_placed) {
-        std::cout << std::setw(15) << v->GetName() << ": ";
-        auto l = v->GetLogicalVolume();
-        std::cout
-          << std::setw(12) << l->GetMaterial()->GetName()
-          << std::setw(12) << G4BestUnit(l->GetMass(), "Mass")
-          << std::setw(12) << G4BestUnit(l->GetSolid()->GetCubicVolume(), "Volume")
-          << std::endl;
+      // Quick visual check that geometry_iterator works TODO expand
+      SECTION("geometry iterator") {
+        std::cout << std::endl;
+        for (const auto v: outer_placed) {
+          std::cout << std::setw(15) << v->GetName() << ": ";
+          auto l = v->GetLogicalVolume();
+          std::cout
+            << std::setw(12) << l->GetMaterial()->GetName()
+            << std::setw(12) << G4BestUnit(l->GetMass(), "Mass")
+            << std::setw(12) << G4BestUnit(l->GetSolid()->GetCubicVolume(), "Volume")
+            << std::endl;
+        }
+        std::cout << std::endl;
       }
-      std::cout << std::endl;
+    }
+
+    SECTION("physical mother") {
+      // Now we place outer first and use it to place inner
+      auto outer_placed = nain4::place(outer).now();
+
+      auto water = nain4::material("G4_WATER");
+      auto inner = nain4::volume<G4Box>("inner", water, 0.3*m, 0.2*m, 0.1*m);
+
+      auto inner_placed = nain4::place(inner)
+        .in(outer_placed)
+        .at(0.1*m, 0.2*m, 0.3*m)
+        .now();
+
+
+      CHECK(inner_placed -> GetMotherLogical() == outer);
+      CHECK(outer_placed -> GetLogicalVolume() == outer);
+      CHECK(outer -> GetNoDaughters() == 1);
+      CHECK(outer -> GetDaughter(0) -> GetLogicalVolume() == inner);
+    }
+
+    SECTION("proto-physical mother") {
+      // Now we don't place the outer volume immediately, but we store
+      // it for later use
+
+      auto outer_stored = nain4::place(outer);
+
+      auto water = nain4::material("G4_WATER");
+      auto inner = nain4::volume<G4Box>("inner", water, 0.3*m, 0.2*m, 0.1*m);
+
+      auto inner_placed = nain4::place(inner)
+        .in(outer_stored)
+        .at(0.1*m, 0.2*m, 0.3*m)
+        .now();
+
+      auto outer_placed = outer_stored.now();
+
+
+      CHECK(inner_placed -> GetMotherLogical() == outer);
+      CHECK(outer_stored .  get_logical()      == outer);
+      CHECK(outer_placed -> GetLogicalVolume() == outer);
+      CHECK(outer -> GetNoDaughters() == 1);
+      CHECK(outer -> GetDaughter(0) -> GetLogicalVolume() == inner);
     }
   }
+
+
 
   SECTION("rotations") {
     auto water = nain4::material("G4_WATER");

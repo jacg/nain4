@@ -5,6 +5,7 @@
 
 #include "n4_run_manager.hh"
 
+#include <G4LogicalVolume.hh>
 #include <G4LogicalVolumeStore.hh>
 #include <G4Material.hh>
 #include <G4MaterialPropertiesTable.hh>
@@ -160,6 +161,8 @@ public:
   place& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
   place& copy_no(int         n)           { copy_number = n      ; return *this; }
   place& in(G4LogicalVolume* parent_)     { parent      = parent_; return *this; }
+  place& in(G4PVPlacement*   parent_)     { return in(parent_ -> GetLogicalVolume()); }
+  place& in(n4::place&       parent_)     { return in(parent_ .  get_logical()     ); }
   place& name(G4String       label_)      { label       = label_ ; return *this; }
 
   place&      check_overlaps           () {  local_check_overlaps_ = true ; return *this; }
@@ -169,6 +172,8 @@ public:
   place  clone() const                                           { return *this; }
   G4PVPlacement* operator()()                                    { return now(); }
   G4PVPlacement* now();
+
+  G4LogicalVolume* get_logical();
 
 private:
   optional<G4LogicalVolume*>  child;
