@@ -159,6 +159,7 @@ public:
   place& at_y(          double y          ) { return at(0, y, 0); }
   place& at_z(                    double z) { return at(0, 0, z); }
   place& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
+  place& trans(G4Transform3D& transform)  { transformation = transform * transformation; return *this; }
   place& copy_no(int         n)           { copy_number = n      ; return *this; }
   place& in(G4LogicalVolume* parent_)     { parent      = parent_; return *this; }
   place& in(G4PVPlacement*   parent_)     { return in(parent_ -> GetLogicalVolume()); }
