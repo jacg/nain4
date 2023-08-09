@@ -145,7 +145,10 @@ n4::place(box).in(world).at_y(3*cm).rot_z(30*deg).now();
 
   NOTE: [Displacements and rotations are not commutative](./displacements-and-rotations-are-not-commutative.md).
 
++ Transformations
+  - `transform(G4Transform3D*)`, `trans(G4Transform3D*)` (identical meanings)
 
+  The above methods specify the overall transformation of the daughter volume with respect to its mother volume.
 
 + `name(string)` By default the physical volume inherits the name of the logical
   volume being placed. This method allows overriding the inherited name.
