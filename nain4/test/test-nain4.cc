@@ -13,6 +13,8 @@
 #include <G4PVPlacement.hh>
 #include <G4RotationMatrix.hh>
 #include <G4Sphere.hh>
+#include <G4ThreeVector.hh>
+#include <G4Transform3D.hh>
 #include <G4Trd.hh>
 
 // Managers
@@ -1059,6 +1061,19 @@ TEST_CASE("nain place", "[nain][place]") {
     CHECK(* rot_xz     -> GetObjectRotation() == rotmat(angle,     0, angle));
     CHECK(* rot_yz     -> GetObjectRotation() == rotmat(    0, angle, angle));
     CHECK(* rot_xyz    -> GetObjectRotation() == rotmat(angle, angle, angle));
+  }
+
+  SECTION("transforms") {
+    auto water  = nain4::material("G4_WATER");
+    auto box    = nain4::volume<G4Box>("box", water, 0.3*m, 0.2*m, 0.1*m);
+
+    auto rotation    = G4RotationMatrix{}; rotation.rotateX(30 * deg);
+    auto translation = G4ThreeVector{0., 0., 50 * cm};
+    auto transform   = G4Transform3D{rotation, translation};
+    auto placed      = nain4::place(box).trans(transform).now();
+
+    CHECK(*placed -> GetObjectRotation   () ==    rotation);
+    CHECK( placed -> GetObjectTranslation() == translation);
   }
 
   SECTION("clone") {
