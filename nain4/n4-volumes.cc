@@ -100,7 +100,7 @@ G4Box* box::solid() const {
 }
 
 G4VSolid* sphere::solid() const {
-  auto [r_inner, r_outer]         = compute_r_range(r_inner_, r_outer_, r_delta_);
+  auto [    r_inner,     r_outer] = compute_r_range(r_inner_, r_outer_, r_delta_);
   auto [  phi_start,   phi_delta] = compute_angles("phi"  ,   phi_start_,   phi_delta_,   phi_end_,   phi_full);
   auto [theta_start, theta_delta] = compute_angles("theta", theta_start_, theta_delta_, theta_end_, theta_full);
 
@@ -112,15 +112,15 @@ G4VSolid* sphere::solid() const {
 
 G4Tubs* tubs::solid() const {
   check_mandatory_args("tubs", name_, half_z_);
-  auto [r_inner, r_outer]     = compute_r_range(r_inner_, r_outer_, r_delta_);
+  auto [  r_inner,   r_outer] = compute_r_range(r_inner_, r_outer_, r_delta_);
   auto [phi_start, phi_delta] = compute_angles("phi", phi_start_, phi_delta_, phi_end_, phi_full);
   return new G4Tubs{name_, r_inner, r_outer, half_z_.value(), phi_start, phi_delta};
 }
 
 G4Cons* cons::solid() const {
   check_mandatory_args("cons", name_, half_z_);
-  auto [r1_inner, r1_outer]   = compute_r_range(r1_inner_, r1_outer_, r1_delta_);
-  auto [r2_inner, r2_outer]   = compute_r_range(r2_inner_, r2_outer_, r2_delta_);
+  auto [ r1_inner,  r1_outer] = compute_r_range(r1_inner_, r1_outer_, r1_delta_);
+  auto [ r2_inner,  r2_outer] = compute_r_range(r2_inner_, r2_outer_, r2_delta_);
   auto [phi_start, phi_delta] = compute_angles("phi", phi_start_, phi_delta_, phi_end_, phi_full);
   return new G4Cons{name_, r1_inner, r1_outer, r2_inner, r2_outer, half_z_.value(), phi_start, phi_delta};
 }
