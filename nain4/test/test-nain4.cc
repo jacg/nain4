@@ -979,6 +979,30 @@ TEST_CASE("nain place", "[nain][place]") {
       CHECK(outer -> GetNoDaughters() == 1);
       CHECK(outer -> GetDaughter(0) -> GetLogicalVolume() == inner);
     }
+
+    SECTION("proto-physical mother") {
+      // Now we don't place the outer volume immediately, but we store
+      // it for later use
+
+      auto outer_stored = nain4::place(outer);
+
+      auto water = nain4::material("G4_WATER");
+      auto inner = nain4::volume<G4Box>("inner", water, 0.3*m, 0.2*m, 0.1*m);
+
+      auto inner_placed = nain4::place(inner)
+        .in(outer_stored)
+        .at(0.1*m, 0.2*m, 0.3*m)
+        .now();
+
+      auto outer_placed = outer_stored.now();
+
+
+      CHECK(inner_placed -> GetMotherLogical() == outer);
+      CHECK(outer_stored .  get_logical()      == outer);
+      CHECK(outer_placed -> GetLogicalVolume() == outer);
+      CHECK(outer -> GetNoDaughters() == 1);
+      CHECK(outer -> GetDaughter(0) -> GetLogicalVolume() == inner);
+    }
   }
 
 
