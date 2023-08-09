@@ -27,24 +27,10 @@ std::tuple<G4double, G4double> compute_angles( G4String name
     throw "You cannot provide all start, delta and end angles for the " + name + " coordinate.";
   }
 
-  if (start.has_value() && delta.has_value()                    ) { return {start.value()              , delta.value()                }; }
-  if (start.has_value() &&                      end.has_value() ) { return {start.value()              , end  .value() - start.value()}; }
-  if (start.has_value()                                         ) { return {start.value()              , full          - start.value()}; }
-  if (                     delta.has_value() && end.has_value() ) { return {end.value() - delta.value(), delta.value()                }; }
-  if (                     delta.has_value()                    ) { return {                          0, delta.value()                }; }
-  if (                                          end.has_value() ) { return {                          0,   end.value()                }; }
-  return {0, full};
-
-  // G4double start_;
-  // G4double delta_;
-  // if (start.has_value()) {
-  //   start_ = start.value();
-  //   delta_ = delta.value_or(end.value_or(full) - start_);
-  // }
-  // else {
-  //   delta_ = delta.value_or(full);
-  //   start_ = end.value_or(full) - delta_;
-  // }
+  if (                     delta.has_value() && end.has_value()) { return {end.value() - delta.value(), delta.value()                       }; }
+  if (                     delta.has_value()                   ) { return {start.value_or(0)          , delta.value()                       }; }
+  if (start.has_value()                                        ) { return {start.value()              , end  .value_or(full) - start.value()}; }
+  return {0, end.value_or(full)};
 }
 
 static const G4String r_usage = "Usage:\n"
