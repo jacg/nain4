@@ -111,7 +111,7 @@ public:                                                                         
   TYPE& phi ## N ## _end     (G4D x) { phi ## N ## _end_     = x; return *this; }; \
   TYPE& phi ## N ## _delta   (G4D x) { phi ## N ## _delta_   = x; return *this; }; \
 private:                                                                           \
-  G4D        phi ## N ## _start_ = 0;                                              \
+  OPT_DOUBLE phi ## N ## _start_;                                                  \
   OPT_DOUBLE phi ## N ## _end_;                                                    \
   OPT_DOUBLE phi ## N ## _delta_;                                                  \
   const static constexpr G4D phi ## N ## _full = 360 * deg;
@@ -122,7 +122,7 @@ public:                                                                         
   TYPE& theta ## N ## _end   (G4D x) { theta ## N ## _end_   = x; return *this; }; \
   TYPE& theta ## N ## _delta (G4D x) { theta ## N ## _delta_ = x; return *this; }; \
 private:                                                                           \
-  G4D   theta ## N ## _start_ = 0;                                                 \
+  OPT_DOUBLE theta ## N ## _start_;                                                \
   OPT_DOUBLE theta ## N ## _end_;                                                  \
   OPT_DOUBLE theta ## N ## _delta_;                                                \
   const static constexpr G4D theta ## N ## _full = 180 * deg;

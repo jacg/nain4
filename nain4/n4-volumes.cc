@@ -17,11 +17,20 @@
 
 using opt_double = std::optional<G4double>;
 
-G4double compute_angle_delta(G4String name, const opt_double& delta, const opt_double& end, G4double start, G4double full) {
-  if (delta.has_value() && end.has_value()) { // TODO consider allowing angle_delta together with angle_end
-    throw "You cannot provide both end-angle and angle-delta for the " + name + " coordinate.";
+std::tuple<G4double, G4double> compute_angles( G4String name
+                                             , const opt_double& start
+                                             , const opt_double& delta
+                                             , const opt_double& end
+                                               , G4double full
+                                             ) {
+  if (start.has_value() && delta.has_value() && end.has_value()) {
+    throw "You cannot provide all start, delta and end angles for the " + name + " coordinate.";
   }
-  return delta.value_or(end.value_or(full) - start);
+
+  if (                     delta.has_value() && end.has_value()) { return {end.value() - delta.value(), delta.value()                       }; }
+  if (                     delta.has_value()                   ) { return {start.value_or(0)          , delta.value()                       }; }
+  if (start.has_value()                                        ) { return {start.value()              , end  .value_or(full) - start.value()}; }
+  return {0, end.value_or(full)};
 }
 
 static const G4String r_usage = "Usage:\n"
@@ -35,7 +44,7 @@ void fail0(){ throw "You must provide some information about the radius. \n" + r
 void fail3(){ throw "You may not provide more than two radius parameters.\n" + r_usage; }
 void faili(){ throw "You provided only inner radius, also need outer or delta.  \n" + r_usage; }
 
-std::tuple<G4double, G4double> compùte_r_range(opt_double min, opt_double max, opt_double del) {
+std::tuple<G4double, G4double> compute_r_range(opt_double min, opt_double max, opt_double del) {
   // Disallowed cases
   if ( min.has_value() &&  max.has_value() &&  del.has_value()) { fail3(); }
   if (!min.has_value() && !max.has_value() && !del.has_value()) { fail0(); }
@@ -91,28 +100,29 @@ G4Box* box::solid() const {
 }
 
 G4VSolid* sphere::solid() const {
-  auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
-  auto   phi_delta = compute_angle_delta("phi"  ,   phi_delta_,   phi_end_,   phi_start_,   phi_full);
-  auto theta_delta = compute_angle_delta("theta", theta_delta_, theta_end_, theta_start_, theta_full);
+  auto [    r_inner,     r_outer] = compute_r_range(r_inner_, r_outer_, r_delta_);
+  auto [  phi_start,   phi_delta] = compute_angles("phi"  ,   phi_start_,   phi_delta_,   phi_end_,   phi_full);
+  auto [theta_start, theta_delta] = compute_angles("theta", theta_start_, theta_delta_, theta_end_, theta_full);
+
   if (r_inner == 0 && phi_delta == phi_full && theta_delta == theta_full) {
     return new G4Orb{name_, r_outer};
   }
-  return new G4Sphere{name_, r_inner, r_outer, phi_start_, phi_delta, theta_start_, theta_delta};
+  return new G4Sphere{name_, r_inner, r_outer, phi_start, phi_delta, theta_start, theta_delta};
 }
 
 G4Tubs* tubs::solid() const {
   check_mandatory_args("tubs", name_, half_z_);
-  auto [r_inner, r_outer] = compùte_r_range(r_inner_, r_outer_, r_delta_);
-  auto phi_delta = compute_angle_delta("phi", phi_delta_, phi_end_, phi_start_, phi_full);
-  return new G4Tubs{name_, r_inner, r_outer, half_z_.value(), phi_start_, phi_delta};
+  auto [  r_inner,   r_outer] = compute_r_range(r_inner_, r_outer_, r_delta_);
+  auto [phi_start, phi_delta] = compute_angles("phi", phi_start_, phi_delta_, phi_end_, phi_full);
+  return new G4Tubs{name_, r_inner, r_outer, half_z_.value(), phi_start, phi_delta};
 }
 
 G4Cons* cons::solid() const {
   check_mandatory_args("cons", name_, half_z_);
-  auto [r1_inner, r1_outer] = compùte_r_range(r1_inner_, r1_outer_, r1_delta_);
-  auto [r2_inner, r2_outer] = compùte_r_range(r2_inner_, r2_outer_, r2_delta_);
-  auto phi_delta = compute_angle_delta("phi", phi_delta_, phi_end_, phi_start_, phi_full);
-  return new G4Cons{name_, r1_inner, r1_outer, r2_inner, r2_outer, half_z_.value(), phi_start_, phi_delta};
+  auto [ r1_inner,  r1_outer] = compute_r_range(r1_inner_, r1_outer_, r1_delta_);
+  auto [ r2_inner,  r2_outer] = compute_r_range(r2_inner_, r2_outer_, r2_delta_);
+  auto [phi_start, phi_delta] = compute_angles("phi", phi_start_, phi_delta_, phi_end_, phi_full);
+  return new G4Cons{name_, r1_inner, r1_outer, r2_inner, r2_outer, half_z_.value(), phi_start, phi_delta};
 }
 
 G4Trd* trd::solid() const {
