@@ -463,8 +463,10 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto phi_s   = spherer("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
   auto phi_se  = spherer("phi_se").phi_start(start).phi_end  (end  ).solid();
   auto phi_sd  = spherer("phi_sd").phi_start(start).phi_delta(delta).solid();
+  auto phi_de  = spherer("phi_de").phi_delta(delta).phi_end  (  end).solid();
   auto phi_es  = spherer("phi_es").phi_end  (end  ).phi_start(start).solid();
   auto phi_ds  = spherer("phi_ds").phi_delta(delta).phi_start(start).solid();
+  auto phi_ed  = spherer("phi_ed").phi_end  (end  ).phi_delta(delta).solid();
   auto phi_e   = spherer("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid();
   auto phi_d   = spherer("phi_d" ).phi_delta(delta) /* .start(0) */ .solid();
 
@@ -474,20 +476,24 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
       CHECK( down(solid) -> GetStartPhiAngle() == start);
       CHECK( down(solid) -> GetDeltaPhiAngle() == delta);
   };
-  check_phi(phi_s , start, twopi - start );
-  check_phi(phi_se, start,   end - start );
-  check_phi(phi_sd, start, delta         );
-  check_phi(phi_es, start,   end - start );
-  check_phi(phi_ds, start, delta         );
-  check_phi(phi_e ,     0,   end         );
-  check_phi(phi_d ,     0, delta         );
+  check_phi(phi_s , start      , twopi - start );
+  check_phi(phi_se, start      ,   end - start );
+  check_phi(phi_sd, start      , delta         );
+  check_phi(phi_de, end - delta,         delta );
+  check_phi(phi_es, start      ,   end - start );
+  check_phi(phi_ds, start      , delta         );
+  check_phi(phi_ed, end - delta, delta         );
+  check_phi(phi_e ,           0,   end         );
+  check_phi(phi_d ,           0, delta         );
 
   start = pi/8; end = pi/2; delta = pi/4;
   auto theta_s  = spherer("theta_s" ).theta_start(start) /*.end(180)*/     .solid();
   auto theta_se = spherer("theta_se").theta_start(start).theta_end  (end  ).solid();
   auto theta_sd = spherer("theta_sd").theta_start(start).theta_delta(delta).solid();
+  auto theta_de = spherer("theta_de").theta_delta(delta).theta_end  (end  ).solid();
   auto theta_es = spherer("theta_es").theta_end  (end  ).theta_start(start).solid();
   auto theta_ds = spherer("theta_ds").theta_delta(delta).theta_start(start).solid();
+  auto theta_ed = spherer("theta_ed").theta_end  (end  ).theta_delta(delta).solid();
   auto theta_e  = spherer("theta_e" ).theta_end  (end  ) /* .start(0) */   .solid();
   auto theta_d  = spherer("theta_d" ).theta_delta(delta) /* .start(0) */   .solid();
 
@@ -496,13 +502,15 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
       CHECK( down(solid) -> GetDeltaThetaAngle() == delta);
   };
 
-  check_theta(theta_s , start,    pi - start );
-  check_theta(theta_se, start,   end - start );
-  check_theta(theta_sd, start, delta         );
-  check_theta(theta_es, start,   end - start );
-  check_theta(theta_ds, start, delta         );
-  check_theta(theta_e ,     0,   end         );
-  check_theta(theta_d ,     0, delta         );
+  check_theta(theta_s , start      ,    pi - start );
+  check_theta(theta_se, start      ,   end - start );
+  check_theta(theta_sd, start      , delta         );
+  check_theta(theta_de, end - delta, delta         );
+  check_theta(theta_es, start      ,   end - start );
+  check_theta(theta_ds, start      , delta         );
+  check_theta(theta_ed, end - delta, delta         );
+  check_theta(theta_e ,           0,   end         );
+  check_theta(theta_d ,           0, delta         );
 
   start = m/8; end = m/2; delta = m/4;
   //  auto r_s  = n4::sphere("r_s" ).r_inner(start) /*.end(180)*/     .solid(); // 1/8 - 8/8    7/8
@@ -610,8 +618,10 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   auto phi_s  = tubsrz("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
   auto phi_se = tubsrz("phi_se").phi_start(start).phi_end  (end  ).solid();
   auto phi_sd = tubsrz("phi_sd").phi_start(start).phi_delta(delta).solid();
+  auto phi_de = tubsrz("phi_de").phi_delta(delta).phi_end  (end  ).solid();
   auto phi_es = tubsrz("phi_es").phi_end  (end  ).phi_start(start).solid();
   auto phi_ds = tubsrz("phi_ds").phi_delta(delta).phi_start(start).solid();
+  auto phi_ed = tubsrz("phi_ed").phi_end  (end  ).phi_delta(delta).solid();
   auto phi_e  = tubsrz("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid();
   auto phi_d  = tubsrz("phi_d" ).phi_delta(delta) /* .start(0) */ .solid();
 
@@ -619,13 +629,15 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
       CHECK( solid -> GetStartPhiAngle() == start);
       CHECK( solid -> GetDeltaPhiAngle() == delta);
   };
-  check_phi(phi_s , start, twopi - start );
-  check_phi(phi_se, start,   end - start );
-  check_phi(phi_sd, start, delta         );
-  check_phi(phi_es, start,   end - start );
-  check_phi(phi_ds, start, delta         );
-  check_phi(phi_e ,     0,   end         );
-  check_phi(phi_d ,     0, delta         );
+  check_phi(phi_s , start      , twopi - start );
+  check_phi(phi_se, start      ,   end - start );
+  check_phi(phi_sd, start      , delta         );
+  check_phi(phi_de, end - delta, delta         );
+  check_phi(phi_es, start      ,   end - start );
+  check_phi(phi_ds, start      , delta         );
+  check_phi(phi_ed, end - delta, delta         );
+  check_phi(phi_e ,           0,   end         );
+  check_phi(phi_d ,           0, delta         );
 
   auto z_full = n4::tubs("z_full").r(1).     z(z  ).solid();
   auto z_half = n4::tubs("z_half").r(1).half_z(z/2).solid();
@@ -704,8 +716,10 @@ TEST_CASE("nain cons", "[nain][cons]") {
   auto phi_s  = consrz("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
   auto phi_se = consrz("phi_se").phi_start(start).phi_end  (end  ).solid();
   auto phi_sd = consrz("phi_sd").phi_start(start).phi_delta(delta).solid();
+  auto phi_de = consrz("phi_de").phi_delta(delta).phi_end  (end  ).solid();
   auto phi_es = consrz("phi_es").phi_end  (end  ).phi_start(start).solid();
   auto phi_ds = consrz("phi_ds").phi_delta(delta).phi_start(start).solid();
+  auto phi_ed = consrz("phi_ed").phi_end  (end  ).phi_delta(delta).solid();
   auto phi_e  = consrz("phi_e" ).phi_end  (end  ) /* .start(0) */ .solid();
   auto phi_d  = consrz("phi_d" ).phi_delta(delta) /* .start(0) */ .solid();
 
@@ -713,13 +727,15 @@ TEST_CASE("nain cons", "[nain][cons]") {
       CHECK( solid -> GetStartPhiAngle() == start);
       CHECK( solid -> GetDeltaPhiAngle() == delta);
   };
-  check_phi(phi_s , start, twopi - start );
-  check_phi(phi_se, start,   end - start );
-  check_phi(phi_sd, start, delta         );
-  check_phi(phi_es, start,   end - start );
-  check_phi(phi_ds, start, delta         );
-  check_phi(phi_e ,     0,   end         );
-  check_phi(phi_d ,     0, delta         );
+  check_phi(phi_s , start      , twopi - start );
+  check_phi(phi_se, start      ,   end - start );
+  check_phi(phi_sd, start      , delta         );
+  check_phi(phi_de, end - delta, delta         );
+  check_phi(phi_es, start      ,   end - start );
+  check_phi(phi_ds, start      , delta         );
+  check_phi(phi_ed, end - delta, delta         );
+  check_phi(phi_e ,           0,   end         );
+  check_phi(phi_d ,           0, delta         );
 
   auto z_full = n4::cons("z_full").r1(1).r2(1).     z(z  ).solid();
   auto z_half = n4::cons("z_half").r1(1).r2(1).half_z(z/2).solid();
