@@ -148,6 +148,18 @@
       ''}";
     };
 
+    # 1. `nix build .#docker`
+    # 2. `docker load < result`
+    # 3. `docker run -it --rm cowsay:0.1.0` ... then type something and press CTRL-D
+    packages.docker = pkgs.dockerTools.buildImage {
+      name = "cowsay";
+      tag = "0.1.0";
+
+      config = { Cmd = [ "${pkgs.cowsay}/bin/cowsay" ]; };
+
+      created = "now";
+    };
+
     # Leading underscore prevents nosys from regenerating this for every system
     _templates = (import ../templates);
 
