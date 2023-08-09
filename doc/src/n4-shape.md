@@ -218,7 +218,7 @@ with the constraint `phi_end = phi_start + phi_delta`. Thus valid combinations o
   <tr><td>phi_start</td><td>         </td><td>       </td>  <td class="thick">       </td><td>2π - start </td><td>2π       </td></tr>
   <tr><td>         </td><td>phi_delta</td><td>       </td>  <td class="thick">0      </td><td>           </td><td>δ        </td></tr>
   <tr><td>         </td><td>         </td><td>phi_end</td>  <td class="thick">0      </td><td>end        </td><td>         </td></tr>
-  <tr><td>         </td><td>phi_delta</td><td>phi_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td><td>TODO</td></tr>
+  <tr><td>         </td><td>phi_delta</td><td>phi_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td></tr>
   <tr><td>phi_start</td><td>         </td><td>phi_end</td>  <td class="thick">       </td><td>end - start</td><td>         </td></tr>
   <tr><td>phi_start</td><td>phi_delta</td><td>       </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
 </table>
@@ -247,7 +247,7 @@ with the constraint `theta_end = theta_start + theta_delta`. Thus valid combinat
   <tr><td>theta_start</td><td>           </td><td>         </td>  <td class="thick">       </td><td>π - start </td><td>π        </td></tr>
   <tr><td>           </td><td>theta_delta</td><td>         </td>  <td class="thick">0      </td><td>           </td><td>δ        </td></tr>
   <tr><td>           </td><td>           </td><td>theta_end</td>  <td class="thick">0      </td><td>end        </td><td>         </td></tr>
-  <tr><td>           </td><td>theta_delta</td><td>theta_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td><td>TODO</td></tr>
+  <tr><td>           </td><td>theta_delta</td><td>theta_end</td>  <td class="thick">end - δ</td><td>           </td><td>         </td></tr>
   <tr><td>theta_start</td><td>           </td><td>theta_end</td>  <td class="thick">       </td><td>end - start</td><td>         </td></tr>
   <tr><td>theta_start</td><td>theta_delta</td><td>         </td>  <td class="thick">       </td><td>           </td><td>start + δ</td></tr>
 </table>
