@@ -146,7 +146,8 @@ public:
   place(G4LogicalVolume* child)  : child(child ? make_optional(child) : nullopt) {}
   place(place const&) = default;
 
-  place& trans(G4Transform3D& transform){ transformation =            transform * transformation; return *this; }
+  place& trans    (G4Transform3D& transform_){ return transform(transform_);                                    }
+  place& transform(G4Transform3D& transform_){ transformation =      transform_ * transformation; return *this; }
 
   place& rotate  (G4RotationMatrix& r)  { transformation = HepGeom::Rotate3D{r} * transformation; return *this; }
   place& rotate_x(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta); return rotate(rot);}
