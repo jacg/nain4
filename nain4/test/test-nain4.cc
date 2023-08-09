@@ -13,6 +13,8 @@
 #include <G4PVPlacement.hh>
 #include <G4RotationMatrix.hh>
 #include <G4Sphere.hh>
+#include <G4ThreeVector.hh>
+#include <G4Transform3D.hh>
 #include <G4Trd.hh>
 
 // Managers
@@ -873,13 +875,14 @@ TEST_CASE("nain volume", "[nain][volume]") {
 }
 
 TEST_CASE("nain place", "[nain][place]") {
-  // nain4::place is a good replacement for G4PVPlacement
-  auto air = nain4::material("G4_AIR");
-  auto outer = nain4::volume<G4Box>("outer", air, 1*m, 2*m, 3*m);
+  // n4::place is a good replacement for G4PVPlacement
+  auto air   = n4::material("G4_AIR");
+  auto water = n4::material("G4_WATER");
+  auto outer = n4::volume<G4Box>("outer", air, 1*m, 2*m, 3*m);
 
   // Default values are sensible
   SECTION("defaults") {
-    auto world = nain4::place(outer).now();
+    auto world = n4::place(outer).now();
 
     auto trans = world->GetObjectTranslation();
     CHECK(trans == G4ThreeVector{});
@@ -892,7 +895,7 @@ TEST_CASE("nain place", "[nain][place]") {
   // Multiple optional values can be set at once.
   SECTION("multiple options") {
     G4ThreeVector translation = {1,2,3};
-    auto world = nain4::place(outer)
+    auto world = n4::place(outer)
       .at(translation) // 1-arg version of at()
       .name("not outer")
       .copy_no(382)
@@ -905,18 +908,18 @@ TEST_CASE("nain place", "[nain][place]") {
 
   // The at() option accepts vector components (as well as a whole vector)
   SECTION("at 3-args") {
-    auto world = nain4::place(outer).at(4,5,6).now(); // 3-arg version of at()
+    auto world = n4::place(outer).at(4,5,6).now(); // 3-arg version of at()
     CHECK(world->GetObjectTranslation() == G4ThreeVector{4,5,6});
   }
 
-  SECTION("at 1-arg") {
-    auto place_x   = nain4::place(outer).at_x( 1)                  .now(); // 1-arg version  of at()
-    auto place_y   = nain4::place(outer)         .at_y( 2)         .now(); // 1-arg version  of at()
-    auto place_z   = nain4::place(outer)                  .at_z( 3).now(); // 1-arg version  of at()
-    auto place_xy  = nain4::place(outer).at_x( 4).at_y( 5)         .now(); // 1-arg versions of at()
-    auto place_xz  = nain4::place(outer).at_x( 6)         .at_z( 7).now(); // 1-arg versions of at()
-    auto place_yz  = nain4::place(outer)         .at_y( 8).at_z( 9).now(); // 1-arg versions of at()
-    auto place_xyz = nain4::place(outer).at_x(10).at_y(11).at_z(12).now(); // 1-arg versions of at()
+  SECTION("at_{x,y,z}") {
+    auto place_x   = n4::place(outer).at_x( 1)                  .now(); // 1-dim version  of at()
+    auto place_y   = n4::place(outer)         .at_y( 2)         .now(); // 1-dim version  of at()
+    auto place_z   = n4::place(outer)                  .at_z( 3).now(); // 1-dim version  of at()
+    auto place_xy  = n4::place(outer).at_x( 4).at_y( 5)         .now(); // 1-dim versions of at()
+    auto place_xz  = n4::place(outer).at_x( 6)         .at_z( 7).now(); // 1-dim versions of at()
+    auto place_yz  = n4::place(outer)         .at_y( 8).at_z( 9).now(); // 1-dim versions of at()
+    auto place_xyz = n4::place(outer).at_x(10).at_y(11).at_z(12).now(); // 1-dim versions of at()
 
     CHECK(place_x   -> GetObjectTranslation() == G4ThreeVector{ 1, 0, 0});
     CHECK(place_y   -> GetObjectTranslation() == G4ThreeVector{ 0, 2, 0});
@@ -930,15 +933,14 @@ TEST_CASE("nain place", "[nain][place]") {
   // The in() option creates correct mother/daughter relationship
   SECTION("in") {
     SECTION("logical mother") {
-      auto water = nain4::material("G4_WATER");
-      auto inner = nain4::volume<G4Box>("inner", water, 0.3*m, 0.2*m, 0.1*m);
+      auto inner = n4::box("inner").xyz(0.3*m, 0.2*m, 0.1*m).volume(water);
 
-      auto inner_placed = nain4::place(inner)
+      auto inner_placed = n4::place(inner)
         .in(outer)
         .at(0.1*m, 0.2*m, 0.3*m)
         .now();
 
-      auto outer_placed = nain4::place(outer).now();
+      auto outer_placed = n4::place(outer).now();
 
       CHECK(inner_placed -> GetMotherLogical() == outer);
       CHECK(outer_placed -> GetLogicalVolume() == outer);
@@ -963,16 +965,14 @@ TEST_CASE("nain place", "[nain][place]") {
 
     SECTION("physical mother") {
       // Now we place outer first and use it to place inner
-      auto outer_placed = nain4::place(outer).now();
+      auto outer_placed = n4::place(outer).now();
 
-      auto water = nain4::material("G4_WATER");
-      auto inner = nain4::volume<G4Box>("inner", water, 0.3*m, 0.2*m, 0.1*m);
+      auto inner = n4::box("inner").xyz(0.3*m, 0.2*m, 0.1*m).volume(water);
 
-      auto inner_placed = nain4::place(inner)
+      auto inner_placed = n4::place(inner)
         .in(outer_placed)
         .at(0.1*m, 0.2*m, 0.3*m)
         .now();
-
 
       CHECK(inner_placed -> GetMotherLogical() == outer);
       CHECK(outer_placed -> GetLogicalVolume() == outer);
@@ -984,12 +984,11 @@ TEST_CASE("nain place", "[nain][place]") {
       // Now we don't place the outer volume immediately, but we store
       // it for later use
 
-      auto outer_stored = nain4::place(outer);
+      auto outer_stored = n4::place(outer);
 
-      auto water = nain4::material("G4_WATER");
-      auto inner = nain4::volume<G4Box>("inner", water, 0.3*m, 0.2*m, 0.1*m);
+      auto inner = n4::box("inner").xyz(0.3*m, 0.2*m, 0.1*m).volume(water);
 
-      auto inner_placed = nain4::place(inner)
+      auto inner_placed = n4::place(inner)
         .in(outer_stored)
         .at(0.1*m, 0.2*m, 0.3*m)
         .now();
@@ -1008,27 +1007,26 @@ TEST_CASE("nain place", "[nain][place]") {
 
 
   SECTION("rotations") {
-    auto water = nain4::material("G4_WATER");
-    auto box   = nain4::volume<G4Box>("box", water, 0.3*m, 0.2*m, 0.1*m);
+    auto box   = n4::box("box").xyz(0.3*m, 0.2*m, 0.1*m).volume(water);
 
     auto sign      = GENERATE(-1, 1);
     auto angle_deg = GENERATE(0, 12.345, 30, 45, 60, 90, 180);
     auto angle     = sign * angle_deg * deg;
 
-    auto rotate_x   = nain4::place(box).rotate_x(angle)                                .now();
-    auto rotate_y   = nain4::place(box).rotate_y(angle)                                .now();
-    auto rotate_z   = nain4::place(box).rotate_z(angle)                                .now();
-    auto rotate_xy  = nain4::place(box).rotate_x(angle).rotate_y(angle)                .now();
-    auto rotate_xz  = nain4::place(box).rotate_x(angle).rotate_z(angle)                .now();
-    auto rotate_yz  = nain4::place(box).rotate_y(angle).rotate_z(angle)                .now();
-    auto rotate_xyz = nain4::place(box).rotate_x(angle).rotate_y(angle).rotate_z(angle).now();
-    auto rot_x      = nain4::place(box).rot_x   (angle)                                .now();
-    auto rot_y      = nain4::place(box).rot_y   (angle)                                .now();
-    auto rot_z      = nain4::place(box).rot_z   (angle)                                .now();
-    auto rot_xy     = nain4::place(box).rot_x   (angle).rotate_y(angle)                .now();
-    auto rot_xz     = nain4::place(box).rot_x   (angle).rotate_z(angle)                .now();
-    auto rot_yz     = nain4::place(box).rot_y   (angle).rotate_z(angle)                .now();
-    auto rot_xyz    = nain4::place(box).rot_x   (angle).rotate_y(angle).rotate_z(angle).now();
+    auto rotate_x   = n4::place(box).rotate_x(angle)                                .now();
+    auto rotate_y   = n4::place(box).rotate_y(angle)                                .now();
+    auto rotate_z   = n4::place(box).rotate_z(angle)                                .now();
+    auto rotate_xy  = n4::place(box).rotate_x(angle).rotate_y(angle)                .now();
+    auto rotate_xz  = n4::place(box).rotate_x(angle).rotate_z(angle)                .now();
+    auto rotate_yz  = n4::place(box).rotate_y(angle).rotate_z(angle)                .now();
+    auto rotate_xyz = n4::place(box).rotate_x(angle).rotate_y(angle).rotate_z(angle).now();
+    auto rot_x      = n4::place(box).rot_x   (angle)                                .now();
+    auto rot_y      = n4::place(box).rot_y   (angle)                                .now();
+    auto rot_z      = n4::place(box).rot_z   (angle)                                .now();
+    auto rot_xy     = n4::place(box).rot_x   (angle).rotate_y(angle)                .now();
+    auto rot_xz     = n4::place(box).rot_x   (angle).rotate_z(angle)                .now();
+    auto rot_yz     = n4::place(box).rot_y   (angle).rotate_z(angle)                .now();
+    auto rot_xyz    = n4::place(box).rot_x   (angle).rotate_y(angle).rotate_z(angle).now();
 
     auto rotmat  = [&] (auto x, auto y, auto z){
        auto rm = G4RotationMatrix();
@@ -1039,8 +1037,8 @@ TEST_CASE("nain place", "[nain][place]") {
     };
 
     auto manyrot = rotmat(angle, angle, angle);
-    auto rotate  = nain4::place(box).rotate(manyrot).now();
-    auto rot     = nain4::place(box).rot   (manyrot).now();
+    auto rotate  = n4::place(box).rotate(manyrot).now();
+    auto rot     = n4::place(box).rot   (manyrot).now();
 
     CHECK(* rotate     -> GetObjectRotation() == manyrot);
     CHECK(* rot        -> GetObjectRotation() == manyrot);
@@ -1061,8 +1059,19 @@ TEST_CASE("nain place", "[nain][place]") {
     CHECK(* rot_xyz    -> GetObjectRotation() == rotmat(angle, angle, angle));
   }
 
+  SECTION("transforms") {
+    auto box    = n4::box("box").xyz(0.3*m, 0.2*m, 0.1*m).volume(water);
+
+    auto rotation    = G4RotationMatrix{}; rotation.rotateX(30 * deg);
+    auto translation = G4ThreeVector{0., 0., 50 * cm};
+    auto transform   = G4Transform3D{rotation, translation};
+    auto placed      = n4::place(box).trans(transform).now();
+
+    CHECK(*placed -> GetObjectRotation   () ==    rotation);
+    CHECK( placed -> GetObjectTranslation() == translation);
+  }
+
   SECTION("clone") {
-    auto water = n4::material("G4_WATER");
     auto place_box = n4::box("box").cube(1*mm).place(water).in(outer).at_x(2*mm);
 
     auto check = [] (auto x, auto expected) {

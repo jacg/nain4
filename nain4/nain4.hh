@@ -146,19 +146,25 @@ public:
   place(G4LogicalVolume* child)  : child(child ? make_optional(child) : nullopt) {}
   place(place const&) = default;
 
-  place& rotate_x(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta);             return rotate(rot);}
-  place& rotate_y(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateY(delta);             return rotate(rot);}
-  place& rotate_z(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateZ(delta);             return rotate(rot);}
-  place& rotate  (G4RotationMatrix& r)  { transformation = HepGeom::Rotate3D{r}          * transformation; return *this;      }
+  place& trans    (G4Transform3D& transform_){ return transform(transform_);                                    }
+  place& transform(G4Transform3D& transform_){ transformation =      transform_ * transformation; return *this; }
+
+  place& rotate  (G4RotationMatrix& r)  { transformation = HepGeom::Rotate3D{r} * transformation; return *this; }
+  place& rotate_x(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta); return rotate(rot);}
+  place& rotate_y(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateY(delta); return rotate(rot);}
+  place& rotate_z(double delta       )  { auto rot = G4RotationMatrix{}; rot.rotateZ(delta); return rotate(rot);}
+
   place& rot     (G4RotationMatrix& r)  { return rotate      (r); }
   place& rot_x   (double delta       )  { return rotate_x(delta); }
   place& rot_y   (double delta       )  { return rotate_y(delta); }
   place& rot_z   (double delta       )  { return rotate_z(delta); }
-  place& at  (double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this;      }
-  place& at_x(double x                    ) { return at(x, 0, 0); }
-  place& at_y(          double y          ) { return at(0, y, 0); }
-  place& at_z(                    double z) { return at(0, 0, z); }
-  place& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
+
+  place& at  (double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this; }
+  place& at  (G4ThreeVector p             ) { return at(p.x(), p.y(), p.z()); }
+  place& at_x(double x                    ) { return at(  x  ,   0  ,   0  ); }
+  place& at_y(          double y          ) { return at(  0  ,   y  ,   0  ); }
+  place& at_z(                    double z) { return at(  0  ,   0  ,   z  ); }
+
   place& copy_no(int         n)           { copy_number = n      ; return *this; }
   place& in(G4LogicalVolume* parent_)     { parent      = parent_; return *this; }
   place& in(G4PVPlacement*   parent_)     { return in(parent_ -> GetLogicalVolume()); }
