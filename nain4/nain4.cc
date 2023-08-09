@@ -1,6 +1,7 @@
 #include "nain4.hh"
 
 #include <G4EmStandardPhysics_option4.hh>
+#include <G4LogicalVolume.hh>
 #include <G4MaterialPropertyVector.hh>
 #include <G4OpticalPhysics.hh>
 #include <G4Box.hh>
@@ -46,6 +47,18 @@ G4PVPlacement* place::now() {
                            WTF_is_pMany,
                            copy_number.value_or(0),
                            global_check_overlaps_ || local_check_overlaps_};
+}
+
+G4LogicalVolume* place::get_logical() {
+  if (!child.has_value()) {
+    auto name = label.value();
+    std::cerr << "Called `n4::place::get_logical` on an incomplete"
+              << " `n4::place` instance (" + name + "). Aborting."
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  return child.value();
 }
 
 std::vector<G4double> scale_by(G4double factor, std::initializer_list<G4double> const& data) {
