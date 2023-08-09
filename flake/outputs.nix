@@ -152,10 +152,16 @@
     # 2. `docker load < result`
     # 3. `docker run -it --rm cowsay:0.1.0` ... then type something and press CTRL-D
     packages.docker = pkgs.dockerTools.buildImage {
-      name = "cowsay";
-      tag = "0.1.0";
+      name = "emacs";
+      #tag = "0.1.0";
 
-      config = { Cmd = [ "${pkgs.cowsay}/bin/cowsay" ]; };
+      copyToRoot = pkgs.buildEnv {
+        name = "image-root";
+        paths = [ pkgs.emacs ];
+        pathsToLink = [ "/bin" "/include"  "/lib"  "/libexec"  "/share"];
+      };
+
+      config = { Cmd = [ "${pkgs.bash}/bin/bash" ]; };
 
       created = "now";
     };
