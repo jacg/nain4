@@ -160,6 +160,7 @@ public:
   place& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
   place& copy_no(int         n)           { copy_number = n      ; return *this; }
   place& in(G4LogicalVolume* parent_)     { parent      = parent_; return *this; }
+  place& in(G4PVPlacement*   parent_)     { return in(parent_ -> GetLogicalVolume()); }
   place& name(G4String       label_)      { label       = label_ ; return *this; }
 
   place&      check_overlaps           () {  local_check_overlaps_ = true ; return *this; }
