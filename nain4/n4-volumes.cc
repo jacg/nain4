@@ -17,7 +17,12 @@
 
 using opt_double = std::optional<G4double>;
 
-std::tuple<G4double, G4double> compute_angles(G4String name, const opt_double& delta, const opt_double& end, const opt_double& start, G4double full) {
+std::tuple<G4double, G4double> compute_angles( G4String name
+                                             , const opt_double& delta
+                                             , const opt_double& end
+                                             , const opt_double& start
+                                             , G4double full
+                                             ) {
   if (start.has_value() && delta.has_value() && end.has_value()) {
     throw "You cannot provide all start, delta and end angles for the " + name + " coordinate.";
   }
