@@ -75,7 +75,7 @@ n4::box("box").cube(1*cm).place(copper).in(world).at_y(3*cm).rot_z(30*deg).now()
   auto box_solid = new G4Box("box", box_size/2, box_size/2, box_size/2);
   auto box_logical = new G4LogicalVolume(box_solid, copper, "box")
   auto rot_z_30 = new G4RotationMatrix();
-  rot_z_30 -> rotateY(30*deg);
+  rot_z_30 -> rotateZ(30*deg);
   new G4PVPlacement(rot_z_30, {0, 3*cm, 0}, box_logical, "box", world, false, 0);
   ```
 </details>
@@ -90,7 +90,7 @@ n4::place(box).in(world).at_y(3*cm).rot_z(30*deg).now();
 
 + Mother volume
   - `in(logical-volume)`
-  - `in(phisical-volume)` // not implemented yet
+  - `in(physical-volume)` // not implemented yet
   - `in(n4::place)` // not implemented yet
 
   If no mother volume is specified, the placed volume becomes the world volume.
