@@ -81,6 +81,7 @@ set(ALL_TEST_SOURCES
 
 # TODO including headers in add_executable apparently makes them show up in IDEs. Verify how?
 add_executable(nain4-tests ${ALL_TEST_SOURCES})
+target_link_options(nain4-tests PRIVATE -undefined dynamic_lookup)
 
 
 target_link_libraries(
