@@ -45,6 +45,8 @@ FILE(GLOB HEADERS ${PROJECT_SOURCE_DIR}/*.hh)
 
 add_library(Nain4 SHARED ${SOURCES} ${HEADERS})
 
+target_link_options(Nain4 PRIVATE -undefined dynamic_lookup)
+
 #set_target_properties(Nain4 PROPERTIES ENABLE_EXPORTS ON)
 
 #----------------------------------------------------------------------------
