@@ -150,19 +150,14 @@
 
     # 1. `nix build .#docker`
     # 2. `docker load < result`
-    # 3. `docker run -it --rm cowsay:0.1.0` ... then type something and press CTRL-D
-    packages.docker = pkgs.dockerTools.buildImage {
-      name = "emacs";
-      #tag = "0.1.0";
-
-      copyToRoot = pkgs.buildEnv {
-        name = "image-root";
-        paths = [ pkgs.emacs ];
-        pathsToLink = [ "/bin" "/include"  "/lib"  "/libexec"  "/share"];
-      };
-
+    # 3. `docker run -it --rm cowsay-and-lolcat:0.1.0`
+    # 4. cowsay hello | lolcat
+    # 5. CTRL-d
+    packages.docker = pkgs.dockerTools.buildLayeredImage {
+      name = "cowsay-and-lolcat";
+      tag = "0.1.0";
+      contents = [ pkgs.bash pkgs.cowsay pkgs.lolcat ];
       config = { Cmd = [ "${pkgs.bash}/bin/bash" ]; };
-
       created = "now";
     };
 
