@@ -437,6 +437,51 @@ See the sections about setting [Cartesian lengths](#cartesian-lengths), [radial 
 
 
 ### `n4::trd`
+
+Constructs `G4Trd`: frustrum (a.k.a. truncated pyramid) with two
+parallel rectangular faces and four trapezoidal faces. The rectangular
+faces are perpendicular to the z axis and their sides are parallel to
+the x and y axes. The bottom face (placed at negative z) has side
+lengths `x1`, `y1`, and the top face (placed at positive z) has side
+lengths `x2`, `y2`. Both faces are separated by a distance
+`z`. Within its frame of reference it is centred on the
+origin. Displacements and rotations can be applied with
+[`.place(material)`](#placing-a-volume).
+
+#### Example
+```c++
+G4Trd* trd = n4::trd("trd").xy1(10*cm).xy2(5*cm).z(50*cm).solid();
+```
+<details class="g4">
+
+  <summary></summary>
+
+  ```c++
+  auto cross_section_bottom = 10*cm, cross_section_top = 5*cm, z_length = 50*cm;
+  G4Trd* trd = new G4Trd("trd", cross_section_bottom/2, cross_section_top/2, cross_section_bottom/2, cross_section_top/2, z_length/2);
+  ```
+</details>
+
+#### Methods
+
+##### Full-length methods
+
+All these methods take full (as opposed to half-) lengths:
++ `x1(lx)`, `x2(ly)`, `y1(lx)`, `y2(ly)`: set one dimension of one
+  rectangular face. 1 Refers to the bottom face, while 2 refers to the
+  top face.
++ `xy1(l)`, `xy2(l)`: set both dimensions of one face. 1 Refers to the
+  bottom face, while 2 refers to the top face.
++ `z(l)`: set the distance between the two parallel faces.
+
+##### Half-length methods
+All the aforementioned full-length methods have alternatives which
+accept half-lengths: `half_x1(lx/2)`, `half_xy2(lxy/2)`,
+`half_z(lz/2)`, etc.
+
+See the sections about setting [Cartesian lengths](#cartesian-lengths) for more details.
+
+
 ### `n4::cons`
 
 ## Obviously missing shapes
