@@ -484,6 +484,63 @@ See the sections about setting [Cartesian lengths](#cartesian-lengths) for more 
 
 ### `n4::cons`
 
+Constructs `G4Cons`: truncated cone or cone section. Within its frame of reference, it is parallel to and centred on the z-axis; φ is measured counterclockwise WRT the x-axis when viewed from positive z. Displacements and rotations can be applied with [`.place(material)`](#placing-a-volume).
+
+#### Examples
+
+A solid truncated cone
+```c++
+G4Tubs* solid_cone = n4::tubs("solid_cone").r1(1*m).r2(2*m).z(3*m).solid();
+```
+<details class="g4"> <summary></summary>
+
+  ```c++
+  auto radius_1 = 1*m, radius_2 = 2*m, z_length = 3*m;
+  G4Cons* solid_cone = new G4Cons("solid_cone", 0, radius_1, 0, radius_2, z_length/2, 0, CLHEP::twopi);
+  ```
+</details>
+
+A hollow cone
+```c++
+G4Cone* hollow_cone = n4::cone("hollow_cone").r1(1*m).r2(2*cm).r_delta(10*cm).z(3*m).solid();
+```
+<details class="g4"> <summary></summary>
+
+  ```c++
+  auto radius_1 = 1*m, radius_2 = 2*m, thickness = 10*cm, z_length = 3*m;
+  G4Cons* hollow_cone = new G4Cons("hollow_cone", radius_1 - thickness, radius_1, radius_2 - thickness, radius_2, z_length/2, 0, CLHEP::twopi);
+  ```
+</details>
+
+
+A conical wedge
+```c++
+G4Cons* wedge = n4::cons("wedge").r1(1*m).r2(2*m).z(3*m).phi_start(20*deg).phi_end(30*deg).solid();
+```
+<details class="g4"> <summary></summary>
+
+  ```c++
+  auto radius_1 = 1*m, radius_2 = 2*m, z_length = 3*m, start_phi = 20*deg, end_phi = 30*deg;
+  G4Cons* wedge = new G4Cons("wedge", 0, radius_1, 0, radius_2, z_length/2, start_phi, end_phi - start_phi);
+  ```
+</details>
+
+
+#### Methods
+
++ `z()`
++ `half_z()`
++ `r1_inner(l)`, `r1_delta(l)`, `r1(l)`: Sets the radial limits of the bottom (negative z) side
++ `r2_inner(l)`, `r2_delta(l)`, `r2(l)`: Sets the radial limits of the top    (positive z) side
++ `r_delta`: Sets both `r1_delta` and `r2_delta`
++ `phi_start(a)`
++ `phi_delta(a)`
++ `phi_end(a)`
+
+See the sections about setting [Cartesian lengths](#cartesian-lengths), [radial lengths](#radial-length-r) and [azimuthal angles](#azimuthal-angle-φ) for more details.
+
+
+
 ## Obviously missing shapes
 
 ### `n4::torus`
