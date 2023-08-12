@@ -193,6 +193,7 @@ struct cons : shape {
   HAS_Z  (cons,  )
   HAS_PHI(cons,  )
 public:
+  cons& r_delta(G4D d) { return r1_delta(d).r2_delta(d); }
   // G4 disallows the inner radius of a G4Cons to be less than this value.
   // 1e3 * G4GeometryTolerance::GetInstance() -> GetRadialTolerance(); which is one nm
   const static constexpr G4double eps = 1 * CLHEP::nm;

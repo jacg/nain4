@@ -767,6 +767,11 @@ TEST_CASE("nain cons", "[nain][cons]") {
   auto r1_e  = cons2("r1_e" ).r1      (end  )/*.r1_inner(0)*/.solid();
   auto r1_d  = cons2("r1_d" ).r1_delta(delta)/*.r1_inner(0)*/.solid();
 
+  auto start_2 = 2*start, end_2 = 2*end;
+
+  auto r12_de = n4::cons("r12_de").z(1*m).r1      (  end).r2      (  end_2).r_delta(delta).solid();
+  auto r12_sd = n4::cons("r12_sd").z(1*m).r1_inner(start).r2_inner(start_2).r_delta(delta).solid();
+
   auto check_r2 = [] (auto solid, auto inner, auto outer) {
       CHECK( solid -> GetInnerRadiusPlusZ() == inner);
       CHECK( solid -> GetOuterRadiusPlusZ() == outer);
@@ -797,6 +802,10 @@ TEST_CASE("nain cons", "[nain][cons]") {
   check_r2(r2_e ,         eps,   end         );
   check_r2(r2_d ,         eps, delta         );
 
+  check_r1(r12_de, end   - delta, end            );
+  check_r2(r12_de, end_2 - delta, end_2          );
+  check_r1(r12_sd, start        , start   + delta);
+  check_r2(r12_sd, start_2      , start_2 + delta);
 }
 
 TEST_CASE("nain trd", "[nain][trd]") {
