@@ -303,7 +303,7 @@ Note the, perhaps surprising, difference between `.xyz()` and the `.xy()`-`.xz()
 
 
 ##### Half-length methods
-All the aforementioned full-length methods have alternatives which accept half-lengths: `half_x(lx/2)`, `half_cube(l/2)`, `half_xy(lx/2, ly/2)`, etc.
+All the aforementioned full-length methods have alternatives which accept half-lengths: `half_x(lx/2)`, `half_cube(l/2)`, `half_xy(lxy)`, etc.
 ##### Overriding
 If any value is specified more than once, the last setting overrides any earlier ones. Thus, the following three lines are equivalent.
 
