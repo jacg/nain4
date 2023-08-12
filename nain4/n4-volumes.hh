@@ -42,18 +42,12 @@ struct shape {
 
   // Boolean operations
 private:
-  boolean_shape add_      (n4::shape& shape);
-  boolean_shape subtract_ (n4::shape& shape);
-  boolean_shape intersect_(n4::shape& shape);
-  boolean_shape add_      (G4VSolid*  solid);
-  boolean_shape subtract_ (G4VSolid*  solid);
-  boolean_shape intersect_(G4VSolid*  solid);
-  boolean_shape join_     (n4::shape& shape);
-  boolean_shape sub_      (n4::shape& shape);
-  boolean_shape inter_    (n4::shape& shape);
-  boolean_shape join_     (G4VSolid*  solid);
-  boolean_shape sub_      (G4VSolid*  solid);
-  boolean_shape inter_    (G4VSolid*  solid);
+  boolean_shape add_      (G4VSolid* solid);
+  boolean_shape subtract_ (G4VSolid* solid);
+  boolean_shape intersect_(G4VSolid* solid);
+  boolean_shape join_     (G4VSolid* solid);
+  boolean_shape sub_      (G4VSolid* solid);
+  boolean_shape inter_    (G4VSolid* solid);
 
 public:
   // Catch the types that are more likely to be passed by mistake
@@ -110,29 +104,32 @@ private:
 "https://jacg.github.io/nain4/explanation/boolean_solid_input_types.md" \
 "\n\n\n\n"
 
+#define SUBCLASS_OF(TYPE) \
+  std::is_base_of_v<TYPE, std::remove_pointer_t<INPUT_TYPE>>
+
 // Rejects specific types
-#define REJECT_KNOWN_TYPE(TYPE, METHOD)                                    \
-static_assert( !std::is_base_of_v<TYPE, std::remove_pointer_t<INPUT_TYPE>> \
-             , CLEAR_ERROR_MSG(METHOD, "a" #TYPE));
+#define REJECT_KNOWN_TYPE(TYPE, METHOD) \
+  static_assert(!SUBCLASS_OF(TYPE), CLEAR_ERROR_MSG(METHOD, "a" #TYPE));
 
 // Rejects any other type. The condition here is unnecessary, but it
 // describes better what we want to achieve
-#define REJECT_UNKNOWN_TYPE(METHOD)                                                 \
-  static_assert( std::is_base_of_v<n4::shape, std::remove_pointer_t<INPUT_TYPE>> || \
-                 std::is_base_of_v<G4VSolid , std::remove_pointer_t<INPUT_TYPE>>    \
+#define REJECT_UNKNOWN_TYPE(METHOD)                              \
+  static_assert( SUBCLASS_OF(n4::shape) || SUBCLASS_OF(G4VSolid) \
                , CLEAR_ERROR_MSG(METHOD, "an invalid type"));
 
 
 // A catch-all template so we give a better error for any type that is
 // not appropriate. The template resolution order takes care of
 // finding the valid input types first
-#define CHECK_INVALID(METHOD)                                          \
-template<class INPUT_TYPE> boolean_shape shape::METHOD(INPUT_TYPE x) { \
-  REJECT_KNOWN_TYPE(G4LogicalVolume, #METHOD)                          \
-  REJECT_KNOWN_TYPE(G4PVPlacement  , #METHOD)                          \
-  REJECT_KNOWN_TYPE(n4::place      , #METHOD)                          \
-  REJECT_UNKNOWN_TYPE(               #METHOD)                          \
-  return shape::METHOD##_(x);                                          \
+#define CHECK_INVALID(METHOD)                                                   \
+template<class INPUT_TYPE> boolean_shape shape::METHOD(INPUT_TYPE x) {          \
+  REJECT_KNOWN_TYPE(G4LogicalVolume, #METHOD)                                   \
+  REJECT_KNOWN_TYPE(G4PVPlacement  , #METHOD)                                   \
+  REJECT_KNOWN_TYPE(n4::place      , #METHOD)                                   \
+  REJECT_UNKNOWN_TYPE(               #METHOD)                                   \
+  /* At this point we know that it's either a n4::shape or a G4VSolid */        \
+  if constexpr (SUBCLASS_OF(n4::shape)) { return shape::METHOD##_(x.solid()); } \
+  else                                  { return shape::METHOD##_(x        ); } \
 }
 
 CHECK_INVALID(add)
@@ -142,6 +139,7 @@ CHECK_INVALID(join)
 CHECK_INVALID(subtract)
 CHECK_INVALID(intersect)
 
+#undef DERIVED
 #undef CHECK_INVALID
 #undef SAME_TYPE
 #undef CLEAR_ERROR_MSG
