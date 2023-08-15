@@ -191,17 +191,6 @@ private:
   static bool global_check_overlaps_;
 };
 
-// --------------------------------------------------------------------------------
-class boolean {
-  // operations
-  void add();
-  void subtract();
-  // etc.
-  // positions
-  void at();
-  void rotate();
-  void transform(); // later
-};
 
 // --------------------------------------------------------------------------------
 // Utility for creating a vector of physical quantity data, without having to
@@ -287,14 +276,6 @@ private:
   std::ios&       stream;
   std::ofstream   dev_null;
 };
-
-// --------------------------------------------------------------------------------
-// Use our flavour of optical physics: jump through 3 hoops in one go
-void use_our_optical_physics(G4RunManager* run_manager, G4int verbosity=0);
-
-// --------------------------------------------------------------------------------
-// Not really nain4, as it's kinda specific to PET / NEMA?
-G4VPhysicalVolume* combine_geometries(G4VPhysicalVolume* phantom, G4VPhysicalVolume* detector);
 
 } // namespace nain4
 
