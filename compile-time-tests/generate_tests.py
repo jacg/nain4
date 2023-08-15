@@ -110,9 +110,12 @@ int main() {{
 }}
 """
 
+number_of_tests      = len(tests)
+max_test_name_length = max(map(len, tests))
+
 main_folder    = tempfile.mkdtemp()
 nain4          = os.path.join(os.environ["PWD"], "..", "install")
-all_failed     = True
+n_failed       = 0
 green          = "\033[92m"
 red            = "\033[91m"
 reset_colour   = "\033[0m"
@@ -131,14 +134,20 @@ for (test_name, (error_match, snippet)) in tests.items():
                             , capture_output = True
                             , shell          = True)
 
-    failed      = process.returncode != 0 and error_match in process.stderr.decode()
-    all_failed &= failed
+    compiled    = process.returncode == 0
+    found_match = error_match in process.stderr.decode()
+    failed      = compiled or not found_match
+    n_failed   += int(failed)
 
-    colour  = green if failed else red
-    message = "FAILED COMPILING as expected" if failed else "COMPILED SUCCESFULLY (and it shouldn't)"
-    print(colour, "\b\b", test_name, message, reset_colour)
+    colour  = red if failed else green
+    message = (
+        f"FAILED: compiler error does not contain expected message ({error_match})" if not found_match else
+         "SUCCEEDED in generating expected compile-time error"                      if not compiled    else
+         "FAILED to generate a compile-time error"
+              )
+    print(colour, f"{test_name:<{max_test_name_length}}", message, reset_colour)
 
-    if not failed:
+    if failed:
         print( "#" * 80 + "\n"
              + " " * 35 + "FULL OUTPUT\n"
              + "-" * 80 + "\n"
@@ -147,12 +156,14 @@ for (test_name, (error_match, snippet)) in tests.items():
              + process.stderr.decode()
              + "#" * 80 + "\n"
              )
-colour  =    green if all_failed else      red
-summary = "PASSED" if all_failed else "FAILED"
+colour  =    red   if n_failed else green
+summary = "FAILED" if n_failed else "PASSED"
 print( colour
      , "=" * 40 +  "\n "
      + "=" * 11 + f" SUMMARY : {summary} " + "=" * 11 + "\n "
+     + "=" * 11 + f" PASSED  : {number_of_tests - n_failed:>6} " + "=" * 11 + "\n "
+     + "=" * 11 + f" FAILED  : {n_failed:>6} " + "=" * 11 + "\n "
      + "=" * 40
      , reset_colour)
 
-sys.exit(0 if all_failed else 1)
+sys.exit(int(n_failed > 0))
