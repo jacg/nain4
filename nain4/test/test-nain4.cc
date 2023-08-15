@@ -1280,6 +1280,7 @@ auto check_properties (n4::boolean_shape& shape, G4Material* mat, G4String name,
   auto solid  = shape.solid();
   auto volume = shape.volume(mat);
   auto placed = shape.place (mat).now();
+
   check_solid_volume_placed_equivalence(solid, volume, placed, 1e-4);
 
   CHECK(solid  -> GetCubicVolume() / m3 == Approx(vol           / m3));
