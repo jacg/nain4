@@ -314,6 +314,9 @@ If any value is specified more than once, the last setting overrides any earlier
 ```
 While the first two work, the last one states the intent most clearly.
 
+See the sections about setting [Cartesian lengths](#cartesian-lengths) for more details.
+
+
 ### `n4::sphere`
 
 Constructs `G4Sphere` or `G4Orb`, depending on values provided.
