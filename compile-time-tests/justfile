@@ -1,0 +1,6 @@
+
+test-all:
+  #!/usr/bin/env sh
+  export NAIN4_INSTALL=$PWD/../install/
+  python generate_tests.py
+  exit $?
