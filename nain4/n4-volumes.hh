@@ -52,12 +52,12 @@ private:
 public:
   // Catch the types that are more likely to be passed by mistake
   // and generate an obvious and prominent error message.
-  template<class INPUT_TYPE> boolean_shape add      (INPUT_TYPE x);
-  template<class INPUT_TYPE> boolean_shape subtract (INPUT_TYPE x);
-  template<class INPUT_TYPE> boolean_shape intersect(INPUT_TYPE x);
-  template<class INPUT_TYPE> boolean_shape join     (INPUT_TYPE x);
-  template<class INPUT_TYPE> boolean_shape sub      (INPUT_TYPE x);
-  template<class INPUT_TYPE> boolean_shape inter    (INPUT_TYPE x);
+  template<class SUBTYPE> boolean_shape add      (SUBTYPE x);
+  template<class SUBTYPE> boolean_shape subtract (SUBTYPE x);
+  template<class SUBTYPE> boolean_shape intersect(SUBTYPE x);
+  template<class SUBTYPE> boolean_shape join     (SUBTYPE x);
+  template<class SUBTYPE> boolean_shape sub      (SUBTYPE x);
+  template<class SUBTYPE> boolean_shape inter    (SUBTYPE x);
 
 
 protected:
@@ -95,41 +95,44 @@ private:
 };
 
 // Clear and prominent error message
-#define CLEAR_ERROR_MSG(METHOD, MSG)                                    \
+#define CLEAR_ERROR_MSG(METHOD, TYPE_DESCRIPTION)                       \
 "\n\n\n\n"                                                              \
 "[n4::boolean_shape::" METHOD "]\n"                                     \
-"Attempted to create a boolean shape using " MSG ".\n"                  \
+"Attempted to create a boolean shape using " TYPE_DESCRIPTION ".\n"     \
 "Only n4::shape and G4VSolid* are accepted.\n"                          \
 "For more details, please check\n"                                      \
 "https://jacg.github.io/nain4/explanation/boolean_solid_input_types.md" \
 "\n\n\n\n"
 
-#define SUBCLASS_OF(TYPE) \
-  std::is_base_of_v<TYPE, std::remove_pointer_t<INPUT_TYPE>>
+#define SUBCLASS_OF(SUPER, SUB)  std::is_base_of_v<SUPER, std::remove_pointer_t<SUB>>
 
 // Rejects specific types
-#define REJECT_KNOWN_TYPE(TYPE, METHOD) \
-  static_assert(!SUBCLASS_OF(TYPE), CLEAR_ERROR_MSG(METHOD, "a" #TYPE));
+#define REJECT_KNOWN_TYPE(SUPER, SUB, METHOD)                                     \
+  static_assert( !SUBCLASS_OF(SUPER, SUB), CLEAR_ERROR_MSG(METHOD, "a " #SUPER));
 
 // Rejects any other type. The condition here is unnecessary, but it
 // describes better what we want to achieve
-#define REJECT_UNKNOWN_TYPE(METHOD)                              \
-  static_assert( SUBCLASS_OF(n4::shape) || SUBCLASS_OF(G4VSolid) \
+#define REJECT_UNKNOWN_TYPE(SUB, METHOD)                                    \
+  static_assert( SUBCLASS_OF(n4::shape, SUB) || SUBCLASS_OF(G4VSolid, SUB)  \
                , CLEAR_ERROR_MSG(METHOD, "an invalid type"));
-
 
 // A catch-all template so we give a better error for any type that is
 // not appropriate. The template resolution order takes care of
 // finding the valid input types first
-#define CHECK_INVALID(METHOD)                                                   \
-template<class INPUT_TYPE> boolean_shape shape::METHOD(INPUT_TYPE x) {          \
-  REJECT_KNOWN_TYPE(G4LogicalVolume, #METHOD)                                   \
-  REJECT_KNOWN_TYPE(G4PVPlacement  , #METHOD)                                   \
-  REJECT_KNOWN_TYPE(n4::place      , #METHOD)                                   \
-  REJECT_UNKNOWN_TYPE(               #METHOD)                                   \
-  /* At this point we know that it's either a n4::shape or a G4VSolid */        \
-  if constexpr (SUBCLASS_OF(n4::shape)) { return shape::METHOD##_(x.solid()); } \
-  else                                  { return shape::METHOD##_(x        ); } \
+#define CHECK_INVALID(METHOD)                                                                 \
+template<class SUBTYPE> boolean_shape shape::METHOD(SUBTYPE x) {                              \
+  /**/ if constexpr (SUBCLASS_OF(n4::shape, SUBTYPE)) { return shape::METHOD##_(x.solid()); } \
+  else if constexpr (SUBCLASS_OF(G4VSolid , SUBTYPE)) { return shape::METHOD##_(x        ); } \
+  else {                                                                                      \
+    REJECT_KNOWN_TYPE(G4LogicalVolume, SUBTYPE, #METHOD);                                     \
+    REJECT_KNOWN_TYPE(G4PVPlacement  , SUBTYPE, #METHOD);                                     \
+    REJECT_KNOWN_TYPE(n4::place      , SUBTYPE, #METHOD);                                     \
+    if constexpr ( !SUBCLASS_OF(G4LogicalVolume, SUBTYPE) &&                                  \
+                   !SUBCLASS_OF(G4PVPlacement  , SUBTYPE) &&                                  \
+                   !SUBCLASS_OF(n4::place      , SUBTYPE) ) {                                 \
+      REJECT_UNKNOWN_TYPE(             SUBTYPE, #METHOD);                                     \
+    }                                                                                         \
+  }                                                                                           \
 }
 
 CHECK_INVALID(add)
@@ -139,9 +142,10 @@ CHECK_INVALID(join)
 CHECK_INVALID(subtract)
 CHECK_INVALID(intersect)
 
-#undef DERIVED
 #undef CHECK_INVALID
-#undef SAME_TYPE
+#undef REJECT_UNKNOWN_TYPE
+#undef REJECT_KNOWN_TYPE
+#undef SUBCLASS_OF
 #undef CLEAR_ERROR_MSG
 
 // ---- Macros for reuse of members and setters of orthogonal directions ------------------------------
