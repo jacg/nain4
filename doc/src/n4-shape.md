@@ -303,7 +303,7 @@ Note the, perhaps surprising, difference between `.xyz()` and the `.xy()`-`.xz()
 
 
 ##### Half-length methods
-All the aforementioned full-length methods have alternatives which accept half-lengths: `half_x(lx/2)`, `half_cube(l/2)`, `half_xy(lx/2, ly/2)`, etc.
+All the aforementioned full-length methods have alternatives which accept half-lengths: `half_x(lx/2)`, `half_cube(l/2)`, `half_xy(lxy)`, etc.
 ##### Overriding
 If any value is specified more than once, the last setting overrides any earlier ones. Thus, the following three lines are equivalent.
 
@@ -313,6 +313,9 @@ If any value is specified more than once, the last setting overrides any earlier
 .xy  (1*m          ).z(2*m)
 ```
 While the first two work, the last one states the intent most clearly.
+
+See the sections about setting [Cartesian lengths](#cartesian-lengths) for more details.
+
 
 ### `n4::sphere`
 
@@ -437,7 +440,109 @@ See the sections about setting [Cartesian lengths](#cartesian-lengths), [radial 
 
 
 ### `n4::trd`
+
+Constructs `G4Trd`: frustrum (a.k.a. truncated pyramid) with two
+parallel rectangular faces and four trapezoidal faces. The rectangular
+faces are perpendicular to the z axis and their sides are parallel to
+the x and y axes. The bottom face (placed at negative z) has side
+lengths `x1`, `y1`, and the top face (placed at positive z) has side
+lengths `x2`, `y2`. Both faces are separated by a distance
+`z`. Within its frame of reference it is centred on the
+origin. Displacements and rotations can be applied with
+[`.place(material)`](#placing-a-volume).
+
+#### Example
+```c++
+G4Trd* trd = n4::trd("trd").xy1(10*cm).xy2(5*cm).z(50*cm).solid();
+```
+<details class="g4">
+
+  <summary></summary>
+
+  ```c++
+  auto cross_section_bottom = 10*cm, cross_section_top = 5*cm, z_length = 50*cm;
+  G4Trd* trd = new G4Trd("trd", cross_section_bottom/2, cross_section_top/2, cross_section_bottom/2, cross_section_top/2, z_length/2);
+  ```
+</details>
+
+#### Methods
+
+##### Full-length methods
+
+All these methods take full (as opposed to half-) lengths:
++ `x1(lx)`, `x2(ly)`, `y1(lx)`, `y2(ly)`: set one dimension of one
+  rectangular face. 1 Refers to the bottom face, while 2 refers to the
+  top face.
++ `xy1(l)`, `xy2(l)`: set both dimensions of one face. 1 Refers to the
+  bottom face, while 2 refers to the top face.
++ `z(l)`: set the distance between the two parallel faces.
+
+##### Half-length methods
+All the aforementioned full-length methods have alternatives which
+accept half-lengths: `half_x1(lx/2)`, `half_xy2(lxy/2)`,
+`half_z(lz/2)`, etc.
+
+See the sections about setting [Cartesian lengths](#cartesian-lengths) for more details.
+
+
 ### `n4::cons`
+
+Constructs `G4Cons`: truncated cone or cone section. Within its frame of reference, it is parallel to and centred on the z-axis; φ is measured counterclockwise WRT the x-axis when viewed from positive z. Displacements and rotations can be applied with [`.place(material)`](#placing-a-volume).
+
+#### Examples
+
+A solid truncated cone
+```c++
+G4Tubs* solid_cone = n4::tubs("solid_cone").r1(1*m).r2(2*m).z(3*m).solid();
+```
+<details class="g4"> <summary></summary>
+
+  ```c++
+  auto radius_1 = 1*m, radius_2 = 2*m, z_length = 3*m;
+  G4Cons* solid_cone = new G4Cons("solid_cone", 0, radius_1, 0, radius_2, z_length/2, 0, CLHEP::twopi);
+  ```
+</details>
+
+A hollow cone
+```c++
+G4Cone* hollow_cone = n4::cone("hollow_cone").r1(1*m).r2(2*cm).r_delta(10*cm).z(3*m).solid();
+```
+<details class="g4"> <summary></summary>
+
+  ```c++
+  auto radius_1 = 1*m, radius_2 = 2*m, thickness = 10*cm, z_length = 3*m;
+  G4Cons* hollow_cone = new G4Cons("hollow_cone", radius_1 - thickness, radius_1, radius_2 - thickness, radius_2, z_length/2, 0, CLHEP::twopi);
+  ```
+</details>
+
+
+A conical wedge
+```c++
+G4Cons* wedge = n4::cons("wedge").r1(1*m).r2(2*m).z(3*m).phi_start(20*deg).phi_end(30*deg).solid();
+```
+<details class="g4"> <summary></summary>
+
+  ```c++
+  auto radius_1 = 1*m, radius_2 = 2*m, z_length = 3*m, start_phi = 20*deg, end_phi = 30*deg;
+  G4Cons* wedge = new G4Cons("wedge", 0, radius_1, 0, radius_2, z_length/2, start_phi, end_phi - start_phi);
+  ```
+</details>
+
+
+#### Methods
+
++ `z()`
++ `half_z()`
++ `r1_inner(l)`, `r1_delta(l)`, `r1(l)`: Sets the radial limits of the bottom (negative z) side
++ `r2_inner(l)`, `r2_delta(l)`, `r2(l)`: Sets the radial limits of the top    (positive z) side
++ `r_delta`: Sets both `r1_delta` and `r2_delta`
++ `phi_start(a)`
++ `phi_delta(a)`
++ `phi_end(a)`
+
+See the sections about setting [Cartesian lengths](#cartesian-lengths), [radial lengths](#radial-length-r) and [azimuthal angles](#azimuthal-angle-φ) for more details.
+
+
 
 ## Obviously missing shapes
 
