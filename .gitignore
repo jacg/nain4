@@ -10,3 +10,4 @@ compile_commands.json
 /cmake_install.cmake
 .README.txt
 G4History.macro
+/install/
