@@ -24,7 +24,7 @@
 
       in {
 
-        devShell = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
+        devShell = pkgs.mkShell {
           name = "G4-examples-devenv";
 
           packages = with pkgs; [
