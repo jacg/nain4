@@ -36,8 +36,8 @@
             geant4.data.G4SAIDDATA
             geant4.data.G4PARTICLEXS
             geant4.data.G4NDL
-            clang_16
-            clang-tools
+            # clang_16
+            # clang-tools
             cmake
             cmake-language-server
             catch2_3
