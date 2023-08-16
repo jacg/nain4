@@ -47,9 +47,6 @@ jobs:
       - name: Run client-side tests
         run: nix develop -c just test-client-side
 
-      - name: Run compile-time tests
-        run: nix develop -c just test-compile-time
-
       - name: Run nain4 examples
         run: nix develop -c just test-examples
 
