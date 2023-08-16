@@ -9,6 +9,4 @@ int main() {
 
   auto box = nain4::volume<G4Box>("test_box", water, lx, ly, lz);
   nain4::place(box).at(0., 0., 0.).now();
-
-  return 0;
 }
