@@ -7,10 +7,17 @@ on:
       - .gitignore
       - doc
       - docs
-jobs:
 
+jobs:
   build-and-test:
-    if: "! contains(github.event.head_commit.message, '[skip ci]')"
+
+    # See https://wildwolf.name/github-actions-how-to-avoid-running-the-same-workflow-multiple-times/
+    if: (! contains(github.event.head_commit.message, '[skip ci]')                   &&
+                  ((github.event_name                             != 'pull_request') ||
+                   (github.event.pull_request.head.repo.full_name !=
+                    github.event.pull_request.base.repo.full_name))
+        )
+
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.allow-fail }}
     strategy:
