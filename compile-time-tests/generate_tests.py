@@ -110,6 +110,16 @@ int main() {{
 }}
 """
 
+def found(needle, haystack):
+    return needle in sanitized(haystack)
+
+def sanitized(text):
+    return (text
+            .replace('’', "'")
+            .replace('‘', "'")
+            )
+
+
 number_of_tests      = len(tests)
 max_test_name_length = max(map(len, tests))
 
@@ -135,7 +145,7 @@ for (test_name, (error_match, snippet)) in tests.items():
                             , shell          = True)
 
     compiled    = process.returncode == 0
-    found_match = error_match in process.stderr.decode()
+    found_match = found(error_match, process.stderr.decode())
     failed      = compiled or not found_match
     n_failed   += int(failed)
 
