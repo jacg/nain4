@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 tmp_dir=$(mktemp -d -t nain4-recompile-XXXXXX)
 test_dir=$(dirname "$(readlink -f "$0")")

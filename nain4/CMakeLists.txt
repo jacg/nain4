@@ -45,6 +45,10 @@ FILE(GLOB HEADERS ${PROJECT_SOURCE_DIR}/*.hh)
 
 add_library(Nain4 SHARED ${SOURCES} ${HEADERS})
 
+if(APPLE)
+    target_link_options(Nain4 PRIVATE -undefined dynamic_lookup)
+endif()
+
 #set_target_properties(Nain4 PROPERTIES ENABLE_EXPORTS ON)
 
 #----------------------------------------------------------------------------
@@ -79,6 +83,10 @@ set(ALL_TEST_SOURCES
 
 # TODO including headers in add_executable apparently makes them show up in IDEs. Verify how?
 add_executable(nain4-tests ${ALL_TEST_SOURCES})
+
+if(APPLE)
+  target_link_options(nain4-tests PRIVATE -undefined dynamic_lookup)
+endif()
 
 
 target_link_libraries(
