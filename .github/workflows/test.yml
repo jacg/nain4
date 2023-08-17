@@ -2,11 +2,11 @@ name: Build and Test
 on:
   pull_request:
   push:
-    branches-ignore:
-      - publish
-      - mdbook
-      - doc-*
-      - docs-*
+    paths-ignore:
+      - README.md
+      - .gitignore
+      - doc
+      - docs
 jobs:
 
   build-and-test:
