@@ -52,6 +52,7 @@ jobs:
 
       - name: nix-shell
         run: nix-shell --run just
+        if: ${{ matrix.devshell == 'clang' }}
 
       - name: Run client-side tests
         run: nix develop .#${{ matrix.devshell }}  -c just test-client-side
