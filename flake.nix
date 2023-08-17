@@ -22,6 +22,23 @@
           enableRaytracerX11   = false;
         });
 
+        # Should be able to remove this, once https://github.com/NixOS/nixpkgs/issues/234710 is merged
+        clang_16 = if pkgs.stdenv.isDarwin
+          then pkgs.llvmPackages_16.clang.override rec {
+            libc = pkgs.darwin.Libsystem;
+            bintools = pkgs.bintools.override { inherit libc; };
+            inherit (pkgs.llvmPackages) libcxx;
+            extraPackages = [
+              pkgs.llvmPackages.libcxxabi
+              # Use the compiler-rt associated with clang, but use the libc++abi from the stdenv
+              # to avoid linking against two different versions (for the same reasons as above).
+              (pkgs.llvmPackages_16.compiler-rt.override {
+                inherit (pkgs.llvmPackages) libcxxabi;
+              })
+            ];
+          }
+          else pkgs.llvmPackages.clang;
+
         my-packages = with pkgs; [
           my-geant4
           geant4.data.G4PhotonEvaporation
@@ -31,6 +48,8 @@
           geant4.data.G4SAIDDATA
           geant4.data.G4PARTICLEXS
           geant4.data.G4NDL
+          clang_16
+          clang-tools
           cmake
           cmake-language-server
           catch2_3
@@ -40,13 +59,11 @@
         ] ++ lib.optionals stdenv.isDarwin [
 
         ] ++ lib.optionals stdenv.isLinux [
-          clang_16
-          clang-tools
         ];
 
       in {
 
-        devShell = pkgs.mkShell {
+        devShell = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
           name = "G4-examples-devenv";
 
           packages = my-packages;
