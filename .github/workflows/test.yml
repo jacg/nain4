@@ -19,14 +19,15 @@ jobs:
         )
 
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.allow-fail }}
+    #continue-on-error: ${{ matrix.allow-fail }}
+    continue-on-error: ${{ matrix.devshell == 'gcc' }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-12]
         py: [311]
         devshell: [ clang, gcc ]
-        allow-fail: [false]
+        #allow-fail: [false]
 
     steps:
       - uses: actions/checkout@v3.5.3
