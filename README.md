@@ -80,7 +80,7 @@ Geant4 obliges you to express everything in (frequently annoying) half-lengths; 
 
    This step will take a while, the very first time you do it: it will download and compile Geant4. Thereafter, the build result is cached, and subsequent invocations should take under a second.
 
-5. Type `just g4-example/run B1`.
+5. Type `just g4-examples/run B1`.
 
    This step compiles and runs the `basic/B1` example that is distributed with Geant4, in interactive mode. A visualization window should pop up.
 
