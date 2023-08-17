@@ -22,29 +22,34 @@
           enableRaytracerX11   = false;
         });
 
+        my-packages = with pkgs; [
+          my-geant4
+          geant4.data.G4PhotonEvaporation
+          geant4.data.G4EMLOW
+          geant4.data.G4RadioactiveDecay
+          geant4.data.G4ENSDFSTATE
+          geant4.data.G4SAIDDATA
+          geant4.data.G4PARTICLEXS
+          geant4.data.G4NDL
+          cmake
+          cmake-language-server
+          catch2_3
+          just
+          gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
+          mdbook
+        ] ++ lib.optionals stdenv.isDarwin [
+
+        ] ++ lib.optionals stdenv.isLinux [
+          clang_16
+          clang-tools
+        ];
+
       in {
 
         devShell = pkgs.mkShell {
           name = "G4-examples-devenv";
 
-          packages = with pkgs; [
-            my-geant4
-            geant4.data.G4PhotonEvaporation
-            geant4.data.G4EMLOW
-            geant4.data.G4RadioactiveDecay
-            geant4.data.G4ENSDFSTATE
-            geant4.data.G4SAIDDATA
-            geant4.data.G4PARTICLEXS
-            geant4.data.G4NDL
-            # clang_16
-            # clang-tools
-            cmake
-            cmake-language-server
-            catch2_3
-            just
-            gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
-            mdbook
-          ];
+          packages = my-packages;
 
           G4_DIR = "${pkgs.geant4}";
           G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
