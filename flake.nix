@@ -12,7 +12,6 @@
     flake-utils.lib.eachSystem ["x86_64-linux" "i686-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"] (system:
       let
         pkgs = import nixpkgs { inherit system; };
-
         my-geant4 = (pkgs.geant4.override {
           enableMultiThreading = false;
           enableInventor       = false;
@@ -45,14 +44,9 @@
           clang-tools
         ];
 
-        my-mkShell = pkgs.mkShell.override {
-          stdenv = if pkgs.stdenv.isDarwin then pkgs.                stdenv
-                                           else pkgs.llvmPackages_16.stdenv;
-        };
-
       in {
 
-        devShell = my-mkShell {
+        devShell = pkgs.mkShell {
           name = "G4-examples-devenv";
 
           packages = my-packages;
