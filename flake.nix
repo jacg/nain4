@@ -48,8 +48,6 @@
           geant4.data.G4SAIDDATA
           geant4.data.G4PARTICLEXS
           geant4.data.G4NDL
-          clang_16
-          clang-tools
           cmake
           cmake-language-server
           catch2_3
@@ -61,10 +59,21 @@
         ] ++ lib.optionals stdenv.isLinux [
         ];
 
-      in {
+      in rec {
 
-        devShell = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
-          name = "G4-examples-devenv";
+        devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
+          name = "nain4-clang-devenv";
+
+          packages = my-packages ++ [ clang_16 pkgs.clang-tools ];
+
+          G4_DIR = "${pkgs.geant4}";
+          G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
+          QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
+
+        };
+
+        devShells.gcc = pkgs.mkShell {
+          name = "nain4-gcc-devenv";
 
           packages = my-packages;
 
@@ -73,6 +82,8 @@
           QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
         };
+
+        devShell = devShells.clang;
 
         packages.geant4  = my-geant4;
         packages.default = my-geant4;

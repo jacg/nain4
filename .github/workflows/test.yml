@@ -19,13 +19,15 @@ jobs:
         )
 
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.allow-fail }}
+    #continue-on-error: ${{ matrix.allow-fail }}
+    continue-on-error: ${{ matrix.devshell == 'gcc' }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-12]
         py: [311]
-        allow-fail: [false]
+        devshell: [ clang, gcc ]
+        #allow-fail: [false]
 
     steps:
       - uses: actions/checkout@v3.5.3
@@ -46,19 +48,20 @@ jobs:
         run: nix develop
 
       - name: Test nain4
-        run: nix develop -c just test-nain4
+        run: nix develop .#${{ matrix.devshell }} -c just test-nain4
 
       - name: nix-shell
         run: nix-shell --run just
+        if: ${{ matrix.devshell == 'clang' }}
 
       - name: Run client-side tests
-        run: nix develop -c just test-client-side
+        run: nix develop .#${{ matrix.devshell }}  -c just test-client-side
 
       - name: Run compile-time tests
-        run: nix develop -c just test-compile-time
+        run: nix develop .#${{ matrix.devshell }}  -c just test-compile-time
 
       - name: Run nain4 examples
-        run: nix develop -c just test-examples
+        run: nix develop .#${{ matrix.devshell }}  -c just test-examples
 
       - name: Run G4 examples
-        run: nix develop -c just g4-examples/run-examples-that-work
+        run: nix develop .#${{ matrix.devshell }}  -c just g4-examples/run-examples-that-work
