@@ -59,9 +59,9 @@
         ] ++ lib.optionals stdenv.isLinux [
         ];
 
-      in {
+      in rec {
 
-        devShell = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
+        devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
           name = "nain4-clang-devenv";
 
           packages = my-packages ++ [ clang_16 pkgs.clang-tools ];
@@ -82,6 +82,8 @@
           QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
         };
+
+        devShell = devShells.clang;
 
         packages.geant4  = my-geant4;
         packages.default = my-geant4;
