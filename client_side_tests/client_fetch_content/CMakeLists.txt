@@ -2,10 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(Client)
 
-execute_process(
-  COMMAND bash -c "git config --get remote.origin.url | cut -d '/' -f 4 | tr -d '\n'"
-  OUTPUT_VARIABLE USERNAME
-)
+set(USERNAME $ENV{GITHUB_USERNAME})
 
 execute_process(
   COMMAND bash -c "git log -1 | head -1 | cut -d ' ' -f 2 | tr -d '\n'"
