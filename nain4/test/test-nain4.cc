@@ -35,6 +35,9 @@
 #include <cmath>
 #include <type_traits>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 using Catch::Approx;
 
 // Many of the tests below check physical quantities. Dividing physical
@@ -1781,3 +1784,5 @@ TEST_CASE("random point in sphere", "[random][sphere]") {
   check_around_axis(z_hits);
 
 }
+
+#pragma GCC diagnostic pop
