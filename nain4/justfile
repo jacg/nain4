@@ -38,13 +38,9 @@ test PATTERN *FLAGS: build
 		printf "\\033[0m"
 	fi
 
-build: cmake
+build:
 	#!/usr/bin/env sh
-	cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo . && make -j
-
-cmake:
-	#!/usr/bin/env sh
-	cmake -S . -B build
+	cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 	cmake --build build --target install -j
 
 
