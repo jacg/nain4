@@ -15,7 +15,7 @@ std::optional<unsigned> parse_unsigned(char* arg) {
     auto parsed = std::stoi(arg);
     if (parsed < 0) { return std::nullopt; }
     return static_cast<unsigned>(parsed);
-  } catch (std::invalid_argument) {
+  } catch (std::invalid_argument&) {
     return std::nullopt;
   }
 }
