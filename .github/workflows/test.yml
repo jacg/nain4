@@ -31,6 +31,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3.5.3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: cachix/install-nix-action@v22
         with:
           nix_path: nixpkgs=channel:nixos-23.05
