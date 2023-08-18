@@ -4,10 +4,10 @@
 
 #include <G4Run.hh>
 
+namespace nain4 {
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
-
-namespace nain4 {
 
 // ----- actions --------------------------------------------------------------------
 void actions::Build() const {
@@ -34,6 +34,6 @@ sensitive_detector::sensitive_detector(G4String name, process_hits_fn process_hi
   fully_activate_sensitive_detector(this);
 }
 
-} // namespace nain4
-
 #pragma GCC diagnostic pop
+
+} // namespace nain4
