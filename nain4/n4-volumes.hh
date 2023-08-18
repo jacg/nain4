@@ -27,6 +27,8 @@
 
 namespace nain4 {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 
 enum class BOOL_OP { ADD, SUB, INT };
 
@@ -286,6 +288,8 @@ public:
 #undef HAS_Y
 #undef HAS_Z
 #undef HAS_XYZ
+
+#pragma GCC diagnostic pop
 
 }; // namespace nain4
 

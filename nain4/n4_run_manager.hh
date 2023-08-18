@@ -20,6 +20,9 @@
 
 namespace nain4 {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 // Type-state pattern to ensure that the run manager is fully
 // configured before initialization.
 // Usage:
@@ -169,6 +172,8 @@ public:
 
   G4RunManager* here_be_dragons() { return manager.get(); }
 };
+
+#pragma GCC diagnostic pop
 
 } // namespace nain4
 
