@@ -108,7 +108,7 @@ If not, read on to see possible problems and fixes.
 
 ### Automatic environment switching with `direnv`
 
-As is stands you have to write `nix develop --extra-experimenal-features 'nix-command flakes'` in order to activate the environment necessary to run and develop this code. What is more, `nix develop` places you in a minimal bash shell in which any personal configurations you may be used to, will be missing.
+As is stands you have to write `nix develop` in order to activate the environment necessary to run and develop this code. What is more, `nix develop` places you in a minimal bash shell in which any personal configurations you may be used to, will be missing.
 
 Both of these problems can be fixed with [direnv](https://direnv.net/) which:
   * automatically enables the environment when you enter the directory (asking your permission, the first time)
@@ -126,15 +126,6 @@ eval "$(direnv hook bash)"  # in ~/.bashrc
 eval "$(direnv hook zsh)"   # in ~/.zshrc
 eval `direnv hook tcsh`     # in ~/.cshrc
 ```
-
-### Enable flakes
-
-Flakes are a feature of Nix which are not enabled by default. If you use `direnv` this is unlikely to matter to you. If you do not use `direnv` you might want to enable flake by editing one of `~/.config/nix/nix.conf` or `/etc/nix/nix.conf` and adding the line:
-
-``` nix
-experimental-features = nix-command flakes
-```
-This will remove the need to add `--extra-experimenal-features 'nix-command flakes'` every time you run `nix develop`.
 
 ## Geant 4 configuration
 
