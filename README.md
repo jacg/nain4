@@ -10,9 +10,9 @@ This repository contains two orthogonal but related products:
 
    Utilities that make writing and testing Geant4 applications much easier.
 
-2. A [Nix](https://nixos.org/) flake for easy provision of Geant4 user and application-developer environments.
+2. A [Nix](https://zero-to-nix.com/) flake for easy provision of Geant4 user and application-developer environments.
 
-   The value proposition is: If *you* [install Nix](https://nixos.org/download.html) on your machine *we* can provide a zero-effort means of installing Geant4 plus dependencies and development tools.
+   The value proposition is: If *you* [install Nix](https://zero-to-nix.com/start/install) on your machine *we* can provide a zero-effort means of installing Geant4 plus dependencies and development tools.
  
 The flake is not necessary to *use* `nain4`, but an installation of Geant4 is necessary to *test* `nain4`.
 
@@ -69,14 +69,17 @@ Geant4 obliges you to express everything in (frequently annoying) half-lengths; 
 # The Nix flake
 
 ## Getting started
+1. [install nix](https://determinate.systems/posts/determinate-nix-installer)
 
-1. [install Nix](https://nixos.org/download.html): `sh <(curl -L https://nixos.org/nix/install) --daemon`
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+   ```
 
 2. Clone this repository: `git clone https://github.com/jacg/nain4`
 
 3. `cd` into it
 
-4. Type `nix develop --extra-experimental-features 'nix-command flakes'`
+4. Type `nix develop`
 
    This step will take a while, the very first time you do it: it will download and compile Geant4. Thereafter, the build result is cached, and subsequent invocations should take under a second.
 
