@@ -10,9 +10,9 @@ This repository contains two orthogonal but related products:
 
    Utilities that make writing and testing Geant4 applications much easier.
 
-2. A [Nix](https://nixos.org/) flake for easy provision of Geant4 user and application-developer environments.
+2. A [Nix](https://zero-to-nix.com/) flake for easy provision of Geant4 user and application-developer environments.
 
-   The value proposition is: If *you* [install Nix](https://nixos.org/download.html) on your machine *we* can provide a zero-effort means of installing Geant4 plus dependencies and development tools.
+   The value proposition is: If *you* [install Nix](https://zero-to-nix.com/start/install) on your machine *we* can provide a zero-effort means of installing Geant4 plus dependencies and development tools.
  
 The flake is not necessary to *use* `nain4`, but an installation of Geant4 is necessary to *test* `nain4`.
 
@@ -69,14 +69,17 @@ Geant4 obliges you to express everything in (frequently annoying) half-lengths; 
 # The Nix flake
 
 ## Getting started
+1. [install nix](https://determinate.systems/posts/determinate-nix-installer)
 
-1. [install Nix](https://nixos.org/download.html): `sh <(curl -L https://nixos.org/nix/install) --daemon`
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+   ```
 
 2. Clone this repository: `git clone https://github.com/jacg/nain4`
 
 3. `cd` into it
 
-4. Type `nix develop --extra-experimental-features 'nix-command flakes'`
+4. Type `nix develop`
 
    This step will take a while, the very first time you do it: it will download and compile Geant4. Thereafter, the build result is cached, and subsequent invocations should take under a second.
 
@@ -99,13 +102,13 @@ If not, read on to see possible problems and fixes.
   [boot]
   systemd=true
   ```
-+ MacOS: The Geant4 provided by this flake compiles on MacOS12 x86_64. Beyond that, the status on MacOS is not known, at present.
++ MacOS: Everything seems to work on macOS, with both Intel processors and Apple Silicon, but it has not been tested extensively.
 
 ## Ergonomics
 
 ### Automatic environment switching with `direnv`
 
-As is stands you have to write `nix develop --extra-experimenal-features 'nix-command flakes'` in order to activate the environment necessary to run and develop this code. What is more, `nix develop` places you in a minimal bash shell in which any personal configurations you may be used to, will be missing.
+As is stands you have to write `nix develop` in order to activate the environment necessary to run and develop this code. What is more, `nix develop` places you in a minimal bash shell in which any personal configurations you may be used to, will be missing.
 
 Both of these problems can be fixed with [direnv](https://direnv.net/) which:
   * automatically enables the environment when you enter the directory (asking your permission, the first time)
@@ -123,15 +126,6 @@ eval "$(direnv hook bash)"  # in ~/.bashrc
 eval "$(direnv hook zsh)"   # in ~/.zshrc
 eval `direnv hook tcsh`     # in ~/.cshrc
 ```
-
-### Enable flakes
-
-Flakes are a feature of Nix which are not enabled by default. If you use `direnv` this is unlikely to matter to you. If you do not use `direnv` you might want to enable flake by editing one of `~/.config/nix/nix.conf` or `/etc/nix/nix.conf` and adding the line:
-
-``` nix
-experimental-features = nix-command flakes
-```
-This will remove the need to add `--extra-experimenal-features 'nix-command flakes'` every time you run `nix develop`.
 
 ## Geant 4 configuration
 
