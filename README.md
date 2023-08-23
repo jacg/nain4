@@ -102,7 +102,7 @@ If not, read on to see possible problems and fixes.
   [boot]
   systemd=true
   ```
-+ MacOS: The Geant4 provided by this flake compiles on MacOS12 x86_64. Beyond that, the status on MacOS is not known, at present.
++ MacOS: Everything seems to work on macOS, with both Intel processors and Apple Silicon, but it has not been tested extensively.
 
 ## Ergonomics
 
