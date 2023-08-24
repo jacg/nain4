@@ -31,6 +31,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3.5.3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: cachix/install-nix-action@v22
         with:
           nix_path: nixpkgs=channel:nixos-23.05
@@ -43,6 +45,14 @@ jobs:
           #signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
           # If you chose API tokens for write access OR if you have a private cache
           authToken: '${{ secrets.CACHIX_JACG_NAIN4 }}'
+
+      - name: pre-build
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "GITHUB_USERNAME=${{ github.event.pull_request.user.login }}" >> $GITHUB_ENV
+          else
+            echo "GITHUB_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+          fi
 
       - name: Nix build
         run: nix develop
