@@ -40,7 +40,7 @@ test PATTERN *FLAGS: build
 
 build:
 	#!/usr/bin/env sh
-	cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+	cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 	cmake --build build --target install -j
 
 

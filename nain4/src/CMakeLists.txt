@@ -6,7 +6,7 @@ project(Nain4)
 # Defaults to <top>/install, but can be overriden from CLI
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX
-      ${PROJECT_SOURCE_DIR}/../install/
+      ${PROJECT_SOURCE_DIR}/../../install/
       CACHE PATH
       "Default installation directory"
       FORCE
@@ -67,15 +67,15 @@ endif()
 include(${Geant4_USE_FILE})
 
 set(Nain4_TESTS
-  test/test-nain4.cc
-  test/test-run-manager.cc
-  test/trivial-full-app-test.cc
+  ../test/test-nain4.cc
+  ../test/test-run-manager.cc
+  ../test/trivial-full-app-test.cc
 )
 
 # ----- Use Catch2 as C++ testing framework ---------------------------------
 find_package(Catch2 3 REQUIRED)
 set(ALL_TEST_SOURCES
-  test/catch2-main-test.cc
+  ../test/catch2-main-test.cc
   # ${Nain4_SOURCES}
   # ${Nain4_HEADERS}
   ${Nain4_TESTS}
