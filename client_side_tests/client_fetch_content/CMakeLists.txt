@@ -23,7 +23,7 @@ FetchContent_Declare(
   GIT_TAG        ${COMMIT_HASH}
   # make sure that no other nain4 installation is used
   OVERRIDE_FIND_PACKAGE
-  SOURCE_SUBDIR nain4
+  SOURCE_SUBDIR nain4/src
 )
 
 FetchContent_MakeAvailable(Nain4)
