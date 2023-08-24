@@ -6,7 +6,7 @@ project(Nain4)
 # Defaults to <top>/install, but can be overriden from CLI
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX
-      ${PROJECT_SOURCE_DIR}/../../install/
+      ${PROJECT_SOURCE_DIR}/../../install/nain4
       CACHE PATH
       "Default installation directory"
       FORCE
@@ -48,8 +48,6 @@ add_library(Nain4 SHARED ${SOURCES} ${HEADERS})
 if(APPLE)
     target_link_options(Nain4 PRIVATE -undefined dynamic_lookup)
 endif()
-
-#set_target_properties(Nain4 PROPERTIES ENABLE_EXPORTS ON)
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default

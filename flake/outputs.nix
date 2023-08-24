@@ -59,7 +59,7 @@
       pname = "nain4";
       version = "0.1.9";
       src = "${self}/nain4/src";
-      nativeBuildInputs = with pkgs; [ cmake geant4 ]; # extra-cmake-modules ?
+      nativeBuildInputs = with pkgs; [ cmake my-geant4 qt5.wrapQtAppsHook ]; # extra-cmake-modules ?
 
       # meta = with pkgs.lib; {
       #   description = "An API that makes it easier to write Geant4 application code.";
@@ -67,6 +67,18 @@
       #   # license = licenses.TODO;
       #   platforms = platforms.unix;
       # };
+    };
+
+    packages.nain4-tests = pkgs.stdenv.mkDerivation {
+      pname = "nain4-tests";
+      version = "0.1.9";
+      src = "${self}/nain4/test";
+      nativeBuildInputs = with pkgs; [
+        self.packages.nain4
+        cmake
+        my-geant4
+        catch2_3
+        qt5.wrapQtAppsHook ]; # extra-cmake-modules ?
     };
 
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {

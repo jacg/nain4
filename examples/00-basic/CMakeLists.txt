@@ -13,7 +13,7 @@ endif()
 # ANCHOR_END: project_setup
 
 # ANCHOR: include_nain4_geant4
-set(Nain4_DIR "../../install/lib/cmake/Nain4/")
+set(Nain4_DIR "../../install/nain4/lib/cmake/Nain4/")
 message(${Nain4_DIR})
 find_package(Nain4 REQUIRED)
 
