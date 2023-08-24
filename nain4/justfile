@@ -46,3 +46,4 @@ build:
 
 clean:
 	rm build -rf
+	rm ../install -rf
