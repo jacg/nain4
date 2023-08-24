@@ -13,3 +13,7 @@ test-client-side:
 
 test-compile-time:
     just compile-time-tests/test-all
+
+clean-deep:
+    fd --no-ignore "^build$"   --exec rm -rf {}
+    fd --no-ignore "^install$" --exec rm -rf {}
