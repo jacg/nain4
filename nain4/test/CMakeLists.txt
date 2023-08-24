@@ -6,7 +6,7 @@ project(Nain4)
 # Defaults to <top>/install, but can be overriden from CLI
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX
-      ${PROJECT_SOURCE_DIR}/../../install/
+      ${PROJECT_SOURCE_DIR}/../install/
       CACHE PATH
       "Default installation directory"
       FORCE
@@ -66,12 +66,47 @@ endif()
 
 include(${Geant4_USE_FILE})
 
+set(Nain4_TESTS
+  ../test/test-nain4.cc
+  ../test/test-run-manager.cc
+  ../test/trivial-full-app-test.cc
+)
+
+# ----- Use Catch2 as C++ testing framework ---------------------------------
+find_package(Catch2 3 REQUIRED)
+set(ALL_TEST_SOURCES
+  ../test/catch2-main-test.cc
+  # ${Nain4_SOURCES}
+  # ${Nain4_HEADERS}
+  ${Nain4_TESTS}
+)
+
+# TODO including headers in add_executable apparently makes them show up in IDEs. Verify how?
+add_executable(nain4-tests ${ALL_TEST_SOURCES})
+
+if(APPLE)
+  target_link_options(nain4-tests PRIVATE -undefined dynamic_lookup)
+endif()
+
+
+target_link_libraries(
+  nain4-tests
+  PUBLIC
+  Catch2::Catch2
+  ${Geant4_LIBRARIES}
+  Nain4
+)
+
 target_include_directories(
   Nain4
   PUBLIC
   $<BUILD_INTERFACE:${NAIN4_INCLUDE_DIRS}>
   $<INSTALL_INTERFACE:include>
 )
+
+include(CTest)
+include(Catch)
+catch_discover_tests(nain4-tests)
 
 include(GNUInstallDirs)
 set(NAIN4_CONFIG_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Nain4)
@@ -93,7 +128,7 @@ install(EXPORT Nain4Targets
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-    ${CMAKE_CURRENT_LIST_DIR}/../src/Nain4Config.cmake.in
+    ${CMAKE_CURRENT_LIST_DIR}/../Nain4Config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/Nain4Config.cmake
     INSTALL_DESTINATION ${NAIN4_CONFIG_DESTINATION}
 )

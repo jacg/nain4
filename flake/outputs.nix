@@ -52,6 +52,23 @@
 
   in rec {
 
+    packages.default = self.packages.nain4;
+
+    # TODO: switch to clang environment
+    packages.nain4 = pkgs.stdenv.mkDerivation {
+      pname = "nain4";
+      version = "0.1.9";
+      src = "${self}/nain4/src";
+      nativeBuildInputs = with pkgs; [ cmake geant4 ]; # extra-cmake-modules ?
+
+      # meta = with pkgs.lib; {
+      #   description = "An API that makes it easier to write Geant4 application code.";
+      #   homepage = "https://jacg.github.io/nain4/";
+      #   # license = licenses.TODO;
+      #   platforms = platforms.unix;
+      # };
+    };
+
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
       name = "nain4-clang-devenv";
 
