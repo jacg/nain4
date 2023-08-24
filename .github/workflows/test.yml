@@ -60,9 +60,8 @@ jobs:
       - name: Test nain4
         run: nix develop .#${{ matrix.devshell }} -c just test-nain4
 
-      - name: nix-shell
-        run: nix-shell --run just
-        if: ${{ matrix.devshell == 'clang' }}
+      - name: Test nain4 app
+        run: nix develop --command just examples/00-basic/run-app 10
 
       - name: Run client-side tests
         run: nix develop .#${{ matrix.devshell }}  -c just test-client-side
