@@ -128,7 +128,7 @@ install(EXPORT Nain4Targets
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-    ${CMAKE_CURRENT_LIST_DIR}/../Nain4Config.cmake.in
+    ${CMAKE_CURRENT_LIST_DIR}/../src/Nain4Config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/Nain4Config.cmake
     INSTALL_DESTINATION ${NAIN4_CONFIG_DESTINATION}
 )
