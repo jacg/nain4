@@ -11,3 +11,4 @@ compile_commands.json
 .README.txt
 G4History.macro
 /install/
+**/.gdb_history
