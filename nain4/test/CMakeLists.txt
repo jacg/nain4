@@ -28,6 +28,10 @@ include_directories(${PROJECT_SOURCE_DIR})
 FILE(GLOB SOURCES ${PROJECT_SOURCE_DIR}/*.cc)
 FILE(GLOB HEADERS ${PROJECT_SOURCE_DIR}/*.hh)
 
+set(Nain4_DIR "../../install/nain4/lib/cmake/Nain4")
+
+find_package(Nain4 REQUIRED)
+
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
 # You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
@@ -78,4 +82,13 @@ catch_discover_tests(${TEST_EXECUTABLE})
 
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${TEST_EXECUTABLE}
         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+)
+
+include(CMakePackageConfigHelpers)
+
+configure_file(
+    ${PROJECT_SOURCE_DIR}/run-each-test-in-separate-process.sh.in
+    ${CMAKE_INSTALL_PREFIX}/bin/run-each-test-in-separate-process.sh
+    FILE_PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+    @ONLY
 )

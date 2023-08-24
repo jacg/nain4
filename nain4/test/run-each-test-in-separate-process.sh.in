@@ -1,18 +1,27 @@
 #!/usr/bin/env sh
 
-cd build
+PATTERN=$1
+if [ ! -z $2 ]; then
+    shift
+    shift
+fi
+FLAGS=$@
+
 NPASSED=0
 NFAILED=0
 FAILED=
+
+EXE=@CMAKE_INSTALL_PREFIX@/bin/@TEST_EXECUTABLE@
+
 while read -r testname
 do
-    if ! ./nain4-tests "$testname" {{FLAGS}}; then
+    if ! $EXE "$testname" ${FLAGS}; then
         FAILED=$FAILED"$testname"\\n
         NFAILED=$((NFAILED+1))
     else
         NPASSED=$((NPASSED+1))
     fi
-done < <(./nain4-tests {{PATTERN}} --list-tests --verbosity quiet)
+done < <($EXE ${PATTERN} --list-tests --verbosity quiet)
 if ! [ -z "$FAILED" ]; then
     printf "\\033[91m===========================================================================\n"
     printf "\\033[32m Passed $NPASSED tests, \\033[91m Failed $NFAILED\n\n"
