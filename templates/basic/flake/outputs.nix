@@ -1,5 +1,6 @@
 { self
 , nixpkgs # <---- This `nixpkgs` has systems removed e.g. legacyPackages.zlib
+, nain4
 , ...
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
@@ -52,62 +53,34 @@
 
   in rec {
 
-    packages.default = self.packages.nain4;
+    wtf = self.system;
 
-    # TODO: switch to clang environment
-    packages.nain4 = pkgs.stdenv.mkDerivation {
-      pname = "nain4";
-      version = "0.1.9";
-      src = "${self}/nain4/src";
-      nativeBuildInputs = with pkgs; [ cmake my-geant4 qt5.wrapQtAppsHook ]; # extra-cmake-modules ?
-
-      # meta = with pkgs.lib; {
-      #   description = "An API that makes it easier to write Geant4 application code.";
-      #   homepage = "https://jacg.github.io/nain4/";
-      #   # license = licenses.TODO;
-      #   platforms = platforms.unix;
-      # };
-    };
-
-    packages.nain4-tests = pkgs.stdenv.mkDerivation {
-      pname = "nain4-tests";
-      version = "0.1.9";
-      src = "${self}/nain4/test";
-      nativeBuildInputs = with pkgs; [
-        self.packages.nain4
-        cmake
-        my-geant4
-        catch2_3
-        qt5.wrapQtAppsHook ]; # extra-cmake-modules ?
-    };
+    # TODO a package to run my nain4 project
 
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
-      name = "nain4-clang-devenv";
+      name = "my-nain4-app-clang-devenv";
 
-      packages = my-packages ++ [ clang_16 pkgs.clang-tools ];
-
-      G4_DIR = "${pkgs.geant4}";
-      G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
-      QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
-
-    };
-
-    devShells.gcc = pkgs.mkShell {
-      name = "nain4-gcc-devenv";
-
-      packages = my-packages;
+      packages = my-packages ++ [ nain4.packages.nain4 my-geant4 clang_16 pkgs.clang-tools ];
 
       G4_DIR = "${pkgs.geant4}";
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
       QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
     };
+
+    # devShells.gcc = pkgs.mkShell {
+    #   name = "my-nain4-app-gcc-devenv";
+
+    #   packages = my-packages;
+
+    #   G4_DIR = "${pkgs.geant4}";
+    #   G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
+    #   QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
+
+    # };
 
     devShell = devShells.clang;
 
     packages.geant4  = my-geant4;
-
-    # Leading underscore prevents nosys from regenerating this for every system
-    _templates = (import ../templates);
 
   }
