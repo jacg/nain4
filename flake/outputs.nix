@@ -110,4 +110,5 @@
     # Leading underscore prevents nosys from regenerating this for every system
     _templates = (import ../templates);
 
+    _contains-systems = { systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ]; };
   }
