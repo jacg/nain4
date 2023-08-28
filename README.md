@@ -127,6 +127,13 @@ eval "$(direnv hook zsh)"   # in ~/.zshrc
 eval `direnv hook tcsh`     # in ~/.cshrc
 ```
 
+The first time `direnv` wants to perform an automatic switch in a new context
+(combination of directory + `.envrc` contents), it asks you for permission to do
+so. You can give it permission by typing `direnv allow` in the shell. The
+message that `direnv` gives you at this stage is pretty clear, but it's usually
+written in red, thus you might get the mistaken impression that there is an
+error.
+
 ## Geant 4 configuration
 
 Various configuration options of Geant4 itself can be changed by editing `flake.nix` here: 
