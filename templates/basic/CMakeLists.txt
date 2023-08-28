@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.25)
 
 project(n4app-00-basic)
 
+# CHANGEME-my-n4-app: change my-n4-app with a name that better suits your
+# project. At the same time you must change it in the justfile of this
+# directory.
+set(EXE my-n4-app)
+
+
 # ----- Generate compile_commands.json, unless otherwise instructed on CLI --
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 # ----- Ensure that standard C++ headers are found by clangd
@@ -24,7 +30,6 @@ endif()
 
 include(${Geant4_USE_FILE})
 
-set(EXE n4app-00-basic)
 add_executable(${EXE} n4app.cc)
 
 target_link_libraries(

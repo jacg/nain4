@@ -11,7 +11,10 @@ compile-app:
 
 run-app N='': compile-app
   #!/usr/bin/env sh
-  ./build/n4app-00-basic {{N}}
+  # CHANGEME-my-n4-app: change my-n4-app with a name that better suits your
+  # project. At the same time you must change it in the CMakeLists.txt
+  # of this directory.
+  ./build/my-n4-app {{N}}
   exit $?
 
 clean:
