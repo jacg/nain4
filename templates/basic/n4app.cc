@@ -1,5 +1,3 @@
-// ANCHOR: full_file
-// ANCHOR: includes
 #include "nain4.hh"
 #include "g4-mandatory.hh"
 #include "n4_ui.hh"
@@ -16,9 +14,7 @@
 
 
 #include <cstdlib>
-// ANCHOR_END: includes
 
-// ANCHOR: print_usage
 void verify_number_of_args(int argc){
   if (argc != 2) {
     std::cerr << "Wrong number of arguments: " << argc
@@ -26,9 +22,7 @@ void verify_number_of_args(int argc){
     std::exit(EXIT_FAILURE);
   }
 }
-// ANCHOR_END: print_usage
 
-// ANCHOR: my_generator
 void my_generator(G4Event* event) {
   auto geantino = n4::find_particle("geantino");
   auto vertex   = new G4PrimaryVertex();
@@ -36,7 +30,6 @@ void my_generator(G4Event* event) {
   vertex -> SetPrimary(new G4PrimaryParticle(geantino, r.x(), r.y(), r.z()));
   event  -> AddPrimaryVertex(vertex);
 }
-// ANCHOR_END: my_generator
 
 n4::actions* create_actions(unsigned& n_event) {
   auto my_stepping_action = [&] (const G4Step* step) {
@@ -59,7 +52,6 @@ n4::actions* create_actions(unsigned& n_event) {
 }
 
 
-// ANCHOR: my_geometry
 auto my_geometry() {
 
   auto water  = n4::material("G4_WATER");
@@ -79,28 +71,16 @@ auto my_geometry() {
 
   return n4::place(world).now();
 }
-// ANCHOR_END: my_geometry
 
-// ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
-  // ANCHOR_END: pick_cli_arguments
-  unsigned n_event = 0;
+    unsigned n_event = 0;
 
-  // ANCHOR: create_run_manager
-  auto run_manager = n4::run_manager::create()
-  // ANCHOR_END: create_run_manager
+    auto run_manager = n4::run_manager::create()
 
-  // ANCHOR: build_minimal_framework
-  // Important! physics list has to be set before the generator!
+    // Important! physics list has to be set before the generator!
   .physics<FTFP_BERT>(0) // version 0
   .geometry(my_geometry)
   .actions(create_actions(n_event));
-  // ANCHOR_END: build_minimal_framework
 
-  // ANCHOR: run
-  n4::ui(argc, argv);
-  // ANCHOR_END: run
-// ANCHOR: closing_bracket
-}
-// ANCHOR_END: closing_bracket
-// ANCHOR_END: full_file
+    n4::ui(argc, argv);
+  }
