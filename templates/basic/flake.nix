@@ -2,7 +2,7 @@
   description = "flake.nix line 2: Change this to describe your project";
 
   inputs = {
-    nain4  .url     = "github:jacg/nain4/";
+    nain4  .url     = "github:jacg/nain4/templates";
     nosys  .follows = "nain4/nosys";
     nixpkgs.follows = "nain4/nixpkgs";
   };
