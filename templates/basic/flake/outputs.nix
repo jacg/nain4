@@ -53,8 +53,6 @@
 
   in rec {
 
-    wtf = self.system;
-
     # TODO a package to run my nain4 project
 
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
