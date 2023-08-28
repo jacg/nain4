@@ -13,3 +13,6 @@ run-app N='': compile-app
   #!/usr/bin/env sh
   ./build/n4app-00-basic {{N}}
   exit $?
+
+clean:
+  rm build -rf
