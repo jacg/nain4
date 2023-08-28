@@ -12,8 +12,7 @@ rec {
           To turn this into your own app
 
           + `git init`
-          + change the project name in files x, y, z
-          + etc.
+          + `grep CHANGEME` and follow instructions in the lines that appear
         '';
   };
 
