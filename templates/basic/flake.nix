@@ -1,4 +1,5 @@
 {
+  #CHANGEME-flake-description: keep it short (1 line).
   description = "flake.nix line 2: Change this to describe your project";
 
   inputs = {
