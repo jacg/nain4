@@ -124,7 +124,7 @@ number_of_tests      = len(tests)
 max_test_name_length = max(map(len, tests))
 
 main_folder    = tempfile.mkdtemp()
-nain4          = os.path.join(os.environ["PWD"], "..", "install")
+nain4          = os.environ["NAIN4_INSTALL"]
 n_failed       = 0
 green          = "\033[92m"
 red            = "\033[91m"
