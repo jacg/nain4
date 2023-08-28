@@ -51,21 +51,7 @@
       "inputs": {
         "flake-compat": "flake-compat",
         "nixpkgs": "nixpkgs",
-        "nosys": "nosys",
-        "systems": "systems"
-      }
-    },
-    "systems": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-syxQBjSh2xjH3AQvgWc42xZB6XmHboMzcCLdN3Wy0mk=",
-        "path": "./flake/systems.nix",
-        "type": "path"
-      },
-      "original": {
-        "path": "./flake/systems.nix",
-        "type": "path"
+        "nosys": "nosys"
       }
     }
   },
