@@ -9,8 +9,6 @@ if(CMAKE_EXPORT_COMPILE_COMMANDS)
   set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})
 endif()
 
-set(Nain4_DIR "../../install/lib/cmake/Nain4/")
-message(${Nain4_DIR})
 find_package(Nain4 REQUIRED)
 
 #----------------------------------------------------------------------------
