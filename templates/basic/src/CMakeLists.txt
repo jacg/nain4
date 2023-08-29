@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(n4app-00-basic)
+# CHANGEME-project-name: Not important, but you might want to change it
+project(my-nain4-project)
 
-# CHANGEME-my-n4-app: change my-n4-app with a name that better suits your
-# project. At the same time you must change it in the justfile of this
-# directory.
+# CHANGEME-my-n4-app: change my-n4-app to a name that better suits your project.
+# At the same time you must change it in the justfile of the parent directory.
 set(EXE my-n4-app)
-
 
 # ----- Generate compile_commands.json, unless otherwise instructed on CLI --
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
@@ -49,6 +48,6 @@ target_link_libraries(
 add_custom_command(
   TARGET ${EXE} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${CMAKE_SOURCE_DIR}/macs $<TARGET_FILE_DIR:${EXE}>/macs
+  ${CMAKE_SOURCE_DIR}../macs $<TARGET_FILE_DIR:${EXE}>/macs
   COMMENT "Symlinking G4 macros directory" VERBATIM
 )
