@@ -3,18 +3,15 @@
 test-app:
   just run-app macs/run.mac
 
-
 compile-app:
-  cmake -S . -B build
-  cmake --build build
-
+  cmake -S src -B build/app
+  cmake --build build/app
 
 run-app N='': compile-app
   #!/usr/bin/env sh
   # CHANGEME-my-n4-app: change my-n4-app with a name that better suits your
-  # project. At the same time you must change it in the CMakeLists.txt
-  # of this directory.
-  ./build/my-n4-app {{N}}
+  # project. At the same time you must change it in the `src/CMakeLists.txt`.
+  ./build/app/my-n4-app {{N}}
   exit $?
 
 clean:
