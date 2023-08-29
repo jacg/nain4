@@ -79,6 +79,4 @@
 
     devShell = devShells.clang;
 
-    packages.geant4  = my-geant4;
-
   }
