@@ -3,17 +3,25 @@ rec {
     path = ./basic;
     description = "Basic nain4 application";
     welcomeText = ''
-          You just created a simple nain4 application which you can use as the basis of your own nain4 project
+You have created a simple nain4 application which you can use as the basis of your own nain4 project
 
-          + `just`  - does something (probably runs the tests)
-          + `just run` - does something else (probably runs the GUI)
-          + `just run 100` - does something even else (probably runs beamOn 100)
+`cd` into the directory of the project and type one of
 
-          To turn this into your own app
++ `direnv allow` (if `direnv` is installed and configured on your machine)
++ `nix develop` (if you do not have `direnv`)
 
-          + `git init`
-          + `grep CHANGEME` and follow instructions in the lines that appear
-        '';
+Some downloading and compilation may take place. When this is complete you can try
+
++ `just` - runs the application in batch mode with the provided `macs/run.mac` Geant4 macro file
++ `just run` - runs the application in interactive mode
++ `just run 100` - runs the application in batch mode with `/run/beamOn 100`
+
+To evolve this into your own application
+
++ `git init`
++ `grep CHANGEME` will give you hints about places where you will probably want to change names, descriptions and metadata to something more appropriate for your project.
++ Edit the code to suit your needs.
+'';
   };
 
   default = basic;
