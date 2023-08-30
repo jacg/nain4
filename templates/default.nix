@@ -30,7 +30,7 @@ Some downloading and compilation may take place. When this is complete you can t
 
 To evolve this into your own application
 
-1. `git init`
+1. `git init && git add . && git commit -m "Bootstrap project from template"`
 2. `grep CHANGEME` will give you hints about places where you will probably want to change names, descriptions and metadata to something more appropriate for your project.
 3. Edit the code to suit your needs.
 '';
