@@ -130,7 +130,7 @@
         echo
         echo You have created a simple nain4 application which you can use as the basis of your own nain4 project.
         echo
-        echo See https://jacg.github.io/nain4/TODO for what to do next.
+        echo See https://jacg.github.io/nain4/how-to/start-a-nain4-based-project.html#basic-usage for what to do next.
       ''}";
     };
 
