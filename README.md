@@ -13,18 +13,18 @@ This repository contains two orthogonal but related products:
 2. A [Nix](https://zero-to-nix.com/) flake for easy provision of Geant4 user and application-developer environments.
 
    The value proposition is: If *you* [install Nix](https://zero-to-nix.com/start/install) on your machine *we* can provide a zero-effort means of installing Geant4 plus dependencies and development tools.
- 
+
 The flake is not necessary to *use* `nain4`, but an installation of Geant4 is necessary to *test* `nain4`.
 
-Providing an easy means of using `nain4` without the flake is a top priority, but the extraction of `nain4` from its parent repository has only just begun, so this is not ready yet. 
+Providing an easy means of using `nain4` without the flake is a top priority, but the extraction of `nain4` from its parent repository has only just begun, so this is not ready yet.
 
 If you manage to persuade `cmake` to treat the contents of `<this-repo>/nain4/` as a package or library (sorry, not sure of the exact cmake nomencladure) in your Geant4 application, then it should work.
- 
+
 # `nain4`
 
 Nain4 is a collection of utilities whose aim is to
 
-1. make it significantly easier to write Geant4 applications, in code that is much more robust, readable and self-documenting; 
+1. make it significantly easier to write Geant4 applications, in code that is much more robust, readable and self-documenting;
 2. make it possible/easy to write unit and integration tests for Geant4 application code;
 3. make it more difficult to write invalid Geant4 code by promoting errors to compile time;
 
@@ -58,7 +58,7 @@ n4::       place(envelope) .in(world)                      .now();
 n4::       place(trapezoid).in(envelope).at_yz(-1*cm, 7*cm).now();
 return n4::place(world)                                    .now();
 ```
-This is the complete (except for setting of the values like `world_sizeXYZ`) `nain4` implementation of `DetectorConstruction::Construct()`. 
+This is the complete (except for setting of the values like `world_sizeXYZ`) `nain4` implementation of `DetectorConstruction::Construct()`.
 
 These 13 lines of code (without comments or blank lines) correspond to 62 lines in the original example.
 
@@ -98,7 +98,7 @@ If not, read on to see possible problems and fixes.
 + Windows: It should work equally well in WSL2 on Windows.
 
   Caveat: if you are going to install Nix in multi-user mode, make sure that `systemd` is enabled. In short, this requires you to ensure that the file `/etc/wsl.conf` exists in your in-WSL linux and that it contains the lines
-  ```shell
+  ```bash
   [boot]
   systemd=true
   ```
@@ -119,24 +119,26 @@ To use `direnv`:
 1. Make sure that it is [installed](https://direnv.net/docs/installation.html) on your system.
 
 2. Don't forget to [hook](https://direnv.net/docs/hook.html) it into your shell.
+   Depending on which shell you are using, this will involve adding
+   one of the following lines to the end of your shell configuration
+   file:
 
-Depending on which shell you are using, this will involve adding one of the following lines to the end of your shell configuration file:
-``` shell
-eval "$(direnv hook bash)"  # in ~/.bashrc
-eval "$(direnv hook zsh)"   # in ~/.zshrc
-eval `direnv hook tcsh`     # in ~/.cshrc
-```
+   ```bash
+   eval "$(direnv hook bash)"  # in ~/.bashrc
+   eval "$(direnv hook zsh)"   # in ~/.zshrc
+   eval `direnv hook tcsh`     # in ~/.cshrc
+   ```
 
-The first time `direnv` wants to perform an automatic switch in a new context
-(combination of directory + `.envrc` contents), it asks you for permission to do
-so. You can give it permission by typing `direnv allow` in the shell. The
-message that `direnv` gives you at this stage is pretty clear, but it's usually
-written in red, thus you might get the mistaken impression that there is an
-error.
+The first time `direnv` wants to perform an automatic switch in a new
+context (combination of directory + `.envrc` contents), it asks you
+for permission to do so. You can give it permission by typing `direnv
+allow` in the shell. The message that `direnv` gives you at this stage
+is pretty clear, but it's usually written in red, thus you might get
+the mistaken impression that there is an error.
 
 ## Geant 4 configuration
 
-Various configuration options of Geant4 itself can be changed by editing `flake.nix` here: 
+Various configuration options of Geant4 itself can be changed by editing `flake.nix` here:
 
 ``` nix
 (geant4.override {
@@ -158,7 +160,7 @@ Be sure to expunge any examples you had compiled with a differently-configured G
 
 This repository also allows you to run and edit the standard Geant4 examples. For example,
 
-``` shell
+```bash
 just g4-examples/run B1
 ```
 
@@ -172,14 +174,14 @@ You should be able to modify the source code (for example increase the value of 
 
 Many of the other examples can be run in the same way: `just g4-examples/run <example-name>`.
 
-+ Some of them will fail because they require Geant4 to be compiled with multithreading enabled. By default, multithreading is disabled in `flake.nix`. 
++ Some of them will fail because they require Geant4 to be compiled with multithreading enabled. By default, multithreading is disabled in `flake.nix`.
 
 + Others will fail because the internal organization of the example differs from that of the simple ones, which is assumed by `just g4-examples/run`.
 
   In many of these cases it should be fairly easy to figure out how to compile and execute the example by hand. The procedure tends to me something like
-  
+
   1. Create a `build` subirectory the example's top-level directory
   2. `cd` into the newly-created `build` directory
   3. `cmake -S . -B build`
   4. `cmake --build build -j`
-  5. Find the executable which was produced by the previous step, and execute it by preceding its name with `./` In the case of the B1 example, this would be `./exampleB1`. 
+  5. Find the executable which was produced by the previous step, and execute it by preceding its name with `./` In the case of the B1 example, this would be `./exampleB1`.
