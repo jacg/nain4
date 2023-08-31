@@ -116,19 +116,18 @@
 
     apps.bootstrap-client-project = {
       type    = "app";
+      # nix run github:jacg/nain4#bootstrap-client-project project-name author etc
       program = "${pkgs.writeShellScript "bootstrap.sh" ''
+        DIRECTORY=$1
         echo 'Running bootstrap'
-
-
-
-
-        #nix run github:jacg/nain4#bootstrap-client-project project-name author etc
-
-        # nix flake new -t github:jacg/nain4 folder
-        # cd folder
-        # git init
-        # git add .
-        # git commit -m "Bootstrap project"
+        mkdir -p $DIRECTORY
+        cp -r ${self}/templates/basic/* $DIRECTORY
+        cd $DIRECTORY
+        git init
+        # TODO: protect against user not having set git user.{name,email}
+        git add .
+        git commit -m "Bootstrap project"
+        # TODO: display welcome message
       ''}";
     };
 
