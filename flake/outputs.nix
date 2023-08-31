@@ -50,6 +50,10 @@
   ] ++ lib.optionals stdenv.isLinux [
   ];
 
+  bootstrap-script = pkgs.writeShellScript "bootstrap.sh" ''
+    echo 'Running bootstrap'
+  '';
+
   in rec {
 
     packages.default = self.packages.nain4;
@@ -106,6 +110,18 @@
     devShell = devShells.clang;
 
     packages.geant4  = my-geant4;
+
+
+    # Executed by `nix run <URL of this flake> -- <args?>`
+    # TODO apps.default = { type = "app"; program = "..."; };
+
+    # Executed by `nix run <URL of this flake>#my-app`
+    # TODO apps.my-app = { type = "app"; program = "<store-path>"; };
+
+    apps.bootstrap-client-project = {
+      type    = "app";
+      program = "${bootstrap-script}";
+    };
 
     # Leading underscore prevents nosys from regenerating this for every system
     _templates = (import ../templates);
