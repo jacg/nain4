@@ -1,5 +1,8 @@
 # How to install `nix`
 
+`nain4` is distributed and its dependencies are managed using
+`nix`. The reasons for this are explained in [why nix?](./why-nix.md).
+
 ## On your personal computer
 
 In order to install `nix` on your personal computer, simply use[^1]

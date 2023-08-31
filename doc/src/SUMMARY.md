@@ -11,6 +11,7 @@
   - [Placement: laziness and accumulation](./placement-laziness-and-accumulation.md)
   - [Displacements and rotations are not commutative](./displacements-and-rotations-are-not-commutative.md)
   - [Input types of boolean solids' methods](./input-types-of-boolean-solids-methods.md)
+  - [Why nix?](./why-nix.md)
 - [Reference](./reference.md)
   - [Constructing solids and logical volumes](./n4-shape.md)
   - [Placement of physical volumes](./n4-place.md)
