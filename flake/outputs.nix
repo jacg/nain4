@@ -122,11 +122,12 @@
         echo 'Running bootstrap'
         mkdir -p $DIRECTORY
         cp -r ${self}/templates/basic/* $DIRECTORY
+        chmod -R u+w $DIRECTORY
         cd $DIRECTORY
-        git -c init.defaultBranch=master init
+        git -c init.defaultBranch=master init -q
         # TODO: protect against user not having set git user.{name,email}
         git add .
-        git commit -m "Bootstrap project"
+        git commit -qm "Bootstrap project"
         # TODO: display welcome message
       ''}";
     };
