@@ -123,7 +123,7 @@
         mkdir -p $DIRECTORY
         cp -r ${self}/templates/basic/* $DIRECTORY
         cd $DIRECTORY
-        git init
+        git -c init.defaultBranch=master init
         # TODO: protect against user not having set git user.{name,email}
         git add .
         git commit -m "Bootstrap project"
