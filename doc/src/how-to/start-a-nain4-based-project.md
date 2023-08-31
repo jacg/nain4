@@ -1,22 +1,37 @@
 # How to start a nain4-based project
 
-## Setting up the project
+The following instructions assume that you have `nix` installed. If
+not, please see [Install nix](./install-nix.md).
 
-In order to create a `nain4`-based project, we recommend starting with
-one of the templates offered by `nain4`. Assuming you have `nix`
-installed (if not, please check, [Install
-nix](./install-nix.md)), simply run the following commands
+## Setting up a new `nain4` project
 
-// Is there something we can do to remove the last one?
+In order to create a `nain4`-based project use `bootstrap-client-project` like this:
+
 ```bash
-nix flake new -t github:jacg/nain4 your-project-folder
-cd your-project-folder
-git init && git add . && git commit -m "Bootstrap project from template"`
+nix run github:jacg/nain4#bootstrap-client-project path/to/your/project
 ```
+
+where `path/to/your/project` should not exist before you run the command.
+
+
+## Basic usage
++ `just run 100`: run the application in batch mode with `/run/beamOn 100`
++ `just run macs/run.mac`: run the application using the macro file `macs/run.mac`
++ `just run`: run the application with the interactive GUI
+  WARNING: this will probably crash unless you are running on
+  + `NixOS`
+  + `macOS`
+  To run the GUI on other OSes you need to use a graphics hardware
+  abstraction helper. There is a `just` recipe which automatically
+  includes this for you:
+  ```bash
+  just view
+  ```
+  The first time you use it, it will take a while to compile.
 
 ## Project contents
 
-This will generate a directory with the following contents
+Your bootstrapped project will contain the following files
 
 // TO BE UPDATED WITH TESTS
 ```
@@ -34,64 +49,26 @@ your-project-folder
     └── n4app.cc
 ```
 
-The `src` folder contains the source code and the `CMakeLists.txt`
-file, which is used to compile the project. The `macs` directory
-contains macro files, used to provide some app configuration
-parameters at runtime. The `justfile` file defines some recipes for
-easier usage of the application.  The `flake` directory and
-`flake.lock`, `flake.nix` files describe the dependency tree for your
-project. In most cases, you will not need to read or modify them.
++ `src/n4app.cc` contains the entire c++ source code of your
+  project. As the project grows, you may wish to break this up into
+  smaller source files. You can add as many header (`.hh`) and
+  implementation (`.cc`) files as you wish.
 
++ `src/CMakeLists.txt` is responsible for the details of the build
+  process. If you do not change the directory structure of your
+  project, you should not need to change this file.
 
-## Compiling the project
++ The `macs` directory contains Geant4 macro files, used to provide
+  some app configuration parameters at runtime.
+  + `macs/run.mac` controls aspects of the simulation
+  + `macs/vis.mac` controls aspects of visulisation (only used in interactive mode)
 
-Using `just`[^1], you can simply compile the program using
++ The `justfile` file defines some recipes for easier usage of the
+  application.
 
-```bash
-just build
-```
-
-All the files related to the compilation of the project will be stored
-in a `build` directory. You can ignore this folder, which will not be
-tracked by `git`. In some rare scenarios, you might need to erase the
-compilation products before attempting to recompile your project. In
-that case run
-
-```bash
-just clean
-```
-
-[^1] This command is provided by the app template.
-
-
-## Running the app
-
-Using `just`, you can run the app with
-
-```bash
-just run
-```
-
-This will compile the program if needed, so you don't need to compile
-it yourself. Without any arguments, the previous line will open the
-interactive GUI, where you will be able to explore the geometry in a
-visual manner. This GUI accepts the usual G4 commands, like
-`/run/beamOn <N>`
-
-In order to run the simulation in batch mode, you can provide a macro
-file
-
-```bash
-just run <macro_file>
-```
-
-or provide it with a certain number of events with
-
-```bash
-just run <N>
-```
-
-In this case, the macro `macs/run.mac` will be used.
++ The `flake` directory and `flake.lock`, `flake.nix` files describe
+  the dependency tree for your project. In most cases, you will not
+  need to read or modify them.
 
 
 ## Make it *your* project
