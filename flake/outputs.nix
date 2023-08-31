@@ -50,10 +50,6 @@
   ] ++ lib.optionals stdenv.isLinux [
   ];
 
-  bootstrap-script = pkgs.writeShellScript "bootstrap.sh" ''
-    echo 'Running bootstrap'
-  '';
-
   in rec {
 
     packages.default = self.packages.nain4;
@@ -120,7 +116,9 @@
 
     apps.bootstrap-client-project = {
       type    = "app";
-      program = "${bootstrap-script}";
+      program = "${pkgs.writeShellScript "bootstrap.sh" ''
+        echo 'Running bootstrap'
+      ''}";
     };
 
     # Leading underscore prevents nosys from regenerating this for every system
