@@ -120,7 +120,7 @@
       program = "${pkgs.writeShellScript "bootstrap.sh" ''
         DIRECTORY=$1
         mkdir -p $DIRECTORY
-        cp -r ${self}/templates/basic/* $DIRECTORY
+        cp -Tr ${self}/templates/basic $DIRECTORY
         chmod -R u+w $DIRECTORY
         cd $DIRECTORY
         git -c init.defaultBranch=master init -q
