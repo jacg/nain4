@@ -25,7 +25,7 @@ project](./how-to/enable-nain4-in-cmake.md)
 
 ## `direnv`
 
-We *strongly* recommend using the `direnv` tool to seemlessly turn on
+We *strongly* recommend using the `direnv` tool to seamlessly turn on
 and off development environments depending on the working
 directory. `direnv` will look for a `.envrc` file and execute it when
 you `cd` into a directory.
