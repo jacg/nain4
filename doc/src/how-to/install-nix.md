@@ -28,24 +28,36 @@ project](./how-to/enable-nain4-in-cmake.md)
 
 ## `direnv`
 
-We *strongly* recommend using the `direnv` tool to seamlessly turn on
-and off development environments depending on the working
-directory. `direnv` will look for a `.envrc` file and execute it when
-you `cd` into a directory.
+We *strongly* recommend using [`direnv`](https://direnv.net/) to automatically
+activate and deactivate development environments when entering or
+leaving a project directory.
 
-To install `direnv` with `nix`[^2], run
+To use `direnv`:
 
-```bash
-nix profile install nixpkgs#direnv
-```
+1. Make sure that it is [installed](https://direnv.net/docs/installation.html) on your system.
+   To install `direnv` with `nix`, run
 
-After this, you will need to hook `direnv` to your shell. Follow [these instructions](https://direnv.net/docs/hook.html) to complete the installation.
+   ```bash
+   nix profile install nixpkgs#direnv
+   ```
 
-Finally, every time you enter a *new* directory where `direnv` can be executed, you will need to actively allow the load of the environment. However, this is only needed the first time. To allow execution, run the following line from within the directory.
+2. Don't forget to [hook](https://direnv.net/docs/hook.html) it into your shell.
+   Depending on which shell you are using, this will involve adding
+   one of the following lines to the end of your shell configuration
+   file:
 
-```bash
-direnv allow
-```
+   ```bash
+   eval "$(direnv hook bash)"  # in ~/.bashrc
+   eval "$(direnv hook zsh)"   # in ~/.zshrc
+   eval `direnv hook tcsh`     # in ~/.cshrc
+   ```
+
+The first time `direnv` wants to perform an automatic switch in a new context
+(combination of directory + `.envrc` contents), it asks you for permission to do
+so. You can give it permission by typing `direnv allow` in the shell. The
+message that `direnv` gives you at this stage is pretty clear, but it's usually
+written in red, thus you might get the mistaken impression that there is an
+error.
 
 Now, every time you enter the directory you will see a message like:
 ```bash
@@ -57,6 +69,3 @@ and when you exit
 ```bash
 direnv: unloading
 ```
-
-
-[^2] For a non-nix installation see [the direnv webpage](https://direnv.net/)
