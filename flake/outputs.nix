@@ -118,6 +118,17 @@
       type    = "app";
       program = "${pkgs.writeShellScript "bootstrap.sh" ''
         echo 'Running bootstrap'
+
+
+
+
+        #nix run github:jacg/nain4#bootstrap-client-project project-name author etc
+
+        # nix flake new -t github:jacg/nain4 folder
+        # cd folder
+        # git init
+        # git add .
+        # git commit -m "Bootstrap project"
       ''}";
     };
 
