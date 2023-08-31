@@ -119,7 +119,6 @@
       # nix run github:jacg/nain4#bootstrap-client-project project-name author etc
       program = "${pkgs.writeShellScript "bootstrap.sh" ''
         DIRECTORY=$1
-        echo 'Running bootstrap'
         mkdir -p $DIRECTORY
         cp -r ${self}/templates/basic/* $DIRECTORY
         chmod -R u+w $DIRECTORY
@@ -128,7 +127,10 @@
         # TODO: protect against user not having set git user.{name,email}
         git add .
         git commit -qm "Bootstrap project"
-        # TODO: display welcome message
+        echo
+        echo You have created a simple nain4 application which you can use as the basis of your own nain4 project.
+        echo
+        echo See https://jacg.github.io/nain4/TODO for what to do next.
       ''}";
     };
 
