@@ -12,7 +12,7 @@ This repository contains two orthogonal but related products:
 
 2. A [Nix](https://zero-to-nix.com/) flake for easy provision of Geant4 user and application-developer environments.
 
-   The value proposition is: If *you* [install Nix](https://zero-to-nix.com/start/install) on your machine *we* can provide a zero-effort means of installing Geant4 plus dependencies and development tools.
+   The value proposition is: If *you* [install nix](https://determinate.systems/posts/determinate-nix-installer) on your machine *we* can provide a zero-effort means of installing Geant4 plus dependencies and development tools.
 
 The flake is not necessary to *use* `nain4`, but an installation of Geant4 is necessary to *test* `nain4`.
 
