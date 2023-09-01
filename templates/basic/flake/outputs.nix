@@ -5,23 +5,6 @@
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
 
-  # Should be able to remove this, once https://github.com/NixOS/nixpkgs/issues/234710 is merged
-  clang_16 = if pkgs.stdenv.isDarwin
-             then pkgs.llvmPackages_16.clang.override rec {
-               libc = pkgs.darwin.Libsystem;
-               bintools = pkgs.bintools.override { inherit libc; };
-               inherit (pkgs.llvmPackages) libcxx;
-               extraPackages = [
-                 pkgs.llvmPackages.libcxxabi
-                 # Use the compiler-rt associated with clang, but use the libc++abi from the stdenv
-                 # to avoid linking against two different versions (for the same reasons as above).
-                 (pkgs.llvmPackages_16.compiler-rt.override {
-                   inherit (pkgs.llvmPackages) libcxxabi;
-                 })
-               ];
-             }
-             else pkgs.llvmPackages.clang;
-
   my-packages = with pkgs; [
     nain4.packages.geant4
     geant4.data.G4PhotonEvaporation
@@ -62,13 +45,13 @@
     devShell = devShells.clang;
 
     # Activated by `nix develop <URL to this flake>#clang`
-    devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
+    devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } {
       name = "my-nain4-app-clang-devenv";
 
       packages = my-packages ++ [
         nain4.packages.nain4
         nain4.packages.geant4
-        clang_16
+        nain4.packages.clang_16
         pkgs.clang-tools
       ];
 

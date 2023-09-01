@@ -113,6 +113,7 @@
     devShell = devShells.clang;
 
     packages.geant4 = my-geant4;
+    packages.clang_16 = clang_16;
 
 
     # Executed by `nix run <URL of this flake> -- <args?>`
