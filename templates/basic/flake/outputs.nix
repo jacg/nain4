@@ -36,7 +36,6 @@
 
       packages = dev-shell-packages ++ [
         nain4.packages.nain4
-        nain4.packages.geant4
         nain4.packages.clang_16
       ];
 
