@@ -44,18 +44,20 @@
              }
              else pkgs.llvmPackages.clang;
 
-  my-packages = with pkgs; [
-    my-geant4 ] ++ geant4-data ++ [
-    cmake
-    cmake-language-server
-    catch2_3
+  dev-deps = with pkgs; [
     just
-    gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
+    cmake-language-server
     mdbook
-  ] ++ lib.optionals stdenv.isDarwin [
-
-  ] ++ lib.optionals stdenv.isLinux [
+    gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
   ];
+
+  build-deps = with pkgs; [ clang-tools cmake my-geant4 qt5.wrapQtAppsHook ];
+  test-deps  = with pkgs; [ catch2_3 ];
+  run-deps   = with pkgs; [ just geant4-data ];
+  dev-shell-packages = dev-deps ++ build-deps ++ test-deps ++ run-deps
+                       ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
+                       ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
+  ;
 
   in rec {
 
@@ -66,7 +68,7 @@
       pname = "nain4";
       version = "0.1.9";
       src = "${self}/nain4/src";
-      nativeBuildInputs = with pkgs; [ cmake my-geant4 qt5.wrapQtAppsHook ]; # extra-cmake-modules ?
+      nativeBuildInputs = build-deps; # extra-cmake-modules ?
 
       # meta = with pkgs.lib; {
       #   description = "An API that makes it easier to write Geant4 application code.";
@@ -91,7 +93,7 @@
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
       name = "nain4-clang-devenv";
 
-      packages = my-packages ++ [ clang_16 pkgs.clang-tools ];
+      packages = dev-shell-packages ++ [ clang_16 ];
 
       G4_DIR = "${pkgs.geant4}";
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
@@ -102,7 +104,7 @@
     devShells.gcc = pkgs.mkShell {
       name = "nain4-gcc-devenv";
 
-      packages = my-packages;
+      packages = dev-shell-packages;
 
       G4_DIR = "${pkgs.geant4}";
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
@@ -146,4 +148,7 @@
     _templates = (import ../templates);
 
     _contains-systems = { systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ]; };
+
+    deps = { inherit dev-deps build-deps test-deps run-deps; };
+
   }

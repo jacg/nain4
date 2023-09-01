@@ -5,25 +5,11 @@
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
 
-  my-packages = with pkgs; [
-    nain4.packages.geant4
-    geant4.data.G4PhotonEvaporation
-    geant4.data.G4EMLOW
-    geant4.data.G4RadioactiveDecay
-    geant4.data.G4ENSDFSTATE
-    geant4.data.G4SAIDDATA
-    geant4.data.G4PARTICLEXS
-    geant4.data.G4NDL
-    cmake
-    cmake-language-server
-    catch2_3
-    just
-    gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
-    mdbook
-  ] ++ lib.optionals stdenv.isDarwin [
-
-  ] ++ lib.optionals stdenv.isLinux [
-  ];
+  dev-shell-packages = with nain4.deps;
+    dev-deps ++ build-deps ++ test-deps ++ run-deps
+    ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
+    ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
+  ;
 
   in rec {
 
@@ -48,7 +34,7 @@
     devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } {
       name = "my-nain4-app-clang-devenv";
 
-      packages = my-packages ++ [
+      packages = dev-shell-packages ++ [
         nain4.packages.nain4
         nain4.packages.geant4
         nain4.packages.clang_16
@@ -65,7 +51,7 @@
     # devShells.gcc = pkgs.mkShell {
     #   name = "my-nain4-app-gcc-devenv";
 
-    #   packages = my-packages;
+    #   packages = dev-shell-packages;
 
     #   G4_DIR = "${pkgs.geant4}";
     #   G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
