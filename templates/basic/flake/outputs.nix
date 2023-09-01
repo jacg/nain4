@@ -4,15 +4,19 @@
 , ...
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
-  my-geant4 = (pkgs.geant4.override {
-    enableMultiThreading = false;
-    enableInventor       = false;
-    enableQt             = true;
-    enableXM             = false;
-    enableOpenGLX11      = true;
-    enablePython         = false;
-    enableRaytracerX11   = false;
-  });
+
+  g4 = { thread ? false , inventor ? false , qt ? false, xm ? false, ogl ? false, python ? false, raytrace ? false }:
+    (pkgs.geant4.override {
+      enableMultiThreading = thread;
+      enableInventor       = inventor;
+      enableQt             = qt;
+      enableXM             = xm;
+      enableOpenGLX11      = ogl;
+      enablePython         = python;
+      enableRaytracerX11   = raytrace;
+    });
+
+  my-geant4 = g4 { qt = true; ogl = true ; };
 
   # Should be able to remove this, once https://github.com/NixOS/nixpkgs/issues/234710 is merged
   clang_16 = if pkgs.stdenv.isDarwin
