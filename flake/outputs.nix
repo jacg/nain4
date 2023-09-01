@@ -107,6 +107,33 @@
 
     packages.geant4  = my-geant4;
 
+
+    # Executed by `nix run <URL of this flake> -- <args?>`
+    # TODO apps.default = { type = "app"; program = "..."; };
+
+    # Executed by `nix run <URL of this flake>#my-app`
+    # TODO apps.my-app = { type = "app"; program = "<store-path>"; };
+
+    apps.bootstrap-client-project = {
+      type    = "app";
+      # nix run github:jacg/nain4#bootstrap-client-project project-name author etc
+      program = "${pkgs.writeShellScript "bootstrap.sh" ''
+        DIRECTORY=$1
+        mkdir -p $DIRECTORY
+        cp -Tr ${self}/templates/basic $DIRECTORY
+        chmod -R u+w $DIRECTORY
+        cd $DIRECTORY
+        git -c init.defaultBranch=master init -q
+        # TODO: protect against user not having set git user.{name,email}
+        git add .
+        git commit -qm "Bootstrap project"
+        echo
+        echo You have created a simple nain4 application which you can use as the basis of your own nain4 project.
+        echo
+        echo See https://jacg.github.io/nain4/how-to/start-a-nain4-based-project.html#basic-usage for what to do next.
+      ''}";
+    };
+
     # Leading underscore prevents nosys from regenerating this for every system
     _templates = (import ../templates);
 
