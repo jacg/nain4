@@ -38,7 +38,6 @@
         nain4.packages.nain4
         nain4.packages.geant4
         nain4.packages.clang_16
-        pkgs.clang-tools
       ];
 
       G4_DIR = "${pkgs.geant4}";
