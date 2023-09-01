@@ -5,19 +5,6 @@
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
 
-  g4 = { thread ? false , inventor ? false , qt ? false, xm ? false, ogl ? false, python ? false, raytrace ? false }:
-    (pkgs.geant4.override {
-      enableMultiThreading = thread;
-      enableInventor       = inventor;
-      enableQt             = qt;
-      enableXM             = xm;
-      enableOpenGLX11      = ogl;
-      enablePython         = python;
-      enableRaytracerX11   = raytrace;
-    });
-
-  my-geant4 = g4 { qt = true; ogl = true ; };
-
   # Should be able to remove this, once https://github.com/NixOS/nixpkgs/issues/234710 is merged
   clang_16 = if pkgs.stdenv.isDarwin
              then pkgs.llvmPackages_16.clang.override rec {
@@ -36,7 +23,7 @@
              else pkgs.llvmPackages.clang;
 
   my-packages = with pkgs; [
-    my-geant4
+    nain4.packages.geant4
     geant4.data.G4PhotonEvaporation
     geant4.data.G4EMLOW
     geant4.data.G4RadioactiveDecay
@@ -78,7 +65,12 @@
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
       name = "my-nain4-app-clang-devenv";
 
-      packages = my-packages ++ [ nain4.packages.nain4 my-geant4 clang_16 pkgs.clang-tools ];
+      packages = my-packages ++ [
+        nain4.packages.nain4
+        nain4.packages.geant4
+        clang_16
+        pkgs.clang-tools
+      ];
 
       G4_DIR = "${pkgs.geant4}";
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
