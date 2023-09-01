@@ -17,6 +17,16 @@
 
   my-geant4 = g4 { qt = true; ogl = true ; };
 
+  geant4-data = with pkgs.geant4.data; [
+    G4PhotonEvaporation
+    G4EMLOW
+    G4RadioactiveDecay
+    G4ENSDFSTATE
+    G4SAIDDATA
+    G4PARTICLEXS
+    G4NDL
+  ];
+
   # Should be able to remove this, once https://github.com/NixOS/nixpkgs/issues/234710 is merged
   clang_16 = if pkgs.stdenv.isDarwin
              then pkgs.llvmPackages_16.clang.override rec {
@@ -35,14 +45,7 @@
              else pkgs.llvmPackages.clang;
 
   my-packages = with pkgs; [
-    my-geant4
-    geant4.data.G4PhotonEvaporation
-    geant4.data.G4EMLOW
-    geant4.data.G4RadioactiveDecay
-    geant4.data.G4ENSDFSTATE
-    geant4.data.G4SAIDDATA
-    geant4.data.G4PARTICLEXS
-    geant4.data.G4NDL
+    my-geant4 ] ++ geant4-data ++ [
     cmake
     cmake-language-server
     catch2_3
