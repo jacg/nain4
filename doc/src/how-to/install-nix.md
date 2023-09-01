@@ -1,7 +1,7 @@
 # How to install `nix`
 
 `nain4` is distributed and its dependencies are managed using
-`nix`. The reasons for this are explained in [why nix?](./why-nix.md).
+`nix`. The reasons for this are explained in [why nix?](../why-nix.md).
 
 ## On your personal computer
 
