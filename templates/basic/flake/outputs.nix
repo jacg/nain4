@@ -5,6 +5,9 @@
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
 
+
+  # TODO inject nain4 itself into most of these:
+
   dev-shell-packages = with nain4.deps;
     dev-deps ++ build-deps ++ test-deps ++ run-deps
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
@@ -29,6 +32,8 @@
 
     # Used by `direnv` when entering this directory (also by `nix develop <URL to this flake>`)
     devShell = devShells.clang;
+
+    # TODO Create functions which generate the shells
 
     # Activated by `nix develop <URL to this flake>#clang`
     devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } {
