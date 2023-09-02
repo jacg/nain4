@@ -3,15 +3,29 @@
 , ...
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
-  my-geant4 = (pkgs.geant4.override {
-    enableMultiThreading = false;
-    enableInventor       = false;
-    enableQt             = true;
-    enableXM             = false;
-    enableOpenGLX11      = true;
-    enablePython         = false;
-    enableRaytracerX11   = false;
-  });
+
+  g4 = { thread ? false , inventor ? false , qt ? false, xm ? false, ogl ? false, python ? false, raytrace ? false }:
+    (pkgs.geant4.override {
+      enableMultiThreading = thread;
+      enableInventor       = inventor;
+      enableQt             = qt;
+      enableXM             = xm;
+      enableOpenGLX11      = ogl;
+      enablePython         = python;
+      enableRaytracerX11   = raytrace;
+    });
+
+  my-geant4 = g4 { qt = true; ogl = true ; };
+
+  geant4-data = with pkgs.geant4.data; [
+    G4PhotonEvaporation
+    G4EMLOW
+    G4RadioactiveDecay
+    G4ENSDFSTATE
+    G4SAIDDATA
+    G4PARTICLEXS
+    G4NDL
+  ];
 
   # Should be able to remove this, once https://github.com/NixOS/nixpkgs/issues/234710 is merged
   clang_16 = if pkgs.stdenv.isDarwin
@@ -30,25 +44,20 @@
              }
              else pkgs.llvmPackages.clang;
 
-  my-packages = with pkgs; [
-    my-geant4
-    geant4.data.G4PhotonEvaporation
-    geant4.data.G4EMLOW
-    geant4.data.G4RadioactiveDecay
-    geant4.data.G4ENSDFSTATE
-    geant4.data.G4SAIDDATA
-    geant4.data.G4PARTICLEXS
-    geant4.data.G4NDL
-    cmake
-    cmake-language-server
-    catch2_3
+  dev-deps = with pkgs; [
     just
-    gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
+    cmake-language-server
     mdbook
-  ] ++ lib.optionals stdenv.isDarwin [
-
-  ] ++ lib.optionals stdenv.isLinux [
+    gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
   ];
+
+  build-deps = with pkgs; [ clang-tools cmake my-geant4 qt5.wrapQtAppsHook ];
+  test-deps  = with pkgs; [ catch2_3 ];
+  run-deps   = with pkgs; [ just geant4-data ];
+  dev-shell-packages = dev-deps ++ build-deps ++ test-deps ++ run-deps
+                       ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
+                       ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
+  ;
 
   in rec {
 
@@ -59,7 +68,7 @@
       pname = "nain4";
       version = "0.1.9";
       src = "${self}/nain4/src";
-      nativeBuildInputs = with pkgs; [ cmake my-geant4 qt5.wrapQtAppsHook ]; # extra-cmake-modules ?
+      nativeBuildInputs = build-deps; # extra-cmake-modules ?
 
       # meta = with pkgs.lib; {
       #   description = "An API that makes it easier to write Geant4 application code.";
@@ -84,7 +93,7 @@
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
       name = "nain4-clang-devenv";
 
-      packages = my-packages ++ [ clang_16 pkgs.clang-tools ];
+      packages = dev-shell-packages ++ [ clang_16 ];
 
       G4_DIR = "${pkgs.geant4}";
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
@@ -95,7 +104,7 @@
     devShells.gcc = pkgs.mkShell {
       name = "nain4-gcc-devenv";
 
-      packages = my-packages;
+      packages = dev-shell-packages;
 
       G4_DIR = "${pkgs.geant4}";
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
@@ -105,7 +114,8 @@
 
     devShell = devShells.clang;
 
-    packages.geant4  = my-geant4;
+    packages.geant4 = my-geant4;
+    packages.clang_16 = clang_16;
 
 
     # Executed by `nix run <URL of this flake> -- <args?>`
@@ -138,4 +148,7 @@
     _templates = (import ../templates);
 
     _contains-systems = { systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ]; };
+
+    deps = { inherit dev-deps build-deps test-deps run-deps; };
+
   }
