@@ -1,4 +1,5 @@
 #include "n4_ui.hh"
+#include "n4_run_manager.hh"
 
 #include <G4VisManager.hh>
 #include <G4VisExecutive.hh>
@@ -24,6 +25,15 @@ std::optional<unsigned> parse_unsigned(char* arg) {
 namespace nain4 {
 
 void ui(int argc, char** argv) {
+  if (!nain4::run_manager::initialize_called) {
+    std::cerr << "\n\n\n"
+              << "n4::ui called before n4::run_manager was initialized.\n"
+              << "Make sure to call `.initialize()` on the run manager before "
+              << "invoking this function.\n\n\n"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   G4UImanager& ui_manager = *G4UImanager::GetUIpointer();
   G4String execute = "/control/execute ";
 
