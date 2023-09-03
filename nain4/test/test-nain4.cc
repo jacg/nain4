@@ -1166,7 +1166,7 @@ TEST_CASE("nain vis_attributes", "[nain][vis_attributes]") {
 }
 
 TEST_CASE("nain find geometry", "[nain][find][geometry]") {
-  auto run_manager = default_run_manager();
+  auto run_manager = default_run_manager().initialize();
 
   // Utilities for retrieving from stores
   SECTION("find_logical") {
@@ -1188,7 +1188,7 @@ TEST_CASE("nain find geometry", "[nain][find][geometry]") {
 }
 
 TEST_CASE("nain find particle", "[nain][find][particle]") {
-  auto run_manager = default_run_manager();
+  auto run_manager = default_run_manager().initialize();
 
   auto name = "gamma";
   auto pita = G4ParticleTable::GetParticleTable()->FindParticle(name);
@@ -1200,7 +1200,7 @@ TEST_CASE("nain find particle", "[nain][find][particle]") {
 
 
 TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
-  auto run_manager = default_run_manager();
+  auto run_manager = default_run_manager().initialize();
 
   auto name = "vanish";
   auto air = nain4::material("G4_AIR");
@@ -1233,7 +1233,7 @@ TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
 }
 
 TEST_CASE("nain geometry iterator", "[nain][geometry][iterator]") {
-  auto run_manager = default_run_manager();
+  auto run_manager = default_run_manager().initialize();
 
   auto air = nain4::material("G4_AIR");
 

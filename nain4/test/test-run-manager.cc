@@ -62,7 +62,8 @@ TEST_CASE("nain run_manager construct initialization", "[nain][run_manager]") {
   auto rm = n4::run_manager::create()
      .physics<FTFP_BERT>(0) // verbosity 0
      .geometry<dummy_geometry>(1., 2., 3.)
-     .actions<dummy_actions>(10);
+     .actions<dummy_actions>(10)
+     .initialize();
 }
 
 TEST_CASE("nain run_manager basic initialization", "[nain][run_manager]") {
@@ -71,12 +72,13 @@ TEST_CASE("nain run_manager basic initialization", "[nain][run_manager]") {
   auto rm = n4::run_manager::create()
      .physics (new FTFP_BERT{0}) // verbosity 0
      .geometry(new dummy_geometry{1., 2., 3.})
-     .actions<dummy_actions>(10);
+     .actions<dummy_actions>(10)
+     .initialize();
 }
 
 
 TEST_CASE("nain run_manager get", "[nain][run_manager]") {
-  auto  rm_value     = default_run_manager();
+  auto  rm_value     = default_run_manager().initialize();
   auto& rm_reference = n4::run_manager::get();
 
   CHECK(&rm_value == &rm_reference);
@@ -102,7 +104,8 @@ TEST_CASE("nain run_manager get", "[nain][run_manager]") {
 //   n4::run_manager::create()
 //      .physics<FTFP_BERT>(0)
 //      .geometry(my_geometry)
-//      .actions(do_nothing);
+//      .actions(do_nothing)
+//      .initialize();
 // }
 
 // TEST_CASE("nain run_manager too_many_world_volumes", "[nain][run_manager]") {
@@ -120,7 +123,8 @@ TEST_CASE("nain run_manager get", "[nain][run_manager]") {
 //   n4::run_manager::create()
 //      .physics<FTFP_BERT>(0)
 //      .geometry(my_geometry)
-//      .actions(do_nothing);
+//      .actions(do_nothing)
+//      .initialize();
 
 // }
 
@@ -132,7 +136,7 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
     auto box_world    = n4::box{"world"   }.cube(1).volume(air);
 
     // No `.in` call defaults to world volume
-           n4::place(box_daughter).in(box_world).now();
+    /*   */n4::place(box_daughter).in(box_world).now();
     return n4::place(box_world   ).now();
   };
 
@@ -140,6 +144,6 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
   n4::run_manager::create()
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
-     .actions(do_nothing);
-
+     .actions(do_nothing)
+     .initialize();
 }

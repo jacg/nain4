@@ -268,7 +268,8 @@ TEST_CASE("trivial app", "[app]") {
   auto run_manager = n4::run_manager::create()
     .physics(default_physics_lists())
     .geometry<geometry>(y_min, y_max, z_min, z_max)
-    .actions <actions >(n_gun, n_inside_generator);
+    .actions <actions >(n_gun, n_inside_generator)
+    .initialize();
 
   run_manager.here_be_dragons() -> BeamOn(n_beam_on);
   hush = nullptr;
