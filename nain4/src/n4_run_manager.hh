@@ -81,11 +81,10 @@ public:
 // required G4VUser* class. In the last step (actions -> initialized),
 // the run manager is initialized implicitly, hence, this macro needs
 // the EXTRA parameter.
-#define NEXT_STATE_BASIC(NEXT_STATE, METHOD, TYPE, EXTRA) \
-  NEXT_STATE METHOD(TYPE* x) {                            \
-      manager -> SetUserInitialization(x);                \
-      EXTRA;                                              \
-      return NEXT_STATE{std::move(manager)};              \
+#define NEXT_STATE_BASIC(NEXT_STATE, METHOD, TYPE) \
+  NEXT_STATE METHOD(TYPE* x) {                     \
+      manager -> SetUserInitialization(x);         \
+      return NEXT_STATE{std::move(manager)};       \
     }
 
 // Transition to the next state by specifying a class and its
@@ -103,25 +102,33 @@ public:
     return METHOD(BODY);                                 \
   }
 
+  struct ready {
+    CORE(ready)
+
+    run_manager initialize() {
+      manager -> Initialize();
+      check_world_volume();
+      return run_manager{std::move(manager)};
+    }
+  };
+
   struct set_actions {
     CORE(set_actions)
     using fn_type = n4::generator::function;
     using gn_type = std::function<n4::generator*()>;
     using ac_type = std::function<n4::actions  *()>;
 
-    NEXT_STATE_BASIC( run_manager, actions, G4VUserActionInitialization
-                    , manager -> Initialize();
-                      check_world_volume())
-    NEXT_CONSTRUCT  (run_manager, actions)
-    NEXT_BUILD_FN   (run_manager, actions, fn_type, new n4::actions{new n4::generator{build}})
-    NEXT_BUILD_FN   (run_manager, actions, gn_type, new n4::actions{build()})
-    NEXT_BUILD_FN   (run_manager, actions, ac_type, build())
+    NEXT_STATE_BASIC(ready, actions, G4VUserActionInitialization)
+    NEXT_CONSTRUCT  (ready, actions)
+    NEXT_BUILD_FN   (ready, actions, fn_type, new n4::actions{new n4::generator{build}})
+    NEXT_BUILD_FN   (ready, actions, gn_type, new n4::actions{build()})
+    NEXT_BUILD_FN   (ready, actions, ac_type, build())
   };
 
   struct set_geometry {
     CORE(set_geometry)
     using fn_type = n4::geometry::construct_fn;
-    NEXT_STATE_BASIC(set_actions, geometry, G4VUserDetectorConstruction,)
+    NEXT_STATE_BASIC(set_actions, geometry, G4VUserDetectorConstruction)
     NEXT_CONSTRUCT  (set_actions, geometry)
     NEXT_BUILD_FN   (set_actions, geometry, fn_type, new n4::geometry{build})
     //TODO: Implement this method
@@ -131,7 +138,7 @@ public:
   struct set_physics {
     CORE(set_physics)
     using fn_type = std::function<G4VUserPhysicsList* ()>;
-    NEXT_STATE_BASIC(set_geometry, physics, G4VUserPhysicsList,)
+    NEXT_STATE_BASIC(set_geometry, physics, G4VUserPhysicsList)
     NEXT_CONSTRUCT  (set_geometry, physics)
     NEXT_BUILD_FN   (set_geometry, physics, fn_type, build())
   };
