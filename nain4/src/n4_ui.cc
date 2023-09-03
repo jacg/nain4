@@ -76,3 +76,5 @@ void ui(int argc, char** argv) {
   }
 }
 } // namespace nain4
+
+namespace n4{using namespace nain4; }
