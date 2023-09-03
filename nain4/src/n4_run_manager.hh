@@ -102,6 +102,9 @@ public:
     return METHOD(BODY);                                 \
   }
 
+  // TODO: a test that shows that without initialized, the simulation doesn't run
+  // TODO: display a clear error message when attempting to run without initialize
+  // IDEA: implement `n4::run` that takes care of verifying that the simulation is ready to be run.
   struct ready {
     CORE(ready)
 
