@@ -94,7 +94,8 @@ int main(int argc, char* argv[]) {
   // Important! physics list has to be set before the generator!
   .physics<FTFP_BERT>(0) // version 0
   .geometry(my_geometry)
-  .actions(create_actions(n_event));
+  .actions(create_actions(n_event))
+  .initialize();
   // ANCHOR_END: build_minimal_framework
 
   // ANCHOR: run
