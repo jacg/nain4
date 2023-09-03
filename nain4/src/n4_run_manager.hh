@@ -61,8 +61,9 @@ public:
   run_manager(run_manager&&) = default;
 
   RM manager;
-  static run_manager* rm_instance;
-  static bool         create_called;
+  static run_manager*       rm_instance;
+  static bool             create_called;
+  static bool         initialize_called;
 
 // Each state needs temporarily owns the G4RunManager and hands over
 // ownership to the next state. The constructor is private to ensure
@@ -111,6 +112,7 @@ public:
     run_manager initialize() {
       manager -> Initialize();
       check_world_volume();
+      run_manager::initialize_called = true;
       return run_manager{std::move(manager)};
     }
   };
@@ -167,13 +169,15 @@ public:
   // auto rm = run_manager::get()
   // where the auto requires an `&` for compilation to succeed.
   static run_manager& get() {
-    if (!rm_instance) {
+    if (!rm_instance || !run_manager::initialize_called) {
       std::cerr << "run_manager::get called before run_manager configuration completed. "
                 << "Configure the run_manager with:\n"
                 << "auto run_manager = n4::run_manager::create()\n"
                 << "                      .physics (...)\n"
                 << "                      .geometry(...)\n"
-                << "                      .actions (...);\n"
+                << "                      .actions (...);\n\n"
+                << "[...]\n\n"
+                << "run_manager.initialize();\n"
                 << std::endl;
       exit(EXIT_FAILURE);
     }
