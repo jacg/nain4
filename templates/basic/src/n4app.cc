@@ -96,8 +96,8 @@ int main(int argc, char* argv[]) {
   // ANCHOR_END: build_minimal_framework
 
   // ANCHOR: run
-  n4::ui(argc, argv);
   run_manager.initialize();
+  n4::ui(argc, argv);
   // ANCHOR_END: run
 // ANCHOR: closing_bracket
 }
