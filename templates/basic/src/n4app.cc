@@ -73,14 +73,16 @@ auto my_geometry() {
 }
 
 int main(int argc, char* argv[]) {
-    unsigned n_event = 0;
+  unsigned n_event = 0;
 
-    auto run_manager = n4::run_manager::create()
+  auto run_manager = n4::run_manager::create()
 
     // Important! physics list has to be set before the generator!
-  .physics<FTFP_BERT>(0) // version 0
-  .geometry(my_geometry)
-  .actions(create_actions(n_event));
+    .physics<FTFP_BERT>(0) // version 0
+    .geometry(my_geometry)
+    .actions(create_actions(n_event));
 
-    n4::ui(argc, argv);
-  }
+  n4::ui(argc, argv);
+
+  run_manager.initialize();
+}
