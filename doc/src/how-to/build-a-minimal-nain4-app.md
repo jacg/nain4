@@ -2,7 +2,7 @@
 
 ## Building the app
 
-The most basic example of a nain4 app can be found in [templates/basic/src/n4app.cc](../../../templates/basic/src/n4app.cc). Here is the full file:
+One of the most basic examples of a nain4 app can be found in [templates/basic/src/n4app.cc](../../../templates/basic/src/n4app.cc). Here is the full file:
 
 ```c++
 {{#include ../../../templates/basic/src/n4app.cc:full_file}}
@@ -38,6 +38,13 @@ here, `my_geometry`, and `my_generator` are the two functions we need to provide
 
 {{#include ../../../templates/basic/src/n4app.cc:my_generator}}
 ```
+
+and `create_actions` is defined as:
+
+```c++
+{{#include ../../../templates/basic/src/n4app.cc:create_actions}}
+```
+
 
 With this, our setup is ready, and we can start the simulation with
 ```c++
