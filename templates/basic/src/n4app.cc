@@ -4,7 +4,6 @@
 #include "n4-volumes.hh"
 
 #include <G4PrimaryParticle.hh>
-#include <G4RotationMatrix.hh>
 #include <G4SystemOfUnits.hh>   // physical units such as `m` for metre
 #include <G4Event.hh>           // needed to inject primary particles into an event
 #include <G4Box.hh>             // for creating shapes in the geometry
@@ -59,15 +58,13 @@ auto my_geometry() {
   auto steel  = n4::material("G4_STAINLESS-STEEL");
   auto world  = n4::box("world").cube(2*m).x(3*m).volume(water);
 
-  n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
-  n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).place(air).in(world).at(0.2*m, 0    , 0    ).now();
-
-  G4RotationMatrix rot;  rot.rotateX(-90 * deg); // TODO replace RotationMatrix with place.rotate_x()
+  n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at  (1.3*m, 0.8*m, 0.3*m).now();
+  n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).place(air).in(world).at_x(0.2*m              ).now();
 
   n4       ::sphere("socket-cap" ).r(0.3*m).phi_delta(180*deg)
     .sub(n4::box   ("socket-hole").cube(0.4*m))
     .name("socket")
-    .place(steel).in(world).rotate(rot).at(1*m, 0, 0.7*m).now();
+    .place(steel).in(world).rotate_x(-90*deg).at(1*m, 0, 0.7*m).now();
 
   return n4::place(world).now();
 }
