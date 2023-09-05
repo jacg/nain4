@@ -64,7 +64,7 @@ n4::actions* create_actions(unsigned& n_event, G4String& particle_name) {
 // ANCHOR_END: create_actions
 
 // ANCHOR: my_geometry
-auto my_geometry(G4double r_str) {
+auto my_geometry(G4double r_str, G4double r_bub) {
 
   auto water  = n4::material("G4_WATER");
   auto air    = n4::material("G4_AIR");
@@ -73,7 +73,7 @@ auto my_geometry(G4double r_str) {
 
 
 
-  n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at  (1.3*m, 0.8*m, 0.3*m).now();
+  n4::sphere("bubble").r(r_bub)         .place(air).in(world).at  (1.3*m, 0.8*m, 0.3*m).now();
   n4::tubs  ("straw" ).r(r_str).z(1.9*m).place(air).in(world).at_x(0.2*m              ).now();
 
   n4       ::sphere("socket-cap" ).r(0.3*m).phi_delta(180*deg)
@@ -90,12 +90,13 @@ int main(int argc, char* argv[]) {
   // ANCHOR_END: pick_cli_arguments
   unsigned n_event = 0;
 
-  G4double straw_radius = 0.1 * m;
+  G4double straw_radius = 0.1 * m, bubble_radius = 0.2 * m;
   G4String particle_name = "geantino";
   // The trailing slash after '/my_geometry' is CRUCIAL: without it, the
   // messenger violates the principle of least surprise.
   auto messenger = new G4GenericMessenger{nullptr, "/my/", "docs: bla bla bla"};
-  messenger -> DeclarePropertyWithUnit("straw_radius", "m", straw_radius);
+  messenger -> DeclarePropertyWithUnit("straw_radius" , "m",  straw_radius);
+  messenger -> DeclarePropertyWithUnit("bubble_radius", "m", bubble_radius);
   messenger -> DeclareProperty("particle", particle_name);
 
   // ANCHOR: create_run_manager
@@ -103,11 +104,11 @@ int main(int argc, char* argv[]) {
     .ui(argc, argv)
 
     .apply_command("/my/straw_radius 0.5 m")
-    // .apply_early_macro()
+    .apply_early_macro("macs/early.mac")
     // .apply_command(...)
 
     .physics<FTFP_BERT>(0) // verbosity 0
-    .geometry([&] { return my_geometry(straw_radius); })
+    .geometry([&] { return my_geometry(straw_radius, bubble_radius); })
     .actions(create_actions(n_event, particle_name))
     .apply_command("/my/particle e-")
     // .apply_late_macro()
