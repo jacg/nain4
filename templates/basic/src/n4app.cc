@@ -30,17 +30,19 @@ void verify_number_of_args(int argc){
 // ANCHOR_END: print_usage
 
 // ANCHOR: my_generator
-void my_generator(G4Event* event) {
-  auto geantino = n4::find_particle("geantino");
-  auto vertex   = new G4PrimaryVertex();
-  auto r = G4RandomDirection();
-  vertex -> SetPrimary(new G4PrimaryParticle(geantino, r.x(), r.y(), r.z()));
-  event  -> AddPrimaryVertex(vertex);
+auto my_generator(const G4String& particle_name) {
+  return [&](G4Event* event) {
+    auto particle_type = n4::find_particle(particle_name);
+    auto vertex   = new G4PrimaryVertex();
+    auto r = G4RandomDirection();
+    vertex -> SetPrimary(new G4PrimaryParticle(particle_type, r.x(), r.y(), r.z()));
+    event  -> AddPrimaryVertex(vertex);
+  };
 }
 // ANCHOR_END: my_generator
 
 // ANCHOR: create_actions
-n4::actions* create_actions(unsigned& n_event) {
+n4::actions* create_actions(unsigned& n_event, G4String& particle_name) {
   auto my_stepping_action = [&] (const G4Step* step) {
     auto pt = step -> GetPreStepPoint();
     auto volume_name = pt -> GetTouchable() -> GetVolume() -> GetName();
@@ -55,9 +57,9 @@ n4::actions* create_actions(unsigned& n_event) {
      std::cout << "end of event " << n_event << std::endl;
   };
 
-  return (new n4::        actions{      my_generator})
- -> set( (new n4::   event_action{                  }) -> end(my_event_action) )
- -> set(  new n4::stepping_action{my_stepping_action} );
+  return (new n4::        actions{my_generator(particle_name)})
+ -> set( (new n4::   event_action{                           }) -> end(my_event_action) )
+ -> set(  new n4::stepping_action{my_stepping_action         });
 }
 // ANCHOR_END: create_actions
 
@@ -89,24 +91,25 @@ int main(int argc, char* argv[]) {
   unsigned n_event = 0;
 
   G4double straw_radius = 0.1 * m;
+  G4String particle_name = "geantino";
   // The trailing slash after '/my_geometry' is CRUCIAL: without it, the
   // messenger violates the principle of least surprise.
-  auto messenger = new G4GenericMessenger{nullptr, "/my_geometry/", "docs: bla bla bla"};
+  auto messenger = new G4GenericMessenger{nullptr, "/my/", "docs: bla bla bla"};
   messenger -> DeclarePropertyWithUnit("straw_radius", "m", straw_radius);
+  messenger -> DeclareProperty("particle", particle_name);
 
   // ANCHOR: create_run_manager
   n4::run_manager::create()
     .ui(argc, argv)
 
-    .apply_command("/my_geometry/straw_radius 0.5 m")
+    .apply_command("/my/straw_radius 0.5 m")
     // .apply_early_macro()
     // .apply_command(...)
 
     .physics<FTFP_BERT>(0) // verbosity 0
     .geometry([&] { return my_geometry(straw_radius); })
-    .actions(create_actions(n_event))
-
-    // .apply_command(...)
+    .actions(create_actions(n_event, particle_name))
+    .apply_command("/my/particle e-")
     // .apply_late_macro()
     // .apply_command(...)
 
