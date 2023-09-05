@@ -16,6 +16,7 @@
 #include <G4RandomDirection.hh> // for launching particles in random directions
 
 
+#include <G4ThreeVector.hh>
 #include <cstdlib>
 // ANCHOR_END: includes
 
@@ -30,11 +31,11 @@ void verify_number_of_args(int argc){
 // ANCHOR_END: print_usage
 
 // ANCHOR: my_generator
-auto my_generator(const G4String& particle_name) {
+auto my_generator(const G4String& particle_name, const G4ThreeVector& particle_direction) {
   return [&](G4Event* event) {
     auto particle_type = n4::find_particle(particle_name);
     auto vertex   = new G4PrimaryVertex();
-    auto r = G4RandomDirection();
+    auto r = particle_direction.mag2() > 0 ? particle_direction : G4RandomDirection();
     vertex -> SetPrimary(new G4PrimaryParticle(particle_type, r.x(), r.y(), r.z()));
     event  -> AddPrimaryVertex(vertex);
   };
@@ -42,7 +43,7 @@ auto my_generator(const G4String& particle_name) {
 // ANCHOR_END: my_generator
 
 // ANCHOR: create_actions
-n4::actions* create_actions(unsigned& n_event, G4String& particle_name) {
+n4::actions* create_actions(unsigned& n_event, G4String& particle_name, const G4ThreeVector& particle_direction) {
   auto my_stepping_action = [&] (const G4Step* step) {
     auto pt = step -> GetPreStepPoint();
     auto volume_name = pt -> GetTouchable() -> GetVolume() -> GetName();
@@ -57,7 +58,7 @@ n4::actions* create_actions(unsigned& n_event, G4String& particle_name) {
      std::cout << "end of event " << n_event << std::endl;
   };
 
-  return (new n4::        actions{my_generator(particle_name)})
+  return (new n4::        actions{my_generator(particle_name, particle_direction)})
  -> set( (new n4::   event_action{                           }) -> end(my_event_action) )
  -> set(  new n4::stepping_action{my_stepping_action         });
 }
@@ -70,8 +71,6 @@ auto my_geometry(G4double r_str, G4double r_bub) {
   auto air    = n4::material("G4_AIR");
   auto steel  = n4::material("G4_STAINLESS-STEEL");
   auto world  = n4::box("world").cube(2*m).x(3*m).volume(water);
-
-
 
   n4::sphere("bubble").r(r_bub)         .place(air).in(world).at  (1.3*m, 0.8*m, 0.3*m).now();
   n4::tubs  ("straw" ).r(r_str).z(1.9*m).place(air).in(world).at_x(0.2*m              ).now();
@@ -92,12 +91,14 @@ int main(int argc, char* argv[]) {
 
   G4double straw_radius = 0.1 * m, bubble_radius = 0.2 * m;
   G4String particle_name = "geantino";
+  G4ThreeVector particle_direction;
   // The trailing slash after '/my_geometry' is CRUCIAL: without it, the
   // messenger violates the principle of least surprise.
   auto messenger = new G4GenericMessenger{nullptr, "/my/", "docs: bla bla bla"};
   messenger -> DeclarePropertyWithUnit("straw_radius" , "m",  straw_radius);
   messenger -> DeclarePropertyWithUnit("bubble_radius", "m", bubble_radius);
   messenger -> DeclareProperty("particle", particle_name);
+  messenger -> DeclareProperty("particle_direction", particle_direction);
 
   // ANCHOR: create_run_manager
   n4::run_manager::create()
@@ -105,14 +106,15 @@ int main(int argc, char* argv[]) {
 
     .apply_command("/my/straw_radius 0.5 m")
     .apply_early_macro("macs/early.mac")
-    // .apply_command(...)
+    // .apply_command(...) // also possible after apply_early_macro
 
     .physics<FTFP_BERT>(0) // verbosity 0
     .geometry([&] { return my_geometry(straw_radius, bubble_radius); })
-    .actions(create_actions(n_event, particle_name))
+    .actions(create_actions(n_event, particle_name, particle_direction))
+
     .apply_command("/my/particle e-")
-    // .apply_late_macro()
-    // .apply_command(...)
+    .apply_late_macro("macs/late.mac")
+    // .apply_command(...) // also possible after apply_late_macro
 
     .run();
 

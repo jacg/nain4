@@ -114,7 +114,8 @@ public:
       run_manager::rm_instance = new run_manager{std::move(manager)};
       ui.run();
     }
-    ready& apply_command(const G4String& command) { ui.apply(command); return *this; }
+    ready& apply_command   (const G4String& command ) { ui.apply    (command ); return *this; }
+    ready& apply_late_macro(const G4String& filename) { ui.run_macro(filename); return *this; }
   };
 
   struct set_actions {
