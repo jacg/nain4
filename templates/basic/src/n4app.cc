@@ -86,18 +86,30 @@ int main(int argc, char* argv[]) {
 
   // ANCHOR: create_run_manager
   auto run_manager = n4::run_manager::create()
+    .ui(argc, argv)
+
+    // .apply_command(...)
+    // .apply_early_macro()
+    // .apply_command(...)
+
+    .physics<FTFP_BERT>(0) // verbosity 0
+    .geometry(my_geometry)
+    .actions(create_actions(n_event))
+
+    // .apply_command(...)
+    // .apply_late_macro()
+    // .apply_command(...)
+
+    .run();
+
+
   // ANCHOR_END: create_run_manager
 
   // ANCHOR: build_minimal_framework
   // Important! physics list has to be set before the generator!
-    .physics<FTFP_BERT>(0) // version 0
-    .geometry(my_geometry)
-    .actions(create_actions(n_event));
   // ANCHOR_END: build_minimal_framework
 
   // ANCHOR: run
-  run_manager.initialize();
-  n4::ui(argc, argv);
   // ANCHOR_END: run
 // ANCHOR: closing_bracket
 }

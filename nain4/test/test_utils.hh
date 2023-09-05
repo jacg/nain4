@@ -32,6 +32,7 @@ inline auto default_run_manager(){
 
   // Construct the default run manager
   auto run_manager = n4::run_manager::create()
+                        .ui(0, {})
                         .physics(default_physics_lists)
                         .geometry(water_box)
                         .actions(do_nothing);

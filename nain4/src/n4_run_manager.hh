@@ -4,6 +4,7 @@
 #define n4_run_manager_hh
 
 #include "g4-mandatory.hh"
+#include "n4_ui.hh"
 
 #include <G4Run.hh>
 #include <G4RunManager.hh>
@@ -61,31 +62,32 @@ public:
   run_manager(run_manager&&) = default;
 
   RM manager;
-  static run_manager*       rm_instance;
-  static bool             create_called;
-  static bool         initialize_called;
+  static run_manager*   rm_instance;
+  static bool         create_called;
 
 // Each state needs temporarily owns the G4RunManager and hands over
 // ownership to the next state. The constructor is private to ensure
 // that clients cannot create their own; by making run_manager a
 // friend, each state can build the next because the states are
 // members of run_manager as is the create method.
-#define CORE(THIS_STATE)                                       \
-    friend run_manager;                                        \
-  private:                                                     \
-    RM manager;                                                \
-    THIS_STATE(RM manager) : manager{std::move(manager)} {}    \
+#define CORE(THIS_STATE)                \
+    friend run_manager;                 \
+  private:                              \
+    RM manager;                         \
+    n4::ui ui;                          \
+    THIS_STATE(RM manager, n4::ui ui) : \
+      manager{std::move(manager)},      \
+      ui     {std::move(ui     )}       \
+      { }                               \
   public:
 
 
 // Transition to the next state by providing an instance of the
-// required G4VUser* class. In the last step (actions -> initialized),
-// the run manager is initialized implicitly, hence, this macro needs
-// the EXTRA parameter.
-#define NEXT_STATE_BASIC(NEXT_STATE, METHOD, TYPE) \
-  NEXT_STATE METHOD(TYPE* x) {                     \
-      manager -> SetUserInitialization(x);         \
-      return NEXT_STATE{std::move(manager)};       \
+// required G4VUser* class.
+#define NEXT_STATE_BASIC(NEXT_STATE, METHOD, TYPE)          \
+  NEXT_STATE METHOD(TYPE* x) {                              \
+      manager -> SetUserInitialization(x);                  \
+      return NEXT_STATE{std::move(manager), std::move(ui)}; \
     }
 
 // Transition to the next state by specifying a class and its
@@ -103,17 +105,13 @@ public:
     return METHOD(BODY);                                 \
   }
 
-  // TODO: a test that shows that without initialized, the simulation doesn't run
-  // TODO: display a clear error message when attempting to run without initialize
-  // IDEA: implement `n4::run` that takes care of verifying that the simulation is ready to be run.
   struct ready {
     CORE(ready)
 
-    run_manager initialize() {
+    void run() {
       manager -> Initialize();
       check_world_volume();
-      run_manager::initialize_called = true;
-      return run_manager{std::move(manager)};
+      run_manager::rm_instance = new run_manager{std::move(manager)};
     }
   };
 
@@ -148,9 +146,23 @@ public:
     NEXT_BUILD_FN   (set_geometry, physics, fn_type, build())
   };
 
+  struct initialize_ui {
+    friend run_manager;
+
+  private:
+    RM manager;
+    initialize_ui(RM manager) : manager{std::move(manager)} { }
+
+  public:
+    set_physics ui(int argc, char** argv) {
+      auto ui = n4::ui(argc, argv);
+      return {std::move(manager), std::move(ui)};
+    }
+  };
+
 
 public:
-  static set_physics create(G4RunManagerType type=G4RunManagerType::SerialOnly) {
+  static initialize_ui create(G4RunManagerType type=G4RunManagerType::SerialOnly) {
     if (run_manager::create_called) {
       std::cerr << "run_manager::create has already been called. "
                 << "It makes no sense to call it more than once."
@@ -161,7 +173,7 @@ public:
     run_manager::create_called = true;
 
     auto manager = std::unique_ptr<G4RunManager>{G4RunManagerFactory::CreateRunManager(type)};
-    return set_physics{std::move(manager)};
+    return initialize_ui{std::move(manager)};
   }
 
   // TODO: Consider returning pointer to make compiler error message
@@ -169,7 +181,7 @@ public:
   // auto rm = run_manager::get()
   // where the auto requires an `&` for compilation to succeed.
   static run_manager& get() {
-    if (!rm_instance || !run_manager::initialize_called) {
+    if (!rm_instance) {
       std::cerr << "run_manager::get called before run_manager configuration completed. "
                 << "Configure the run_manager with:\n"
                 << "auto run_manager = n4::run_manager::create()\n"

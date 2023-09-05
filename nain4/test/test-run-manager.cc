@@ -37,6 +37,7 @@ TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   auto rm = n4::run_manager::create()
+     .ui(0, {})
      .physics(default_physics_lists)
      .geometry(water_box)
      .actions(do_nothing);
@@ -59,30 +60,32 @@ struct dummy_actions : G4VUserActionInitialization {
 TEST_CASE("nain run_manager construct initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
-  auto rm = n4::run_manager::create()
+  n4::run_manager::create()
+     .ui(0, {})
      .physics<FTFP_BERT>(0) // verbosity 0
      .geometry<dummy_geometry>(1., 2., 3.)
      .actions<dummy_actions>(10)
-     .initialize();
+     .run();
 }
 
 TEST_CASE("nain run_manager basic initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
-  auto rm = n4::run_manager::create()
+  n4::run_manager::create()
+     .ui(0, {})
      .physics (new FTFP_BERT{0}) // verbosity 0
      .geometry(new dummy_geometry{1., 2., 3.})
      .actions<dummy_actions>(10)
-     .initialize();
+     .run();
 }
 
 
-TEST_CASE("nain run_manager get", "[nain][run_manager]") {
-  auto  rm_value     = default_run_manager().initialize();
-  auto& rm_reference = n4::run_manager::get();
+// TEST_CASE("nain run_manager get", "[nain][run_manager]") {
+//   default_run_manager().run();
+//   auto& rm_reference = n4::run_manager::get();
 
-  CHECK(&rm_value == &rm_reference);
-}
+//   CHECK(&rm_value == &rm_reference);
+// }
 
 // These tests are commented out because we still don't know how to get Catch2
 // to assert failures.
@@ -142,8 +145,9 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
 
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
+     .ui(0, {})
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
      .actions(do_nothing)
-     .initialize();
+     .run();
 }

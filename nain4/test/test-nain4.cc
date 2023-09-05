@@ -1166,29 +1166,24 @@ TEST_CASE("nain vis_attributes", "[nain][vis_attributes]") {
 }
 
 TEST_CASE("nain find geometry", "[nain][find][geometry]") {
-  auto run_manager = default_run_manager().initialize();
+  default_run_manager().run();
 
-  // Utilities for retrieving from stores
-  SECTION("find_logical") {
-    auto air       = nain4::material("G4_AIR");
-    auto long_name = "made just for find_logical test";
-    auto find_me   = nain4::volume<G4Box>(long_name, air, 1 * cm, 1 * cm, 1 * cm);
-    auto found     = nain4::find_logical(long_name);
-    CHECK(found == find_me);
-    auto should_not_exist = nain4::find_logical("Hopefully this name hasn't been used anywhere", false);
-    CHECK(should_not_exist == nullptr);
+  auto air       = nain4::material("G4_AIR");
+  auto long_name = "made just for find_logical test";
+  auto find_me   = nain4::volume<G4Box>(long_name, air, 1 * cm, 1 * cm, 1 * cm);
+  auto found     = nain4::find_logical(long_name);
+  CHECK(found == find_me);
+  auto should_not_exist = nain4::find_logical("Hopefully this name hasn't been used anywhere", false);
+  CHECK(should_not_exist == nullptr);
 
-    SECTION("find_physical") {
-      auto placed = nain4::place(find_me).now();
-      auto found_placed = nain4::find_physical(long_name);
-      CHECK(found_placed == placed);
-      CHECK(found_placed != nullptr);
-    }
-  }
+  auto placed = nain4::place(find_me).now();
+  auto found_placed = nain4::find_physical(long_name);
+  CHECK(found_placed == placed);
+  CHECK(found_placed != nullptr);
 }
 
 TEST_CASE("nain find particle", "[nain][find][particle]") {
-  auto run_manager = default_run_manager().initialize();
+  default_run_manager().run();
 
   auto name = "gamma";
   auto pita = G4ParticleTable::GetParticleTable()->FindParticle(name);
@@ -1200,7 +1195,7 @@ TEST_CASE("nain find particle", "[nain][find][particle]") {
 
 
 TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
-  auto run_manager = default_run_manager().initialize();
+  default_run_manager().run();
 
   auto name = "vanish";
   auto air = nain4::material("G4_AIR");
@@ -1233,7 +1228,7 @@ TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
 }
 
 TEST_CASE("nain geometry iterator", "[nain][geometry][iterator]") {
-  auto run_manager = default_run_manager().initialize();
+  default_run_manager().run();
 
   auto air = nain4::material("G4_AIR");
 
