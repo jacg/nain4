@@ -66,7 +66,7 @@
     # TODO: switch to clang environment
     packages.nain4 = pkgs.stdenv.mkDerivation {
       pname = "nain4";
-      version = "0.1.9";
+      version = "0.1.10";
       src = "${self}/nain4/src";
       nativeBuildInputs = build-deps; # extra-cmake-modules ?
 
@@ -80,7 +80,7 @@
 
     packages.nain4-tests = pkgs.stdenv.mkDerivation {
       pname = "nain4-tests";
-      version = "0.1.9";
+      version = "0.1.10";
       src = "${self}/nain4/test";
       nativeBuildInputs = [ self.packages.nain4 ] ++ build-deps ++ test-deps;
     };
