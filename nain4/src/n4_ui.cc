@@ -24,22 +24,18 @@ std::optional<unsigned> parse_unsigned(char* arg) {
 
 namespace nain4 {
 
-ui::ui(int argc, char** argv) : n_events{10}, early_macro{}, late_macro{}, vis_macro{} {}
+ui::ui(int argc, char** argv)
+:
+  n_events{},
+  early_macro{},
+  late_macro{"macs/run.mac"},
+  vis_macro{},
+  argc{argc},
+  argv{argv},
+  g4_ui{*G4UImanager::GetUIpointer()}
+{
 
-  // G4UImanager& ui_manager = *G4UImanager::GetUIpointer();
-  // G4String execute = "/control/execute ";
-
-  // auto run_macro = [&] (auto file_name) { ui_manager.ApplyCommand(execute + file_name); };
-  // auto beam_on   = [&] (auto N        ) { ui_manager.ApplyCommand("/run/beamOn " + std::to_string(N.value())); };
-
-  // // Zero arguments on CLI: run interactively in GUI with macs/vis.mac
-  // if (argc == 1) {
-  //   G4UIExecutive ui_executive{argc, argv};
-  //   G4VisExecutive vis_manager;
-  //   vis_manager.Initialize();
-  //   run_macro("macs/vis.mac");
-  //   ui_executive.SessionStart();
-  // }
+}
 
   // // 1 argument on CLI: run in batch mode
   // //   +     integer: <ARGUMENT-FOR-BEAM-ON>
@@ -68,7 +64,19 @@ ui::ui(int argc, char** argv) : n_events{10}, early_macro{}, late_macro{}, vis_m
   // }
 
 void ui::run() {
-  G4UImanager::GetUIpointer() -> ApplyCommand("/run/beamOn " + std::to_string(n_events.value()));
+
+  if (n_events.has_value()) {
+    beam_on(n_events.value());
+  }
+
+  if (vis_macro.has_value()) {
+    G4UIExecutive ui_executive{argc, argv};
+    G4VisExecutive vis_manager;
+    vis_manager.Initialize();
+    run_macro("macs/vis.mac");
+    ui_executive.SessionStart();
+  }
+
 }
 
 } // namespace nain4
