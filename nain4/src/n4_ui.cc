@@ -28,8 +28,8 @@ ui::ui(int argc, char** argv)
 :
   n_events{},
   early_macro{},
-  late_macro{"macs/run.mac"},
-  vis_macro{},
+  late_macro{},
+  vis_macro{"macs/vis.mac"},
   argc{argc},
   argv{argv},
   g4_ui{*G4UImanager::GetUIpointer()}

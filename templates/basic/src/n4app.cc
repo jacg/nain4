@@ -5,6 +5,8 @@
 #include "n4_ui.hh"
 #include "n4-volumes.hh"
 
+#include <G4GenericMessenger.hh>
+
 #include <G4PrimaryParticle.hh>
 #include <G4SystemOfUnits.hh>   // physical units such as `m` for metre
 #include <G4Event.hh>           // needed to inject primary particles into an event
@@ -60,15 +62,17 @@ n4::actions* create_actions(unsigned& n_event) {
 // ANCHOR_END: create_actions
 
 // ANCHOR: my_geometry
-auto my_geometry() {
+auto my_geometry(G4double r_str) {
 
   auto water  = n4::material("G4_WATER");
   auto air    = n4::material("G4_AIR");
   auto steel  = n4::material("G4_STAINLESS-STEEL");
   auto world  = n4::box("world").cube(2*m).x(3*m).volume(water);
 
+
+
   n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at  (1.3*m, 0.8*m, 0.3*m).now();
-  n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).place(air).in(world).at_x(0.2*m              ).now();
+  n4::tubs  ("straw" ).r(r_str).z(1.9*m).place(air).in(world).at_x(0.2*m              ).now();
 
   n4       ::sphere("socket-cap" ).r(0.3*m).phi_delta(180*deg)
     .sub(n4::box   ("socket-hole").cube(0.4*m))
@@ -84,6 +88,10 @@ int main(int argc, char* argv[]) {
   // ANCHOR_END: pick_cli_arguments
   unsigned n_event = 0;
 
+  G4double straw_radius = 0.1 * m;
+  auto messenger = new G4GenericMessenger{nullptr, "/my_geometry", "docs: bla bla bla"};
+  messenger -> DeclarePropertyWithUnit("straw_radius", "m", straw_radius);
+
   // ANCHOR: create_run_manager
   n4::run_manager::create()
     .ui(argc, argv)
@@ -93,7 +101,7 @@ int main(int argc, char* argv[]) {
     // .apply_command(...)
 
     .physics<FTFP_BERT>(0) // verbosity 0
-    .geometry(my_geometry)
+    .geometry([&] { return my_geometry(straw_radius); })
     .actions(create_actions(n_event))
 
     // .apply_command(...)
