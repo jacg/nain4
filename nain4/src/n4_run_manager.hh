@@ -52,9 +52,9 @@ namespace nain4 {
 void check_world_volume();
 
 class run_manager {
-  using RM = std::unique_ptr<G4RunManager>;
+  using G4RM = std::unique_ptr<G4RunManager>;
 
-  run_manager(RM manager) : manager{std::move(manager)} {
+  run_manager(G4RM g4_manager) : g4_manager{std::move(g4_manager)} {
     rm_instance = this;
   }
 
@@ -62,7 +62,7 @@ public:
   run_manager(run_manager& ) = delete;
   run_manager(run_manager&&) = default;
 
-  RM manager;
+  G4RM g4_manager;
   static run_manager*   rm_instance;
   static bool         create_called;
 
@@ -71,24 +71,24 @@ public:
 // that clients cannot create their own; by making run_manager a
 // friend, each state can build the next because the states are
 // members of run_manager as is the create method.
-#define CORE(THIS_STATE)                \
-    friend run_manager;                 \
-  private:                              \
-    RM manager;                         \
-    n4::ui ui;                          \
-    THIS_STATE(RM manager, n4::ui ui) : \
-      manager{std::move(manager)},      \
-      ui     {std::move(ui     )}       \
-      { }                               \
+#define CORE(THIS_STATE)                     \
+    friend run_manager;                      \
+  private:                                   \
+    G4RM g4_manager;                         \
+    n4::ui ui;                               \
+    THIS_STATE(G4RM g4_manager, n4::ui ui) : \
+      g4_manager{std::move(g4_manager)},     \
+      ui     {std::move(ui     )}            \
+      { }                                    \
   public:
 
 
 // Transition to the next state by providing an instance of the
 // required G4VUser* class.
-#define NEXT_STATE_BASIC(NEXT_STATE, METHOD, TYPE)          \
-  NEXT_STATE METHOD(TYPE* x) {                              \
-      manager -> SetUserInitialization(x);                  \
-      return NEXT_STATE{std::move(manager), std::move(ui)}; \
+#define NEXT_STATE_BASIC(NEXT_STATE, METHOD, TYPE)             \
+  NEXT_STATE METHOD(TYPE* x) {                                 \
+      g4_manager -> SetUserInitialization(x);                  \
+      return NEXT_STATE{std::move(g4_manager), std::move(ui)}; \
     }
 
 // Transition to the next state by specifying a class and its
@@ -109,9 +109,9 @@ public:
   struct ready {
     CORE(ready)
     void run() {
-      manager -> Initialize();
+      g4_manager -> Initialize();
       check_world_volume();
-      run_manager::rm_instance = new run_manager{std::move(manager)};
+      run_manager::rm_instance = new run_manager{std::move(g4_manager)};
       ui.run();
     }
     ready& apply_command   (const G4String& command ) { ui.apply    (command ); return *this; }
@@ -155,13 +155,13 @@ public:
     friend run_manager;
 
   private:
-    RM manager;
-    initialize_ui(RM manager) : manager{std::move(manager)} { }
+    G4RM g4_manager;
+    initialize_ui(G4RM g4_manager) : g4_manager{std::move(g4_manager)} { }
 
   public:
     set_physics ui(int argc, char** argv) {
       auto ui = n4::ui(argc, argv);
-      return {std::move(manager), std::move(ui)};
+      return {std::move(g4_manager), std::move(ui)};
     }
   };
 
@@ -177,8 +177,8 @@ public:
 
     run_manager::create_called = true;
 
-    auto manager = std::unique_ptr<G4RunManager>{G4RunManagerFactory::CreateRunManager(type)};
-    return initialize_ui{std::move(manager)};
+    auto g4_manager = std::unique_ptr<G4RunManager>{G4RunManagerFactory::CreateRunManager(type)};
+    return initialize_ui{std::move(g4_manager)};
   }
 
   // TODO: Consider returning pointer to make compiler error message
@@ -201,7 +201,7 @@ public:
     return *rm_instance;
   }
 
-  G4RunManager* here_be_dragons() { return manager.get(); }
+  G4RunManager* here_be_dragons() { return g4_manager.get(); }
 };
 
 #pragma GCC diagnostic pop
