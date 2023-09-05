@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
   unsigned n_event = 0;
 
   // ANCHOR: create_run_manager
-  auto run_manager = n4::run_manager::create()
+  n4::run_manager::create()
     .ui(argc, argv)
 
     // .apply_command(...)

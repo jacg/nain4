@@ -112,6 +112,7 @@ public:
       manager -> Initialize();
       check_world_volume();
       run_manager::rm_instance = new run_manager{std::move(manager)};
+      ui.run();
     }
   };
 
