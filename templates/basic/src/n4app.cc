@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
   n4::run_manager::create()
     .ui(argc, argv)
 
-    // .apply_command(...)
+    .apply_command("/my_geometry/straw_radius 0.5 m")
     // .apply_early_macro()
     // .apply_command(...)
 

@@ -16,6 +16,7 @@ public:
   void run();
   void run_macro(const G4String& filename) { g4_ui.ApplyCommand("/control/execute " + filename    ); }
   void beam_on  (      G4int            n) { g4_ui.ApplyCommand("/run/beamOn " + std::to_string(n)); }
+  void apply    (const G4String& command ) { g4_ui.ApplyCommand(command);                            }
 
 private:
   std::optional<G4int   >    n_events;

@@ -8,6 +8,7 @@
 
 #include <G4Run.hh>
 #include <G4RunManager.hh>
+#include <G4String.hh>
 #include <G4VUserActionInitialization.hh>
 #include <G4VUserDetectorConstruction.hh>
 #include <G4VUserPhysicsList.hh>
@@ -141,6 +142,7 @@ public:
 
   struct set_physics {
     CORE(set_physics)
+    set_physics& apply_command(const G4String& command) { ui.apply(command); return *this; }
     using fn_type = std::function<G4VUserPhysicsList* ()>;
     NEXT_STATE_BASIC(set_geometry, physics, G4VUserPhysicsList)
     NEXT_CONSTRUCT  (set_geometry, physics)
