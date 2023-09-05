@@ -1,10 +1,11 @@
+// ANCHOR: full_file
+// ANCHOR: includes
 #include "nain4.hh"
 #include "g4-mandatory.hh"
 #include "n4_ui.hh"
 #include "n4-volumes.hh"
 
 #include <G4PrimaryParticle.hh>
-#include <G4RotationMatrix.hh>
 #include <G4SystemOfUnits.hh>   // physical units such as `m` for metre
 #include <G4Event.hh>           // needed to inject primary particles into an event
 #include <G4Box.hh>             // for creating shapes in the geometry
@@ -14,7 +15,9 @@
 
 
 #include <cstdlib>
+// ANCHOR_END: includes
 
+// ANCHOR: print_usage
 void verify_number_of_args(int argc){
   if (argc != 2) {
     std::cerr << "Wrong number of arguments: " << argc
@@ -22,7 +25,9 @@ void verify_number_of_args(int argc){
     std::exit(EXIT_FAILURE);
   }
 }
+// ANCHOR_END: print_usage
 
+// ANCHOR: my_generator
 void my_generator(G4Event* event) {
   auto geantino = n4::find_particle("geantino");
   auto vertex   = new G4PrimaryVertex();
@@ -30,7 +35,9 @@ void my_generator(G4Event* event) {
   vertex -> SetPrimary(new G4PrimaryParticle(geantino, r.x(), r.y(), r.z()));
   event  -> AddPrimaryVertex(vertex);
 }
+// ANCHOR_END: my_generator
 
+// ANCHOR: create_actions
 n4::actions* create_actions(unsigned& n_event) {
   auto my_stepping_action = [&] (const G4Step* step) {
     auto pt = step -> GetPreStepPoint();
@@ -50,8 +57,9 @@ n4::actions* create_actions(unsigned& n_event) {
  -> set( (new n4::   event_action{                  }) -> end(my_event_action) )
  -> set(  new n4::stepping_action{my_stepping_action} );
 }
+// ANCHOR_END: create_actions
 
-
+// ANCHOR: my_geometry
 auto my_geometry() {
 
   auto water  = n4::material("G4_WATER");
@@ -59,28 +67,39 @@ auto my_geometry() {
   auto steel  = n4::material("G4_STAINLESS-STEEL");
   auto world  = n4::box("world").cube(2*m).x(3*m).volume(water);
 
-  n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at(1.3*m, 0.8*m, 0.3*m).now();
-  n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).place(air).in(world).at(0.2*m, 0    , 0    ).now();
-
-  G4RotationMatrix rot;  rot.rotateX(-90 * deg); // TODO replace RotationMatrix with place.rotate_x()
+  n4::sphere("bubble").r(0.2*m)         .place(air).in(world).at  (1.3*m, 0.8*m, 0.3*m).now();
+  n4::tubs  ("straw" ).r(0.1*m).z(1.9*m).place(air).in(world).at_x(0.2*m              ).now();
 
   n4       ::sphere("socket-cap" ).r(0.3*m).phi_delta(180*deg)
     .sub(n4::box   ("socket-hole").cube(0.4*m))
     .name("socket")
-    .place(steel).in(world).rotate(rot).at(1*m, 0, 0.7*m).now();
+    .place(steel).in(world).rotate_x(-90*deg).at(1*m, 0, 0.7*m).now();
 
   return n4::place(world).now();
 }
+// ANCHOR_END: my_geometry
 
+// ANCHOR: pick_cli_arguments
 int main(int argc, char* argv[]) {
-    unsigned n_event = 0;
+  // ANCHOR_END: pick_cli_arguments
+  unsigned n_event = 0;
 
-    auto run_manager = n4::run_manager::create()
+  // ANCHOR: create_run_manager
+  auto run_manager = n4::run_manager::create()
+  // ANCHOR_END: create_run_manager
 
-    // Important! physics list has to be set before the generator!
-  .physics<FTFP_BERT>(0) // version 0
-  .geometry(my_geometry)
-  .actions(create_actions(n_event));
+  // ANCHOR: build_minimal_framework
+  // Important! physics list has to be set before the generator!
+    .physics<FTFP_BERT>(0) // version 0
+    .geometry(my_geometry)
+    .actions(create_actions(n_event));
+  // ANCHOR_END: build_minimal_framework
 
-    n4::ui(argc, argv);
-  }
+  // ANCHOR: run
+  run_manager.initialize();
+  n4::ui(argc, argv);
+  // ANCHOR_END: run
+// ANCHOR: closing_bracket
+}
+// ANCHOR_END: closing_bracket
+// ANCHOR_END: full_file
