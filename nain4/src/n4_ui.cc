@@ -37,23 +37,6 @@ ui::ui(int argc, char** argv)
 
 }
 
-  // // 1 argument on CLI: run in batch mode
-  // //   +     integer: <ARGUMENT-FOR-BEAM-ON>
-  // //   + non-integer: <MACRO-FILE>
-  // if (argc == 2) {
-  //   auto n         = parse_unsigned(argv[1]);
-  //   auto file_name =                argv[1] ;
-  //   if (n.has_value()) { beam_on  (n        ); }
-  //   else               { run_macro(file_name); }
-  // }
-  // // 2 arguments on CLI: <MACRO-FILE> <ARGUMENT-FOR-BEAM-ON>
-  // else if (argc == 3) {
-  //   auto n         = parse_unsigned(argv[2]);
-  //   auto file_name =                argv[1] ;
-  //   if (n.has_value()) {
-  //     run_macro(file_name);
-  //     beam_on  (n        );
-  //   }
   // } else {
   //   std::cerr << "Usage:\n\n"
   //             << argv[0] << "              # run GUI with macs/vis.mac\n"
@@ -75,6 +58,10 @@ void ui::run() {
     vis_manager.Initialize();
     run_macro("macs/vis.mac");
     ui_executive.SessionStart();
+  }
+
+  if (late_macro.has_value()) {
+    run_macro(late_macro.value());
   }
 
 }
