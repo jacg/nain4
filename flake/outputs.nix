@@ -174,7 +174,7 @@
       build-prop = with pkgs; [ ]; # extra-cmake-modules ?
       test       = with pkgs; [ catch2_3 ];
       run        = with pkgs; [ ];
-      run-prop   = with pkgs; [ just geant4-data cmake my-geant4 qt5.wrapQtAppsHook argparse ];
+      run-prop   = with pkgs; [ just geant4-data cmake meson ninja pkg-config my-geant4 qt5.wrapQtAppsHook argparse ];
       g4-data-package = pkgs.geant4.data;
     };
 
