@@ -89,7 +89,9 @@ int main(int argc, char* argv[]) {
   unsigned n_event = 0;
 
   G4double straw_radius = 0.1 * m;
-  auto messenger = new G4GenericMessenger{nullptr, "/my_geometry", "docs: bla bla bla"};
+  // The trailing slash after '/my_geometry' is CRUCIAL: without it, the
+  // messenger violates the principle of least surprise.
+  auto messenger = new G4GenericMessenger{nullptr, "/my_geometry/", "docs: bla bla bla"};
   messenger -> DeclarePropertyWithUnit("straw_radius", "m", straw_radius);
 
   // ANCHOR: create_run_manager
