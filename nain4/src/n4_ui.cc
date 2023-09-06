@@ -6,6 +6,8 @@
 #include <G4UImanager.hh>
 #include <G4UIExecutive.hh>
 
+#include <argparse/argparse.hpp>
+
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -24,7 +26,7 @@ std::optional<unsigned> parse_unsigned(char* arg) {
 
 namespace nain4 {
 
-ui::ui(int argc, char** argv)
+ui::ui(const std::string& program_name, int argc, char** argv)
 :
   n_events{},
   early_macro{},
@@ -34,7 +36,7 @@ ui::ui(int argc, char** argv)
   argv{argv},
   g4_ui{*G4UImanager::GetUIpointer()}
 {
-
+  argparse::ArgumentParser args(program_name);
 }
 
   // } else {

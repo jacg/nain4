@@ -266,7 +266,7 @@ TEST_CASE("trivial app", "[app]") {
   auto hush = std::make_unique<n4::silence>(std::cout);
 
   n4::run_manager::create()
-    .ui(0, {})
+    .ui("progname", 0, {})
     .physics(default_physics_lists())
     .geometry<geometry>(y_min, y_max, z_min, z_max)
     .actions <actions >(n_gun, n_inside_generator)

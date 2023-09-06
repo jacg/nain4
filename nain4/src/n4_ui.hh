@@ -12,7 +12,7 @@ namespace nain4 {
 
 class ui {
 public:
-  ui(int argc, char** argv);
+  ui(const std::string& program_name, int argc, char** argv);
   void run();
   void run_macro(const G4String& filename) { g4_ui.ApplyCommand("/control/execute " + filename    ); }
   void beam_on  (      G4int            n) { g4_ui.ApplyCommand("/run/beamOn " + std::to_string(n)); }

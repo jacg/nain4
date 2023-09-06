@@ -161,8 +161,8 @@ private:
     initialize_ui(G4RM g4_manager) : g4_manager{std::move(g4_manager)} { }
 
   public:
-    set_physics ui(int argc, char** argv) {
-      auto ui = n4::ui(argc, argv);
+    set_physics ui(const std::string& program_name, int argc, char** argv) {
+      auto ui = n4::ui(program_name, argc, argv);
       return {std::move(g4_manager), std::move(ui)};
     }
   };
