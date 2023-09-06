@@ -51,7 +51,7 @@
     gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
   ];
 
-  build-deps = with pkgs; [ clang-tools cmake my-geant4 qt5.wrapQtAppsHook ];
+  build-deps = with pkgs; [ clang-tools cmake my-geant4 qt5.wrapQtAppsHook argparse ];
   test-deps  = with pkgs; [ catch2_3 ];
   run-deps   = with pkgs; [ just geant4-data ];
   dev-shell-packages = dev-deps ++ build-deps ++ test-deps ++ run-deps
