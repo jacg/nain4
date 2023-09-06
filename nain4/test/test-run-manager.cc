@@ -33,11 +33,13 @@ using Catch::Approx;
 
 #include <numeric>
 
+char *fake_argv[] = { (char*)"progname-aaa", NULL };
+
 TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   auto rm = n4::run_manager::create()
-     .ui("progname", 0, {})
+     .ui("progname", 1, fake_argv, false)
      .physics(default_physics_lists)
      .geometry(water_box)
      .actions(do_nothing);
@@ -61,7 +63,7 @@ TEST_CASE("nain run_manager construct initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   n4::run_manager::create()
-     .ui("progname", 0, {})
+     .ui("progname", 1, fake_argv, false)
      .physics<FTFP_BERT>(0) // verbosity 0
      .geometry<dummy_geometry>(1., 2., 3.)
      .actions<dummy_actions>(10)
@@ -72,7 +74,7 @@ TEST_CASE("nain run_manager basic initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   n4::run_manager::create()
-     .ui("progname", 0, {})
+     .ui("progname", 1, fake_argv, false)
      .physics (new FTFP_BERT{0}) // verbosity 0
      .geometry(new dummy_geometry{1., 2., 3.})
      .actions<dummy_actions>(10)
@@ -145,7 +147,7 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
 
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
-     .ui("progname", 0, {})
+     .ui("progname", 1, fake_argv, false)
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
      .actions(do_nothing)

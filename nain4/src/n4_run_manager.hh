@@ -118,6 +118,7 @@ private:
     }
     ready& apply_command   (const G4String& command ) { ui.apply    (command ); return *this; }
     ready& apply_late_macro(const G4String& filename) { ui.run_macro(filename); return *this; }
+    ready& apply_cli_late_macro(                    ) { ui.run_late_macro()   ; return *this; }
   };
 
   struct set_actions {
@@ -147,6 +148,7 @@ private:
     CORE(set_physics)
     set_physics& apply_command    (const G4String& command ) { ui.apply    (command ); return *this; }
     set_physics& apply_early_macro(const G4String& filename) { ui.run_macro(filename); return *this; }
+    set_physics& apply_cli_early_macro(                    ) { ui.run_early_macro()  ; return *this; }
     using fn_type = std::function<G4VUserPhysicsList* ()>;
     NEXT_STATE_BASIC(set_geometry, physics, G4VUserPhysicsList)
     NEXT_CONSTRUCT  (set_geometry, physics)
@@ -161,8 +163,8 @@ private:
     initialize_ui(G4RM g4_manager) : g4_manager{std::move(g4_manager)} { }
 
   public:
-    set_physics ui(const std::string& program_name, int argc, char** argv) {
-      auto ui = n4::ui(program_name, argc, argv);
+    set_physics ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run=true) {
+      auto ui = n4::ui(program_name, argc, argv, warn_empty_run);
       return {std::move(g4_manager), std::move(ui)};
     }
   };

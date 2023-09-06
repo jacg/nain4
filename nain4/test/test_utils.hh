@@ -30,9 +30,10 @@ inline auto default_run_manager(){
   // Redirect G4cout to /dev/null while Geant4 makes noise
   auto hush = n4::silence{std::cout};
 
+  char *fake_argv[] = { (char*)"progname-ccc", NULL };
   // Construct the default run manager
   auto run_manager = n4::run_manager::create()
-                        .ui("progname", 0, {})
+                        .ui("progname", 1, fake_argv, false)
                         .physics(default_physics_lists)
                         .geometry(water_box)
                         .actions(do_nothing);
