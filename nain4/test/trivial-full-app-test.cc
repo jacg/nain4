@@ -34,8 +34,6 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 
-#define SHOUT(x) std::cout << "I am in " << x << std::endl << std::flush;
-
 // ----- Fundamental requirements of Geant4 --------------------------------------
 
 // Geant4 apps need to register 3 mandatory user-defined classes with the Geant4
