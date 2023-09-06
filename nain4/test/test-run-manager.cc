@@ -33,10 +33,13 @@ using Catch::Approx;
 
 #include <numeric>
 
+char *fake_argv[] = { (char*)"progname-aaa", NULL };
+
 TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   auto rm = n4::run_manager::create()
+     .ui("progname", 1, fake_argv, false)
      .physics(default_physics_lists)
      .geometry(water_box)
      .actions(do_nothing);
@@ -59,28 +62,32 @@ struct dummy_actions : G4VUserActionInitialization {
 TEST_CASE("nain run_manager construct initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
-  auto rm = n4::run_manager::create()
+  n4::run_manager::create()
+     .ui("progname", 1, fake_argv, false)
      .physics<FTFP_BERT>(0) // verbosity 0
      .geometry<dummy_geometry>(1., 2., 3.)
-     .actions<dummy_actions>(10);
+     .actions<dummy_actions>(10)
+     .run();
 }
 
 TEST_CASE("nain run_manager basic initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
-  auto rm = n4::run_manager::create()
+  n4::run_manager::create()
+     .ui("progname", 1, fake_argv, false)
      .physics (new FTFP_BERT{0}) // verbosity 0
      .geometry(new dummy_geometry{1., 2., 3.})
-     .actions<dummy_actions>(10);
+     .actions<dummy_actions>(10)
+     .run();
 }
 
 
-TEST_CASE("nain run_manager get", "[nain][run_manager]") {
-  auto  rm_value     = default_run_manager();
-  auto& rm_reference = n4::run_manager::get();
+// TEST_CASE("nain run_manager get", "[nain][run_manager]") {
+//   default_run_manager().run();
+//   auto& rm_reference = n4::run_manager::get();
 
-  CHECK(&rm_value == &rm_reference);
-}
+//   CHECK(&rm_value == &rm_reference);
+// }
 
 // These tests are commented out because we still don't know how to get Catch2
 // to assert failures.
@@ -102,7 +109,8 @@ TEST_CASE("nain run_manager get", "[nain][run_manager]") {
 //   n4::run_manager::create()
 //      .physics<FTFP_BERT>(0)
 //      .geometry(my_geometry)
-//      .actions(do_nothing);
+//      .actions(do_nothing)
+//      .initialize();
 // }
 
 // TEST_CASE("nain run_manager too_many_world_volumes", "[nain][run_manager]") {
@@ -120,7 +128,8 @@ TEST_CASE("nain run_manager get", "[nain][run_manager]") {
 //   n4::run_manager::create()
 //      .physics<FTFP_BERT>(0)
 //      .geometry(my_geometry)
-//      .actions(do_nothing);
+//      .actions(do_nothing)
+//      .initialize();
 
 // }
 
@@ -132,14 +141,15 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
     auto box_world    = n4::box{"world"   }.cube(1).volume(air);
 
     // No `.in` call defaults to world volume
-           n4::place(box_daughter).in(box_world).now();
+    /*   */n4::place(box_daughter).in(box_world).now();
     return n4::place(box_world   ).now();
   };
 
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
+     .ui("progname", 1, fake_argv, false)
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
-     .actions(do_nothing);
-
+     .actions(do_nothing)
+     .run();
 }

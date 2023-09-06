@@ -51,7 +51,7 @@
     gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
   ];
 
-  build-deps = with pkgs; [ clang-tools cmake my-geant4 qt5.wrapQtAppsHook ];
+  build-deps = with pkgs; [ clang-tools cmake my-geant4 qt5.wrapQtAppsHook argparse ];
   test-deps  = with pkgs; [ catch2_3 ];
   run-deps   = with pkgs; [ just geant4-data ];
   dev-shell-packages = dev-deps ++ build-deps ++ test-deps ++ run-deps
@@ -66,7 +66,7 @@
     # TODO: switch to clang environment
     packages.nain4 = pkgs.stdenv.mkDerivation {
       pname = "nain4";
-      version = "0.1.9";
+      version = "0.1.10";
       src = "${self}/nain4/src";
       nativeBuildInputs = build-deps; # extra-cmake-modules ?
 
@@ -80,14 +80,9 @@
 
     packages.nain4-tests = pkgs.stdenv.mkDerivation {
       pname = "nain4-tests";
-      version = "0.1.9";
+      version = "0.1.10";
       src = "${self}/nain4/test";
-      nativeBuildInputs = with pkgs; [
-        self.packages.nain4
-        cmake
-        my-geant4
-        catch2_3
-        qt5.wrapQtAppsHook ]; # extra-cmake-modules ?
+      nativeBuildInputs = [ self.packages.nain4 ] ++ build-deps ++ test-deps;
     };
 
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {

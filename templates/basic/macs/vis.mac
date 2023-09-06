@@ -81,4 +81,4 @@
 /vis/verbose warnings
 
 # Shoot 100 particles
-/run/beamOn 100
+#/run/beamOn 100

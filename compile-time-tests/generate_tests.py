@@ -11,6 +11,7 @@ tests = {
     ( "no member named 'initialize'"
     , """
 n4::run_manager::create()
+   .ui("program-name", argc, argv, false)
    .initialize();
 """)
 ,
@@ -20,6 +21,7 @@ n4::run_manager::create()
     ("no member named 'geometry'"
     ,"""
 n4::run_manager::create()
+   .ui("program-name", argc, argv, false)
    .geometry  (dummy_geometry)
    .actions   (dummy_actions)
    .initialize();
@@ -31,9 +33,10 @@ n4::run_manager::create()
     ( "no member named 'actions'"
     , """
 n4::run_manager::create()
-  .actions   (dummy_actions)
-  .geometry  (dummy_geometry)
-  .initialize();
+   .ui("program-name", argc, argv, false)
+   .actions   (dummy_actions)
+   .geometry  (dummy_geometry)
+   .initialize();
 """)
 ,
 
@@ -42,6 +45,7 @@ n4::run_manager::create()
     ( "no member named 'initialize'"
     , """
 n4::run_manager::create()
+   .ui("program-name", argc, argv, false)
    .physics(dummy_physics_list)
    .initialize();
 """)
@@ -52,6 +56,7 @@ n4::run_manager::create()
     ( "no member named 'actions'"
     , """
 n4::run_manager::create()
+   .ui("program-name", argc, argv, false)
    .physics(dummy_physics_list)
    .actions(dummy_actions)
    .initialize();
@@ -63,6 +68,7 @@ n4::run_manager::create()
     ( "no member named 'geometry'"
     , """
 n4::run_manager::create()
+   .ui("program-name", argc, argv, false)
    .geometry  (dummy_geometry)
    .physics   (dummy_physics_list)
    .actions   (dummy_actions)
@@ -76,6 +82,7 @@ n4::run_manager::create()
     ( "no member named 'actions'"
     , """
 n4::run_manager::create()
+   .ui("program-name", argc, argv, false)
    .actions   (dummy_actions)
    .physics   (dummy_physics_list)
    .geometry  (dummy_geometry)
@@ -89,6 +96,7 @@ n4::run_manager::create()
     ( "no member named 'actions'"
     , """
 n4::run_manager::create()
+   .ui("program-name", argc, argv, false)
    .physics   (dummy_physics_list)
    .actions   (dummy_actions)
    .geometry  (dummy_geometry)
@@ -103,7 +111,7 @@ test_template = """
 #include "nain4.hh"
 #include "compile_time_common.hh"
 
-int main() {{
+int main(int argc, char** argv) {{
 
 {snippet}
 

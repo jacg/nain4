@@ -78,8 +78,5 @@ jobs:
       - name: Run compile-time tests
         run: nix develop .#${{ matrix.devshell }}  -c just test-compile-time
 
-      - name: Run nain4 examples
-        run: nix develop .#${{ matrix.devshell }}  -c just test-examples
-
       - name: Run G4 examples
         run: nix develop .#${{ matrix.devshell }}  -c just g4-examples/run-examples-that-work

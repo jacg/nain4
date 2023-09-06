@@ -1,5 +1,6 @@
 // clang-format off
 
+#include "n4_run_manager.hh"
 #include "nain4.hh"
 #include "test_utils.hh"
 
@@ -32,8 +33,6 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
-
-#define SHOUT(x) std::cout << "I am in " << x << std::endl << std::flush;
 
 // ----- Fundamental requirements of Geant4 --------------------------------------
 
@@ -265,12 +264,16 @@ TEST_CASE("trivial app", "[app]") {
   auto expected_hits = n_gun * n_beam_on * n_inside_generator;
 
   auto hush = std::make_unique<n4::silence>(std::cout);
-  auto run_manager = n4::run_manager::create()
+
+  char *fake_argv[] = { (char*)"progname-bbb", NULL };
+  n4::run_manager::create()
+    .ui("progname", 1, fake_argv, false)
     .physics(default_physics_lists())
     .geometry<geometry>(y_min, y_max, z_min, z_max)
-    .actions <actions >(n_gun, n_inside_generator);
+    .actions <actions >(n_gun, n_inside_generator)
+    .run();
 
-  run_manager.here_be_dragons() -> BeamOn(n_beam_on);
+  n4::run_manager::get().here_be_dragons() -> BeamOn(n_beam_on);
   hush = nullptr;
 
   // Verify that all the geantinos coming out from the source, hit the detector
@@ -283,6 +286,7 @@ TEST_CASE("trivial app", "[app]") {
 
   // Verify that all generated particles arrived at the detector
   CHECK(sd->detected_particles == expected_hits);
+
 }
 
 #pragma GCC diagnostic pop
