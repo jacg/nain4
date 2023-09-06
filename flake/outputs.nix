@@ -82,12 +82,7 @@
       pname = "nain4-tests";
       version = "0.1.9";
       src = "${self}/nain4/test";
-      nativeBuildInputs = with pkgs; [
-        self.packages.nain4
-        cmake
-        my-geant4
-        catch2_3
-        qt5.wrapQtAppsHook ]; # extra-cmake-modules ?
+      nativeBuildInputs = [ self.packages.nain4 ] ++ build-deps ++ test-deps;
     };
 
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
