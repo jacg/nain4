@@ -1,24 +1,36 @@
 {
   "nodes": {
-    "nain4": {
-      "inputs": {
-        "nixpkgs": "nixpkgs",
-        "nosys": "nosys",
-        "systems": "systems"
-      },
+    "flake-compat": {
+      "flake": false,
       "locked": {
-        "lastModified": 1692484492,
-        "narHash": "sha256-xTimPPR3PA2L2lpALlWjpva2cS5iausCAsFjmuM9MNA=",
-        "owner": "jacg",
-        "repo": "nain4",
-        "rev": "f6b0462795fa1e79c0fc3d37c0338ddcd0757ba0",
+        "lastModified": 1673956053,
+        "narHash": "sha256-4gtG9iQuiKITOjNQQeQIpoIB6b16fm+504Ch3sNKLd8=",
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "rev": "35bb57c0c8d8b62bbfd284272c928ceb64ddbde9",
         "type": "github"
       },
       "original": {
-        "owner": "jacg",
-        "ref": "templates",
-        "repo": "nain4",
+        "owner": "edolstra",
+        "repo": "flake-compat",
         "type": "github"
+      }
+    },
+    "nain4": {
+      "inputs": {
+        "flake-compat": "flake-compat",
+        "nixpkgs": "nixpkgs",
+        "nosys": "nosys"
+      },
+      "locked": {
+        "lastModified": 1693983370,
+        "narHash": "sha256-iBBBPSP41aFWr42HlXTcL/oVWjOdjWz05kd6GdZEsC4=",
+        "type": "git",
+        "url": "file:///home/jacek/src/nain4"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///home/jacek/src/nain4"
       }
     },
     "nixpkgs": {
@@ -62,24 +74,7 @@
         "nosys": [
           "nain4",
           "nosys"
-        ],
-        "systems": [
-          "nain4",
-          "systems"
         ]
-      }
-    },
-    "systems": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-syxQBjSh2xjH3AQvgWc42xZB6XmHboMzcCLdN3Wy0mk=",
-        "path": "./flake/systems.nix",
-        "type": "path"
-      },
-      "original": {
-        "path": "./flake/systems.nix",
-        "type": "path"
       }
     }
   },
