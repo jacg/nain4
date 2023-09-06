@@ -29,7 +29,7 @@ ui::ui(int argc, char** argv)
   n_events{},
   early_macro{},
   late_macro{},
-  vis_macro{},
+  vis_macro{"macs/vis.mac"},
   argc{argc},
   argv{argv},
   g4_ui{*G4UImanager::GetUIpointer()}
@@ -56,7 +56,7 @@ void ui::run() {
     G4UIExecutive ui_executive{argc, argv};
     G4VisExecutive vis_manager;
     vis_manager.Initialize();
-    run_macro("macs/vis.mac");
+    run_macro(vis_macro.value());
     ui_executive.SessionStart();
   }
 
