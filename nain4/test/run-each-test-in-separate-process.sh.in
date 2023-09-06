@@ -15,7 +15,9 @@ EXE=@CMAKE_INSTALL_PREFIX@/bin/@TEST_EXECUTABLE@
 
 while read -r testname
 do
-    if ! $EXE "$testname" ${FLAGS}; then
+    OUTPUT=$($EXE "$testname" ${FLAGS})
+    STATUS=$?
+    if ! $STATUS; then
         FAILED=$FAILED"$testname"\\n
         NFAILED=$((NFAILED+1))
     else
