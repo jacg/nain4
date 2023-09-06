@@ -34,7 +34,9 @@ void verify_number_of_args(int argc){
 struct my {
   G4double       straw_radius{0.1 * m};
   G4double      bubble_radius{0.2 * m};
+  G4double      socket_rot   {-90 * deg};
   G4String      particle_name{"geantino"};
+  G4double      particle_energy{511 * keV};
   G4ThreeVector particle_dir {};
 };
 
@@ -42,9 +44,13 @@ struct my {
 auto my_generator(const my& my) {
   return [&](G4Event* event) {
     auto particle_type = n4::find_particle(my.particle_name);
-    auto vertex   = new G4PrimaryVertex();
+    auto vertex = new G4PrimaryVertex();
     auto r = my.particle_dir.mag2() > 0 ? my.particle_dir : G4RandomDirection();
-    vertex -> SetPrimary(new G4PrimaryParticle(particle_type, r.x(), r.y(), r.z()));
+    vertex -> SetPrimary(new G4PrimaryParticle(
+                           particle_type,
+                           r.x(), r.y(), r.z(),
+                           my.particle_energy
+                         ));
     event  -> AddPrimaryVertex(vertex);
   };
 }
@@ -87,7 +93,7 @@ auto my_geometry(const my& my) {
   n4       ::sphere("socket-cap" ).r(0.3*m).phi_delta(180*deg)
     .sub(n4::box   ("socket-hole").cube(0.4*m))
     .name("socket")
-    .place(steel).in(world).rotate_x(-90*deg).at(1*m, 0, 0.7*m).now();
+    .place(steel).in(world).rotate_x(my.socket_rot).at(1*m, 0, 0.7*m).now();
 
   return n4::place(world).now();
 }
@@ -103,18 +109,20 @@ int main(int argc, char* argv[]) {
   // The trailing slash after '/my_geometry' is CRUCIAL: without it, the
   // messenger violates the principle of least surprise.
   auto messenger = new G4GenericMessenger{nullptr, "/my/", "docs: bla bla bla"};
-  messenger -> DeclarePropertyWithUnit("straw_radius" , "m",  my.straw_radius);
-  messenger -> DeclarePropertyWithUnit("bubble_radius", "m", my.bubble_radius);
-  messenger -> DeclareProperty        ("particle"          , my.particle_name);
-  messenger -> DeclareProperty        ("particle_direction", my.particle_dir );
+  messenger -> DeclarePropertyWithUnit("straw_radius"      , "m"  , my. straw_radius  );
+  messenger -> DeclarePropertyWithUnit("bubble_radius"     , "m"  , my.bubble_radius  );
+  messenger -> DeclarePropertyWithUnit("socket_rot"        , "deg", my.socket_rot     );
+  messenger -> DeclarePropertyWithUnit("particle_energy"   , "keV", my.particle_energy);
+  messenger -> DeclareProperty        ("particle"          ,        my.particle_name  );
+  messenger -> DeclareProperty        ("particle_direction",        my.particle_dir   );
 
   // ANCHOR: create_run_manager
   n4::run_manager::create()
     .ui("my-program-name", argc, argv)
 
     .apply_command("/my/straw_radius 0.5 m")
-    .apply_early_macro("macs/early.mac")
-    .apply_cli_early_macro() // CLI --early-macro executed at this pont
+    .apply_early_macro("macs/early-hard-wired.mac")
+    .apply_cli_early_macro() // CLI --early-macro executed at this point
     // .apply_command(...) // also possible after apply_early_macro
 
     .physics<FTFP_BERT>(0) // verbosity 0
@@ -122,7 +130,7 @@ int main(int argc, char* argv[]) {
     .actions(create_actions(my, n_event))
 
     .apply_command("/my/particle e-")
-    .apply_late_macro("macs/late.mac")
+    .apply_late_macro("macs/late-hard-wired.mac")
     .apply_cli_late_macro() // CLI --late-macro executed at this point
     // .apply_command(...) // also possible after apply_late_macro
 
