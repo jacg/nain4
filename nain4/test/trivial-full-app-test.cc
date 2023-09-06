@@ -288,7 +288,6 @@ TEST_CASE("trivial app", "[app]") {
   // Verify that all generated particles arrived at the detector
   CHECK(sd->detected_particles == expected_hits);
 
-  delete n4::run_manager::rm_instance;
 }
 
 #pragma GCC diagnostic pop

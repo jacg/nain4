@@ -62,6 +62,7 @@ public:
   run_manager(run_manager& ) = delete;
   run_manager(run_manager&&) = default;
 
+private:
   G4RM g4_manager;
   static run_manager*   rm_instance;
   static bool         create_called;
@@ -108,11 +109,12 @@ public:
 
   struct ready {
     CORE(ready)
-    void run() {
+    run_manager* run() {
       g4_manager -> Initialize();
       check_world_volume();
       run_manager::rm_instance = new run_manager{std::move(g4_manager)};
       ui.run();
+      return run_manager::rm_instance;
     }
     ready& apply_command   (const G4String& command ) { ui.apply    (command ); return *this; }
     ready& apply_late_macro(const G4String& filename) { ui.run_macro(filename); return *this; }
