@@ -8,24 +8,24 @@
 
 #include <argparse/argparse.hpp>
 
+#include <cstdlib>
 #include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
 
-std::optional<unsigned> parse_unsigned(char* arg) {
-  try {
-    auto parsed = std::stoi(arg);
-    if (parsed < 0) { return std::nullopt; }
-    return static_cast<unsigned>(parsed);
-  } catch (std::invalid_argument&) {
-    return std::nullopt;
-  }
+
+unsigned parse_beam_on(const std::string&  arg) {
+  auto parsed = std::stoi(arg.c_str());
+  if (parsed < 0) { throw std::runtime_error{std::string{"--beam-on requires an unsigned integer, you gave '"} + arg + "'"}; }
+  return static_cast<unsigned>(parsed);
+
 }
 
 
 namespace nain4 {
 
+// TODO forward to private constructor that accepts parser as parameter, for direct initialization
 ui::ui(const std::string& program_name, int argc, char** argv)
 :
   n_events{},
@@ -37,16 +37,26 @@ ui::ui(const std::string& program_name, int argc, char** argv)
   g4_ui{*G4UImanager::GetUIpointer()}
 {
   argparse::ArgumentParser args(program_name);
-}
 
-  // } else {
-  //   std::cerr << "Usage:\n\n"
-  //             << argv[0] << "              # run GUI with macs/vis.mac\n"
-  //             << argv[0] << " N            # batch mode: /run/beamOn N\n"
-  //             << argv[0] << " MACRO-FILE   # batch mode: excecute MACRO-FILE\n"
-  //             << argv[0] << " MACRO-FILE N # batch mode: excecute MACRO-FILE then /run/beamOn N\n"
-  //             << std::endl;
-  // }
+  args.add_argument("--beam-on"    , "-n", "-b").metavar("N-EVENTS").help("run simulation with given number of events");
+  args.add_argument("--early-macro", "-e"      ).metavar("FILENAME").help("execute before run manager instantiation");
+  args.add_argument( "--late-macro", "-l"      ).metavar("FILENAME").help("execute after  run manager instantiation");
+  args.add_argument(  "--vis-macro", "-g"      ).metavar("FILENAME").help("switch from batch mode to GUI, executing this macro");
+
+  try {
+    args.parse_args(argc, argv);
+  } catch(const std::runtime_error& err) {
+    std::cerr << err.what() << std::endl;
+    std::cerr << args;
+    std::exit(EXIT_FAILURE);
+  }
+
+  if (auto n = args.present("--beam-on")) { n_events = parse_beam_on(n.value()); }
+  early_macro = args.present("--early-macro");
+  late_macro  = args.present( "--late-macro");
+  vis_macro   = args.present(  "--vis-macro");
+
+}
 
 void ui::run() {
 

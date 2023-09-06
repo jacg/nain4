@@ -114,6 +114,7 @@ int main(int argc, char* argv[]) {
 
     .apply_command("/my/straw_radius 0.5 m")
     .apply_early_macro("macs/early.mac")
+    .apply_cli_early_macro() // CLI --early-macro executed at this pont
     // .apply_command(...) // also possible after apply_early_macro
 
     .physics<FTFP_BERT>(0) // verbosity 0
@@ -122,6 +123,7 @@ int main(int argc, char* argv[]) {
 
     .apply_command("/my/particle e-")
     .apply_late_macro("macs/late.mac")
+    .apply_cli_late_macro() // CLI --late-macro executed at this point
     // .apply_command(...) // also possible after apply_late_macro
 
     .run();
