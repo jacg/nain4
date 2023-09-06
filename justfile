@@ -1,7 +1,7 @@
 # -*-Makefile-*-
 
-test-nain4:
-    just nain4/test-all
+test-nain4 *FLAGS:
+    just nain4/test-all {{FLAGS}}
 
 
 test-examples:
