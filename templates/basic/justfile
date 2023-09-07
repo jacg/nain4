@@ -17,5 +17,11 @@ run *ARGS: build
 clean:
   rm build -rf
 
-view:
-  nix run --impure github:guibou/nixGL -- just run
+view vis_macro="":
+  #!/usr/bin/env sh
+  if [ ! -z {{vis_macro}} ]; then
+      args="--vis-macro {{vis_macro}}"
+  else
+      args=""
+  fi
+  sh view.sh just run $args
