@@ -18,3 +18,12 @@ test-compile-time:
 clean-deep:
     fd --no-ignore "^build$"   --exec rm -rf {}
     fd --no-ignore "^install$" --exec rm -rf {}
+
+view vis_macro="":
+    #!/usr/bin/env sh
+    if [ ! -z {{vis_macro}} ]; then
+        args="--vis-macro {{vis_macro}}"
+    else
+        args=""
+    fi
+    sh view.sh just run $args
