@@ -1,6 +1,5 @@
 #!/usr/bin/env sh
 
-
 case $1 in
     -vv) PATTERN=""; verbose=2; shift; FLAGS=$@ ;;
     -v ) PATTERN=""; verbose=1; shift; FLAGS=$@ ;;
@@ -16,8 +15,6 @@ NPASSED=0
 NFAILED=0
 FAILED=
 
-echo VERBOSE $verbose
-
 EXE=@CMAKE_INSTALL_PREFIX@/bin/@TEST_EXECUTABLE@
 
 while read -r testname
@@ -30,7 +27,10 @@ do
             1) printf "\\033[91m    %s\n" "${testname}" ;;
             0) printf "\\033[91mF" ;;
         esac
-        FAILED=$FAILED"$testname"\\n
+        FAILED=$FAILED"####################################################\n"
+        FAILED=$FAILED"# $testname\n"
+        FAILED=$FAILED"####################################################\n"
+        FAILED=$FAILED"\n${OUTPUT}\n\n\n\n"
         NFAILED=$((NFAILED+1))
     else
         case $verbose in
@@ -43,6 +43,8 @@ do
 done < <($EXE ${PATTERN} --list-tests --verbosity quiet)
 echo
 echo
+
+
 if ! [ -z "$FAILED" ]; then
     printf "\\033[91m===========================================================================\n"
     printf "\\033[32m Passed $NPASSED tests, \\033[91m Failed $NFAILED\n\n"
