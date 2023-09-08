@@ -11,17 +11,21 @@ run *ARGS: build
   #!/usr/bin/env sh
   # CHANGEME-my-n4-app: change my-n4-app with a name that better suits your
   # project. At the same time you must change it in the `src/CMakeLists.txt`.
-  ./build/app/my-n4-app {{ARGS}}
+  just run-dispatch-vis-cli ./build/app/my-n4-app {{ARGS}}
   exit $?
 
 clean:
   rm build -rf
 
-view vis_macro="":
+run-dispatch-vis-system *COMMAND:
   #!/usr/bin/env sh
-  if [ ! -z {{vis_macro}} ]; then
-      args="--vis-macro {{vis_macro}}"
+  sh execute-with-nixgl-if-needed-by-system.sh {{COMMAND}}
+
+run-dispatch-vis-cli *COMMAND:
+  #!/usr/bin/env sh
+  gui=$(echo "{{COMMAND}}" | grep -E "\-\-vis\-macro | \-g")
+  if [ -z "$gui" ]; then
+      {{COMMAND}}
   else
-      args=""
+      just run-dispatch-vis-system {{COMMAND}}
   fi
-  sh view.sh just run $args
