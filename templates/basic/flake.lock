@@ -23,14 +23,17 @@
         "nosys": "nosys"
       },
       "locked": {
-        "lastModified": 1693983370,
-        "narHash": "sha256-iBBBPSP41aFWr42HlXTcL/oVWjOdjWz05kd6GdZEsC4=",
-        "type": "git",
-        "url": "file:///home/jacek/src/nain4"
+        "lastModified": 1694010457,
+        "narHash": "sha256-PamV00sgNgWAVTtbBvGmCrdMIQv2tMu7xE6Ljr9EM6A=",
+        "owner": "jacg",
+        "repo": "nain4",
+        "rev": "96ac1ea7359d384f49da06a5d587218be497d159",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:///home/jacek/src/nain4"
+        "owner": "jacg",
+        "repo": "nain4",
+        "type": "github"
       }
     },
     "nixpkgs": {
