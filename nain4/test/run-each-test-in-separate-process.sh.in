@@ -1,11 +1,15 @@
 #!/usr/bin/env sh
 
-PATTERN=$1
-if [ ! -z $2 ]; then
-    shift
-    shift
-fi
-FLAGS=$@
+case $1 in
+    -vv) PATTERN=""; verbose=2; shift; FLAGS=$@ ;;
+    -v ) PATTERN=""; verbose=1; shift; FLAGS=$@ ;;
+    *  ) PATTERN=$1; case $2 in
+                         -vv) verbose=2; shift; shift; FLAGS=$@ ;;
+                         -v ) verbose=1; shift; shift; FLAGS=$@ ;;
+                         *  ) verbose=0;               FLAGS=$@ ;;
+                     esac ;;
+esac
+
 
 NPASSED=0
 NFAILED=0
@@ -15,13 +19,39 @@ EXE=@CMAKE_INSTALL_PREFIX@/bin/@TEST_EXECUTABLE@
 
 while read -r testname
 do
-    if ! $EXE "$testname" ${FLAGS}; then
-        FAILED=$FAILED"$testname"\\n
+    OUTPUT=$($EXE "$testname" ${FLAGS} 2>&1)
+    OUTPUT=${OUTPUT//===============================================================================/}
+    STATUS=$?
+
+    if [ $verbose -eq 2 ]; then
+        printf "===============================================================================\n"
+    fi
+
+
+    if [ $STATUS -ne 0 ]; then
+        case $verbose in
+            2) printf "\\033[91m%s\n\n" "$OUTPUT" ;;
+            1) printf "\\033[91m    %s\n" "${testname}" ;;
+            0) printf "\\033[91mF" ;;
+        esac
+        FAILED=$FAILED"####################################################\n"
+        FAILED=$FAILED"# $testname\n"
+        FAILED=$FAILED"####################################################\n"
+        FAILED=$FAILED"\n${OUTPUT}\n\n\n\n"
         NFAILED=$((NFAILED+1))
     else
+        case $verbose in
+            2) printf "\\033[32m%s\n\n" "$OUTPUT" ;;
+            1) printf "\\033[32m    %s\n" "${testname}" ;;
+            0) printf "\\033[32m." ;;
+        esac
         NPASSED=$((NPASSED+1))
     fi
 done < <($EXE ${PATTERN} --list-tests --verbosity quiet)
+echo
+echo
+
+
 if ! [ -z "$FAILED" ]; then
     printf "\\033[91m===========================================================================\n"
     printf "\\033[32m Passed $NPASSED tests, \\033[91m Failed $NFAILED\n\n"

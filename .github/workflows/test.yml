@@ -58,7 +58,7 @@ jobs:
         run: nix develop
 
       - name: Test nain4
-        run: nix develop .#${{ matrix.devshell }} -c just test-nain4
+        run: nix develop .#${{ matrix.devshell }} -c just test-nain4 -v
 
       - name: Test bootstrapping of client project
         run: |
