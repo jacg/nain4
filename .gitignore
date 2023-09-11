@@ -1,5 +1,7 @@
 .cache/
+*~
 build
+install
 compile_commands.json
 /.direnv/
 /result
@@ -10,7 +12,6 @@ compile_commands.json
 /cmake_install.cmake
 .README.txt
 G4History.macro
-/install/
 **/.gdb_history
 **/Testing
 
