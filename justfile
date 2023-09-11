@@ -1,10 +1,31 @@
 # -*-Makefile-*-
 
-_ *FLAGS_AND_ARGS:
-    just test-nain4 {{FLAGS_AND_ARGS}}
+default:
+    just clean # Remove this once exploratory development is done
+    just test-nain4
 
-test-nain4 *FLAGS:
-    just nain4/test-all {{FLAGS}}
+test PATTERN *FLAGS: install-tests
+    sh install/nain4-test/run-each-test-in-separate-process.sh {{PATTERN}} {{FLAGS}}
+
+test-nain4 *FLAGS: install-tests
+    just test '' {{FLAGS}}
+
+clean:
+    fd --no-ignore "^build$"   --exec rm -rf {}
+    fd --no-ignore "^install$" --exec rm -rf {}
+
+install-nain4:
+    meson setup nain4/build/nain4 nain4/src
+    meson compile -C nain4/build/nain4
+    meson install -C nain4/build/nain4
+
+install-tests: install-nain4
+    meson setup nain4/build/nain4-test nain4/test
+    meson compile -C nain4/build/nain4-test
+    meson install -C nain4/build/nain4-test
+
+# ----------------------------------------------------------------------
+# Add recipes here to help with discovery of recipes in subdirectories
 
 test-examples:
     just examples/
@@ -14,7 +35,3 @@ test-client-side:
 
 test-compile-time:
     just compile-time-tests/test-all
-
-clean-deep:
-    fd --no-ignore "^build$"   --exec rm -rf {}
-    fd --no-ignore "^install$" --exec rm -rf {}
