@@ -96,7 +96,7 @@
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
       QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
       shellHook = ''
-          export NAIN4_LIB=$PWD/install/nain4/lib/x86_64-linux-gnu/
+          export NAIN4_LIB=$PWD/install/nain4/lib/
           export LD_LIBRARY_PATH=$NAIN4_LIB:$LD_LIBRARY_PATH;
           export PKG_CONFIG_PATH=$NAIN4_LIB/pkgconfig:$PKG_CONFIG_PATH;
       '';
