@@ -74,11 +74,6 @@
         nain4.packages.nain4
         nain4.packages.clang_16
       ];
-
-      G4_DIR = "${pkgs.geant4}";
-      G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
-      QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
-
     };
 
     # Activated by `nix develop <URL to this flake>#gcc`

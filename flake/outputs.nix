@@ -70,6 +70,14 @@
       src = "${self}/nain4/src";
       nativeBuildInputs = build-deps; # extra-cmake-modules ?
 
+      hook_g4_dir = "${pkgs.geant4}";
+      hook_g4_examples = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
+      hook_qt_stuff = "${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
+      setupHook = ./nain4-hook.sh;
+
+      # https://nixos.org/guides/nix-pills/basic-dependencies-and-hooks#id1470
+      # TODO propagatedBuildInputs ... will be used as buildInputs by dependencies
+
       # meta = with pkgs.lib; {
       #   description = "An API that makes it easier to write Geant4 application code.";
       #   homepage = "https://jacg.github.io/nain4/";
