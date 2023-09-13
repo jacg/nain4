@@ -17,6 +17,8 @@
 
   in {
 
+    packages.default = self.packages.CHANGEME-my-package;
+
     # TODO: switch to clang environment
     packages.CHANGEME-my-package = pkgs.stdenv.mkDerivation {
       # CHANGEME-pname: replace "CHANGEME-my-package" with a name better-suited to your project
