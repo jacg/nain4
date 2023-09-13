@@ -80,6 +80,19 @@ jobs:
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" build-and-run-client-package-output
 
+      - name: Test variables set by nain4 setupHook
+        run: |
+          nix develop ~/work/my-project# -c env > my-project-env
+          echo ====== grepping for G4_DIR ====================
+          grep G4_DIR my-project-env
+          echo ===============================================
+          echo ====== grepping for G4_EXAMPLES ===============
+          grep G4_EXAMPLES my-project-env
+          echo ===============================================
+          echo grepping for QT_QPA_PLATFORM_PLUGIN_PATH
+          grep QT_QPA_PLATFORM_PLUGIN_PATH my-project-env
+          echo ===============================================
+
       - name: Test nix run client app
         run: |
           nix run ~/work/my-project#CHANGEME-my-app -- --beam-on 13 | tee run-client-app-output
