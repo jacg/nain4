@@ -9,9 +9,7 @@ build:
 
 run *ARGS: build
   #!/usr/bin/env sh
-  # CHANGEME-my-n4-app: change my-n4-app with a name that better suits your
-  # project. At the same time you must change it in the `src/CMakeLists.txt`.
-  just run-dispatch-vis-cli ./build/app/my-n4-app {{ARGS}}
+  just run-dispatch-vis-cli ./build/app/CHANGEME-my-n4-prog {{ARGS}}
   exit $?
 
 clean:

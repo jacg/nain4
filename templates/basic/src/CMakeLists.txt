@@ -3,9 +3,7 @@ cmake_minimum_required(VERSION 3.25)
 # CHANGEME-project-name: Not important, but you might want to change it
 project(my-nain4-project)
 
-# CHANGEME-my-n4-app: change my-n4-app to a name that better suits your project.
-# At the same time you must change it in the justfile of the parent directory.
-set(EXE my-n4-app)
+set(EXE CHANGEME-my-n4-prog)
 
 # ----- Generate compile_commands.json, unless otherwise instructed on CLI --
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
