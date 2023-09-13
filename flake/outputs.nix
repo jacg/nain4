@@ -127,6 +127,7 @@
         mkdir -p $DIRECTORY
         ${pkgs.coreutils}/bin/cp -Tr ${self}/templates/basic $DIRECTORY
         chmod -R u+w $DIRECTORY
+        nix develop $DIRECTORY -c true # create flake.lock
         cd $DIRECTORY
         git -c init.defaultBranch=master init -q
         # TODO: protect against user not having set git user.{name,email}
