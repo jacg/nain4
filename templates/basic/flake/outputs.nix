@@ -14,7 +14,7 @@
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
 
-  in rec {
+  in {
 
     # packages.default = pkgs.stdenv.mkDerivation { stdenv = pkgs.clang_16.stdenv; } {
     #   # CHANGEME-pname: replace "my-package" with a name better-suited to your project
@@ -31,7 +31,7 @@
     # TODO apps.my-app = { type = "app"; program = "<store-path>"; };
 
     # Used by `direnv` when entering this directory (also by `nix develop <URL to this flake>`)
-    devShell = devShells.clang;
+    devShell = self.devShells.clang;
 
     # TODO Create functions which generate the shells
 

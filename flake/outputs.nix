@@ -59,7 +59,7 @@
                        ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
 
-  in rec {
+  in {
 
     packages.default = self.packages.nain4;
 
@@ -107,7 +107,7 @@
 
     };
 
-    devShell = devShells.clang;
+    devShell = self.devShells.clang;
 
     packages.geant4 = my-geant4;
     packages.clang_16 = clang_16;
