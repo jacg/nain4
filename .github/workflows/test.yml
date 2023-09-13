@@ -72,12 +72,18 @@ jobs:
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" just-output
 
-
       - name: Test nix build client package
         run: |
           nix build   ~/work/my-project#
-          nix develop ~/work/my-project# -c result/bin/CHANGEME-my-n4-prog --beam-on 12 | tee run-client-app-output
+          nix develop ~/work/my-project# -c result/bin/CHANGEME-my-n4-prog --beam-on 12 | tee build-and-run-client-package-output
           PATTERN="end of event 12"
+          echo Looking for "'$PATTERN'" in output of 'just'
+          grep "$PATTERN" build-and-run-client-package-output
+
+      - name: Test nix run client app
+        run: |
+          nix run ~/work/my-project#CHANGEME-my-app -- --beam-on 13 | tee run-client-app-output
+          PATTERN="end of event 13"
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" run-client-app-output
 
