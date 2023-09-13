@@ -144,6 +144,9 @@
 
     _contains-systems = { systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ]; };
 
-    deps = { inherit dev-deps build-deps test-deps run-deps; };
+    deps = {
+      inherit dev-deps build-deps test-deps run-deps;
+      g4-data-package = pkgs.geant4.data;
+    };
 
   }
