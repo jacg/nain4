@@ -127,6 +127,7 @@
         mkdir -p $DIRECTORY
         ${pkgs.coreutils}/bin/cp -Tr ${self}/templates/basic $DIRECTORY
         chmod -R u+w $DIRECTORY
+        nix develop $DIRECTORY -c true # create flake.lock
         cd $DIRECTORY
         git -c init.defaultBranch=master init -q
         # TODO: protect against user not having set git user.{name,email}
@@ -144,6 +145,9 @@
 
     _contains-systems = { systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ]; };
 
-    deps = { inherit dev-deps build-deps test-deps run-deps; };
+    deps = {
+      inherit dev-deps build-deps test-deps run-deps;
+      g4-data-package = pkgs.geant4.data;
+    };
 
   }
