@@ -9,6 +9,7 @@
   # TODO inject nain4 itself into most of these:
 
   dev-shell-packages = with nain4.deps;
+    [ nain4.packages.nain4 ] ++
     dev-deps ++ build-deps ++ test-deps ++ run-deps
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
@@ -16,13 +17,14 @@
 
   in {
 
-    # packages.default = pkgs.stdenv.mkDerivation { stdenv = pkgs.clang_16.stdenv; } {
-    #   # CHANGEME-pname: replace "my-package" with a name better-suited to your project
-    #   pname = "my-package";
-    #   version = "0.0.1";
-    #   src = "${self}/src";
-    #   # TODO nativeBuildInputs =
-    # };
+    # TODO: switch to clang environment
+    packages.CHANGEME-my-package = pkgs.stdenv.mkDerivation {
+      # CHANGEME-pname: replace "CHANGEME-my-package" with a name better-suited to your project
+      pname = "CHANGEME-my-package";
+      version = "0.0.0";
+      src = "${self}/src";
+      nativeBuildInputs = dev-shell-packages; # TODO be more discriminating in nativeBuildInputs
+    };
 
     # Executed by `nix run <URL of this flake> -- <args?>`
     # TODO apps.default = { type = "app"; program = "..."; };

@@ -51,3 +51,8 @@ add_custom_command(
   ${CMAKE_SOURCE_DIR}../macs $<TARGET_FILE_DIR:${EXE}>/macs
   COMMENT "Symlinking G4 macros directory" VERBATIM
 )
+
+
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${EXE}
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+)
