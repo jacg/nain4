@@ -27,6 +27,7 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
   args.add_argument("--early-macro", "-e"      ).metavar("FILENAME").help("execute before run manager instantiation");
   args.add_argument( "--late-macro", "-l"      ).metavar("FILENAME").help("execute after  run manager instantiation");
   args.add_argument(  "--vis-macro", "-g"      ).metavar("FILENAME").help("switch from batch mode to GUI, executing this macro");
+  args.add_argument( "--macro-path", "-p"      ).metavar("PATH"    ).help("Extra search paths for macros").nargs(argparse::nargs_pattern::any);
 
   try {
     args.parse_args(argc, argv);
@@ -59,6 +60,16 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   early_macro = args.present("--early-macro");
   late_macro  = args.present( "--late-macro");
   vis_macro   = args.present(  "--vis-macro");
+
+  // c++ sucks and G4 sucks even more. Here we use std::string because
+  // G4String does not work. Don't know why, but it's probably due to
+  // an absurd reason. So much time wasted on this...
+  auto macro_paths = args.present<std::vector<std::string>>("--macro-path");
+  if (macro_paths.has_value()) {
+    for (auto& path : macro_paths.value()) {
+      append_path(path);
+    }
+  }
 
   if (warn_empty_run && ! (n_events.has_value() ^ vis_macro.has_value())) {
     std::cerr << "'" + program_name + "' is not going to do anything interesting without some command-line arguments.\n\n";
