@@ -95,7 +95,7 @@ jobs:
 
       - name: Test nix run client app
         run: |
-          nix run ~/work/my-project#CHANGEME-my-app -- --beam-on 13 | tee run-client-app-output
+          nix run ~/work/my-project# -- --beam-on 13 | tee run-client-app-output
           PATTERN="end of event 13"
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" run-client-app-output

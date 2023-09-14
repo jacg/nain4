@@ -29,7 +29,7 @@
     };
 
     # Executed by `nix run <URL of this flake> -- <args?>`
-    # TODO apps.default = { type = "app"; program = "..."; };
+    apps.default = self.apps.CHANGEME-my-app;
 
     # Executed by `nix run <URL of this flake>#CHANGEME-my-app`
     apps.CHANGEME-my-app = let
