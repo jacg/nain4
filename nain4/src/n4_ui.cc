@@ -70,6 +70,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
       append_path(path);
     }
   }
+  g4_ui.ParseMacroSearchPath();
 
   if (warn_empty_run && ! (n_events.has_value() ^ vis_macro.has_value())) {
     std::cerr << "'" + program_name + "' is not going to do anything interesting without some command-line arguments.\n\n";
