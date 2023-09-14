@@ -153,3 +153,25 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
      .actions(do_nothing)
      .run();
 }
+
+TEST_CASE("test macropath", "[nain][run_manager][macropath]") {
+  auto hush = n4::silence{std::cout};
+
+  char *argv[] = { (char*)"progname-aaa"
+                 , (char*)"--macro-path"
+                 , (char*)"path-aaa"
+                 , (char*)"path-bbb"
+                 , (char*)"path-ccc"
+                 , NULL
+                 };
+
+   auto rm = n4::run_manager::create()
+     .ui("progname", 5, argv, false);
+
+   auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
+
+   CHECK(search_path.find("path-aaa") != std::string::npos);
+   CHECK(search_path.find("path-bbb") != std::string::npos);
+   CHECK(search_path.find("path-ccc") != std::string::npos);
+
+}
