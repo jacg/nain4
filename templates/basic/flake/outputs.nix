@@ -93,8 +93,8 @@
     # 3. [on lxplus] `singularity run hello.img`
     packages.singularity = pkgs.singularity-tools.buildImage {
       name = "test";
-      contents = [ self.pkgs.xxx ];
-      runScript = "${self.pkgs.xxx}/bin/hello";
+      contents = [ self.packages.CHANGEME-my-package ];
+      runScript = "${self.packages.CHANGEME-my-package}/bin/CHANGEME-my-n4-prog";
     };
 
   }
