@@ -50,7 +50,8 @@
         export G4ABLADATA="${g4-data.G4ABLA}/share/Geant4-11.0.4/data/G4ABLA3.1"
         export G4INCLDATA="${g4-data.G4INCL}/share/Geant4-11.0.4/data/G4INCL1.0"
         export G4ENSDFSTATEDATA="${g4-data.G4ENSDFSTATE}/share/Geant4-11.0.4/data/G4ENSDFSTATE2.3"
-        exec CHANGEME-my-n4-prog "--macro-path ${self} $@"
+
+        exec CHANGEME-my-n4-prog --macro-path ${self} "$@"
       '';
     in { type = "app"; program = "${CHANGEME-wrap-my-package}/bin/CHANGEME-my-app"; };
 
