@@ -67,7 +67,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   auto macro_paths = args.present<std::vector<std::string>>("--macro-path");
   if (macro_paths.has_value()) {
     for (auto& path : macro_paths.value()) {
-      append_path(path);
+      prepend_path(path);
     }
   }
   g4_ui.ParseMacroSearchPath();

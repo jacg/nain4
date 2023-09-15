@@ -23,8 +23,8 @@ public:
   void  run_late_macro() { if ( late_macro.has_value()) { run_macro( late_macro.value()); }          }
   void   run_vis_macro() { if (  vis_macro.has_value()) { run_macro(  vis_macro.value()); }          }
 
-  void    set_path(G4String const& path) { g4_ui.SetMacroSearchPath(path); }
-  void append_path(G4String const& path) { set_path(g4_ui.GetMacroSearchPath() + ":" + path);}
+  void     set_path(G4String const& path) {                       g4_ui.SetMacroSearchPath(path) ;}
+  void prepend_path(G4String const& path) { set_path(path + ":" + g4_ui.GetMacroSearchPath(    ));}
 
 private:
   argparse::ArgumentParser args;
