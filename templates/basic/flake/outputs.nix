@@ -93,8 +93,8 @@
     # 3. [on lxplus] `singularity run hello.img`
     packages.singularity = pkgs.singularity-tools.buildImage {
       name = "test";
-      contents = [ self.packages.CHANGEME-my-package ];
-      runScript = "${self.packages.CHANGEME-my-package}/bin/CHANGEME-my-n4-prog";
+      contents = [ self.apps.CHANGEME-my-app.program ];
+      runScript = "${self.apps.CHANGEME-my-app.program} $@";
       diskSize = 10240;
       memSize = 5120;
     };
