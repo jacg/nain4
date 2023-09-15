@@ -50,12 +50,6 @@
         export G4ABLADATA="${g4-data.G4ABLA}/share/Geant4-11.0.4/data/G4ABLA3.1"
         export G4INCLDATA="${g4-data.G4INCL}/share/Geant4-11.0.4/data/G4INCL1.0"
         export G4ENSDFSTATEDATA="${g4-data.G4ENSDFSTATE}/share/Geant4-11.0.4/data/G4ENSDFSTATE2.3"
-
-        echo
-        echo $PATH
-        echo
-        echo $LD_LIBRARY_PATH
-        echo
         exec CHANGEME-my-n4-prog "$@"
       '';
     in { type = "app"; program = "${CHANGEME-wrap-my-package}/bin/CHANGEME-my-app"; };
@@ -87,5 +81,16 @@
     #   QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
     # };
+
+    # 1. `nix build` .#singularity
+    # 2. `scp result <me>@lxplus7.cern.ch:hello.img`
+    # 3. [on lxplus] `singularity run hello.img`
+    packages.singularity = pkgs.singularity-tools.buildImage {
+      name = "test";
+      contents = [ self.apps.CHANGEME-my-app.program ];
+      runScript = "${self.apps.CHANGEME-my-app.program} $@";
+      diskSize = 10240;
+      memSize = 5120;
+    };
 
   }
