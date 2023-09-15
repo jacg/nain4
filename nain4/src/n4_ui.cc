@@ -36,7 +36,7 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
   } catch(const std::runtime_error& err) {
     std::cerr << err.what() << std::endl;
     std::cerr << args;
-    std::exit(EXIT_FAILURE);
+    throw err;
   }
 
   return args;
