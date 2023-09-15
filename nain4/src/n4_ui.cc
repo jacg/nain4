@@ -23,11 +23,13 @@ unsigned parse_beam_on(const std::string&  arg) {
 
 argparse::ArgumentParser define_args(const std::string& program_name, int argc, char** argv) {
   argparse::ArgumentParser args{program_name};
-  args.add_argument("--beam-on"    , "-n", "-b").metavar("N-EVENTS").help("run simulation with given number of events");
-  args.add_argument("--early-macro", "-e"      ).metavar("FILENAME").help("execute before run manager instantiation");
-  args.add_argument( "--late-macro", "-l"      ).metavar("FILENAME").help("execute after  run manager instantiation");
-  args.add_argument(  "--vis-macro", "-g"      ).metavar("FILENAME").help("switch from batch mode to GUI, executing this macro");
-  args.add_argument( "--macro-path", "-p"      ).metavar("PATH"    ).help("Extra search paths for macros").nargs(argparse::nargs_pattern::any);
+  args.add_argument("--beam-on"    , "-n", "-b").metavar("N-EVENTS"   ).help("run simulation with given number of events");
+  args.add_argument("--early-macro", "-e"      ).metavar("FILENAME"   ).help("execute before run manager instantiation");
+  args.add_argument( "--late-macro", "-l"      ).metavar("FILENAME"   ).help("execute after  run manager instantiation");
+  args.add_argument(  "--vis-macro", "-g"      ).metavar("FILENAME"   ).help("switch from batch mode to GUI, executing this macro");
+  args.add_argument("--macro-path",  "-m"      ).metavar("MACRO-PATHS").help("Add directories to Geant4 macro search path")
+    .nargs(argparse::nargs_pattern::at_least_one)
+    .append();
 
   try {
     args.parse_args(argc, argv);
@@ -64,11 +66,9 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   // c++ sucks and G4 sucks even more. Here we use std::string because
   // G4String does not work. Don't know why, but it's probably due to
   // an absurd reason. So much time wasted on this...
-  auto macro_paths = args.present<std::vector<std::string>>("--macro-path");
-  if (macro_paths.has_value()) {
-    for (auto& path : macro_paths.value()) {
-      prepend_path(path);
-    }
+  auto macro_paths = args.get<std::vector<std::string>>("--macro-path");
+  for (auto& path : macro_paths) {
+    prepend_path(path);
   }
   g4_ui.ParseMacroSearchPath();
 
