@@ -63,9 +63,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   late_macro  = args.present( "--late-macro");
   vis_macro   = args.present(  "--vis-macro");
 
-  // c++ sucks and G4 sucks even more. Here we use std::string because
-  // G4String does not work. Don't know why, but it's probably due to
-  // an absurd reason. So much time wasted on this...
+  // Here we use std::string because G4String does not work
   auto macro_paths = args.get<std::vector<std::string>>("--macro-path");
   for (auto& path : macro_paths) {
     prepend_path(path);
