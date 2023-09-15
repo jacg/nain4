@@ -95,6 +95,8 @@
       name = "test";
       contents = [ self.packages.CHANGEME-my-package ];
       runScript = "${self.packages.CHANGEME-my-package}/bin/CHANGEME-my-n4-prog";
+      diskSize = 10240;
+      memSize = 5120;
     };
 
   }
