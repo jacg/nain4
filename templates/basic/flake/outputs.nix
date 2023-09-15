@@ -50,12 +50,6 @@
         export G4ABLADATA="${g4-data.G4ABLA}/share/Geant4-11.0.4/data/G4ABLA3.1"
         export G4INCLDATA="${g4-data.G4INCL}/share/Geant4-11.0.4/data/G4INCL1.0"
         export G4ENSDFSTATEDATA="${g4-data.G4ENSDFSTATE}/share/Geant4-11.0.4/data/G4ENSDFSTATE2.3"
-
-        echo
-        echo $PATH
-        echo
-        echo $LD_LIBRARY_PATH
-        echo
         exec CHANGEME-my-n4-prog "$@"
       '';
     in { type = "app"; program = "${CHANGEME-wrap-my-package}/bin/CHANGEME-my-app"; };
