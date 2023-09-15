@@ -161,16 +161,6 @@
       created = "now";
     };
 
-    # 1. `nix build` .#singularity
-    # 2. `scp result <me>@lxplus7.cern.ch:hello.img`
-    # 3. [on lxplus] `singularity run hello.img`
-    packages.singularity = pkgs.singularity-tools.buildImage {
-      name = "test";
-      contents = [ pkgs.hello ];
-      runScript = "${pkgs.hello}/bin/hello";
-    };
-
-
     # Leading underscore prevents nosys from regenerating this for every system
     _templates = (import ../templates);
 
