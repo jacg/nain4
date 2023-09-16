@@ -149,6 +149,8 @@ private:
     set_physics& apply_command    (const G4String& command ) { ui.apply    (command ); return *this; }
     set_physics& apply_early_macro(const G4String& filename) { ui.run_macro(filename); return *this; }
     set_physics& apply_cli_early_macro(                    ) { ui.run_early_macro()  ; return *this; }
+    set_physics& macro_path       (const G4String& path    ) { ui.prepend_path(path) ; return *this; }
+
     using fn_type = std::function<G4VUserPhysicsList* ()>;
     NEXT_STATE_BASIC(set_geometry, physics, G4VUserPhysicsList)
     NEXT_CONSTRUCT  (set_geometry, physics)
