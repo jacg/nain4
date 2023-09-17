@@ -22,6 +22,8 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_contains.hpp>
+#include <stdexcept>
 
 using Catch::Approx;
 
@@ -152,4 +154,54 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
      .geometry(my_geometry)
      .actions(do_nothing)
      .run();
+}
+
+TEST_CASE("test macropath with values", "[nain][run_manager][macropath]") {
+  auto hush = n4::silence{std::cout};
+
+  char *argv[] = { (char*)"progname-aaa"
+                 , (char*)"--macro-path"
+                 , (char*)"path-aaa"
+                 , (char*)"--macro-path"
+                 , (char*)"path-bbb"
+                 , (char*)"path-ccc"
+                 , NULL
+                 };
+
+  auto rm = n4::run_manager::create().ui("progname", 6, argv, false);
+
+  auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
+  std::cerr << search_path << std::endl;
+
+  CHECK(search_path.find("path-aaa") != std::string::npos);
+  CHECK(search_path.find("path-bbb") != std::string::npos);
+  CHECK(search_path.find("path-ccc") != std::string::npos);
+}
+
+
+TEST_CASE("test without macropath", "[nain][run_manager][macropath]") {
+  auto hush = n4::silence{std::cout};
+
+  char *argv[] = {(char*)"progname-aaa", NULL};
+
+  auto rm = n4::run_manager::create().ui("progname", 1, argv, false);
+
+  auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
+  std::cerr << "XXX" << search_path << "XXX" << std::endl;
+
+  CHECK(search_path == "");
+}
+
+
+TEST_CASE("test macropath without value", "[nain][run_manager][macropath]") {
+  auto hush = n4::silence{std::cout};
+
+  char *argv[] = {(char*)"progname-aaa", (char*)"--macro-path", NULL};
+
+  using Catch::Matchers::Contains;
+  // We tried
+  //   REQUIRE_THROWS_WITH( n4::run_manager::create().ui("progname", 2, argv, false)
+  //                      , Contains("Too few arguments") && Contains("--macro-path"));
+  // and variations on the there but nothing worked sensibly.
+  REQUIRE_THROWS_AS(n4::run_manager::create().ui("progname", 2, argv, false), std::runtime_error);
 }

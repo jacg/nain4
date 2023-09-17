@@ -119,9 +119,9 @@ int main(int argc, char* argv[]) {
   // ANCHOR: create_run_manager
   n4::run_manager::create()
     .ui("my-program-name", argc, argv)
-
+    .macro_path("macs")
     .apply_command("/my/straw_radius 0.5 m")
-    .apply_early_macro("macs/early-hard-wired.mac")
+    .apply_early_macro("early-hard-wired.mac")
     .apply_cli_early_macro() // CLI --early-macro executed at this point
     // .apply_command(...) // also possible after apply_early_macro
 
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
     .actions(create_actions(my, n_event))
 
     .apply_command("/my/particle e-")
-    .apply_late_macro("macs/late-hard-wired.mac")
+    .apply_late_macro("late-hard-wired.mac")
     .apply_cli_late_macro() // CLI --late-macro executed at this point
     // .apply_command(...) // also possible after apply_late_macro
 
