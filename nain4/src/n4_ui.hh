@@ -23,7 +23,12 @@ public:
   void  run_late_macro() { if ( late_macro.has_value()) { run_macro( late_macro.value()); }          }
   void   run_vis_macro() { if (  vis_macro.has_value()) { run_macro(  vis_macro.value()); }          }
 
-  void     set_path(G4String const& path) {                       g4_ui.SetMacroSearchPath(path) ;}
+  // Parsing the macro search path every time something is prepended
+  // to the search path is technically unnecessary and introduces some
+  // overhead but not doing so is error-prone and can cause many
+  // headaches. Since this function will only be called a reduced
+  // number of times, I think in the benefits outweight the cost.
+  void     set_path(G4String const& path) {                       g4_ui.SetMacroSearchPath(path) ; g4_ui.ParseMacroSearchPath();}
   void prepend_path(G4String const& path) { set_path(path + ":" + g4_ui.GetMacroSearchPath(    ));}
 
 private:
