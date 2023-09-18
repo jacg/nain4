@@ -1,0 +1,7 @@
+/control/execute vis.mac
+
+# Override colours set in vis.mac
+
+#                        name  depth red green blue opacity
+/vis/geometry/set/colour world   0    0    1    0     .3
+/vis/geometry/set/colour bubble  0    1    1    0     .6

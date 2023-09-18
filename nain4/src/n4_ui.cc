@@ -26,7 +26,8 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
   args.add_argument("--beam-on"    , "-n", "-b").metavar("N-EVENTS").help("run simulation with given number of events");
   args.add_argument("--early-macro", "-e"      ).metavar("EARLY"   ).help("execute before run manager instantiation");
   args.add_argument( "--late-macro", "-l"      ).metavar("LATE"    ).help("execute after  run manager instantiation");
-  args.add_argument(  "--vis-macro", "-g"      ).metavar("VIS"     ).help("switch from batch mode to GUI, executing this macro");
+  args.add_argument(  "--vis-macro", "-g"      ).metavar("VIS"     ).help("switch from batch mode to GUI, executing this macro")
+    .default_value(std::string{"vis.mac"});
   args.add_argument("--macro-path",  "-m"      ).metavar("MACRO-PATHS").help("Add directories to Geant4 macro search path")
     .nargs(argparse::nargs_pattern::at_least_one)
     .append();
@@ -61,7 +62,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   if (auto n = args.present("--beam-on")) { n_events = parse_beam_on(n.value()); }
   early_macro = args.present("--early-macro");
   late_macro  = args.present( "--late-macro");
-  vis_macro   = args.present(  "--vis-macro");
+  if (args.is_used("-g")) { vis_macro = args.get("-g"); }
 
   // Here we use std::string because G4String does not work
   auto macro_paths = args.get<std::vector<std::string>>("--macro-path");
