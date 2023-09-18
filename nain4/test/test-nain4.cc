@@ -81,20 +81,20 @@ TEST_CASE("nain material", "[nain][material]") {
     auto state = kStateSolid;
     auto [nH, nC, nO] = std::make_tuple(12, 18, 3);
 
-    // Make the material using nain4::material_from_elements
-    auto fr4 = nain4::material_from_elements_N(name, density, state,
-                                               {{"H", nH}, {"C", nC}, {"O", nO}});
-    CHECK(fr4 != nullptr);
-
-    // Verify that the material can be retrieved with nain4::material
-    auto fr4_found = nain4::material(name);
-    CHECK(fr4 == fr4_found);
-
     // Grab elements and calculate some properties for use in tests lower down
     auto H = nain4::element("H"); auto mH = H->GetAtomicMassAmu();
     auto C = nain4::element("C"); auto mC = C->GetAtomicMassAmu();
     auto O = nain4::element("O"); auto mO = O->GetAtomicMassAmu();
     auto total_mass = nH*mH + nC*mC + nO*mO;
+
+    // Make the material using nain4::material_from_elements
+    auto fr4 = nain4::material_from_elements_N(name, density, state,
+                                               {{"H", nH}, {"C", nC}, {O, nO}});
+    CHECK(fr4 != nullptr);
+
+    // Verify that the material can be retrieved with nain4::material
+    auto fr4_found = nain4::material(name);
+    CHECK(fr4 == fr4_found);
 
     // Elements used correctly?
     CHECK(fr4 -> GetElement(0) == H);
