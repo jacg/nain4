@@ -89,7 +89,7 @@ TEST_CASE("nain material", "[nain][material]") {
 
     // Make the material using nain4::material_from_elements
     auto fr4 = nain4::material_from_elements_N(name, density, {.state=state},
-                                               {{"H", nH}, {"C", nC}, {"O", nO}});
+                                               {{"H", nH}, {"C", nC}, {O, nO}});
     CHECK(fr4 != nullptr);
 
     // Verify that the material can be retrieved with nain4::material
