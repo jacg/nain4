@@ -1704,7 +1704,7 @@ TEST_CASE("nain map", "[nain][map]") {
 TEST_CASE("biased choice", "[random][biased][choice]") {
   // TODO Ideally this should be done with a proptesting generator/shrinker
   std::vector<G4double> weights{9.1, 1.2, 3.4, 100, 0.3, 12.4, 6.7};
-  auto pick = n4::random::biased_choice(weights);
+  auto pick = n4::random::biased_choice{weights};
   std::vector<size_t> hits(weights.size(), 0);
   for (size_t i=0; i<1000000; ++i) {
     hits[pick()] += 1;
