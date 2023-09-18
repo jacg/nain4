@@ -5,6 +5,7 @@
 
 #include "n4_run_manager.hh"
 
+#include <CLHEP/Units/PhysicalConstants.h>
 #include <G4Element.hh>
 #include <G4LogicalVolume.hh>
 #include <G4LogicalVolumeStore.hh>
@@ -20,6 +21,7 @@
 #include <G4SolidStore.hh>
 #include <G4ThreeVector.hh>
 #include <G4Transform3D.hh>
+#include <G4Types.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4VSolid.hh>
 #include <G4VisAttributes.hh>
@@ -100,7 +102,6 @@ IA event_number  ()       { return run_manager::get().here_be_dragons() -> GetCu
 // Remove all, logical/physical volumes, solids and assemblies.
 inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeometry(true); }
 
-
 // An element identifier + element count.
 // The element can be identified by
 // + G4Element*
@@ -119,6 +120,12 @@ struct element_spec_F {
   G4double const n;
 };
 
+struct material_options {
+  G4State  state   {kStateUndefined};
+  G4double temp    {       NTP_Temperature};
+  G4double pressure{CLHEP::STP_Pressure};
+};
+
 // --------------------------------------------------------------------------------
 // The G4Material::AddElement is overloaded on double/int in the second
 // parameter. Template argument deduction doesn't seem to be able to resolve
@@ -127,14 +134,17 @@ struct element_spec_F {
 // provide wrappers (material_from_elements_N and material_from_elements_F) with
 // the hope that it's a slightly nicer interface.
 template<typename ELEMENT_SPEC>
-G4Material* material_from_elements(std::string name, G4double density, G4State state,
-                                   std::vector<ELEMENT_SPEC> components,
-                                   bool warn = false)
-{
+G4Material* material_from_elements(
+  std::string name,
+  G4double density,
+  material_options const& opts,
+  std::vector<ELEMENT_SPEC> components,
+  bool warn = false
+) {
   auto the_material = G4Material::GetMaterial(name, warn);
   if (!the_material) {
     auto n_components = static_cast<G4int>(components.size());
-    the_material = new G4Material{name, density, n_components, state};
+    the_material = new G4Material{name, density, n_components, opts.state, opts.temp, opts.pressure};
     for (auto const& spec: components) {
       the_material -> AddElement((G4Element*)spec.element, spec.n);
     }
@@ -145,18 +155,18 @@ G4Material* material_from_elements(std::string name, G4double density, G4State s
 
 // Wrapper for material_from_elements<G4int>
 inline
-G4Material* material_from_elements_N(std::string name, G4double density, G4State state,
+G4Material* material_from_elements_N(std::string name, G4double density, material_options const& opts,
                                      std::vector<element_spec_N> components,
                                      bool warn = false) {
-  return material_from_elements<element_spec_N>(name, density, state, components, warn);
+  return material_from_elements<element_spec_N>(name, density, opts, components, warn);
 }
 
 // Wrapper for material_from_elements<G4double>
 inline
-G4Material* material_from_elements_F(std::string name, G4double density, G4State state,
+G4Material* material_from_elements_F(std::string name, G4double density, material_options const& opts,
                                      std::vector<element_spec_F> components,
                                      bool warn = false) {
-  return material_from_elements<element_spec_F>(name, density, state, components, warn);
+  return material_from_elements<element_spec_F>(name, density, opts, components, warn);
 }
 
 // --------------------------------------------------------------------------------
