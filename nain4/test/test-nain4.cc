@@ -88,8 +88,8 @@ TEST_CASE("nain material", "[nain][material]") {
     auto total_mass = nH*mH + nC*mC + nO*mO;
 
     // Make the material using nain4::material_from_elements
-    auto fr4 = nain4::material_from_elements_N(name, density, state,
-                                               {{"H", nH}, {"C", nC}, {O, nO}});
+    auto fr4 = nain4::material_from_elements_N(name, density, {.state=state},
+                                               {{"H", nH}, {"C", nC}, {"O", nO}});
     CHECK(fr4 != nullptr);
 
     // Verify that the material can be retrieved with nain4::material
@@ -132,7 +132,7 @@ TEST_CASE("nain material", "[nain][material]") {
     auto [fLu, fY, fSi, fO] = std::make_tuple(0.714, 0.040, 0.064, 0.182);
 
     // Make the material using nain4::material_from_elements
-    auto lyso = nain4::material_from_elements_F(name, density, state,
+    auto lyso = nain4::material_from_elements_F(name, density, {.state=state},
                                                 {{"Lu", fLu}, {"Y", fY}, {"Si", fSi}, {"O", fO}});
     CHECK(lyso != nullptr);
 
