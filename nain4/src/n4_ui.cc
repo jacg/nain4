@@ -23,12 +23,12 @@ unsigned parse_beam_on(const std::string&  arg) {
 
 argparse::ArgumentParser define_args(const std::string& program_name, int argc, char** argv) {
   argparse::ArgumentParser args{program_name};
-  args.add_argument("--beam-on"    , "-n", "-b").metavar("N-EVENTS").help("run simulation with given number of events");
-  args.add_argument("--early-macro", "-e"      ).metavar("EARLY"   ).help("execute before run manager instantiation");
-  args.add_argument( "--late-macro", "-l"      ).metavar("LATE"    ).help("execute after  run manager instantiation");
-  args.add_argument(  "--vis-macro", "-g"      ).metavar("VIS"     ).help("switch from batch mode to GUI, executing this macro")
+  args.add_argument("--beam-on"    , "-n", "-b").metavar("N").help("run simulation with N events");
+  args.add_argument("--early-macro", "-e"      ).metavar("EARLY").help("execute EARLY before run manager instantiation");
+  args.add_argument( "--late-macro", "-l"      ).metavar("LATE" ).help("execute LATE  after  run manager instantiation");
+  args.add_argument(  "--vis-macro", "-g"      ).metavar("VIS"  ).help("switch from batch mode to GUI, executing VIS")
     .default_value(std::string{"vis.mac"});
-  args.add_argument("--macro-path",  "-m"      ).metavar("MACRO-PATHS").help("Add directories to Geant4 macro search path")
+  args.add_argument("--macro-path",  "-m"      ).metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path") // TODO metavar does not appear in help
     .nargs(argparse::nargs_pattern::at_least_one)
     .append();
 
