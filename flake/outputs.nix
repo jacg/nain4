@@ -17,6 +17,9 @@
       enableOpenGLX11      = ogl;
       enablePython         = python;
       enableRaytracerX11   = raytrace;
+    }).overrideAttrs (oldAttrs: {
+      dontStrip = true;
+      cmakeBuildType = "Debug";
     });
 
   my-geant4 = g4 { qt = true; ogl = true ; };
