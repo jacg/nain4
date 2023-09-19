@@ -21,7 +21,7 @@
 
   my-geant4 = g4 { qt = true; ogl = true ; };
 
-  geant4-data = with pkgs.geant4.data; [
+  geant4-data = with my-geant4.data; [
     G4PhotonEvaporation
     G4EMLOW
     G4RadioactiveDecay
@@ -63,8 +63,8 @@
   ;
 
   shell-shared = {
-    G4_DIR = "${pkgs.geant4}";
-      G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
+    G4_DIR = "${my-geant4}";
+      G4_EXAMPLES_DIR = "${my-geant4}/share/Geant4-11.0.4/examples/";
       QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
       shellHook = ''
@@ -91,8 +91,8 @@
                       buildInputs = self.deps.run;        # local            build and runtime environment
       propagatedBuildInputs       = self.deps.prop-run;   # local and client build and runtime environment
 
-      hook_g4_dir = "${pkgs.geant4}";
-      hook_g4_examples = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
+      hook_g4_dir = "${my-geant4}";
+      hook_g4_examples = "${my-geant4}/share/Geant4-11.0.4/examples/";
       hook_qt_stuff = "${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
       setupHook = ./nain4-hook.sh;
 
@@ -171,7 +171,7 @@
 
     deps = {
       dev-shell-packages = client-dev-shell-packages;
-      g4-data-package = pkgs.geant4.data; # Needed for exporting G4*DATA envvars in client app
+      g4-data-package = my-geant4.data; # Needed for exporting G4*DATA envvars in client app
       # TODO: leave for now, in case client needs it, but make these purely
       # internal once we're happy that everything works
       # The prop-* variants are to be propagated to downstream packages (either by Nix (build, run) or by us (dev, test))
