@@ -17,7 +17,7 @@
       enableOpenGLX11      = ogl;
       enablePython         = python;
       enableRaytracerX11   = raytrace;
-    });
+    }).overrideAttrs (oldAttrs: { dontStrip = true; });
 
   my-geant4 = g4 { qt = true; ogl = true ; };
 
