@@ -79,6 +79,8 @@
 
   in {
 
+    packages.my-geant4 = my-geant4;
+
     packages.default = self.packages.nain4;
 
     # TODO: switch to clang environment
