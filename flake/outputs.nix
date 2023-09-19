@@ -180,8 +180,8 @@
       # ND: nain4  devshell,    NB: nain4  build time,     NR: nani4  run time
       # CD: client devshell,    CB: client build time,     CR: client run time
 
-      #            ND                NB        NB NR
-      dev = [ pkgs.mdbook ]; build = [ ]; run = [ ];
+      #                      ND                NB        NB NR
+      dev = with pkgs; [ mdbook gdb ]; build = [ ]; run = [ ];
       # ND CD
       prop-dev   = with pkgs; self.deps.prop-build ++ [ just clang-tools catch2_3 ];
       # NB CB
