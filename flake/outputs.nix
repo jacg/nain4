@@ -17,13 +17,19 @@
 
   g4 = { thread ? false , inventor ? false , qt ? false, xm ? false, ogl ? false, python ? false, raytrace ? false }:
     pkgs.geant4.override {
-      enableMultiThreading = thread;
-      enableInventor       = inventor;
-      enableQt             = qt;
-      enableXM             = xm;
-      enableOpenGLX11      = ogl;
-      enablePython         = python;
-      enableRaytracerX11   = raytrace;
+
+      # enableMultiThreading = thread;
+      # enableInventor       = inventor;
+      # enableQt             = qt;
+      # enableXM             = xm;
+      # enableOpenGLX11      = ogl;
+      # enablePython         = python;
+      # enableRaytracerX11   = raytrace;
+
+      enableMultiThreading = false;
+      enableQt             = true; # debug symbols present when false, absent when true
+      enableOpenGLX11      = true;
+
     };
 
   hmm = pkgs.callPackage ../hmm.nix {};
@@ -34,7 +40,10 @@
 in {
     packages.default = self.packages.my-geant4;
     packages.geant4-with-debug-symbols = pkgs.geant4;
-    packages.my-geant4 = g4 { qt = true; ogl = true; };
+    packages.my-geant4 = g4 {
+      # qt  = true;
+      # ogl = true;
+    };
     packages.hmm    = hmm;
     packages.hmm-o  = hmm-o;
     packages.hmm-a  = hmm-a;
