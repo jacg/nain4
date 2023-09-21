@@ -21,16 +21,6 @@
 #include <cstdlib>
 // ANCHOR_END: includes
 
-// ANCHOR: print_usage
-void verify_number_of_args(int argc){
-  if (argc != 2) {
-    std::cerr << "Wrong number of arguments: " << argc
-              << "\nUsage:\n./n4app <number of events>" << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-}
-// ANCHOR_END: print_usage
-
 struct my {
   G4double       straw_radius{0.1 * m};
   G4double      bubble_radius{0.2 * m};
