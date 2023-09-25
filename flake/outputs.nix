@@ -27,7 +27,7 @@
       # enableRaytracerX11   = raytrace;
 
       enableMultiThreading = false;
-      enableQt             = true; # debug symbols present when false, absent when true
+      enableQt             = false; # debug symbols present when false, absent when true
       enableOpenGLX11      = true;
 
     };
