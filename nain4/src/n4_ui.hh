@@ -16,12 +16,13 @@ class ui {
 public:
   ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run);
   void run();
-  void run_macro(const G4String& filename) { g4_ui.ApplyCommand("/control/execute " + filename    ); }
-  void beam_on  (      G4int            n) { g4_ui.ApplyCommand("/run/beamOn " + std::to_string(n)); }
-  void apply    (const G4String& command ) { g4_ui.ApplyCommand(command);                            }
-  void run_early_macro() { if (early_macro.has_value()) { run_macro(early_macro.value()); }          }
-  void  run_late_macro() { if ( late_macro.has_value()) { run_macro( late_macro.value()); }          }
-  void   run_vis_macro() { if (  vis_macro.has_value()) { run_macro(  vis_macro.value()); }          }
+  void run_many (const std::vector<std::string> macros_and_commands);
+  void run_macro(const G4String& filename) { g4_ui.ApplyCommand("/control/execute " + filename ); }
+  void command  (const G4String& command ) { g4_ui.ApplyCommand(command);                         }
+  void beam_on  (      G4int     n       ) { command("/run/beamOn " + std::to_string(n)); }
+  void run_early() { run_many(early); }
+  void run_late () { run_many(late ); }
+  void run_vis_macro() { if ( vis_macro.has_value()) { run_macro(vis_macro.value()); }}
 
   // Parsing the macro search path every time something is prepended
   // to the search path is technically unnecessary and introduces some
@@ -34,10 +35,10 @@ public:
 private:
   argparse::ArgumentParser args;
 
-  std::optional<G4int   >    n_events;
-  std::optional<G4String> early_macro;
-  std::optional<G4String>  late_macro;
-  std::optional<G4String>   vis_macro;
+  std::optional<G4int>     n_events;
+  std::vector<std::string> early;
+  std::vector<std::string> late;
+  std::optional<G4String>  vis_macro;
 
   int    argc;
   char** argv;
@@ -47,6 +48,6 @@ private:
 
 } // namespace nain4
 
-namespace n4{ using namespace nain4; }
+namespace n4 { using namespace nain4; }
 
 #endif // nain4_ui_hh

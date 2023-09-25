@@ -116,9 +116,9 @@ private:
       ui.run();
       return run_manager::rm_instance;
     }
-    ready& apply_command   (const G4String& command ) { ui.apply    (command ); return *this; }
+    ready& apply_command   (const G4String& command ) { ui.command  (command ); return *this; }
     ready& apply_late_macro(const G4String& filename) { ui.run_macro(filename); return *this; }
-    ready& apply_cli_late_macro(                    ) { ui.run_late_macro()   ; return *this; }
+    ready& apply_cli_late  (                        ) { ui.run_late()         ; return *this; }
   };
 
   struct set_actions {
@@ -146,9 +146,9 @@ private:
 
   struct set_physics {
     CORE(set_physics)
-    set_physics& apply_command    (const G4String& command ) { ui.apply    (command ); return *this; }
+    set_physics& apply_command    (const G4String& command ) { ui.command  (command ); return *this; }
     set_physics& apply_early_macro(const G4String& filename) { ui.run_macro(filename); return *this; }
-    set_physics& apply_cli_early_macro(                    ) { ui.run_early_macro()  ; return *this; }
+    set_physics& apply_cli_early  (                        ) { ui.run_early(        ); return *this; }
     set_physics& macro_path       (const G4String& path    ) { ui.prepend_path(path) ; return *this; }
 
     using fn_type = std::function<G4VUserPhysicsList* ()>;
