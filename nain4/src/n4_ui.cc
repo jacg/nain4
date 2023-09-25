@@ -1,12 +1,13 @@
-#include "n4_ui.hh"
-#include "n4_run_manager.hh"
+#include <n4_ui.hh>
+#include <n4_run_manager.hh>
 
-#include <G4VisManager.hh>
-#include <G4VisExecutive.hh>
-#include <G4UImanager.hh>
 #include <G4UIExecutive.hh>
+#include <G4UImanager.hh>
+#include <G4VisExecutive.hh>
+#include <G4VisManager.hh>
 
 #include <argparse/argparse.hpp>
+
 #include <cstdlib>
 #include <memory>
 #include <optional>
@@ -21,16 +22,15 @@ unsigned parse_beam_on(const std::string&  arg) {
 
 }
 
+#define MULTIPLE nargs(argparse::nargs_pattern::at_least_one).append()
+
 argparse::ArgumentParser define_args(const std::string& program_name, int argc, char** argv) {
   argparse::ArgumentParser args{program_name};
-  args.add_argument("--beam-on"    , "-n", "-b").metavar("N").help("run simulation with N events");
-  args.add_argument("--early-macro", "-e"      ).metavar("EARLY").help("execute EARLY before run manager instantiation");
-  args.add_argument( "--late-macro", "-l"      ).metavar("LATE" ).help("execute LATE  after  run manager instantiation");
-  args.add_argument(  "--vis-macro", "-g"      ).metavar("VIS"  ).help("switch from batch mode to GUI, executing VIS")
-    .default_value(std::string{"vis.mac"});
-  args.add_argument("--macro-path",  "-m"      ).metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path") // TODO metavar does not appear in help
-    .nargs(argparse::nargs_pattern::at_least_one)
-    .append();
+  args.add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
+  args.add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
+  args.add_argument("--late"    , "-l").metavar("ITEMS").help("execute ITEMS  after run manager instantiation").MULTIPLE;
+  args.add_argument("--vis"     , "-g").metavar("MACRO").help("switch from batch mode to GUI, executing MACRO").implicit_value(std::string{"vis.mac"});
+  args.add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE; // TODO metavar does not appear in help
 
   try {
     args.parse_args(argc, argv);
@@ -43,6 +43,7 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
   return args;
 }
 
+#undef MULTIPLE
 
 namespace nain4 {
 
@@ -51,17 +52,14 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
 :
   args{define_args(program_name, argc, argv)},
   n_events{},
-  early_macro{},
-  late_macro{},
+  early{args.get<std::vector<std::string>>("--early")},
+  late {args.get<std::vector<std::string>>("--late" )},
   vis_macro{},
   argc{argc},
   argv{argv},
   g4_ui{*G4UImanager::GetUIpointer()}
 {
-
   if (auto n = args.present("--beam-on")) { n_events = parse_beam_on(n.value()); }
-  early_macro = args.present("--early-macro");
-  late_macro  = args.present( "--late-macro");
   if (args.is_used("-g")) { vis_macro = args.get("-g"); }
 
   // Here we use std::string because G4String does not work
@@ -91,6 +89,13 @@ void ui::run() {
     ui_executive.SessionStart();
   }
 
+}
+
+void ui::run_many(const std::vector<std::string> macros_and_commands) {
+  for (const auto& item: macros_and_commands) {
+    if (item.ends_with(".mac")) { run_macro(item); }
+    else                        { command(item);   }
+  }
 }
 
 } // namespace nain4
