@@ -1,12 +1,13 @@
-#include "n4_ui.hh"
-#include "n4_run_manager.hh"
+#include <n4_ui.hh>
+#include <n4_run_manager.hh>
 
-#include <G4VisManager.hh>
-#include <G4VisExecutive.hh>
-#include <G4UImanager.hh>
 #include <G4UIExecutive.hh>
+#include <G4UImanager.hh>
+#include <G4VisExecutive.hh>
+#include <G4VisManager.hh>
 
 #include <argparse/argparse.hpp>
+
 #include <cstdlib>
 #include <memory>
 #include <optional>

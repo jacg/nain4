@@ -1,8 +1,8 @@
 #ifndef nain4_ui_hh
 #define nain4_ui_hh
 
-#include <G4Types.hh>
 #include <G4String.hh>
+#include <G4Types.hh>
 #include <G4UImanager.hh>
 
 #include <argparse/argparse.hpp>
