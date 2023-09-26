@@ -44,7 +44,7 @@
              }
              else pkgs.llvmPackages.clang;
 
-  dev-shell-packages = with self.deps; dev ++ build ++ test ++ run
+  dev-shell-packages = with self.deps; dev ++ build ++ build-prop ++ test ++ run ++ run-prop
                        ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
                        ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
@@ -58,7 +58,11 @@
       pname = "nain4";
       version = "0.1.10";
       src = "${self}/nain4/src";
-      nativeBuildInputs = self.deps.build; # extra-cmake-modules ?
+
+      nativeBuildInputs           = self.deps.build;      # local              build environment
+      propagatedNativeBuildInputs = self.deps.build-prop; # local and client   build environment
+      buildInputs                 = self.deps.run;        # local            runtime environment
+      propagatedBuildInputs       = self.deps.run-prop;   # local and client runtime environment
 
       hook_g4_dir = "${pkgs.geant4}";
       hook_g4_examples = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
@@ -159,14 +163,18 @@
     deps = {
       dev = with pkgs; [
         just
+        clang-tools
         cmake-language-server
         mdbook
         gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
       ];
 
-      build = with pkgs; [ clang-tools cmake my-geant4 qt5.wrapQtAppsHook argparse ];
-      test  = with pkgs; [ catch2_3 ];
-      run   = with pkgs; [ just geant4-data ];
+      # The -prop variants are to be propagated to downstream packages
+      build      = with pkgs; [ ];
+      build-prop = with pkgs; [ cmake my-geant4 qt5.wrapQtAppsHook argparse ]; # extra-cmake-modules ?
+      test       = with pkgs; [ catch2_3 ];
+      run        = with pkgs; [ ];
+      run-prop   = with pkgs; [ just geant4-data ];
       g4-data-package = pkgs.geant4.data;
     };
 
