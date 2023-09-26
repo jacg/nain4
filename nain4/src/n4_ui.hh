@@ -17,8 +17,8 @@ public:
   ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run);
   void run();
   void run_many (const std::vector<std::string> macros_and_commands);
-  void run_macro(const G4String& filename) { g4_ui.ApplyCommand("/control/execute " + filename ); }
-  void command  (const G4String& command ) { g4_ui.ApplyCommand(command);                         }
+  void run_macro(const G4String& filename);
+  void command  (const G4String& command );
   void beam_on  (      G4int     n       ) { command("/run/beamOn " + std::to_string(n)); }
   void run_early() { run_many(early); }
   void run_late () { run_many(late ); }

@@ -98,4 +98,19 @@ void ui::run_many(const std::vector<std::string> macros_and_commands) {
   }
 }
 
+void ui::run_macro(const G4String& filename) {
+  std::cout << "CLI-specified  macro  gave result: "
+            << g4_ui.ApplyCommand("/control/execute " + filename )
+            << " (" << filename << ')'
+            << std::endl;
+}
+
+void ui::command (const G4String& command ) {
+  std::cout << "CLI-specified command gave result: "
+            << g4_ui.ApplyCommand(command)
+            << " (" << command  << ')'
+            << std::endl;
+}
+
+
 } // namespace nain4
