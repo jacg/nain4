@@ -44,17 +44,7 @@
              }
              else pkgs.llvmPackages.clang;
 
-  dev-deps = with pkgs; [
-    just
-    cmake-language-server
-    mdbook
-    gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
-  ];
-
-  build-deps = with pkgs; [ clang-tools cmake my-geant4 qt5.wrapQtAppsHook argparse ];
-  test-deps  = with pkgs; [ catch2_3 ];
-  run-deps   = with pkgs; [ just geant4-data ];
-  dev-shell-packages = dev-deps ++ build-deps ++ test-deps ++ run-deps
+  dev-shell-packages = with self.deps; dev ++ build ++ test ++ run
                        ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
                        ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
@@ -68,7 +58,7 @@
       pname = "nain4";
       version = "0.1.10";
       src = "${self}/nain4/src";
-      nativeBuildInputs = build-deps; # extra-cmake-modules ?
+      nativeBuildInputs = self.deps.build; # extra-cmake-modules ?
 
       hook_g4_dir = "${pkgs.geant4}";
       hook_g4_examples = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
@@ -90,7 +80,7 @@
       pname = "nain4-tests";
       version = "0.1.10";
       src = "${self}/nain4/test";
-      nativeBuildInputs = [ self.packages.nain4 ] ++ build-deps ++ test-deps;
+      nativeBuildInputs = with self; [ packages.nain4 ] ++ deps.build ++ deps.test;
     };
 
     devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
@@ -167,7 +157,16 @@
     _contains-systems = { systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ]; };
 
     deps = {
-      inherit dev-deps build-deps test-deps run-deps;
+      dev = with pkgs; [
+        just
+        cmake-language-server
+        mdbook
+        gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
+      ];
+
+      build = with pkgs; [ clang-tools cmake my-geant4 qt5.wrapQtAppsHook argparse ];
+      test  = with pkgs; [ catch2_3 ];
+      run   = with pkgs; [ just geant4-data ];
       g4-data-package = pkgs.geant4.data;
     };
 

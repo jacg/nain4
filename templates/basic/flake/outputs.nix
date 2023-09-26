@@ -8,9 +8,9 @@
 
   # TODO inject nain4 itself into most of these:
 
-  dev-shell-packages = with nain4.deps;
+  dev-shell-packages = with nain4;
     [ nain4.packages.nain4 ] ++
-    dev-deps ++ build-deps ++ test-deps ++ run-deps
+    deps.dev ++ deps.build ++ deps.test ++ deps.run
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
