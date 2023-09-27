@@ -59,9 +59,9 @@
       version = "0.1.10";
       src = "${self}/nain4/src";
 
-      nativeBuildInputs           = self.deps.build;      # local              build environment
-      propagatedNativeBuildInputs = self.deps.build-prop; # local and client   build environment
-      buildInputs                 = self.deps.run;        # local            runtime environment
+                nativeBuildInputs = self.deps.build;      # local              build environment
+      propagatedNativeBuildInputs = self.deps.build-prop; # local and client   build environment # appears NOT to propagate!
+                      buildInputs = self.deps.run;        # local            runtime environment
       propagatedBuildInputs       = self.deps.run-prop;   # local and client runtime environment
 
       hook_g4_dir = "${pkgs.geant4}";
@@ -171,10 +171,10 @@
 
       # The -prop variants are to be propagated to downstream packages
       build      = with pkgs; [ ];
-      build-prop = with pkgs; [ cmake my-geant4 qt5.wrapQtAppsHook argparse ]; # extra-cmake-modules ?
+      build-prop = with pkgs; [ ]; # extra-cmake-modules ?
       test       = with pkgs; [ catch2_3 ];
       run        = with pkgs; [ ];
-      run-prop   = with pkgs; [ just geant4-data ];
+      run-prop   = with pkgs; [ just geant4-data cmake my-geant4 qt5.wrapQtAppsHook argparse ];
       g4-data-package = pkgs.geant4.data;
     };
 
