@@ -25,7 +25,10 @@
       pname = "CHANGEME-my-package";
       version = "0.0.0";
       src = "${self}/src";
-      nativeBuildInputs = [ nain4.packages.nain4 ]; # Relying on propagated inputs for transitive dependencies
+      nativeBuildInputs = [ nain4.packages.nain4 ]
+        # We expect these to be propagated, because they are in
+        # propagatedNativeBuildInputs, but apparently they are not:
+                          ++ nain4.deps.build-prop;
     };
 
     # Executed by `nix run <URL of this flake> -- <args?>`
