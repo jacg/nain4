@@ -32,12 +32,11 @@ inline auto default_run_manager() {
 
   char *fake_argv[] = { (char*)"progname-ccc", NULL };
   // Construct the default run manager
-  auto run_manager = n4::run_manager::create()
-                        .ui("progname", 1, fake_argv, false)
-                        .physics(default_physics_lists)
-                        .geometry(water_box)
-                        .actions(do_nothing);
-  return run_manager;
+  return n4::run_manager::create()
+    .ui("progname", 1, fake_argv, false)
+    .physics(default_physics_lists)
+    .geometry(water_box)
+    .actions(do_nothing);
 }
 
 inline auto default_run_manager_with_ui_args(int argc, char** argv) {
@@ -45,14 +44,13 @@ inline auto default_run_manager_with_ui_args(int argc, char** argv) {
   auto hush = n4::silence{std::cout};
 
   // Construct the default run manager
-  auto run_manager = n4::run_manager::create()
-                        .ui("progname", argc, argv, false)
-                        .apply_cli_early()
-                        .physics(default_physics_lists)
-                        .geometry(water_box)
-                        .actions(do_nothing);
-  run_manager.apply_cli_late();
-  return run_manager;
+  return n4::run_manager::create()
+    .ui("progname", argc, argv, false)
+    .apply_cli_early()
+    .physics(default_physics_lists)
+    .geometry(water_box)
+    .actions(do_nothing)
+    .apply_cli_late();
 }
 
 #endif // test_utils_hh
