@@ -42,7 +42,7 @@
                  })
                ];
              }
-             else pkgs.llvmPackages.clang;
+             else pkgs.llvmPackages_16.clang;
 
   dev-shell-packages = with self.deps; dev ++ build ++ build-prop ++ test ++ run ++ run-prop
                        ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
