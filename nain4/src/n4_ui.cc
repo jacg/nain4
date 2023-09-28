@@ -1,7 +1,9 @@
 #include <n4_ui.hh>
 #include <n4_run_manager.hh>
 
+#include <G4String.hh>
 #include <G4UIExecutive.hh>
+#include <G4UIcommandStatus.hh>
 #include <G4UImanager.hh>
 #include <G4VisExecutive.hh>
 #include <G4VisManager.hh>
@@ -13,7 +15,6 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
-
 
 unsigned parse_beam_on(const std::string&  arg) {
   auto parsed = std::stoi(arg.c_str());
@@ -91,25 +92,36 @@ void ui::run() {
 
 }
 
-void ui::run_many(const std::vector<std::string> macros_and_commands) {
+void ui::run_many(const std::vector<std::string> macros_and_commands, const G4String& prefix) {
   for (const auto& item: macros_and_commands) {
-    if (item.ends_with(".mac")) { run_macro(item); }
-    else                        { command(item);   }
+    if (item.ends_with(".mac")) { run_macro(item, "CLI-"+prefix           ); }
+    else                        { command  (item, "CLI-"+prefix, "command"); }
   }
 }
 
-void ui::run_macro(const G4String& filename) {
-  std::cout << "CLI-specified  macro  gave result: "
-            << g4_ui.ApplyCommand("/control/execute " + filename )
-            << " (" << filename << ')'
-            << std::endl;
+void ui::run_macro(const G4String& filename, const G4String& prefix) {
+  command("/control/execute " + filename, prefix, "macro");
 }
 
-void ui::command (const G4String& command ) {
-  std::cout << "CLI-specified command gave result: "
-            << g4_ui.ApplyCommand(command)
-            << " (" << command  << ')'
-            << std::endl;
+void ui::command (const G4String& command, const G4String& prefix, const G4String& kind) {
+  auto status = g4_ui.ApplyCommand(command);
+  if (status != fCommandSucceeded) {
+    std::string reason =
+      (status == fCommandNotFound)          ? "command not found"             :
+      (status == fIllegalApplicationState)  ? "illegal application state"     :
+      (status == fParameterOutOfRange)      ? "parameter out of range"        :
+      (status == fParameterUnreadable)      ? "parameter unreadable"          :
+      (status == fParameterOutOfCandidates) ? "parameter not in accepted set" :
+      (status == fAliasNotFound)            ? "alias not found"               :
+                                              "this should not have happened!";
+    std::string message{prefix + ' ' + kind + " failed: (" + command + ") because: " + reason};
+    std::cerr << message << std::endl;
+    throw std::runtime_error{message};
+  }
+  std::cout << "nain4::ui:"
+            << std::setw(15) << prefix << ' '
+            << std::setw( 7) << kind
+            << " succeeded: (" << command  << ')' << std::endl;
 }
 
 

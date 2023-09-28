@@ -16,13 +16,13 @@ class ui {
 public:
   ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run);
   void run();
-  void run_many (const std::vector<std::string> macros_and_commands);
-  void run_macro(const G4String& filename);
-  void command  (const G4String& command );
-  void beam_on  (      G4int     n       ) { command("/run/beamOn " + std::to_string(n)); }
-  void run_early() { run_many(early); }
-  void run_late () { run_many(late ); }
-  void run_vis_macro() { if ( vis_macro.has_value()) { run_macro(vis_macro.value()); }}
+  void run_many (const std::vector<std::string> macros_and_commands, const G4String& prefix);
+  void run_macro(const G4String& filename, const G4String& prefix);
+  void command  (const G4String& command , const G4String& prefix, const G4String& kind);
+  void beam_on  (      G4int     n       ) { command("/run/beamOn " + std::to_string(n), "", "beam-on"); }
+  void run_early() { run_many(early, "early"); }
+  void run_late () { run_many(late , "late" ); }
+  void run_vis_macro() { if ( vis_macro.has_value()) { run_macro(vis_macro.value(), "vis macro"); }}
 
   // Parsing the macro search path every time something is prepended
   // to the search path is technically unnecessary and introduces some
