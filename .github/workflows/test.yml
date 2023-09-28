@@ -75,6 +75,9 @@ jobs:
       - name: Test nix build client package
         run: |
           nix build   ~/work/my-project#
+
+      - name: Test run nix build client package result
+        run: |
           nix develop ~/work/my-project# -c result/bin/CHANGEME-my-n4-prog --beam-on 12 | tee build-and-run-client-package-output
           PATTERN="end of event 12"
           echo Looking for "'$PATTERN'" in output of 'just'
