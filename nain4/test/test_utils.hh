@@ -25,20 +25,6 @@ inline auto default_physics_lists() {
   return physics_list;
 }
 
-
-inline auto default_run_manager() {
-  // Redirect G4cout to /dev/null while Geant4 makes noise
-  auto hush = n4::silence{std::cout};
-
-  char *fake_argv[] = { (char*)"progname-ccc", NULL };
-  // Construct the default run manager
-  return n4::run_manager::create()
-    .ui("progname", 1, fake_argv, false)
-    .physics(default_physics_lists)
-    .geometry(water_box)
-    .actions(do_nothing);
-}
-
 inline auto default_run_manager_with_ui_args(int argc, char** argv) {
   // Redirect G4cout to /dev/null while Geant4 makes noise
   auto hush = n4::silence{std::cout};
@@ -51,6 +37,11 @@ inline auto default_run_manager_with_ui_args(int argc, char** argv) {
     .geometry(water_box)
     .actions(do_nothing)
     .apply_cli_late();
+}
+
+inline auto default_run_manager() {
+  char *fake_argv[] = { (char*)"progname-ccc", NULL };
+  return default_run_manager_with_ui_args(1, fake_argv);
 }
 
 #endif // test_utils_hh
