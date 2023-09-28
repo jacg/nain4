@@ -31,10 +31,10 @@ namespace nain4 {
 // auto run_manager = n4::run_manager::create()
 //                       .physics (...)
 //                       .geometry(...)
-//                       .actions (...);
+//                       .actions (...)
+//                       .run();
 
-// The last step implicitly initializes the run manager. At each step
-// we provide three alternative styles of providing the required
+// At each step we provide three alternative styles of providing the required
 // information (using physics as an example)
 // .physics(a_physics_list_instance)            // implemented by NEXT_STATE_BASIC
 // .physics<a_physics_list_type>(args...)       // implemented by NEXT_CONSTRUCT
