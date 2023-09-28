@@ -156,7 +156,7 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
      .run();
 }
 
-TEST_CASE("test macropath with values", "[nain][run_manager][macropath]") {
+TEST_CASE("macropath with values", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
 
   char *argv[] = { (char*)"progname-aaa"
@@ -179,7 +179,7 @@ TEST_CASE("test macropath with values", "[nain][run_manager][macropath]") {
 }
 
 
-TEST_CASE("test without macropath", "[nain][run_manager][macropath]") {
+TEST_CASE("without macropath", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
 
   char *argv[] = {(char*)"progname-aaa", NULL};
@@ -193,7 +193,7 @@ TEST_CASE("test without macropath", "[nain][run_manager][macropath]") {
 }
 
 
-TEST_CASE("test macropath without value", "[nain][run_manager][macropath]") {
+TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
 
   char *argv[] = {(char*)"progname-aaa", (char*)"--macro-path", NULL};
