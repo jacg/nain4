@@ -156,7 +156,7 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
      .run();
 }
 
-TEST_CASE("test macropath with values", "[nain][run_manager][macropath]") {
+TEST_CASE("macropath with values", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
 
   char *argv[] = { (char*)"progname-aaa"
@@ -179,7 +179,7 @@ TEST_CASE("test macropath with values", "[nain][run_manager][macropath]") {
 }
 
 
-TEST_CASE("test without macropath", "[nain][run_manager][macropath]") {
+TEST_CASE("without macropath", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
 
   char *argv[] = {(char*)"progname-aaa", NULL};
@@ -193,7 +193,7 @@ TEST_CASE("test without macropath", "[nain][run_manager][macropath]") {
 }
 
 
-TEST_CASE("test macropath without value", "[nain][run_manager][macropath]") {
+TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
 
   char *argv[] = {(char*)"progname-aaa", (char*)"--macro-path", NULL};
@@ -204,4 +204,18 @@ TEST_CASE("test macropath without value", "[nain][run_manager][macropath]") {
   //                      , Contains("Too few arguments") && Contains("--macro-path"));
   // and variations on the there but nothing worked sensibly.
   REQUIRE_THROWS_AS(n4::run_manager::create().ui("progname", 2, argv, false), std::runtime_error);
+}
+
+
+TEST_CASE("apply command failure stops", "[nain][run_manager][command]") {
+  auto hush = n4::silence{std::cout};
+
+  char *argv[] = {(char*)"progname-aaa", (char*)"--early", (char*)"/some/rubbish", NULL};
+
+  using Catch::Matchers::Contains;
+  // We tried
+  //   REQUIRE_THROWS_WITH( n4::run_manager::create().ui("progname", 2, argv, false)
+  //                      , Contains("Too few arguments") && Contains("--macro-path"));
+  // and variations on the there but nothing worked sensibly.
+  REQUIRE_THROWS_AS(default_run_manager_with_ui_args(3, argv).run(), std::runtime_error);
 }
