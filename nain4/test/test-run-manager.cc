@@ -1,3 +1,4 @@
+#include "g4-mandatory.hh"
 #include "nain4.hh"
 #include "test_utils.hh"
 #include "n4-volumes.hh"
@@ -6,6 +7,8 @@
 #include <FTFP_BERT.hh>
 #include <G4Box.hh>
 #include <G4Cons.hh>
+#include <G4PVPlacement.hh>
+#include <G4RunManager.hh>
 #include <G4Trd.hh>
 
 // Managers
@@ -16,8 +19,9 @@
 #include <G4UnitsTable.hh>
 
 // Other G4
-#include <G4Material.hh>
 #include <G4Gamma.hh>
+#include <G4Material.hh>
+#include <G4VUserDetectorConstruction.hh>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -206,7 +210,6 @@ TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   REQUIRE_THROWS_AS(n4::run_manager::create().ui("progname", 2, argv, false), std::runtime_error);
 }
 
-
 TEST_CASE("apply command failure stops", "[nain][run_manager][command]") {
   auto hush = n4::silence{std::cout};
 
@@ -218,4 +221,75 @@ TEST_CASE("apply command failure stops", "[nain][run_manager][command]") {
   //                      , Contains("Too few arguments") && Contains("--macro-path"));
   // and variations on the there but nothing worked sensibly.
   REQUIRE_THROWS_AS(default_run_manager_with_ui_args(3, argv).run(), std::runtime_error);
+
+}
+
+TEST_CASE("run manager get geometry", "[run_manager][get_geometry]") {
+  auto my_geometry = [] {
+    auto air = n4::material("G4_AIR");
+    auto box_daughter = n4::box{"daughter"}.cube(1).volume(air);
+    auto box_world    = n4::box{"world"   }.cube(1).volume(air);
+
+    // No `.in` call defaults to world volume
+    /*   */n4::place(box_daughter).in(box_world).now();
+    return n4::place(box_world   ).now();
+  };
+
+  auto my_generator = [] (auto) {
+    auto geo_from_n4_rm = &n4::run_manager::get_geometry<n4::geometry>();
+    auto geo_from_g4_rm = static_cast<const n4::geometry*>(G4RunManager::GetRunManager() -> GetUserDetectorConstruction());
+    CHECK(geo_from_g4_rm == geo_from_n4_rm);
+  };
+
+  char *argv[] = {(char*)"progname-aaa", (char*)"-n", (char*)"1", NULL};
+  auto hush = n4::silence{std::cout};
+  n4::run_manager::create()
+     .ui("progname", 3, argv, false)
+     .physics<FTFP_BERT>(0)
+     .geometry(my_geometry)
+     .actions(my_generator)
+     .run();
+
+}
+
+
+TEST_CASE("run manager get run action", "[run_manager][get_run_action]") {
+  auto generator_with_check = [] (auto) {
+    auto      run_action_from_n4_rm = &n4::run_manager::     get_run_action<n4::     run_action>();
+    auto    event_action_from_n4_rm = &n4::run_manager::   get_event_action<n4::   event_action>();
+    auto tracking_action_from_n4_rm = &n4::run_manager::get_tracking_action<n4::tracking_action>();
+    auto stacking_action_from_n4_rm = &n4::run_manager::get_stacking_action<n4::stacking_action>();
+    auto stepping_action_from_n4_rm = &n4::run_manager::get_stepping_action<n4::stepping_action>();
+
+    auto      run_action_from_g4_rm = static_cast<const n4::     run_action*>(G4RunManager::GetRunManager() ->      GetUserRunAction());
+    auto    event_action_from_g4_rm = static_cast<const n4::   event_action*>(G4RunManager::GetRunManager() ->    GetUserEventAction());
+    auto tracking_action_from_g4_rm = static_cast<const n4::tracking_action*>(G4RunManager::GetRunManager() -> GetUserTrackingAction());
+    auto stacking_action_from_g4_rm = static_cast<const n4::stacking_action*>(G4RunManager::GetRunManager() -> GetUserStackingAction());
+    auto stepping_action_from_g4_rm = static_cast<const n4::stepping_action*>(G4RunManager::GetRunManager() -> GetUserSteppingAction());
+
+    CHECK(     run_action_from_g4_rm ==      run_action_from_n4_rm);
+    CHECK(   event_action_from_g4_rm ==    event_action_from_n4_rm);
+    CHECK(tracking_action_from_g4_rm == tracking_action_from_n4_rm);
+    CHECK(stacking_action_from_g4_rm == stacking_action_from_n4_rm);
+    CHECK(stepping_action_from_g4_rm == stepping_action_from_n4_rm);
+  };
+
+  auto actions = [&generator_with_check] {
+    return (new n4::actions(generator_with_check))
+      -> set(new n4::     run_action)
+      -> set(new n4::   event_action)
+      -> set(new n4::tracking_action)
+      -> set(new n4::stacking_action)
+      -> set(new n4::stepping_action{[] (auto) {}});
+  };
+
+  char *argv[] = {(char*)"progname-aaa", (char*)"-n", (char*)"1", NULL};
+  auto hush = n4::silence{std::cout};
+  n4::run_manager::create()
+     .ui("progname", 3, argv, false)
+     .physics<FTFP_BERT>(0)
+     .geometry(water_box)
+     .actions(actions)
+     .run();
+
 }

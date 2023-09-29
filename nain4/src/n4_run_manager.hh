@@ -9,8 +9,8 @@
 #include <G4Run.hh>
 #include <G4RunManager.hh>
 #include <G4String.hh>
+#include <G4UserRunAction.hh>
 #include <G4VUserActionInitialization.hh>
-#include <G4VUserDetectorConstruction.hh>
 #include <G4VUserPhysicsList.hh>
 
 #include <G4RunManager.hh>
@@ -19,6 +19,8 @@
 
 #include <cstdlib>
 
+
+class G4VUserDetectorConstruction;
 
 namespace nain4 {
 
@@ -99,6 +101,7 @@ private:
     inline NEXT_STATE METHOD(ArgTypes&&... args) {                     \
       return METHOD(new G4VUSERTYPE{std::forward<ArgTypes>(args)...}); \
     }
+
 
 // Transition to the next state by providing a zero-argument function
 // which returns an instance of the required G4VUser* class.
@@ -187,28 +190,43 @@ public:
     return initialize_ui{std::move(g4_manager)};
   }
 
+  static void exit_if_too_early(const G4String& method);
+
   // TODO: Consider returning pointer to make compiler error message
   // clearer, in cases such as
   // auto rm = run_manager::get()
   // where the auto requires an `&` for compilation to succeed.
   static run_manager& get() {
-    if (!rm_instance) {
-      std::cerr << "run_manager::get called before run_manager configuration completed. "
-                << "Configure the run_manager with:\n"
-                << "auto run_manager = n4::run_manager::create()\n"
-                << "                      .physics (...)\n"
-                << "                      .geometry(...)\n"
-                << "                      .actions (...);\n\n"
-                << "[...]\n\n"
-                << "run_manager.initialize();\n"
-                << std::endl;
-      exit(EXIT_FAILURE);
-    }
+    exit_if_too_early("run_manager::get");
     return *rm_instance;
   }
 
+  static const G4VUserDetectorConstruction& get_geometry();
+  static const G4UserRunAction            & get_run_action();
+  static const G4UserEventAction          & get_event_action();
+  static const G4UserTrackingAction       & get_tracking_action();
+  static const G4UserStackingAction       & get_stacking_action();
+  static const G4UserSteppingAction       & get_stepping_action();
+
+#define DOWNCAST(METHOD)                        \
+  template <class DOWN>                         \
+  static const DOWN& METHOD() {                 \
+    exit_if_too_early("run_manager::" #METHOD); \
+    return static_cast<const DOWN&>(METHOD());  \
+  }
+
+  DOWNCAST(get_geometry);
+  DOWNCAST(get_run_action);
+  DOWNCAST(get_event_action);
+  DOWNCAST(get_tracking_action);
+  DOWNCAST(get_stacking_action);
+  DOWNCAST(get_stepping_action);
+
+#undef DOWNCAST
+
   G4RunManager* here_be_dragons() { return g4_manager.get(); }
 };
+
 
 #pragma GCC diagnostic pop
 
