@@ -13,12 +13,14 @@ function cli_requires_nixgl() {
     if [ -z "$CLI_WANTS_GRAPHICS" ]
     then
         echo CLI does NOT require graphics
+        false
     else
         echo CLI requires graphics
+        true
     fi
 }
 
-if system_requires_nixgl && cli_requires_nixgl
+if system_requires_nixgl && cli_requires_nixgl $@
 then
     echo Running with nixGL
     nix --extra-experimental-features "nix-command flakes" run --impure github:guibou/nixGL -- "$@"
