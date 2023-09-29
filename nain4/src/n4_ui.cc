@@ -114,14 +114,14 @@ void ui::command (const G4String& command, const G4String& prefix, const G4Strin
       (status == fParameterOutOfCandidates) ? "parameter not in accepted set" :
       (status == fAliasNotFound)            ? "alias not found"               :
                                               "this should not have happened!";
-    std::string message{prefix + ' ' + kind + " failed: (" + command + ") because: " + reason};
+    std::string message{prefix + ' ' + kind + " rejected: (" + command + ") because: " + reason};
     std::cerr << message << std::endl;
     throw std::runtime_error{message};
   }
   std::cout << "nain4::ui:"
             << std::setw(15) << prefix << ' '
             << std::setw( 7) << kind
-            << " succeeded: (" << command  << ')' << std::endl;
+            << " accepted: (" << command  << ')' << std::endl;
 }
 
 
