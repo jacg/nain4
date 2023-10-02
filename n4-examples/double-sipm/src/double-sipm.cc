@@ -153,10 +153,10 @@ auto actions(data& data, output& output, G4String seed) {
   auto two_gammas = [](auto event){ generate_back_to_back_511_keV_gammas(event, {}, 0); };
 
   return (new n4::actions{two_gammas})
-    -> set((new n4::run_action())
+    -> set((new n4::run_action{})
            -> begin([&] (auto) { open_files(output, seed);})
            -> end  ([&] (auto) {close_files(output      );}) )
-    -> set((new n4::event_action())
+    -> set((new n4::event_action{})
            -> begin([&] (auto) { reset_photon_count(data        ); })
            -> end  ([&] (auto) { write_photon_count(data, output); }))
     -> set(new n4::stepping_action{[&] (auto step) { accumulate_energy(data, step); } });
