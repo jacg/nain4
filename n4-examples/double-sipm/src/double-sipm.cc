@@ -86,8 +86,8 @@ void open_files(output& output, G4String seed) {
   std::filesystem::create_directory("output");
   output.gamma_z_data_files[0].open("output/z_pos_0_seed_" + seed + ".csv");
   output.gamma_z_data_files[1].open("output/z_pos_1_seed_" + seed + ".csv");
-  output.   time_data_files[1].open("output/times_0_seed_" + seed + ".csv");
-  output.   time_data_files[0].open("output/times_1_seed_" + seed + ".csv");
+  output.   time_data_files[0].open("output/times_0_seed_" + seed + ".csv");
+  output.   time_data_files[1].open("output/times_1_seed_" + seed + ".csv");
   output.   edep_data_files[0].open("output/edeps_0_seed_" + seed + ".csv");
   output.   edep_data_files[1].open("output/edeps_1_seed_" + seed + ".csv");
 }
