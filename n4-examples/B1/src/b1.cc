@@ -76,12 +76,11 @@ auto geometry() {
 
 auto generator() {
   auto particle     = G4ParticleTable::GetParticleTable() -> FindParticle("gamma");
-  auto particle_gun = std::make_shared<G4ParticleGun>(particle, 1); // 1 particle
+  auto particle_gun = std::make_unique<G4ParticleGun>(particle, 1); // 1 particle
+  particle_gun -> SetParticleMomentumDirection({0.,0.,1.});
+  particle_gun -> SetParticleEnergy(6*MeV);
 
-  return [particle_gun] (auto event) {
-    particle_gun -> SetParticleMomentumDirection({0.,0.,1.});
-    particle_gun -> SetParticleEnergy(6*MeV);
-
+  return [particle_gun=std::move(particle_gun)] (auto event) {
     auto envelope = dynamic_cast<G4Box*>(n4::find_logical("Envelope") -> GetSolid());
     auto env_size_xy = envelope -> GetXHalfLength() * 2;
     auto env_size_z  = envelope -> GetZHalfLength() * 2;
