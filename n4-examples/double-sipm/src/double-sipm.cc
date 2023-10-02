@@ -154,8 +154,8 @@ auto actions(data& data, output& output, G4String seed) {
 
   return (new n4::actions{two_gammas})
     -> set((new n4::run_action{})
-           -> begin([&] (auto) { open_files(output, seed);})
-           -> end  ([&] (auto) {close_files(output      );}) )
+           -> begin([&, seed] (auto) { open_files(output, seed);})
+           -> end  ([&      ] (auto) {close_files(output      );}) )
     -> set((new n4::event_action{})
            -> begin([&] (auto) { reset_photon_count(data        ); })
            -> end  ([&] (auto) { write_photon_count(data, output); }))
