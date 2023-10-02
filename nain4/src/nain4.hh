@@ -227,8 +227,8 @@ private:
 // repeat the physical unit in each element.
 
 // TODO const version?
-std::vector<G4double> scale_by   (G4double factor, std::initializer_list<G4double> const& data);
-std::vector<G4double> factor_over(G4double factor, std::initializer_list<G4double> const& data);
+std::vector<G4double> scale_by  (G4double factor, std::initializer_list<G4double> const& data);
+std::vector<G4double> const_over(G4double factor, std::initializer_list<G4double> const& data);
 
 // --------------------------------------------------------------------------------
 // keyword-argument construction of G4VisAttributes
