@@ -5,6 +5,6 @@
 
 class G4PVPlacement;
 
-G4PVPlacement* make_geometry(std::vector<std::vector<G4double>>& times_of_arrival, const config& config);
+G4PVPlacement* make_geometry(data& times_of_arrival, const config& config);
 
 #endif // GEOMETRY_HH

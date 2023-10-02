@@ -4,6 +4,7 @@
 #include <nain4.hh>
 #include <n4-volumes.hh>
 #include <g4-mandatory.hh>
+#include <n4-constants.hh>
 
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -29,13 +30,11 @@
 using vec_double = std::vector<G4double>;
 using vec_int    = std::vector<G4int>;
 
-const G4double hc = CLHEP::h_Planck * CLHEP::c_light;
-
 G4double detection_probability(G4double energy, vec_double& energies, vec_double& scintillation);
 void place_csi_teflon_border_surface_between(G4PVPlacement* one, G4PVPlacement* two);
-n4::sensitive_detector* sensitive_detector(G4int nb_detectors_per_side, std::vector<vec_double>& times_of_arrival);
+n4::sensitive_detector* sensitive_detector(G4int nb_detectors_per_side, data& data);
 
-G4PVPlacement* make_geometry(std::vector<std::vector<G4double>>& times_of_arrival, const config& config) {
+G4PVPlacement* make_geometry(data& data, const config& config) {
     auto csi    =    csi_with_properties(config);
     auto air    =    air_with_properties();
     auto teflon = teflon_with_properties();
@@ -61,61 +60,79 @@ G4PVPlacement* make_geometry(std::vector<std::vector<G4double>>& times_of_arriva
     n4::place(coated_scint_log).in(world).at(0, 0, scintillator_offset).rot_y(180*deg).copy_no(1).now();
 
     // ---- Detector geometry --------------------------------------------------------------------------------
-    G4int nb_detectors_per_side = 3;
-    G4double detector_width = scint_xy / nb_detectors_per_side; // assumes the detectors are square
-    G4double detector_depth = detector_width; // this will make the detectors cubes
-    auto detector = n4::box{"Detector"}.xy(detector_width).z(detector_depth)
-        .sensitive(sensitive_detector(nb_detectors_per_side, times_of_arrival))
-        .volume(air); // material doesn't matter: everything entering the detector is stopped immediately
+    G4int n_sipms_per_axis = 3;
+    G4int n_sipms = n_sipms_per_axis * n_sipms_per_axis;
 
-    for (G4int side=0; side<2; side++) {
-        for (G4int i=0; i<nb_detectors_per_side; i++) {
-            for (G4int j=0; j<nb_detectors_per_side; j++) {
-                G4double xpos = (i - ((float) nb_detectors_per_side/2 - 0.5)) * detector_width;
-                G4double ypos = (j - ((float) nb_detectors_per_side/2 - 0.5)) * detector_width;
-                G4double zpos;
-                if (side == 0) { zpos =   scintillator_offset + coating_thck/2 + scint_z/2 + detector_depth/2;  }
-                else           { zpos = -(scintillator_offset + coating_thck/2 + scint_z/2 + detector_depth/2); }
-                n4::place(detector)
-                    .in(world)
-                    .at({xpos, ypos, zpos})
-                    .copy_no(side*pow(nb_detectors_per_side, 2) + i*nb_detectors_per_side + j)
-                    .now();
-            }
+    G4double sipm_width = scint_xy / n_sipms_per_axis; // assumes the detectors are square
+    G4double sipm_depth = sipm_width;                  // this will make the sipms cubes
+    auto sipm = n4::box{"Sipm"}.xy(sipm_width).z(sipm_depth)
+      .sensitive(sensitive_detector(n_sipms, data))
+      .volume(air); // material doesn't matter: everything entering the sipm is stopped immediately
+
+    auto offset = -(n_sipms_per_axis - 1) * sipm_width / 2;
+    auto zabs   = scintillator_offset + coating_thck/2 + scint_z/2 + sipm_depth/2;
+
+    auto copy=0;
+    for     (auto side=0; side<2            ; side++) {
+      for   (auto    i=0; i<n_sipms_per_axis;    i++) {
+        for (auto    j=0; j<n_sipms_per_axis;    j++) {
+          G4double xpos = i * sipm_width + offset;
+          G4double ypos = j * sipm_width + offset;
+          G4double zpos = side == 0 ? zabs : -zabs;
+          n4::place(sipm).in(world).at(xpos, ypos, zpos).copy_no(copy++).now();
         }
+      }
     }
-    // -------------------------------------------------------------------------------------------------------
     return n4::place(world).now();
 }
 
-n4::sensitive_detector* sensitive_detector(G4int nb_detectors_per_side, std::vector<vec_double>& times_of_arrival) {
-    auto process_hits = [nb_detectors_per_side, &times_of_arrival](G4Step* step) {
-        G4Track* track = step -> GetTrack();
-        track -> SetTrackStatus(fStopAndKill);
+n4::sensitive_detector* sensitive_detector(G4int n_sipms, data& data) {
+  auto process_hits = [n_sipms, &data](G4Step* step) {
+    step -> GetTrack() -> SetTrackStatus(fStopAndKill);
 
-        auto pre             = step -> GetPreStepPoint();
-        auto copy_nb         = pre  -> GetTouchable() -> GetCopyNumber();
-        auto time            = pre  -> GetGlobalTime(); // This will be written to file: what are the units?
-        auto photon_momentum = pre -> GetMomentum();
-        auto photon_energy   = photon_momentum.mag();
+    auto pre           = step -> GetPreStepPoint();
+    auto copy_no       = pre  -> GetTouchable() -> GetCopyNumber();
+    auto time          = pre  -> GetGlobalTime()    / ns;
+    auto photon_energy = pre  -> GetKineticEnergy() / eV;
 
-        // Pixel pitch 25 um
-        // auto sipm_energies = n4::scale_by(hc*eV, {1/0.9 , 1/0.7, 1/0.5  , 1/0.46 , 1/0.4 , 1/0.32});
-        // std::vector<G4double> sipm_pdes =        {  0.03,   0.1,   0.245,   0.255,   0.23,   0.02};
-        auto sipm_energies = n4::scale_by(hc*eV, {1/0.9 , 1/0.7, 1/0.5  , 1/0.46 , 1/0.4 , 1/0.36, 1/0.34, 1/0.3 , 1/0.28});
-        std::vector<G4double> sipm_pdes =        {  0.03,   0.1,   0.245,   0.255,   0.23,   0.18,   0.18,   0.14,   0.02};
+    std::cerr << "XXXXX c = "
+              << CLHEP::c_light
+              << " hc/um ="
+              << c4::hc/um
+              << " hc ="
+              << c4::hc/um
+              << " hc ="
+              << c4::hc
+              << " um ="
+              << um
+              << " pc ="
+              << pre -> GetMomentum().mag() * CLHEP::c_light
+              << " p="
+              << pre -> GetMomentum().mag()
+              << " e="
+              << pre -> GetKineticEnergy()
+              << std::endl;
 
+    // TODO: rename factor_over in nain4
+    auto sipm_energies = n4::factor_over(c4::hc/um, {0.9 , 0.7, 0.5  , 0.46 , 0.4 , 0.36, 0.34, 0.3 , 0.28});
+    std::vector<G4double> sipm_pdes =               {0.03, 0.1, 0.245, 0.255, 0.23, 0.18, 0.18, 0.14, 0.02};
 
-        if (G4UniformRand() < detection_probability(photon_energy, sipm_energies, sipm_pdes)) {
-            if (copy_nb < pow(nb_detectors_per_side, 2)) { times_of_arrival[0].push_back(time); }
-            else                                         { times_of_arrival[1].push_back(time); }
-        }
+    std::cerr << step -> GetTrack() -> GetParticleDefinition() -> GetParticleName()
+              << " "
+              << photon_energy
+              << std::endl;
 
-        return true;
-    };
-
-    auto end_of_event = [](G4HCofThisEvent* what) {};
-    return (new n4::sensitive_detector{"Detector", process_hits}) -> end_of_event(end_of_event);
+    for (auto e: sipm_energies) {
+      std::cerr << e / eV << " ";
+    }
+    std::cerr << std::endl;
+    if (G4UniformRand() < detection_probability(photon_energy, sipm_energies, sipm_pdes)) {
+      auto side = copy_no < n_sipms ? 0 : 1;
+      data.times_of_arrival[side].push_back(time);
+    }
+    return true;
+  };
+  return new n4::sensitive_detector{"Detector", process_hits};
 }
 
 void place_csi_teflon_border_surface_between(G4PVPlacement* one, G4PVPlacement* two) {

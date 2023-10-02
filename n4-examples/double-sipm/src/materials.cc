@@ -1,13 +1,13 @@
 #include "materials.hh"
 
 #include <nain4.hh>
+#include <n4-constants.hh>
 
 #include <G4SystemOfUnits.hh>
 
 using vec_double = std::vector<G4double>;
 
 // TODO: remove duplication of hc (defined in moth materials.cc and geometry.cc)
-const G4double hc = CLHEP::h_Planck * CLHEP::c_light;
 const vec_double OPTPHOT_ENERGY_RANGE{1*eV, 8.21*eV};
 
 G4Material* csi_with_properties(const config& config) {
@@ -15,9 +15,9 @@ G4Material* csi_with_properties(const config& config) {
     // csi_rindex: values taken from "Optimization of Parameters for a CsI(Tl) Scintillator Detector Using GEANT4-Based Monte Carlo..." by Mitra et al (mainly page 3)
     //  csi_scint: values from Fig. 2 in "A New Scintillation Material: Pure CsI with 10ns Decay Time" by Kubota et al (these are approximate...)
     // must be in increasing ENERGY order (decreasing wavelength) for scintillation to work properly
-    auto      csi_energies = n4::scale_by(hc*eV, {1/0.55, 1/0.36, 1/0.3 , 1/0.26}); // denominator is wavelength in micrometres
-    auto csi_energies_cold = n4::scale_by(hc*eV, {1/0.5 , 1/0.4 , 1/0.35, 1/0.27}); // denominator is wavelength in micrometres
-    // auto     csi_energies = n4::scale_by(hc*eV, {1/0.9, 1/0.7, 1/0.54, 1/0.35});
+    auto      csi_energies = n4::scale_by(c4::hc/um, {1/0.55, 1/0.36, 1/0.3 , 1/0.26}); // denominator is wavelength in micrometres
+    auto csi_energies_cold = n4::scale_by(c4::hc/um, {1/0.5 , 1/0.4 , 1/0.35, 1/0.27}); // denominator is wavelength in micrometres
+    // auto     csi_energies = n4::scale_by(c4::hc/um, {1/0.9, 1/0.7, 1/0.54, 1/0.35});
     vec_double csi_rindex =                     {1.79  , 1.79  , 1.79 , 1.79  };  //vec_double csi_rindex = {2.2094, 1.7611};
     vec_double  csi_scint =                     {0.0   , 0.1   , 1.0  , 0.0   };
     auto    csi_abslength = n4::scale_by(m    , {5     , 5     , 5    , 5     });

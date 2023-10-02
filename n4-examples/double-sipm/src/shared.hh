@@ -20,11 +20,11 @@ struct config {
 };
 
 struct data {
-  std::vector<            G4double >       total_edep;
-  std::vector<std::vector<G4double>>         gamma_zs;
-  std::vector<std::vector<G4double>> times_of_arrival;
-  G4int double_hits;
-  G4int event_number;
+  std::vector<            G4double >       total_edep{ 0,  0};
+  std::vector<std::vector<G4double>>         gamma_zs{{}, {}};
+  std::vector<std::vector<G4double>> times_of_arrival{{}, {}};
+  G4int double_hits  = 0;
+  G4int event_number = 0;
 };
 
 struct output {

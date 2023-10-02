@@ -29,6 +29,8 @@
 #include <G4UImanager.hh>
 #include <G4VisExecutive.hh>
 #include <G4VisManager.hh>
+
+#include <filesystem>
 #include <iostream>
 #include <memory>
 
@@ -36,10 +38,9 @@
 static bool DEBUG = false;
 
 auto physics_list() {
-  G4int verbosity;
-  auto physics_list = new FTFP_BERT{verbosity = 0};
-  physics_list ->  ReplacePhysics(new G4EmStandardPhysics_option4());
-  physics_list -> RegisterPhysics(new G4OpticalPhysics{});
+  auto physics_list =             new FTFP_BERT{0};
+  physics_list ->  ReplacePhysics(new G4EmStandardPhysics_option4{0});
+  physics_list -> RegisterPhysics(new G4OpticalPhysics{0});
   return physics_list;
 }
 
@@ -82,12 +83,13 @@ void gamma_interaction_z_pos(std::vector<std::vector<G4double>>& gamma_zs, G4Ste
 }
 
 void open_files(output& output, G4String seed) {
-  output.gamma_z_data_files[0].open("z_pos_0_seed_" + seed + ".csv");
-  output.gamma_z_data_files[1].open("z_pos_1_seed_" + seed + ".csv");
-  output.   time_data_files[1].open("times_0_seed_" + seed + ".csv");
-  output.   time_data_files[0].open("times_1_seed_" + seed + ".csv");
-  output.   edep_data_files[0].open("edeps_0_seed_" + seed + ".csv");
-  output.   edep_data_files[1].open("edeps_1_seed_" + seed + ".csv");
+  std::filesystem::create_directory("output");
+  output.gamma_z_data_files[0].open("output/z_pos_0_seed_" + seed + ".csv");
+  output.gamma_z_data_files[1].open("output/z_pos_1_seed_" + seed + ".csv");
+  output.   time_data_files[1].open("output/times_0_seed_" + seed + ".csv");
+  output.   time_data_files[0].open("output/times_1_seed_" + seed + ".csv");
+  output.   edep_data_files[0].open("output/edeps_0_seed_" + seed + ".csv");
+  output.   edep_data_files[1].open("output/edeps_1_seed_" + seed + ".csv");
 }
 
 void close_files(output& output) {
@@ -175,7 +177,7 @@ int main(int argc, char *argv[]) {
     .macro_path("macs")
     .apply_cli_early() // CLI --early executed at this point
     .physics (physics_list)
-    .geometry([&]{ return make_geometry(data.times_of_arrival, config); })
+    .geometry([&]{ return make_geometry(data, config); })
     .actions ([&]{ return actions(data, output, std::to_string(seed)); })
     .apply_cli_late() // CLI --late executed at this point
     .run();
