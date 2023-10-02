@@ -29,7 +29,7 @@
 
 using vec_double = std::vector<G4double>;
 
-G4double detection_probability(G4double energy, vec_double& energies, vec_double& scintillation);
+G4double detection_probability(G4double energy, const vec_double& energies, const vec_double& scintillation);
 void place_csi_teflon_border_surface_between(G4PVPlacement* one, G4PVPlacement* two);
 n4::sensitive_detector* sensitive_detector(G4int nb_detectors_per_side, data& data);
 
@@ -112,26 +112,28 @@ n4::sensitive_detector* sensitive_detector(G4int n_sipms, data& data) {
 void place_csi_teflon_border_surface_between(G4PVPlacement* one, G4PVPlacement* two) {
     static G4OpticalSurface* csi_teflon_surface = nullptr;
     auto name = "CsI-TeflonSurface";
-    if (! csi_teflon_surface) {
+    if (!csi_teflon_surface) {
         csi_teflon_surface = new G4OpticalSurface(name);
         // Values from same paper as above ("Optimization of Parameters...")
-        // "groundfrontpainted" (I think) only considers whether the photon is reflected or absorbed, so there will be no shine through visible in the simulation
+        // "groundfrontpainted" (I think) only considers whether the
+        // photon is reflected or absorbed, so there will be no shine
+        // through visible in the simulation
         csi_teflon_surface -> SetType(dielectric_dielectric);
         csi_teflon_surface -> SetModel(unified);
         csi_teflon_surface -> SetFinish(groundfrontpainted);
         csi_teflon_surface -> SetSigmaAlpha(0.0);
 
-        vec_double pp = {2.038*eV, 4.144*eV};
         // According to the docs, for UNIFIED, dielectric_dielectric surfaces only the Lambertian reflection is turned on
         csi_teflon_surface -> SetMaterialPropertiesTable(
             n4::material_properties{}
-            .add("REFLECTIVITY", pp, {1.0 , 1.0})
-            .done());
+               .add("REFLECTIVITY", {2.038*eV, 4.144*eV}, 1.0)
+               .done()
+        );
     }
     new G4LogicalBorderSurface(name, one, two, csi_teflon_surface);
 }
 
-G4double detection_probability(G4double energy, vec_double& energies, vec_double& scintillation) {
+G4double detection_probability(G4double energy, const vec_double& energies, const vec_double& scintillation) {
     // Detection probablity = 0 if energy lies outside of range
     if (! (energies.front() <= energy && energy <= energies.back())) { return 0; }
 
@@ -145,5 +147,5 @@ G4double detection_probability(G4double energy, vec_double& energies, vec_double
     }
     G4double y0 = scintillation[index-1]; G4double y1 = scintillation[index];
     G4double x0 = energies     [index-1]; G4double x1 = energies     [index];
-    return y0 + ((y1 - y0) / (x1 - x0)) * (energy - x0);
+    return y0 + (y1 - y0) / (x1 - x0) * (energy - x0);
 }
