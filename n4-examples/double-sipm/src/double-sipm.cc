@@ -1,5 +1,4 @@
 #include "shared.hh"
-
 #include "generator.hh"
 #include "geometry.hh"
 
