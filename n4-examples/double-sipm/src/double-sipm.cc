@@ -150,7 +150,7 @@ void accumulate_energy(data& data, const G4Step* step) {
 
 auto actions(data& data, output& output, G4String seed) {
   // Each event produces a pair of back-to-back 511 keV gammas
-  auto two_gammas = [](auto event){ generate_back_to_back_511_keV_gammas(event, {}, 0); };
+  auto two_gammas = [](auto event){ generate_back_to_back_511_keV_gammas(event); };
 
   return (new n4::actions{two_gammas})
     -> set((new n4::run_action{})

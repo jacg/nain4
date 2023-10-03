@@ -5,6 +5,7 @@
 #include <n4-volumes.hh>
 #include <g4-mandatory.hh>
 #include <n4-constants.hh>
+#include <n4-utils.hh>
 
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -75,12 +76,11 @@ G4PVPlacement* make_geometry(data& data, const config& config) {
     auto zabs   = scintillator_offset + coating_thck/2 + scint_z/2 + sipm_depth/2;
 
     auto copy=0;
-    for     (auto side=0; side<2            ; side++) {
-      for   (auto    i=0; i<n_sipms_per_axis;    i++) {
-        for (auto    j=0; j<n_sipms_per_axis;    j++) {
+    for     (auto zpos: {-zabs, zabs}          ) {
+      for   (auto  i=0; i<n_sipms_per_axis; i++) {
+        for (auto  j=0; j<n_sipms_per_axis; j++) {
           G4double xpos = i * sipm_width + offset;
           G4double ypos = j * sipm_width + offset;
-          G4double zpos = side == 0 ? zabs : -zabs;
           n4::place(sipm).in(world).at(xpos, ypos, zpos).copy_no(copy++).now();
         }
       }
@@ -100,7 +100,7 @@ n4::sensitive_detector* sensitive_detector(G4int n_sipms, data& data) {
     auto sipm_energies = n4::const_over(c4::hc/nm, { 900, 700,   500,   460,  400,  360,  340,  300,  280});
     std::vector<G4double> sipm_pdes =              {0.03, 0.1, 0.245, 0.255, 0.23, 0.18, 0.18, 0.14, 0.02};
 
-    if (G4UniformRand() < detection_probability(photon_energy, sipm_energies, sipm_pdes)) {
+    if (n4::random::uniform() < detection_probability(photon_energy, sipm_energies, sipm_pdes)) {
       auto side = copy_no < n_sipms ? 0 : 1;
       data.times_of_arrival[side].push_back(time);
     }
