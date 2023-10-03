@@ -33,6 +33,7 @@
 #include <filesystem>
 #include <iostream>
 #include <memory>
+#include <string>
 
 
 static bool DEBUG = false;
@@ -82,7 +83,8 @@ void gamma_interaction_z_pos(std::vector<std::vector<G4double>>& gamma_zs, G4Ste
   }
 }
 
-void open_files(output& output, G4String seed) {
+void open_files(output& output) {
+  auto seed = std::to_string(G4Random::getTheSeed());
   std::filesystem::create_directory("output");
   output.gamma_z_data_files[0].open("output/z_pos_0_seed_" + seed + ".csv");
   output.gamma_z_data_files[1].open("output/z_pos_1_seed_" + seed + ".csv");
@@ -148,14 +150,13 @@ void accumulate_energy(data& data, const G4Step* step) {
   gamma_interaction_z_pos(data.gamma_zs  , step);
 }
 
-auto actions(data& data, output& output, G4String seed) {
+auto actions(data& data, output& output) {
   // Each event produces a pair of back-to-back 511 keV gammas
   auto two_gammas = [](auto event){ generate_back_to_back_511_keV_gammas(event); };
-
   return (new n4::actions{two_gammas})
     -> set((new n4::run_action{})
-           -> begin([&, seed] (auto) { open_files(output, seed);})
-           -> end  ([&      ] (auto) {close_files(output      );}) )
+           -> begin([&] (auto) { open_files(output);})
+           -> end  ([&] (auto) {close_files(output);}) )
     -> set((new n4::event_action{})
            -> begin([&] (auto) { reset_photon_count(data        ); })
            -> end  ([&] (auto) { write_photon_count(data, output); }))
@@ -168,17 +169,13 @@ int main(int argc, char *argv[]) {
   data     data;
   output output;
 
-  // Fixing the seed because we want reproducibility
-  G4long seed = 123456789;
-  G4Random::setTheSeed(seed);
-
   n4::run_manager::create()
     .ui("double-sipm", argc, argv)
     .macro_path("macs")
     .apply_cli_early() // CLI --early executed at this point
     .physics (physics_list)
     .geometry([&]{ return make_geometry(data, config); })
-    .actions ([&]{ return actions(data, output, std::to_string(seed)); })
+    .actions ([&]{ return actions(data, output); })
     .apply_cli_late() // CLI --late executed at this point
     .run();
 }

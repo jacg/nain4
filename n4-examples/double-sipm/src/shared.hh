@@ -18,6 +18,7 @@ struct config {
 
   config();
   std::unique_ptr<G4GenericMessenger> msngr;
+  void set_random_seed(G4long seed);
 };
 
 struct data {
