@@ -13,7 +13,7 @@ install NAME: (prepare NAME)
   cmake --build {{NAME}}/build --target install
 
 run NAME *ARGS: (install NAME)
-  ./{{NAME}}/install/example-{{NAME}} {{ARGS}}
+  ./{{NAME}}/install/example-{{NAME}} {{ARGS}} --macro-path {{NAME}}/macs
 
 run-all:
   for example in `just list-available-examples`; do \
