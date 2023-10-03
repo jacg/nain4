@@ -12,14 +12,16 @@
 
 
 struct config {
+  config();
+
   G4double csi_scint_yield = 3200 / MeV;
   G4String particle        = "e-";
   G4bool   cold            = false;
-
-  config();
-  std::unique_ptr<G4GenericMessenger> msngr;
-  void set_random_seed(G4long seed);
   static G4bool debug;
+
+private:
+  void set_random_seed(G4long seed);
+  std::unique_ptr<G4GenericMessenger> msngr;
 };
 
 struct data {
