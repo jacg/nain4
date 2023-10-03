@@ -12,7 +12,10 @@ config::config() : msngr{new G4GenericMessenger{this, "/my/", "MY configuration 
   //msngr -> DeclarePropertyWithUnit("csi_scint_yield", "1/MeV", csi_scint_yield);
   msngr -> DeclareProperty("csi_scint_yield", csi_scint_yield);
   msngr -> DeclareProperty("cold", cold);
+  msngr -> DeclareProperty("debug", debug);
   msngr -> DeclareMethod("random_seed", &config::set_random_seed);
 }
 
 void config::set_random_seed(G4long seed) { G4Random::setTheSeed(seed); }
+
+G4bool config::debug = false;

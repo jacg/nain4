@@ -35,9 +35,6 @@
 #include <memory>
 #include <string>
 
-
-static bool DEBUG = false;
-
 auto physics_list() {
   auto physics_list =             new FTFP_BERT{0};
   physics_list ->  ReplacePhysics(new G4EmStandardPhysics_option4{0});
@@ -51,7 +48,7 @@ void add_step_edep(std::vector<G4double>& total_edep, G4Step const* step) {
   auto particle_pos    = step -> GetTrack() -> GetPosition();
   auto e_dep           = step -> GetTotalEnergyDeposit();
 
-  if (DEBUG && e_dep > 0) {
+  if (config::debug && e_dep > 0) {
     auto interaction     = step -> GetPostStepPoint() -> GetProcessDefinedStep() -> GetProcessName();
     auto particle_name   = step -> GetTrack() -> GetDefinition() -> GetParticleName();
 
@@ -136,7 +133,7 @@ void write_photon_count(data& data, output& output) {
   }
 
   // Writing the deposited energy
-  if (DEBUG) {
+  if (config::debug) {
     G4cout << "Energies: " << data.total_edep      [0]        << ", " << data.total_edep      [1]        << G4endl;
     G4cout << "Counts  : " << data.times_of_arrival[0].size() << ", " << data.times_of_arrival[1].size() << G4endl;
   }
