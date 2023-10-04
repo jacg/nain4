@@ -4,7 +4,6 @@
 #include <n4-run-manager.hh>
 
 #include <G4LogicalVolumeStore.hh>
-#include <G4NistManager.hh>
 #include <G4PVPlacement.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4SolidStore.hh>
@@ -66,8 +65,6 @@ G4LogicalVolume* envelope_of(G4LogicalVolume* original, G4String name);
 #define NAME     (G4String const& name)
 #define NAME_VRB (G4String const& name, G4bool verbose=true)
 #define IA inline auto
-IA material      NAME     { return G4NistManager        ::   Instance()->FindOrBuildMaterial(name         ); }
-IA element       NAME     { return G4NistManager        ::   Instance()->FindOrBuildElement (name         ); }
 IA find_logical  NAME_VRB { return G4LogicalVolumeStore ::GetInstance()->GetVolume          (name, verbose); }
 IA find_physical NAME_VRB { return G4PhysicalVolumeStore::GetInstance()->GetVolume          (name, verbose); }
 IA find_solid    NAME_VRB { return G4SolidStore         ::GetInstance()->GetSolid           (name, verbose); }
@@ -79,73 +76,6 @@ IA event_number  ()       { return run_manager::get().here_be_dragons() -> GetCu
 
 // Remove all, logical/physical volumes, solids and assemblies.
 inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeometry(true); }
-
-// An element identifier + element count.
-// The element can be identified by
-// + G4Element*
-// + a string containing the name of the element
-// Comes in two varieties, N/F: see discussion of material_from_elements_{N,F} below
-struct element_spec_N {
-  element_spec_N(G4Element const * const element, G4int n): element{            element      }, n{n} {}
-  element_spec_N(std::string const& element_name, G4int n): element{n4::element(element_name)}, n{n} {}
-  G4Element const * const element;
-  G4int const n;
-};
-struct element_spec_F {
-  element_spec_F(G4Element const * const element, G4double f): element{            element      }, n{f} {}
-  element_spec_F(std::string const& element_name, G4double f): element{n4::element(element_name)}, n{f} {}
-  G4Element const * const element;
-  G4double const n;
-};
-
-struct material_options {
-  G4State  state   {kStateUndefined};
-  G4double temp    {       NTP_Temperature};
-  G4double pressure{CLHEP::STP_Pressure};
-};
-
-// --------------------------------------------------------------------------------
-// The G4Material::AddElement is overloaded on double/int in the second
-// parameter. Template argument deduction doesn't seem to be able to resolve
-// this, when the values are nested inside an std::initializer_list argument.
-// This forces the caller to specify the template argument explicitly, so we
-// provide wrappers (material_from_elements_N and material_from_elements_F) with
-// the hope that it's a slightly nicer interface.
-template<typename ELEMENT_SPEC>
-G4Material* material_from_elements(
-  std::string name,
-  G4double density,
-  material_options const& opts,
-  std::vector<ELEMENT_SPEC> components,
-  bool warn = false
-) {
-  auto the_material = G4Material::GetMaterial(name, warn);
-  if (!the_material) {
-    auto n_components = static_cast<G4int>(components.size());
-    the_material = new G4Material{name, density, n_components, opts.state, opts.temp, opts.pressure};
-    for (auto const& spec: components) {
-      the_material -> AddElement((G4Element*)spec.element, spec.n);
-    }
-  }
-  return the_material;
-}
-
-
-// Wrapper for material_from_elements<G4int>
-inline
-G4Material* material_from_elements_N(std::string name, G4double density, material_options const& opts,
-                                     std::vector<element_spec_N> components,
-                                     bool warn = false) {
-  return material_from_elements<element_spec_N>(name, density, opts, components, warn);
-}
-
-// Wrapper for material_from_elements<G4double>
-inline
-G4Material* material_from_elements_F(std::string name, G4double density, material_options const& opts,
-                                     std::vector<element_spec_F> components,
-                                     bool warn = false) {
-  return material_from_elements<element_spec_F>(name, density, opts, components, warn);
-}
 
 // --------------------------------------------------------------------------------
 

@@ -1,4 +1,5 @@
 #include <nain4.hh>
+#include <n4-material.hh>
 
 #include <G4Box.hh>
 
