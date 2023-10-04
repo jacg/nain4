@@ -4,6 +4,7 @@
 #include <n4-volumes.hh>
 #include <n4-utils.hh>
 #include <n4-geometry-iterators.hh>
+#include <n4-material.hh>
 
 // Solids
 #include <CLHEP/Units/SystemOfUnits.h>
