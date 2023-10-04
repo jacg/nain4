@@ -1,5 +1,4 @@
-#ifndef nain4_ui_hh
-#define nain4_ui_hh
+#pragma once
 
 #include <G4String.hh>
 #include <G4Types.hh>
@@ -49,5 +48,3 @@ private:
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
-
-#endif // nain4_ui_hh

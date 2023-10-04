@@ -1,5 +1,4 @@
-#ifndef n4_test_utils_hh
-#define n4_test_utils_hh
+#pragma once
 
 #include "nain4.hh"
 
@@ -43,5 +42,3 @@ inline auto default_run_manager() {
   char *fake_argv[] = { (char*)"progname-ccc", NULL };
   return default_run_manager_with_ui_args(1, fake_argv);
 }
-
-#endif // test_utils_hh

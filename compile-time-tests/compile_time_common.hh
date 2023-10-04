@@ -1,5 +1,4 @@
-#ifndef compile_time_common_hh
-#define compile_time_common_hh
+#pragma once
 
 #include "nain4.hh"
 
@@ -32,5 +31,3 @@ inline auto dummy_geometry() {
 inline auto dummy_actions() {
   return new n4::actions(shoot);
 }
-
-#endif // test_utils_hh

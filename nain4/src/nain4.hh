@@ -1,7 +1,5 @@
 // clang-format off
-
-#ifndef nain4_hh
-#define nain4_hh
+#pragma once
 
 #include "n4_run_manager.hh"
 
@@ -374,5 +372,3 @@ geometry_iterator   end(G4LogicalVolume*);
 
 
 #pragma GCC diagnostic pop
-
-#endif

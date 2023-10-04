@@ -1,5 +1,4 @@
-#ifndef N4_VOLUMES_HH
-#define N4_VOLUMES_HH
+#pragma once
 
 #include "nain4.hh"
 
@@ -294,5 +293,3 @@ public:
 }; // namespace nain4
 
 namespace n4 { using namespace nain4; }
-
-#endif // N4_VOLUMES_HH

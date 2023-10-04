@@ -1,5 +1,4 @@
-#ifndef N4_CONSTANTS_HH
-#define N4_CONSTANTS_HH
+#pragma once
 
 namespace nain4 {
 namespace physical_const {
@@ -12,5 +11,3 @@ namespace physical_const {
 
 namespace n4{ using namespace nain4;                 }
 namespace c4{ using namespace nain4::physical_const; }
-
-#endif // N4_CONSTANTS_HH

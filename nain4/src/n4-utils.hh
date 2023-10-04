@@ -1,5 +1,4 @@
-#ifndef N4_UTILS_HH
-#define N4_UTILS_HH
+#pragma once
 
 #include <G4ThreeVector.hh>
 #include <Randomize.hh>
@@ -83,6 +82,3 @@ std::tuple<G4double, G4double> random_on_disc(G4double radius);
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
-
-
-#endif // N4_UTILS_HH

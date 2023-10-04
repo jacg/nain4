@@ -1,5 +1,5 @@
-#ifndef nain4_g4_mandatory_hh
-#define nain4_g4_mandatory_hh
+#pragma once
+
 #include <G4HCofThisEvent.hh>
 #include <G4SDManager.hh>
 
@@ -200,5 +200,3 @@ private:
 namespace n4 { using namespace nain4; }
 
 #pragma GCC diagnostic pop
-
-#endif

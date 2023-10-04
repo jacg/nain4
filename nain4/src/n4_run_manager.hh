@@ -1,7 +1,5 @@
 // clang-format off
-
-#ifndef n4_run_manager_hh
-#define n4_run_manager_hh
+#pragma once
 
 #include "g4-mandatory.hh"
 #include "n4_ui.hh"
@@ -231,5 +229,3 @@ public:
 #pragma GCC diagnostic pop
 
 } // namespace nain4
-
-#endif // n4_run_manager_hh
