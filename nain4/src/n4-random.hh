@@ -14,8 +14,8 @@ namespace random {
 
 // Random result generation utilities
 inline G4double uniform           ()                          { return G4Random().flat(); }
-inline G4double uniform_range     (G4double lo, G4double  hi) { return (hi - lo) * uniform() + lo; }
-inline G4double uniform_half_width(G4double dx              ) { return uniform_range(-dx, dx); }
+inline G4double uniform           (G4double lo, G4double  hi) { return (hi - lo) * uniform() + lo; }
+inline G4double uniform_half_width(G4double dx              ) { return uniform(-dx, dx); }
 inline G4double uniform_width     (G4double dx              ) { return uniform_half_width(dx/2); }
 
 inline G4ThreeVector direction() { return G4RandomDirection(); }
