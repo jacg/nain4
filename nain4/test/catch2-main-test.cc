@@ -1,4 +1,4 @@
-#include "nain4.hh"
+#include <nain4.hh>
 
 #include <G4Box.hh>
 #include <G4SystemOfUnits.hh>

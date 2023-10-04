@@ -1,4 +1,4 @@
-#include "nain4.hh"
+#include <nain4.hh>
 
 #include <G4EmStandardPhysics_option4.hh>
 #include <G4LogicalVolume.hh>

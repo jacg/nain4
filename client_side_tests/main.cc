@@ -1,5 +1,6 @@
+#include <nain4.hh>
+
 #include <G4Box.hh>
-#include "nain4.hh"
 
 int main() {
   auto water = nain4::material("G4_WATER");

@@ -1,6 +1,6 @@
-#include "n4-volumes.hh"
+#include <n4-volumes.hh>
+#include <nain4.hh>
 
-#include "nain4.hh"
 #include <G4CSGSolid.hh>
 #include <G4Cons.hh>
 #include <G4LogicalVolume.hh>

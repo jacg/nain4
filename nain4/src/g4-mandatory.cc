@@ -1,6 +1,6 @@
-#include "g4-mandatory.hh"
+#include <g4-mandatory.hh>
 
-#include "nain4.hh"
+#include <nain4.hh>
 
 #include <G4Run.hh>
 

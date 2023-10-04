@@ -1,7 +1,8 @@
-#include "nain4.hh"
 #include "test_utils.hh"
-#include "n4-volumes.hh"
-#include "n4-utils.hh"
+
+#include <nain4.hh>
+#include <n4-volumes.hh>
+#include <n4-utils.hh>
 
 // Solids
 #include <CLHEP/Units/SystemOfUnits.h>

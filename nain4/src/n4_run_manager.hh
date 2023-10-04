@@ -1,8 +1,8 @@
 // clang-format off
 #pragma once
 
-#include "g4-mandatory.hh"
-#include "n4_ui.hh"
+#include <g4-mandatory.hh>
+#include <n4_ui.hh>
 
 #include <G4Run.hh>
 #include <G4RunManager.hh>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nain4.hh"
+#include <nain4.hh>
 
 #include <G4Event.hh>
 #include <G4PrimaryVertex.hh>

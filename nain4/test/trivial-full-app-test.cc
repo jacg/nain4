@@ -1,8 +1,8 @@
 // clang-format off
 
-#include "n4_run_manager.hh"
-#include "nain4.hh"
-#include "test_utils.hh"
+#include <n4_run_manager.hh>
+#include <nain4.hh>
+#include <test_utils.hh>
 
 #include <G4Box.hh>
 

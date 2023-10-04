@@ -108,7 +108,7 @@ n4::run_manager::create()
 
 
 test_template = """
-#include "nain4.hh"
+#include <nain4.hh>
 #include "compile_time_common.hh"
 
 int main(int argc, char** argv) {{

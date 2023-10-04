@@ -1,4 +1,4 @@
-#include "n4-utils.hh"
+#include <n4-utils.hh>
 
 #include <G4ThreeVector.hh>
 #include <numeric>
