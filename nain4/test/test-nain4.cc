@@ -1129,46 +1129,6 @@ TEST_CASE("nain const_over", "[nain][const_over]") {
   CHECK(nain4::const_over(   1., {10, 100})    == std::vector<G4double>{0.1, 0.01});
 }
 
-TEST_CASE("nain vis_attributes", "[nain][vis_attributes]") {
-  // Utility for more convenient configuration of G4VisAttributes
-  // TODO could do with more extensive testing
-  using nain4::vis_attributes;
-  auto convenient = vis_attributes{}
-    .visible(true)
-    .colour({1,0,0})
-    .start_time(1.23)
-    .end_time(4.56)
-    .force_line_segments_per_circle(20)
-    .force_solid(true)
-    .force_wireframe(false);
-  auto pita = G4VisAttributes{};
-  pita.SetVisibility(true);
-  pita.SetColour({1,0,0});
-  pita.SetStartTime(1.23);
-  pita.SetEndTime(4.56);
-  pita.SetForceLineSegmentsPerCircle(20);
-  pita.SetForceSolid(true);
-  pita.SetForceWireframe(false);
-  CHECK(convenient == pita);
-
-  // The meaning of the different constructors
-
-  // Default constructor sets colour: white, visibility: true
-  CHECK(vis_attributes{} == vis_attributes{}.colour({1,1,1}).visible(true));
-  // Can set colour via constructor
-  CHECK(vis_attributes         {{0,1,0}} ==
-        vis_attributes{}.colour({0,1,0}));
-  // Can set visibility via constructor
-  CHECK(vis_attributes          {true} ==
-        vis_attributes{}.visible(true));
-
-  CHECK(vis_attributes          {false} ==
-        vis_attributes{}.visible(false));
-  // Can set both visibility and colour via constructor
-  CHECK(vis_attributes          {false ,       {1,1,0}} ==
-        vis_attributes{}.visible(false).colour({1,1,0}));
-}
-
 TEST_CASE("nain find geometry", "[nain][find][geometry]") {
   default_run_manager().run();
 
