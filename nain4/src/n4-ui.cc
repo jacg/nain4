@@ -1,4 +1,4 @@
-#include <n4_ui.hh>
+#include <n4-ui.hh>
 #include <n4_run_manager.hh>
 
 #include <G4String.hh>

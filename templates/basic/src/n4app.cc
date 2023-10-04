@@ -2,7 +2,7 @@
 // ANCHOR: includes
 #include <nain4.hh>
 #include <g4-mandatory.hh>
-#include <n4_ui.hh>
+#include <n4-ui.hh>
 #include <n4-volumes.hh>
 
 #include <G4GenericMessenger.hh>

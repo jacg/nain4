@@ -2,7 +2,7 @@
 #pragma once
 
 #include <g4-mandatory.hh>
-#include <n4_ui.hh>
+#include <n4-ui.hh>
 
 #include <G4Run.hh>
 #include <G4RunManager.hh>
