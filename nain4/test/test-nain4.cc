@@ -3,6 +3,7 @@
 #include <nain4.hh>
 #include <n4-volumes.hh>
 #include <n4-utils.hh>
+#include <n4-geometry-iterators.hh>
 
 // Solids
 #include <CLHEP/Units/SystemOfUnits.h>

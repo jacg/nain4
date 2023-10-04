@@ -6,12 +6,10 @@
 #include <G4OpticalPhysics.hh>
 #include <G4Box.hh>
 #include <FTFP_BERT.hh>
-#include <G4PVPlacement.hh>
 #include <G4String.hh>
 
 #include <algorithm>
 #include <initializer_list>
-#include <iterator>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -199,15 +197,5 @@ G4LogicalVolume* envelope_of(G4LogicalVolume* original, G4String name) {
 }
 
 } // namespace nain4
-
-geometry_iterator begin(G4VPhysicalVolume& vol) { return geometry_iterator{&vol}; }
-geometry_iterator   end(G4VPhysicalVolume&    ) { return geometry_iterator{    }; }
-geometry_iterator begin(G4VPhysicalVolume* vol) { return begin(*vol); }
-geometry_iterator   end(G4VPhysicalVolume* vol) { return   end(*vol); }
-
-geometry_iterator begin(G4LogicalVolume& vol) { return geometry_iterator{&vol}; }
-geometry_iterator   end(G4LogicalVolume&    ) { return geometry_iterator{    }; }
-geometry_iterator begin(G4LogicalVolume* vol) { return begin(*vol); }
-geometry_iterator   end(G4LogicalVolume* vol) { return   end(*vol); }
 
 #pragma GCC diagnostic pop
