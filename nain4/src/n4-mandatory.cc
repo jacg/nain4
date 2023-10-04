@@ -19,11 +19,12 @@ void actions::Build() const {
 }
 // ----- primary generator -----------------------------------------------------------
 void generator::geantino_along_x(G4Event* event) {
-  auto geantino  = nain4::find_particle("geantino");
-  auto p         = 1 * CLHEP::MeV;
-  auto vertex    = new G4PrimaryVertex();
-  vertex->SetPrimary(new G4PrimaryParticle(geantino, p, 0, 0));
-  event->AddPrimaryVertex(vertex);
+  // TODO this doesn't really belong in n4 itself
+  // auto geantino  = nain4::find_particle("geantino");
+  // auto p         = 1 * CLHEP::MeV;
+  // auto vertex    = new G4PrimaryVertex();
+  // vertex->SetPrimary(new G4PrimaryParticle(geantino, p, 0, 0));
+  // event->AddPrimaryVertex(vertex);
 }
 // --------------------------------------------------------------------------------
 // definition of sensitive_detector

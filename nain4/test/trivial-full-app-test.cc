@@ -3,6 +3,7 @@
 #include <n4-run-manager.hh>
 #include <nain4.hh>
 #include <test_utils.hh>
+#include <n4-inspect.hh>
 
 #include <G4Box.hh>
 

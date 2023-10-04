@@ -45,21 +45,6 @@ namespace nain4 {
 G4LogicalVolume* envelope_of(G4LogicalVolume* original);
 G4LogicalVolume* envelope_of(G4LogicalVolume* original, G4String name);
 
-// --------------------------------------------------------------------------------
-// Utilies for concisely retrieving things from stores
-// clang-format off
-#define NAME     (G4String const& name)
-#define NAME_VRB (G4String const& name, G4bool verbose=true)
-#define IA inline auto
-IA find_logical  NAME_VRB { return G4LogicalVolumeStore ::GetInstance()->GetVolume          (name, verbose); }
-IA find_physical NAME_VRB { return G4PhysicalVolumeStore::GetInstance()->GetVolume          (name, verbose); }
-IA find_solid    NAME_VRB { return G4SolidStore         ::GetInstance()->GetSolid           (name, verbose); }
-IA find_particle NAME     { return G4ParticleTable:: GetParticleTable()->FindParticle       (name         ); }
-IA event_number  ()       { return run_manager::get().here_be_dragons() -> GetCurrentRun() -> GetNumberOfEvent(); }
-#undef IA
-#undef NAME
-#undef NAME_VRB
-
 // Remove all, logical/physical volumes, solids and assemblies.
 inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeometry(true); }
 
