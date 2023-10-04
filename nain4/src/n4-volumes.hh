@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nain4.hh>
+#include <n4-place.hh>
 
 #include <G4LogicalVolume.hh>
 #include <G4Material.hh>
