@@ -3,7 +3,7 @@
 #include <nain4.hh>
 #include <n4-mandatory.hh>
 #include <n4-ui.hh>
-#include <n4-volumes.hh>
+#include <n4-shapes.hh>
 
 #include <G4GenericMessenger.hh>
 

@@ -1,6 +1,6 @@
 # Constructing solids and logical volumes
 
-Header: `<n4-volumes.hh>`
+Header: `<n4-shapes.hh>`
 
 ## Summary
 
