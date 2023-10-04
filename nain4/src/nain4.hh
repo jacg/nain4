@@ -1,7 +1,7 @@
 // clang-format off
 #pragma once
 
-#include <n4_run_manager.hh>
+#include <n4-run-manager.hh>
 
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <G4Element.hh>

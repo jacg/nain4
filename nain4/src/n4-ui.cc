@@ -1,5 +1,5 @@
 #include <n4-ui.hh>
-#include <n4_run_manager.hh>
+#include <n4-run-manager.hh>
 
 #include <G4String.hh>
 #include <G4UIExecutive.hh>
