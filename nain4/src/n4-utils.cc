@@ -16,6 +16,20 @@ std::vector<G4double> linspace(G4double start, G4double stop, size_t n_entries) 
   return output;
 }
 
+std::vector<G4double> scale_by(G4double factor, std::initializer_list<G4double> const& data) {
+  std::vector<G4double> out;
+  out.reserve(data.size());
+  std::transform(begin(data), end(data), back_inserter(out), [factor](auto d){ return d*factor; });
+  return out;
+}
+
+std::vector<G4double> const_over(G4double factor, std::initializer_list<G4double> const& data) {
+  std::vector<G4double> out;
+  out.reserve(data.size());
+  std::transform(begin(data), end(data), back_inserter(out), [factor](auto d){ return factor/d; });
+  return out;
+}
+
 namespace random {
 
 // Going with rejection sampling, for now

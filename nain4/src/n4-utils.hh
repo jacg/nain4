@@ -5,10 +5,6 @@
 #include <G4Types.hh>
 
 #include <algorithm>
-#include <initializer_list>
-#include <iterator>
-#include <tuple>
-#include <vector>
 
 template <typename T,
           typename TIter = decltype(std::begin(std::declval<T>())),
@@ -55,6 +51,15 @@ template<class O, class I, class F> std::vector<O> map(F f, I const& input) {
   std::transform(begin(input), end(input), begin(output), f);
   return output;
 }
+
+// --------------------------------------------------------------------------------
+// Utility for creating a vector of physical quantity data, without having to
+// repeat the physical unit in each element.
+
+// TODO const version?
+std::vector<G4double> scale_by  (G4double factor, std::initializer_list<G4double> const& data);
+std::vector<G4double> const_over(G4double factor, std::initializer_list<G4double> const& data);
+
 
 namespace random {
 

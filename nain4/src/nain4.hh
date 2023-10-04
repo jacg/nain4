@@ -220,14 +220,6 @@ private:
 
 
 // --------------------------------------------------------------------------------
-// Utility for creating a vector of physical quantity data, without having to
-// repeat the physical unit in each element.
-
-// TODO const version?
-std::vector<G4double> scale_by  (G4double factor, std::initializer_list<G4double> const& data);
-std::vector<G4double> const_over(G4double factor, std::initializer_list<G4double> const& data);
-
-// --------------------------------------------------------------------------------
 // keyword-argument construction of G4VisAttributes
 // TODO: G4VisAttributes does NOT have virtual destructor, do we get UB by subclassing?
 class vis_attributes : public G4VisAttributes {

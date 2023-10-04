@@ -58,21 +58,6 @@ G4LogicalVolume* place::get_logical() {
   return child.value();
 }
 
-std::vector<G4double> scale_by(G4double factor, std::initializer_list<G4double> const& data) {
-  std::vector<G4double> out;
-  out.reserve(data.size());
-  std::transform(begin(data), end(data), back_inserter(out), [factor](auto d){ return d*factor; });
-  return out;
-}
-
-std::vector<G4double> const_over(G4double factor, std::initializer_list<G4double> const& data) {
-  std::vector<G4double> out;
-  out.reserve(data.size());
-  std::transform(begin(data), end(data), back_inserter(out), [factor](auto d){ return factor/d; });
-  return out;
-}
-
-
 // --------------------------------------------------------------------------------
 // stream redirection utilities
 
