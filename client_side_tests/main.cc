@@ -1,6 +1,6 @@
 #include <nain4.hh>
 #include <n4-material.hh>
-#include <n4-volumes.hh>
+#include <n4-geometry.hh>
 
 #include <G4Box.hh>
 
