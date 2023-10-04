@@ -1,15 +1,5 @@
 #include <nain4.hh>
 
-#include <G4EmStandardPhysics_option4.hh>
-#include <G4LogicalVolume.hh>
-#include <G4OpticalPhysics.hh>
-#include <G4Box.hh>
-#include <FTFP_BERT.hh>
-#include <G4String.hh>
-
-#include <algorithm>
-#include <initializer_list>
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 
