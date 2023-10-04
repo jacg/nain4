@@ -23,6 +23,9 @@ IA event_number  ()       { return n4::run_manager::get().here_be_dragons() -> G
 #undef NAME
 #undef NAME_VRB
 
+// Remove all, logical/physical volumes, solids and assemblies.
+inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeometry(true); }
+
 } // nampsepace nain4
 
 namespace n4 { using namespace nain4; }

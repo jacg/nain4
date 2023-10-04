@@ -45,9 +45,6 @@ namespace nain4 {
 G4LogicalVolume* envelope_of(G4LogicalVolume* original);
 G4LogicalVolume* envelope_of(G4LogicalVolume* original, G4String name);
 
-// Remove all, logical/physical volumes, solids and assemblies.
-inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeometry(true); }
-
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
