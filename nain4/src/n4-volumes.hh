@@ -31,6 +31,15 @@ namespace nain4 {
 
 enum class BOOL_OP { ADD, SUB, INT };
 
+inline auto volume(G4VSolid* solid, G4Material* material) { return new G4LogicalVolume{solid, material, solid->GetName()}; }
+
+// Create logical volume from solid and material
+template<class SOLID, class NAME, class... ArgTypes>
+G4LogicalVolume* volume(NAME name, G4Material* material, ArgTypes&&... args) {
+  auto solid = new SOLID{std::forward<NAME>(name), std::forward<ArgTypes>(args)...};
+  return volume(solid, material);
+}
+
 struct boolean_shape;
 
 // ---- Base class for interfaces to G4VSolids --------------------------------------------------------
