@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+namespace nain4 {
+
 template <typename T,
           typename TIter = decltype(std::begin(std::declval<T>())),
           typename       = decltype(std::  end(std::declval<T>()))>
@@ -41,8 +43,6 @@ constexpr auto enumerate(const std::initializer_list<T>& data) {
   };
   return iterable_wrapper{ data };
 }
-
-namespace nain4 {
 
 std::vector<G4double> linspace(G4double start, G4double stop, size_t n_entries);
 

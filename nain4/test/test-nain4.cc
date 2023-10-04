@@ -1560,7 +1560,7 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
   // NB, const is ignored and by-reference is implicit!
   SECTION("primitives") {
     std::vector<unsigned> stuff {5, 4, 3, 2, 1};
-    for (const auto [n, el] : enumerate(stuff)) {
+    for (const auto [n, el] : n4::enumerate(stuff)) {
       CHECK(el == 5 - n);
       el++;
     }
@@ -1572,7 +1572,7 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
       unsigned n;
     };
     std::vector<Foo> stuff {2, 8};
-    for (auto [n, el] : enumerate(stuff)) {
+    for (auto [n, el] : n4::enumerate(stuff)) {
       if (n == 0) { CHECK(el.n == 2); }
       else        { CHECK(el.n == 8); }
       el.n += 1000;
@@ -1581,7 +1581,7 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
     CHECK(stuff[1].n == 1008);
   }
   SECTION("literal braces primitives") {
-    for (const auto [n, el] : enumerate({7,6,5,4})) {
+    for (const auto [n, el] : n4::enumerate({7,6,5,4})) {
       CHECK(static_cast<unsigned>(el) == 7 - n);
     }
   }
@@ -1590,7 +1590,7 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
       Foo(unsigned n): n{n} {}
       unsigned n;
     };
-    for (auto [n, el] : enumerate({Foo{4}, Foo{2}})) {
+    for (auto [n, el] : n4::enumerate({Foo{4}, Foo{2}})) {
       if (n == 0) { CHECK(el.n == 4); }
       else        { CHECK(el.n == 2); }
     }
