@@ -1,6 +1,7 @@
 #pragma once
 
 #include <n4-material.hh>
+#include <n4-run-manager.hh>
 #include <n4-shape.hh>
 #include <n4-stream.hh>
 

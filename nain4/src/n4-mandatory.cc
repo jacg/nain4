@@ -1,4 +1,3 @@
-#include <nain4.hh>
 #include <n4-mandatory.hh>
 
 #include <G4Run.hh>
