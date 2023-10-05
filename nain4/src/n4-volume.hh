@@ -15,6 +15,10 @@ G4LogicalVolume* volume(NAME name, G4Material* material, ArgTypes&&... args) {
   return volume(solid, material);
 }
 
+// Here for now, as it admits volumes. Needs to find a better home if we ever overload it.
+G4LogicalVolume* envelope_of(G4LogicalVolume* original);
+G4LogicalVolume* envelope_of(G4LogicalVolume* original, G4String name);
+
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
