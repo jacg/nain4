@@ -60,32 +60,6 @@ template<class O, class I, class F> std::vector<O> map(F f, I const& input) {
 std::vector<G4double> scale_by  (G4double factor, std::initializer_list<G4double> const& data);
 std::vector<G4double> const_over(G4double factor, std::initializer_list<G4double> const& data);
 
-// --------------------------------------------------------------------------------
-// stream redirection utilities
-
-// redirect to arbitrary stream or buffer
-class redirect {
-public:
-  redirect(std::ios& stream, std::streambuf* new_buffer);
-  redirect(std::ios& stream, std::ios&       new_stream);
-  ~redirect();
-private:
-  std::streambuf* original_buffer;
-  std::ios&       stream;
-};
-
-// redirect to /dev/null
-class silence {
-public:
-  explicit silence(std::ios& stream);
-  ~silence();
-private:
-  std::streambuf* original_buffer;
-  std::ios&       stream;
-  std::ofstream   dev_null;
-};
-
-
 namespace random {
 
 // Random result generation utilities
