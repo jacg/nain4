@@ -1,6 +1,9 @@
 #include <n4-stream.hh>
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 
 // redirect to arbitrary stream or buffer
@@ -24,3 +27,5 @@ silence::silence(std::ios& stream)
 silence::~silence() { stream.rdbuf(original_buffer); }
 
 } // namespace nain4
+
+#pragma GCC diagnostic pop

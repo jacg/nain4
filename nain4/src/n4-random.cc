@@ -3,6 +3,9 @@
 #include <numeric>
 #include <stack>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 namespace random {
 
@@ -72,3 +75,5 @@ unsigned biased_choice::operator()() const {
 
 } // namespace random
 } // namespace nain4
+
+#pragma GCC diagnostic pop

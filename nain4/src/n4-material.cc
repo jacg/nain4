@@ -1,6 +1,9 @@
 #include <n4-material.hh>
 
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 
 material_properties& material_properties::add(G4String const& key, vec const& energies, vec const& values) {
@@ -91,3 +94,5 @@ material_properties& material_properties::copy_NEW_from(
 }
 
 } // namespace nain4
+
+#pragma GCC diagnostic pop

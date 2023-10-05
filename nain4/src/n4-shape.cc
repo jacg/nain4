@@ -7,9 +7,10 @@
 #include <G4VGraphicsScene.hh>
 #include <G4VPVParameterisation.hh>
 
-
-
 #include <cstdlib>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 
 using opt_double = std::optional<G4double>;
 
@@ -126,3 +127,5 @@ G4LogicalVolume* shape::volume(G4Material* material) const {
 
 
 } // namespace nain4
+
+#pragma GCC diagnostic pop

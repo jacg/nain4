@@ -2,6 +2,9 @@
 
 #include <G4LogicalVolume.hh>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 
 bool place::global_check_overlaps_ = false;
@@ -47,3 +50,5 @@ G4LogicalVolume* place::get_logical() {
 }
 
 } // namespace nain4
+
+#pragma GCC diagnostic pop

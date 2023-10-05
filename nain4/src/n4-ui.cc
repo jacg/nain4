@@ -16,6 +16,9 @@
 #include <stdexcept>
 #include <string>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 unsigned parse_beam_on(const std::string&  arg) {
   auto parsed = std::stoi(arg.c_str());
   if (parsed < 0) { throw std::runtime_error{std::string{"--beam-on requires an unsigned integer, you gave '"} + arg + "'"}; }
@@ -124,5 +127,6 @@ void ui::command (const G4String& command, const G4String& prefix, const G4Strin
             << " accepted: (" << command  << ')' << std::endl;
 }
 
-
 } // namespace nain4
+
+#pragma GCC diagnostic pop

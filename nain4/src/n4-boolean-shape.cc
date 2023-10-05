@@ -4,6 +4,9 @@
 #include <G4SubtractionSolid.hh>
 #include <G4IntersectionSolid.hh>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 
 G4VSolid* boolean_shape::solid() const {
@@ -15,3 +18,5 @@ G4VSolid* boolean_shape::solid() const {
 }
 
 } // namespace nain4
+
+#pragma GCC diagnostic pop
