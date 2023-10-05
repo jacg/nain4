@@ -5,8 +5,6 @@
 #include <test_utils.hh>
 #include <n4-inspect.hh>
 
-#include <G4Box.hh>
-
 #include <G4EventManager.hh>
 #include <G4LogicalVolumeStore.hh>
 #include <G4ParticleGun.hh>
@@ -153,18 +151,18 @@ public:
     auto world_x     = 1.1 * sep + dx;
     auto world_yz    = 1.1 * detector_yz;
 
-    // --- The logical volumes that make up the geometry
-    auto detector = nain4::volume<G4Box>("detector", air,      dx/2, detector_yz/2, detector_yz/2);
-    auto source   = nain4::volume<G4Box>("source"  , air,      dx/2,   source_y /2,    source_z/2);
-    auto world    = nain4::volume<G4Box>("world"   , air, world_x/2,    world_yz/2,    world_yz/2);
+    // --- The volumes that make up the geometry
+    auto world = n4::box("world").x(world_x).yz(world_yz)
+      .place(air).now();
 
-    // --- Make the detector volume sensitive ----------------------------------
-    detector->SetSensitiveDetector(new sensitive("/sensitive"));
+    n4::box("detector").x(dx).yz(detector_yz)
+      .sensitive(new sensitive("/sensitive"))
+      .place(air).in(world).at_x(sep/2).now();
 
-    // --- Establish the geometrical relationship between the volumes ----------
-    nain4::place(source)  .in(world).at({-sep/2, source_cy, source_cz}).now();
-    nain4::place(detector).in(world).at({ sep/2,         0,         0}).now();
-    return nain4::place(world)                                         .now();
+    n4::box("source").xyz(dx, source_y, source_z)
+      .place(air).in(world).at(-sep/2, source_cy, source_cz).now();
+
+    return world;
   }
 
 private:
