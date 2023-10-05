@@ -1,5 +1,7 @@
 #include <n4-geometry-iterators.hh>
 
+using namespace n4::test;
+
 geometry_iterator begin(G4VPhysicalVolume& vol) { return geometry_iterator{&vol}; }
 geometry_iterator   end(G4VPhysicalVolume&    ) { return geometry_iterator{    }; }
 geometry_iterator begin(G4VPhysicalVolume* vol) { return begin(*vol); }

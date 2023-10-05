@@ -9,10 +9,13 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 
-// TODO Move into nain4 namespace
 // TODO This is breadth-first; how about depth-first?
 // TODO This is an input iterator; how about output/forward?
 // TODO Swich to C++ 20 and do it with concepts
+
+namespace nain4 {
+namespace test  {
+
 class geometry_iterator {
 public:
   geometry_iterator() {}
@@ -53,16 +56,22 @@ private:
   }
 };
 
+} // namespace test
+} // namespace nain4
+
 // By overloading begin and end, we can make G4PhysicalVolume
 // usable with the STL algorithms and range-based for loops.
-geometry_iterator begin(G4VPhysicalVolume&);
-geometry_iterator   end(G4VPhysicalVolume&);
-geometry_iterator begin(G4VPhysicalVolume*);
-geometry_iterator   end(G4VPhysicalVolume*);
+nain4::test::geometry_iterator begin(G4VPhysicalVolume&);
+nain4::test::geometry_iterator   end(G4VPhysicalVolume&);
+nain4::test::geometry_iterator begin(G4VPhysicalVolume*);
+nain4::test::geometry_iterator   end(G4VPhysicalVolume*);
 
-geometry_iterator begin(G4LogicalVolume&);
-geometry_iterator   end(G4LogicalVolume&);
-geometry_iterator begin(G4LogicalVolume*);
-geometry_iterator   end(G4LogicalVolume*);
+nain4::test::geometry_iterator begin(G4LogicalVolume&);
+nain4::test::geometry_iterator   end(G4LogicalVolume&);
+nain4::test::geometry_iterator begin(G4LogicalVolume*);
+nain4::test::geometry_iterator   end(G4LogicalVolume*);
+
+
+namespace n4 { using namespace nain4; }
 
 #pragma GCC diagnostic pop
