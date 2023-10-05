@@ -1,8 +1,4 @@
-#include <n4_run_manager.hh>
-#include <nain4.hh>
-#include <g4-mandatory.hh>
-#include <n4_ui.hh>
-#include <n4-volumes.hh>
+#include <n4-all.hh>
 
 #include <G4Box.hh>
 #include <G4Event.hh>
