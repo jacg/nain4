@@ -2,7 +2,6 @@
 
 #include <n4-material.hh>
 #include <n4-shapes.hh>
-#include <n4-sequences.hh>
 #include <n4-stream.hh>
 
 #include <FTFP_BERT.hh>
@@ -11,9 +10,7 @@
 
 
 inline auto water_box() {
-  auto water = n4::material("G4_WATER");
-  auto box   = n4::volume<G4Box>("box", water, 1., 1., 1.);
-  return n4::place(box).now();
+  return n4::box("box").cube(1).place(n4::material("G4_WATER")).now();
 }
 
 inline void do_nothing(G4Event*) {}

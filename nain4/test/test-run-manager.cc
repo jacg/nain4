@@ -55,8 +55,7 @@ TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
 struct dummy_geometry : G4VUserDetectorConstruction {
   dummy_geometry(double, double, double) {}
   G4PVPlacement* Construct() {
-    auto box = n4::volume<G4Box>("box", n4::material("G4_AIR"), 1., 1., 1.);
-    return n4::place(box).now();
+    return water_box();
   }
 };
 
