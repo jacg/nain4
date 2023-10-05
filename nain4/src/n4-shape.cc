@@ -1,5 +1,5 @@
 #include <n4-shape.hh>
-#include <n4-shape-boolean.hh>
+#include <n4-boolean-shape.hh>
 #include <n4-volume.hh>
 
 #include <G4LogicalVolume.hh>
@@ -59,13 +59,13 @@ std::tuple<G4double, G4double> compute_r_range(opt_double min, opt_double max, o
 
 namespace nain4 {
 
-shape_boolean shape::add_      (G4VSolid* solid) { return shape_boolean{this -> solid(), solid, BOOL_OP::ADD}; }
-shape_boolean shape::subtract_ (G4VSolid* solid) { return shape_boolean{this -> solid(), solid, BOOL_OP::SUB}; }
-shape_boolean shape::intersect_(G4VSolid* solid) { return shape_boolean{this -> solid(), solid, BOOL_OP::INT}; }
+boolean_shape shape::add_      (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::ADD}; }
+boolean_shape shape::subtract_ (G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::SUB}; }
+boolean_shape shape::intersect_(G4VSolid* solid) { return boolean_shape{this -> solid(), solid, BOOL_OP::INT}; }
 
-shape_boolean shape::join_ (G4VSolid* solid) { return add_      (solid); }
-shape_boolean shape::sub_  (G4VSolid* solid) { return subtract_ (solid); }
-shape_boolean shape::inter_(G4VSolid* solid) { return intersect_(solid); }
+boolean_shape shape::join_ (G4VSolid* solid) { return add_      (solid); }
+boolean_shape shape::sub_  (G4VSolid* solid) { return subtract_ (solid); }
+boolean_shape shape::inter_(G4VSolid* solid) { return intersect_(solid); }
 
 template<class... Args>
 void check_mandatory_args(G4String type, G4String name, Args&&... args) {

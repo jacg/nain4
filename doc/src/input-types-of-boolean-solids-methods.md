@@ -41,7 +41,7 @@ All the errors share the same message, with a hint of what the type
 of the incorrect input is. The error message looks like this:
 
 ```
-[n4::shape_boolean::<METHOD>]
+[n4::boolean_shape::<METHOD>]
 Attempted to create a boolean shape using <TYPE_HINT>.
 Only n4::shape and G4VSolid* are accepted.
 For more details, please check https://jacg.github.io/nain4/explanation/boolean_solid_input_types.md
