@@ -13,9 +13,7 @@
 
 #include <G4String.hh>
 #include <G4SystemOfUnits.hh>
-
 class G4VSensitiveDetector;
-
 
 #include <optional>
 

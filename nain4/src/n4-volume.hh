@@ -4,6 +4,9 @@
 #include <G4Material.hh>
 #include <G4VSolid.hh>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 
 inline auto volume(G4VSolid* solid, G4Material* material) { return new G4LogicalVolume{solid, material, solid->GetName()}; }
@@ -22,3 +25,5 @@ G4LogicalVolume* envelope_of(G4LogicalVolume* original, G4String name);
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
+
+#pragma GCC diagnostic pop

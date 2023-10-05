@@ -9,6 +9,8 @@
 #include <G4EmStandardPhysics_option4.hh>
 #include <G4OpticalPhysics.hh>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 
 inline auto water_box() {
   return n4::box("box").cube(1).place(n4::material("G4_WATER")).now();
@@ -43,3 +45,5 @@ inline auto default_run_manager() {
   char *fake_argv[] = { (char*)"progname-ccc", NULL };
   return default_run_manager_with_ui_args(1, fake_argv);
 }
+
+#pragma GCC diagnostic pop

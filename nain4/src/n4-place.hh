@@ -4,6 +4,9 @@
 
 #include <optional>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 
 class place {
@@ -59,3 +62,5 @@ private:
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
+
+#pragma GCC diagnostic pop

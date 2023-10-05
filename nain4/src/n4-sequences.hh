@@ -1,5 +1,8 @@
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 #include <G4ThreeVector.hh>
 #include <Randomize.hh>
 #include <G4Types.hh>
@@ -63,3 +66,5 @@ std::vector<G4double> const_over(G4double factor, std::initializer_list<G4double
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
+
+#pragma GCC diagnostic pop

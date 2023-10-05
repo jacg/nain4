@@ -7,6 +7,9 @@
 #include <G4SolidStore.hh>
 #include <G4ParticleTable.hh>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 
 // Utilies for concisely retrieving things from stores
@@ -29,3 +32,5 @@ inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeom
 } // nampsepace nain4
 
 namespace n4 { using namespace nain4; }
+
+#pragma GCC diagnostic pop

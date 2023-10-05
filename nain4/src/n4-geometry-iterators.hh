@@ -6,6 +6,9 @@
 #include <iterator>
 #include <queue>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 // TODO Move into nain4 namespace
 // TODO This is breadth-first; how about depth-first?
 // TODO This is an input iterator; how about output/forward?
@@ -61,3 +64,5 @@ geometry_iterator begin(G4LogicalVolume&);
 geometry_iterator   end(G4LogicalVolume&);
 geometry_iterator begin(G4LogicalVolume*);
 geometry_iterator   end(G4LogicalVolume*);
+
+#pragma GCC diagnostic pop
