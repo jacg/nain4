@@ -1,8 +1,8 @@
 #include "materials.hh"
 
+#include <n4-all.hh>
+
 #include <G4Material.hh>
-#include <nain4.hh>
-#include <n4-constants.hh>
 
 #include <G4SystemOfUnits.hh>
 

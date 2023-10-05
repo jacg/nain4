@@ -1,11 +1,7 @@
 #include "geometry.hh"
 #include "materials.hh"
 
-#include <nain4.hh>
-#include <n4-volumes.hh>
-#include <g4-mandatory.hh>
-#include <n4-constants.hh>
-#include <n4-utils.hh>
+#include <n4-all.hh>
 
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
