@@ -1,5 +1,4 @@
-#include "test_utils.hh"
-
+#include <n4-defaults.hh>
 #include <n4-shape.hh>
 #include <n4-shape-boolean.hh>
 #include <n4-utils.hh>

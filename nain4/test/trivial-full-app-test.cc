@@ -1,7 +1,7 @@
 // clang-format off
 
+#include <n4-defaults.hh>
 #include <n4-run-manager.hh>
-#include <test_utils.hh>
 #include <n4-inspect.hh>
 
 #include <G4EventManager.hh>
