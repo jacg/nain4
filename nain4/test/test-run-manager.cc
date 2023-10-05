@@ -41,6 +41,8 @@ using Catch::Approx;
 
 char *fake_argv[] = { (char*)"progname-aaa", NULL };
 
+using namespace n4::test;
+
 TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 

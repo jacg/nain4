@@ -266,7 +266,7 @@ TEST_CASE("trivial app", "[app]") {
   char *fake_argv[] = { (char*)"progname-bbb", NULL };
   n4::run_manager::create()
     .ui("progname", 1, fake_argv, false)
-    .physics(default_physics_lists())
+    .physics(n4::test::default_physics_lists())
     .geometry<geometry>(y_min, y_max, z_min, z_max)
     .actions <actions >(n_gun, n_inside_generator)
     .run();

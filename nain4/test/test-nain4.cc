@@ -51,6 +51,8 @@ using Catch::Approx;
 
 #include <numeric>
 
+using namespace n4::test;
+
 TEST_CASE("nain material", "[nain][material]") {
 
   // nain4::material finds the same materials as the verbose G4 style

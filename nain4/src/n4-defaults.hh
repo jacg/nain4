@@ -12,12 +12,14 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 
+namespace nain4 {
+namespace test {
+
 inline auto water_box() {
   return n4::box("box").cube(1).place(n4::material("G4_WATER")).now();
 }
 
 inline void do_nothing(G4Event*) {}
-
 
 inline auto default_physics_lists() {
   auto verbosity = 0;
@@ -45,5 +47,9 @@ inline auto default_run_manager() {
   char *fake_argv[] = { (char*)"progname-ccc", NULL };
   return default_run_manager_with_ui_args(1, fake_argv);
 }
+} // namespace test
+} // namespace nain4
+
+namespace n4 { using namespace nain4; }
 
 #pragma GCC diagnostic pop
