@@ -213,12 +213,12 @@ public:
     return static_cast<const DOWN&>(METHOD());  \
   }
 
-  DOWNCAST(get_geometry);
-  DOWNCAST(get_run_action);
-  DOWNCAST(get_event_action);
-  DOWNCAST(get_tracking_action);
-  DOWNCAST(get_stacking_action);
-  DOWNCAST(get_stepping_action);
+  DOWNCAST(get_geometry)
+  DOWNCAST(get_run_action)
+  DOWNCAST(get_event_action)
+  DOWNCAST(get_tracking_action)
+  DOWNCAST(get_stacking_action)
+  DOWNCAST(get_stepping_action)
 
 #undef DOWNCAST
 
