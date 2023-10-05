@@ -9,26 +9,26 @@ namespace nain4 {
 enum class BOOL_OP { ADD, SUB, INT };
 
 // ---- Interface for constructing G4 boolean solids --------------------------------------------------
-struct boolean_shape : shape {
+struct shape_boolean : shape {
   friend shape;
   G4VSolid* solid() const override;
 
-  boolean_shape& rotate_x(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta);             return rotate(rot);}
-  boolean_shape& rotate_y(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateY(delta);             return rotate(rot);}
-  boolean_shape& rotate_z(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateZ(delta);             return rotate(rot);}
-  boolean_shape& rotate  (G4RotationMatrix& r  )  { transformation = HepGeom::Rotate3D{r}        * transformation; return *this; }
-  boolean_shape& rot     (G4RotationMatrix& r  )  { return rotate(r); }
-  boolean_shape& rot_x   (double delta         )  { return rotate_x(delta); }
-  boolean_shape& rot_y   (double delta         )  { return rotate_y(delta); }
-  boolean_shape& rot_z   (double delta         )  { return rotate_z(delta); }
-  boolean_shape& at  (double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this; }
-  boolean_shape& at_x(double x                    ) { return at(x, 0, 0); }
-  boolean_shape& at_y(          double y          ) { return at(0, y, 0); }
-  boolean_shape& at_z(                    double z) { return at(0, 0, z); }
-  boolean_shape& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
-  boolean_shape& name(G4String name)              { name_ = name; return *this; }
+  shape_boolean& rotate_x(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta);             return rotate(rot);}
+  shape_boolean& rotate_y(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateY(delta);             return rotate(rot);}
+  shape_boolean& rotate_z(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateZ(delta);             return rotate(rot);}
+  shape_boolean& rotate  (G4RotationMatrix& r  )  { transformation = HepGeom::Rotate3D{r}        * transformation; return *this; }
+  shape_boolean& rot     (G4RotationMatrix& r  )  { return rotate(r); }
+  shape_boolean& rot_x   (double delta         )  { return rotate_x(delta); }
+  shape_boolean& rot_y   (double delta         )  { return rotate_y(delta); }
+  shape_boolean& rot_z   (double delta         )  { return rotate_z(delta); }
+  shape_boolean& at  (double x, double y, double z) { transformation = HepGeom::Translate3D{x,y,z} * transformation; return *this; }
+  shape_boolean& at_x(double x                    ) { return at(x, 0, 0); }
+  shape_boolean& at_y(          double y          ) { return at(0, y, 0); }
+  shape_boolean& at_z(                    double z) { return at(0, 0, z); }
+  shape_boolean& at(G4ThreeVector    p)           { return at(p.x(), p.y(), p.z()); }
+  shape_boolean& name(G4String name)              { name_ = name; return *this; }
 private:
-  boolean_shape(G4VSolid* a, G4VSolid* b, BOOL_OP op) : shape{a -> GetName()}, a{a}, b{b}, op{op}  {}
+  shape_boolean(G4VSolid* a, G4VSolid* b, BOOL_OP op) : shape{a -> GetName()}, a{a}, b{b}, op{op}  {}
   G4VSolid* a;
   G4VSolid* b;
   BOOL_OP   op;
@@ -38,7 +38,7 @@ private:
 // Clear and prominent error message
 #define CLEAR_ERROR_MSG(METHOD, TYPE_DESCRIPTION)                       \
 "\n\n\n\n"                                                              \
-"[n4::boolean_shape::" METHOD "]\n"                                     \
+"[n4::shape_boolean::" METHOD "]\n"                                     \
 "Attempted to create a boolean shape using " TYPE_DESCRIPTION ".\n"     \
 "Only n4::shape and G4VSolid* are accepted.\n"                          \
 "For more details, please check\n"                                      \
@@ -61,7 +61,7 @@ private:
 // not appropriate. The template resolution order takes care of
 // finding the valid input types first
 #define CHECK_INVALID(METHOD)                                                                 \
-template<class SUBTYPE> boolean_shape shape::METHOD(SUBTYPE x) {                              \
+template<class SUBTYPE> shape_boolean shape::METHOD(SUBTYPE x) {                              \
   /**/ if constexpr (SUBCLASS_OF(n4::shape, SUBTYPE)) { return shape::METHOD##_(x.solid()); } \
   else if constexpr (SUBCLASS_OF(G4VSolid , SUBTYPE)) { return shape::METHOD##_(x        ); } \
   else {                                                                                      \

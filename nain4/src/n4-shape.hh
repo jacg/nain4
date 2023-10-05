@@ -28,7 +28,7 @@ namespace nain4 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 
-struct boolean_shape;
+struct shape_boolean;
 
 // ---- Base class for interfaces to G4VSolids --------------------------------------------------------
 struct shape {
@@ -40,22 +40,22 @@ struct shape {
 
   // Boolean operations
 private:
-  boolean_shape add_      (G4VSolid* solid);
-  boolean_shape subtract_ (G4VSolid* solid);
-  boolean_shape intersect_(G4VSolid* solid);
-  boolean_shape join_     (G4VSolid* solid);
-  boolean_shape sub_      (G4VSolid* solid);
-  boolean_shape inter_    (G4VSolid* solid);
+  shape_boolean add_      (G4VSolid* solid);
+  shape_boolean subtract_ (G4VSolid* solid);
+  shape_boolean intersect_(G4VSolid* solid);
+  shape_boolean join_     (G4VSolid* solid);
+  shape_boolean sub_      (G4VSolid* solid);
+  shape_boolean inter_    (G4VSolid* solid);
 
 public:
   // Catch the types that are more likely to be passed by mistake
   // and generate an obvious and prominent error message.
-  template<class SUBTYPE> boolean_shape add      (SUBTYPE x);
-  template<class SUBTYPE> boolean_shape subtract (SUBTYPE x);
-  template<class SUBTYPE> boolean_shape intersect(SUBTYPE x);
-  template<class SUBTYPE> boolean_shape join     (SUBTYPE x);
-  template<class SUBTYPE> boolean_shape sub      (SUBTYPE x);
-  template<class SUBTYPE> boolean_shape inter    (SUBTYPE x);
+  template<class SUBTYPE> shape_boolean add      (SUBTYPE x);
+  template<class SUBTYPE> shape_boolean subtract (SUBTYPE x);
+  template<class SUBTYPE> shape_boolean intersect(SUBTYPE x);
+  template<class SUBTYPE> shape_boolean join     (SUBTYPE x);
+  template<class SUBTYPE> shape_boolean sub      (SUBTYPE x);
+  template<class SUBTYPE> shape_boolean inter    (SUBTYPE x);
 
 
 protected:
