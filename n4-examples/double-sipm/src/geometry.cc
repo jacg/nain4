@@ -19,7 +19,7 @@
 #include <G4MaterialPropertiesTable.hh>
 #include <G4OpticalPhysics.hh>
 #include <G4OpticalSurface.hh>
-#include <G4VPhysicalVolume.hh>
+#include <G4PVPlacement.hh>
 #include <G4RandomDirection.hh>
 #include <G4RunManagerFactory.hh>
 #include <G4SubtractionSolid.hh>
@@ -34,7 +34,7 @@ G4double detection_probability(G4double energy, const vec_double& energies, cons
 void place_csi_teflon_border_surface_between(G4PVPlacement* one, G4PVPlacement* two);
 n4::sensitive_detector* sensitive_detector(G4int nb_detectors_per_side, data& data);
 
-G4VPhysicalVolume* make_geometry(data& data, const config& config) {
+G4PVPlacement* make_geometry(data& data, const config& config) {
     auto csi     =    csi_with_properties(config);
     auto air     =    air_with_properties();
     auto teflon  = teflon_with_properties();
