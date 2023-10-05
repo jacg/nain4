@@ -3,7 +3,7 @@
 #include <nain4.hh>
 #include <n4-shapes.hh>
 #include <n4-shapes-boolean.hh>
-#include <n4-utils.hh>
+#include <n4-sequences.hh>
 #include <n4-geometry-iterators.hh>
 #include <n4-material.hh>
 #include <n4-inspect.hh>
