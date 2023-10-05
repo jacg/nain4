@@ -3,8 +3,8 @@
 
 #include "shared.hh"
 
-class G4PVPlacement;
+class G4VPhysicalVolume;
 
-G4PVPlacement* make_geometry(data& data, const config& config);
+G4VPhysicalVolume* make_geometry(data& data, const config& config);
 
 #endif // GEOMETRY_HH

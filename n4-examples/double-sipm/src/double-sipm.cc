@@ -2,7 +2,7 @@
 #include "generator.hh"
 #include "geometry.hh"
 
-#include <n4-all.hh>
+#include <n4-main.hh>
 
 #include <CLHEP/Vector/ThreeVector.h>
 #include <FTFP_BERT.hh>

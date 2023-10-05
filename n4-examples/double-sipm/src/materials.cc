@@ -1,6 +1,9 @@
 #include "materials.hh"
 
-#include <n4-all.hh>
+#include <n4-constants.hh>
+#include <n4-material.hh>
+#include <n4-sequences.hh>
+
 
 #include <G4Material.hh>
 

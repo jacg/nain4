@@ -1,6 +1,7 @@
 #include "generator.hh"
 
-#include <n4-all.hh>
+#include <n4-random.hh>
+#include <n4-inspect.hh>
 
 #include <G4Event.hh>
 #include <G4PrimaryParticle.hh>
