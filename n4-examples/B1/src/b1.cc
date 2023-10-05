@@ -1,18 +1,7 @@
 #include <n4-all.hh>
 
-#include <G4Box.hh>
-#include <G4Event.hh>
-#include <G4Exception.hh>
-#include <G4ExceptionSeverity.hh>
-#include <G4GenericMessenger.hh>
-#include <G4PrimaryParticle.hh>
-#include <G4RandomDirection.hh>
-#include <G4Sphere.hh>
-#include <G4SteppingVerbose.hh>
-#include <G4String.hh>
-#include <G4SystemOfUnits.hh>
-#include <G4ThreeVector.hh>
 #include <G4UnitsTable.hh>
+#include <G4SteppingVerbose.hh>
 #include <QBBC.hh>
 
 #include <cstdlib>
