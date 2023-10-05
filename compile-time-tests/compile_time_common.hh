@@ -1,6 +1,11 @@
 #pragma once
 
-#include "nain4.hh"
+#include <n4-inspect.hh>
+#include <n4-place.hh>
+#include <n4-mandatory.hh>
+#include <n4-material.hh>
+#include <n4-volume.hh>
+
 
 #include <G4Event.hh>
 #include <G4PrimaryVertex.hh>

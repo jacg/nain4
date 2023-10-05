@@ -1,5 +1,5 @@
-#include <n4_ui.hh>
-#include <n4_run_manager.hh>
+#include <n4-ui.hh>
+#include <n4-run-manager.hh>
 
 #include <G4String.hh>
 #include <G4UIExecutive.hh>
@@ -15,6 +15,9 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 
 unsigned parse_beam_on(const std::string&  arg) {
   auto parsed = std::stoi(arg.c_str());
@@ -124,5 +127,6 @@ void ui::command (const G4String& command, const G4String& prefix, const G4Strin
             << " accepted: (" << command  << ')' << std::endl;
 }
 
-
 } // namespace nain4
+
+#pragma GCC diagnostic pop

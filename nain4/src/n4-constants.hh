@@ -1,5 +1,8 @@
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
 namespace nain4 {
 namespace physical_const {
   // Planck's constant * speed of light
@@ -11,3 +14,5 @@ namespace physical_const {
 
 namespace n4{ using namespace nain4;                 }
 namespace c4{ using namespace nain4::physical_const; }
+
+#pragma GCC diagnostic pop

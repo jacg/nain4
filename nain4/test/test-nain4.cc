@@ -1,7 +1,10 @@
-#include "nain4.hh"
-#include "test_utils.hh"
-#include "n4-volumes.hh"
-#include "n4-utils.hh"
+#include <n4-defaults.hh>
+#include <n4-shape.hh>
+#include <n4-boolean-shape.hh>
+#include <n4-utils.hh>
+#include <n4-volume.hh>
+#include <n4-geometry-iterators.hh>
+#include <n4-material.hh>
 
 // Solids
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -33,12 +36,11 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <cmath>
+#include <numeric>
 #include <type_traits>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
-
-using Catch::Approx;
 
 // Many of the tests below check physical quantities. Dividing physical
 // quantities by their units gives raw numbers which are easily understandable
@@ -46,7 +48,8 @@ using Catch::Approx;
 // this gives rise to the apparently superfluous division by the same unit on
 // both sides of an equation, in the source code.
 
-#include <numeric>
+using Catch::Approx;
+using namespace n4::test;
 
 TEST_CASE("nain material", "[nain][material]") {
 
@@ -1125,46 +1128,6 @@ TEST_CASE("nain const_over", "[nain][const_over]") {
   CHECK(nain4::const_over(   1., {10, 100})    == std::vector<G4double>{0.1, 0.01});
 }
 
-TEST_CASE("nain vis_attributes", "[nain][vis_attributes]") {
-  // Utility for more convenient configuration of G4VisAttributes
-  // TODO could do with more extensive testing
-  using nain4::vis_attributes;
-  auto convenient = vis_attributes{}
-    .visible(true)
-    .colour({1,0,0})
-    .start_time(1.23)
-    .end_time(4.56)
-    .force_line_segments_per_circle(20)
-    .force_solid(true)
-    .force_wireframe(false);
-  auto pita = G4VisAttributes{};
-  pita.SetVisibility(true);
-  pita.SetColour({1,0,0});
-  pita.SetStartTime(1.23);
-  pita.SetEndTime(4.56);
-  pita.SetForceLineSegmentsPerCircle(20);
-  pita.SetForceSolid(true);
-  pita.SetForceWireframe(false);
-  CHECK(convenient == pita);
-
-  // The meaning of the different constructors
-
-  // Default constructor sets colour: white, visibility: true
-  CHECK(vis_attributes{} == vis_attributes{}.colour({1,1,1}).visible(true));
-  // Can set colour via constructor
-  CHECK(vis_attributes         {{0,1,0}} ==
-        vis_attributes{}.colour({0,1,0}));
-  // Can set visibility via constructor
-  CHECK(vis_attributes          {true} ==
-        vis_attributes{}.visible(true));
-
-  CHECK(vis_attributes          {false} ==
-        vis_attributes{}.visible(false));
-  // Can set both visibility and colour via constructor
-  CHECK(vis_attributes          {false ,       {1,1,0}} ==
-        vis_attributes{}.visible(false).colour({1,1,0}));
-}
-
 TEST_CASE("nain find geometry", "[nain][find][geometry]") {
   default_run_manager().run();
 
@@ -1596,7 +1559,7 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
   // NB, const is ignored and by-reference is implicit!
   SECTION("primitives") {
     std::vector<unsigned> stuff {5, 4, 3, 2, 1};
-    for (const auto [n, el] : enumerate(stuff)) {
+    for (const auto [n, el] : n4::enumerate(stuff)) {
       CHECK(el == 5 - n);
       el++;
     }
@@ -1608,7 +1571,7 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
       unsigned n;
     };
     std::vector<Foo> stuff {2, 8};
-    for (auto [n, el] : enumerate(stuff)) {
+    for (auto [n, el] : n4::enumerate(stuff)) {
       if (n == 0) { CHECK(el.n == 2); }
       else        { CHECK(el.n == 8); }
       el.n += 1000;
@@ -1617,7 +1580,7 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
     CHECK(stuff[1].n == 1008);
   }
   SECTION("literal braces primitives") {
-    for (const auto [n, el] : enumerate({7,6,5,4})) {
+    for (const auto [n, el] : n4::enumerate({7,6,5,4})) {
       CHECK(static_cast<unsigned>(el) == 7 - n);
     }
   }
@@ -1626,7 +1589,7 @@ TEST_CASE("enumerate", "[utils][enumerate]") {
       Foo(unsigned n): n{n} {}
       unsigned n;
     };
-    for (auto [n, el] : enumerate({Foo{4}, Foo{2}})) {
+    for (auto [n, el] : n4::enumerate({Foo{4}, Foo{2}})) {
       if (n == 0) { CHECK(el.n == 4); }
       else        { CHECK(el.n == 2); }
     }

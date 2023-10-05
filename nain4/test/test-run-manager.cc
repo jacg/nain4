@@ -1,7 +1,7 @@
-#include "g4-mandatory.hh"
-#include "nain4.hh"
-#include "test_utils.hh"
-#include "n4-volumes.hh"
+#include <n4-defaults.hh>
+#include <n4-mandatory.hh>
+#include <n4-run-manager.hh>
+#include <n4-shape.hh>
 
 // Solids
 #include <FTFP_BERT.hh>
@@ -41,6 +41,8 @@ using Catch::Approx;
 
 char *fake_argv[] = { (char*)"progname-aaa", NULL };
 
+using namespace n4::test;
+
 TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
@@ -55,8 +57,7 @@ TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
 struct dummy_geometry : G4VUserDetectorConstruction {
   dummy_geometry(double, double, double) {}
   G4PVPlacement* Construct() {
-    auto box = n4::volume<G4Box>("box", n4::material("G4_AIR"), 1., 1., 1.);
-    return n4::place(box).now();
+    return water_box();
   }
 };
 

@@ -1,20 +1,25 @@
 #pragma once
 
-#include "nain4.hh"
+#include <n4-material.hh>
+#include <n4-run-manager.hh>
+#include <n4-shape.hh>
+#include <n4-stream.hh>
 
 #include <FTFP_BERT.hh>
 #include <G4EmStandardPhysics_option4.hh>
 #include <G4OpticalPhysics.hh>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
+namespace nain4 {
+namespace test {
 
 inline auto water_box() {
-  auto water = n4::material("G4_WATER");
-  auto box   = n4::volume<G4Box>("box", water, 1., 1., 1.);
-  return n4::place(box).now();
+  return n4::box("box").cube(1).place(n4::material("G4_WATER")).now();
 }
 
 inline void do_nothing(G4Event*) {}
-
 
 inline auto default_physics_lists() {
   auto verbosity = 0;
@@ -42,3 +47,9 @@ inline auto default_run_manager() {
   char *fake_argv[] = { (char*)"progname-ccc", NULL };
   return default_run_manager_with_ui_args(1, fake_argv);
 }
+} // namespace test
+} // namespace nain4
+
+namespace n4 { using namespace nain4; }
+
+#pragma GCC diagnostic pop

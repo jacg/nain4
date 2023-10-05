@@ -1,19 +1,16 @@
-#include "n4-volumes.hh"
+#include <n4-shape.hh>
+#include <n4-boolean-shape.hh>
+#include <n4-volume.hh>
 
-#include "nain4.hh"
-#include <G4CSGSolid.hh>
-#include <G4Cons.hh>
 #include <G4LogicalVolume.hh>
 #include <G4String.hh>
-#include <G4UnionSolid.hh>
-#include <G4SubtractionSolid.hh>
-#include <G4IntersectionSolid.hh>
 #include <G4VGraphicsScene.hh>
 #include <G4VPVParameterisation.hh>
-#include <G4Orb.hh>
-#include <G4VSolid.hh>
 
 #include <cstdlib>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 
 using opt_double = std::optional<G4double>;
 
@@ -70,14 +67,6 @@ boolean_shape shape::intersect_(G4VSolid* solid) { return boolean_shape{this -> 
 boolean_shape shape::join_ (G4VSolid* solid) { return add_      (solid); }
 boolean_shape shape::sub_  (G4VSolid* solid) { return subtract_ (solid); }
 boolean_shape shape::inter_(G4VSolid* solid) { return intersect_(solid); }
-
-G4VSolid* boolean_shape::solid() const {
-  if (op == BOOL_OP::ADD) { return new G4UnionSolid       {name_, a, b, transformation}; }
-  if (op == BOOL_OP::SUB) { return new G4SubtractionSolid {name_, a, b, transformation}; }
-  if (op == BOOL_OP::INT) { return new G4IntersectionSolid{name_, a, b, transformation}; }
-  // Unreachable
-  return nullptr;
-}
 
 template<class... Args>
 void check_mandatory_args(G4String type, G4String name, Args&&... args) {
@@ -138,3 +127,5 @@ G4LogicalVolume* shape::volume(G4Material* material) const {
 
 
 } // namespace nain4
+
+#pragma GCC diagnostic pop
