@@ -36,12 +36,11 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <cmath>
+#include <numeric>
 #include <type_traits>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
-
-using Catch::Approx;
 
 // Many of the tests below check physical quantities. Dividing physical
 // quantities by their units gives raw numbers which are easily understandable
@@ -49,8 +48,7 @@ using Catch::Approx;
 // this gives rise to the apparently superfluous division by the same unit on
 // both sides of an equation, in the source code.
 
-#include <numeric>
-
+using Catch::Approx;
 using namespace n4::test;
 
 TEST_CASE("nain material", "[nain][material]") {
