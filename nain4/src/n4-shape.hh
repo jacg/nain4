@@ -2,23 +2,22 @@
 
 #include <n4-place.hh>
 
-#include <G4LogicalVolume.hh>
-#include <G4Material.hh>
-#include <G4PVPlacement.hh>
-#include <G4String.hh>
-#include <G4SystemOfUnits.hh>
-#include <G4Types.hh>
 #include <G4Box.hh>
 #include <G4Cons.hh>
-#include <G4Trd.hh>
-#include <G4VSolid.hh>
+#include <G4Orb.hh>
 #include <G4Sphere.hh>
+#include <G4Trd.hh>
 #include <G4Tubs.hh>
 
-#include <G4VSensitiveDetector.hh>
-#include <G4VSolid.hh>
+#include <G4LogicalVolume.hh>
+
+#include <G4String.hh>
+#include <G4SystemOfUnits.hh>
+
+class G4VSensitiveDetector;
+
+
 #include <optional>
-#include <type_traits>
 
 #define G4D G4double
 #define OPT_DOUBLE std::optional<G4double>

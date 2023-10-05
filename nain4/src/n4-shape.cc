@@ -2,14 +2,12 @@
 #include <n4-shape-boolean.hh>
 #include <n4-volume.hh>
 
-#include <G4CSGSolid.hh>
-#include <G4Cons.hh>
 #include <G4LogicalVolume.hh>
 #include <G4String.hh>
 #include <G4VGraphicsScene.hh>
 #include <G4VPVParameterisation.hh>
-#include <G4Orb.hh>
-#include <G4VSolid.hh>
+
+
 
 #include <cstdlib>
 

@@ -2,6 +2,8 @@
 
 #include <n4-shape.hh>
 
+#include <type_traits>
+
 namespace nain4 {
 
 enum class BOOL_OP { ADD, SUB, INT };
