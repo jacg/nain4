@@ -1,5 +1,5 @@
-#include <n4-shapes.hh>
-#include <n4-shapes-boolean.hh>
+#include <n4-shape.hh>
+#include <n4-shape-boolean.hh>
 #include <n4-volume.hh>
 
 #include <G4CSGSolid.hh>

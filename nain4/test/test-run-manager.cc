@@ -1,7 +1,7 @@
 #include <n4-mandatory.hh>
 #include <nain4.hh>
 #include <test_utils.hh>
-#include <n4-shapes.hh>
+#include <n4-shape.hh>
 
 // Solids
 #include <FTFP_BERT.hh>

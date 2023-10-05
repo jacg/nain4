@@ -1,7 +1,7 @@
 #pragma once
 
 #include <n4-material.hh>
-#include <n4-shapes.hh>
+#include <n4-shape.hh>
 #include <n4-stream.hh>
 
 #include <FTFP_BERT.hh>

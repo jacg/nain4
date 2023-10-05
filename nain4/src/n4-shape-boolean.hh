@@ -1,6 +1,6 @@
 #pragma once
 
-#include <n4-shapes.hh>
+#include <n4-shape.hh>
 
 namespace nain4 {
 

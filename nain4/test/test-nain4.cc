@@ -1,8 +1,8 @@
 #include "test_utils.hh"
 
 #include <nain4.hh>
-#include <n4-shapes.hh>
-#include <n4-shapes-boolean.hh>
+#include <n4-shape.hh>
+#include <n4-shape-boolean.hh>
 #include <n4-utils.hh>
 #include <n4-volume.hh>
 #include <n4-geometry-iterators.hh>

@@ -1,4 +1,4 @@
-#include <n4-shapes-boolean.hh>
+#include <n4-shape-boolean.hh>
 
 #include <G4UnionSolid.hh>
 #include <G4SubtractionSolid.hh>
