@@ -196,6 +196,29 @@ TEST_CASE("without macropath", "[nain][run_manager][macropath]") {
 }
 
 
+TEST_CASE("CLI1", "[nain][run_manager][cli]") {
+  auto hush = n4::silence{std::cout};
+  char *argv[] = {(char*)"progname", NULL};
+  std::cerr << "                                       progname **no args**" << std::endl;
+  auto rm = n4::run_manager::create().ui("progname", 1, argv, false);
+}
+
+TEST_CASE("CLI2", "[nain][run_manager][cli]") {
+  auto hush = n4::silence{std::cout};
+  char *argv[] = {(char*)"progname", (char*)"-g", NULL};
+  std::cerr << "                                       progname -g" << std::endl;
+  auto rm = n4::run_manager::create().ui("progname", 2, argv, false);
+}
+
+TEST_CASE("CLI3", "[nain][run_manager][cli]") {
+  auto hush = n4::silence{std::cout};
+  char *argv[] = {(char*)"progname", (char*)"-g", (char*)"aaa", NULL};
+  std::cerr << "                                       progname -g aaa" << std::endl;
+  auto rm = n4::run_manager::create().ui("progname", 3, argv, false);
+}
+
+
+
 TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
 

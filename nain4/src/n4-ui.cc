@@ -72,6 +72,10 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
     prepend_path(path);
   }
 
+  auto padding = "                                       ";
+  std::cerr << padding << "IS -g USED? " << std::boolalpha << args.is_used("-g") << std::endl;
+  if (args.is_used("-g")) { std::cerr << padding << "vis macro === >" << args.get("-g") << std::endl; }
+
   if (warn_empty_run && ! (n_events.has_value() || vis_macro.has_value())) {
     std::cerr << "'" + program_name + "' is not going to do anything interesting without some command-line arguments.\n\n";
     std::cerr << args << std::endl;
