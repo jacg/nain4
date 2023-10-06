@@ -20,7 +20,7 @@ However
 
 This is the purpose of `flake.lock`: it pins the precise version (the commit id) of all of your project's `flake.nix`-specified dependencies.
 
-## Upgranding to the lastest version of `nain4` available of `master`
+## Upgrading to the lastest version of `nain4` available of `master`
 
 If you want to upgrade to the most recent version of `nain4` available on its `master` branch, see [here](../how-to/upgrade-nain4.md).
 
@@ -52,4 +52,3 @@ By default, `flake.nix` instructs your system to use the latest `master` and `fl
 For the full details, see the [Nix manual](https://nixos.org/manual/nix/unstable/command-ref/new-cli/nix3-flake#url-like-syntax).
 
 Don't forget that, after switching to a different version of `nain4`, you may need to `just clean` and recompile your code, to avoid mysterious and annoying errors caused by stale build artefacts. (Hopefully this will be done for you automatically once `nain4` migrates its build infrastructure from `cmake` to `meson`.)
-
