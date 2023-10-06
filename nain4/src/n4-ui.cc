@@ -59,12 +59,13 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   early{args.get<std::vector<std::string>>("--early")},
   late {args.get<std::vector<std::string>>("--late" )},
   vis_macro{},
+  use_graphics{args.is_used("-g")},
   argc{argc},
   argv{argv},
   g4_ui{*G4UImanager::GetUIpointer()}
 {
-  if (auto n = args.present("--beam-on")) { n_events = parse_beam_on(n.value()); }
-  if (args.is_used("-g")) { vis_macro = args.get("-g"); }
+  if (auto n = args.present("--beam-on")) { n_events  = parse_beam_on(n.value()); }
+  if (use_graphics                      ) { vis_macro = args.get("-g"); }
 
   // Here we use std::string because G4String does not work
   auto macro_paths = args.get<std::vector<std::string>>("--macro-path");
@@ -76,7 +77,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   std::cerr << padding << "IS -g USED? " << std::boolalpha << args.is_used("-g") << std::endl;
   if (args.is_used("-g")) { std::cerr << padding << "vis macro === >" << args.get("-g") << std::endl; }
 
-  if (warn_empty_run && ! (n_events.has_value() || vis_macro.has_value())) {
+  if (warn_empty_run && ! (n_events.has_value() || use_graphics)) {
     std::cerr << "'" + program_name + "' is not going to do anything interesting without some command-line arguments.\n\n";
     std::cerr << args << std::endl;
   }
@@ -84,11 +85,11 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
 }
 
 void ui::run() {
-  if (n_events.has_value() && !vis_macro.has_value()) {
+  if (n_events.has_value() && !use_graphics) {
     beam_on(n_events.value());
   }
 
-  if (vis_macro.has_value()) {
+  if (use_graphics) {
     G4UIExecutive ui_executive{argc, argv};
     G4VisExecutive vis_manager;
     vis_manager.Initialize();

@@ -38,6 +38,7 @@ private:
   std::vector<std::string> early;
   std::vector<std::string> late;
   std::optional<G4String>  vis_macro;
+  bool                     use_graphics;
 
   int    argc;
   char** argv;
