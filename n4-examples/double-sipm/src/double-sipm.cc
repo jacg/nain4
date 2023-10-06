@@ -3,6 +3,7 @@
 #include "geometry.hh"
 
 #include <n4-main.hh>
+#include <n4-inspect.hh>
 
 #include <CLHEP/Vector/ThreeVector.h>
 #include <FTFP_BERT.hh>
@@ -97,6 +98,7 @@ void close_files(output& output) {
 };
 
 void reset_photon_count(data& data) {
+  data.event_number        = n4::event_number();
   data.      total_edep[0] = 0;
   data.      total_edep[1] = 0;
   data.        gamma_zs[0].clear();
