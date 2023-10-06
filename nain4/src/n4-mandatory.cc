@@ -25,13 +25,6 @@ void generator::geantino_along_x(G4Event* event) {
   // vertex->SetPrimary(new G4PrimaryParticle(geantino, p, 0, 0));
   // event->AddPrimaryVertex(vertex);
 }
-// --------------------------------------------------------------------------------
-// definition of sensitive_detector
-sensitive_detector::sensitive_detector(G4String name, process_hits_fn process_hits)
-: G4VSensitiveDetector{name}
-, process_hits{process_hits} {
-  fully_activate_sensitive_detector(this);
-}
 
 #pragma GCC diagnostic pop
 

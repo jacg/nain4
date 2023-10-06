@@ -28,6 +28,7 @@ As your program grows and is split into multiple files, and you gain more experi
   + `<n4-boolean-shape>`: construction of boolean solids
   + `<n4-volume>` creation of logical volumes
   + `<n4-place>` creation and placement of physical volumes
+  + `<n4-sensitive>` `nain4` utilities for concise implementation of `G4VSensitiveDetector`
 
 + `<n4-utils.hh>`
 
