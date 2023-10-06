@@ -33,7 +33,9 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
   args.add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
   args.add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
   args.add_argument("--late"    , "-l").metavar("ITEMS").help("execute ITEMS  after run manager instantiation").MULTIPLE;
-  args.add_argument("--vis"     , "-g").metavar("MACRO").help("switch from batch mode to GUI, executing MACRO").implicit_value(std::string{"vis.mac"});
+  args.add_argument("--vis"     , "-g").metavar("MACRO").help("switch from batch mode to GUI, executing MACRO")
+    .default_value(std::string{"vis.mac"})
+    ;
   args.add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE; // TODO metavar does not appear in help
 
   try {
