@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.25)
 # CHANGEME-project-name: Not important, but you might want to change it
 project(my-nain4-project)
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(EXE CHANGEME-my-n4-prog)
 

@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(Client)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ANCHOR: find_package
 set(Nain4_DIR "$ENV{NAIN4_INSTALL}/lib/cmake/Nain4/")

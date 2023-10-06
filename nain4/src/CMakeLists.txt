@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.25)
 
 project(Nain4)
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 
 # ----- Set installation variables
 # Defaults to <top>/install, but can be overriden from CLI
