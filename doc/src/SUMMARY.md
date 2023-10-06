@@ -7,6 +7,7 @@
   - [How to make `nain4` available in a `Geant4`/`cmake` project](./how-to/enable-nain4-in-cmake.md)
   - [How start a `nain4`-based project](./how-to/start-a-nain4-based-project.md)
   - [How to build a minimal `nain4` app](./how-to/build-a-minimal-nain4-app.md)
+  - [How to upgrade your `nain4` dependency](./how-to/upgrade-nain4.md)
 - [Explanation](./explanation.md)
   - [Placement: laziness and accumulation](./placement-laziness-and-accumulation.md)
   - [Displacements and rotations are not commutative](./displacements-and-rotations-are-not-commutative.md)
@@ -17,3 +18,4 @@
   - [Constructing solids and logical volumes](./n4-shape.md)
   - [Placement of physical volumes](./n4-place.md)
   - [Constructing boolean solids](./n4-boolean-solids.md)
+  - [Managing `nain4` versions](./reference/managing-nain4-versions.md)
