@@ -1,8 +1,5 @@
 #pragma once
 
-#include <G4HCofThisEvent.hh>
-#include <G4SDManager.hh>
-
 #include <G4Box.hh>
 #include <G4ClassificationOfNewTrack.hh>
 #include <G4ParticleGun.hh>
@@ -13,7 +10,6 @@
 #include <G4UserStackingAction.hh>
 #include <G4UserSteppingAction.hh>
 #include <G4UserTrackingAction.hh>
-#include <G4VSensitiveDetector.hh>
 #include <G4VUserActionInitialization.hh>
 #include <G4VUserEventInformation.hh>
 #include <G4VUserDetectorConstruction.hh>
@@ -152,34 +148,6 @@ struct geometry : public G4VUserDetectorConstruction {
 private:
   construct_fn construct;
 };
-
-// --------------------------------------------------------------------------------
-// TODO: needs tests
-class sensitive_detector : public G4VSensitiveDetector {
-public:
-  using process_hits_fn = std::function<bool(G4Step*)>;
-  using initialize_fn   = std::function<void(G4HCofThisEvent*)>;
-  using end_of_event_fn = std::function<void(G4HCofThisEvent*)>;
-
-  sensitive_detector* initialize  (initialize_fn   f) { init = f; return this; }
-  sensitive_detector* end_of_event(end_of_event_fn f) { eoev = f; return this; }
-
-  sensitive_detector(G4String name, process_hits_fn process_hits);
-  bool ProcessHits(G4Step* step, G4TouchableHistory*) override { return process_hits(step); };
-  void Initialize (G4HCofThisEvent* hc)               override {        init        (hc  ); };
-  void EndOfEvent (G4HCofThisEvent* hc)               override {        eoev        (hc  ); };
-private:
-  process_hits_fn process_hits;
-  initialize_fn   init = [] (auto) {};
-  end_of_event_fn eoev = [] (auto) {};
-};
-// --------------------------------------------------------------------------------
-template<class SENSITIVE>
-auto fully_activate_sensitive_detector(SENSITIVE* detector) {
-  detector -> Activate(true);
-  G4SDManager::GetSDMpointer() -> AddNewDetector(detector);
-  return detector;
-}
 
 // --------------------------------------------------------------------------------
 // TODO Currently has a hard-wired storing of steps: generalize :
