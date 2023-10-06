@@ -95,7 +95,7 @@ n4::sensitive_detector* sensitive_detector(G4int n_sipms, data& data) {
     auto pre           = step -> GetPreStepPoint();
     auto copy_no       = pre  -> GetTouchable() -> GetCopyNumber();
     auto time          = pre  -> GetGlobalTime()    / ns;
-    auto photon_energy = pre  -> GetKineticEnergy() / eV;
+    auto photon_energy = pre  -> GetKineticEnergy();
 
     auto sipm_energies = n4::const_over(c4::hc/nm, { 900, 700,   500,   460,  400,  360,  340,  300,  280});
     std::vector<G4double> sipm_pdes =              {0.03, 0.1, 0.245, 0.255, 0.23, 0.18, 0.18, 0.14, 0.02};
