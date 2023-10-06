@@ -1,0 +1,21 @@
+
+list-available-examples:
+  @ls -d */ | tr -d "\/"
+
+clean NAME:
+  rm -rf {{NAME}}/{build,install}
+
+prepare NAME: (clean NAME)
+  sed 's/XXX/{{NAME}}/g' CMakeLists.txt > {{NAME}}/src/CMakeLists.txt
+
+install NAME: (prepare NAME)
+  cmake -S {{NAME}}/src -B {{NAME}}/build
+  cmake --build {{NAME}}/build --target install
+
+run NAME *ARGS: (install NAME)
+  ./{{NAME}}/install/example-{{NAME}} {{ARGS}} --macro-path {{NAME}}/macs
+
+run-all:
+  for example in `just list-available-examples`; do \
+    just run $example -n 100; \
+  done
