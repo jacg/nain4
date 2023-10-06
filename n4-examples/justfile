@@ -4,6 +4,7 @@ list-available-examples:
 
 clean NAME:
   rm -rf {{NAME}}/{build,install}
+  rm -rf {{NAME}}/src/CMakeLists.txt
 
 prepare NAME: (clean NAME)
   sed 's/XXX/{{NAME}}/g' CMakeLists.txt > {{NAME}}/src/CMakeLists.txt
