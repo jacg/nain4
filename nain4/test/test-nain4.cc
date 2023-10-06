@@ -1872,4 +1872,49 @@ TEST_CASE("random point in sphere", "[random][sphere]") {
 
 }
 
+TEST_CASE("random direction octants", "[random][direction]") {
+  // costheta < 0 -> z < 0
+  // costheta > 0 -> z > 0
+  // 0pi/2 < phi < 1pi/2 -> x > 0, y > 0
+  // 1pi/2 < phi < 2pi/2 -> x < 0, y > 0
+  // 2pi/2 < phi < 3pi/2 -> x < 0, y < 0
+  // 3pi/2 < phi < 4pi/2 -> x > 0, y < 0
+  auto zpos_xpos_ypos = n4::random::direction{}.min_cos_theta(0)                         .max_phi(  CLHEP::halfpi);
+  auto zpos_xneg_ypos = n4::random::direction{}.min_cos_theta(0).min_phi(  CLHEP::halfpi).max_phi(2*CLHEP::halfpi);
+  auto zpos_xneg_yneg = n4::random::direction{}.min_cos_theta(0).min_phi(2*CLHEP::halfpi).max_phi(3*CLHEP::halfpi);
+  auto zpos_xpos_yneg = n4::random::direction{}.min_cos_theta(0).min_phi(3*CLHEP::halfpi);
+  auto zneg_xpos_ypos = n4::random::direction{}.max_cos_theta(0)                         .max_phi(  CLHEP::halfpi);
+  auto zneg_xneg_ypos = n4::random::direction{}.max_cos_theta(0).min_phi(  CLHEP::halfpi).max_phi(2*CLHEP::halfpi);
+  auto zneg_xneg_yneg = n4::random::direction{}.max_cos_theta(0).min_phi(2*CLHEP::halfpi).max_phi(3*CLHEP::halfpi);
+  auto zneg_xpos_yneg = n4::random::direction{}.max_cos_theta(0).min_phi(3*CLHEP::halfpi);
+
+  G4ThreeVector p;
+  for (auto i=0; i<100; ++i) {
+    p = zpos_xpos_ypos.get(); CHECK(p.x() > 0); CHECK(p.y() > 0); CHECK(p.z() > 0);
+    p = zpos_xneg_ypos.get(); CHECK(p.x() < 0); CHECK(p.y() > 0); CHECK(p.z() > 0);
+    p = zpos_xneg_yneg.get(); CHECK(p.x() < 0); CHECK(p.y() < 0); CHECK(p.z() > 0);
+    p = zpos_xpos_yneg.get(); CHECK(p.x() > 0); CHECK(p.y() < 0); CHECK(p.z() > 0);
+    p = zneg_xpos_ypos.get(); CHECK(p.x() > 0); CHECK(p.y() > 0); CHECK(p.z() < 0);
+    p = zneg_xneg_ypos.get(); CHECK(p.x() < 0); CHECK(p.y() > 0); CHECK(p.z() < 0);
+    p = zneg_xneg_yneg.get(); CHECK(p.x() < 0); CHECK(p.y() < 0); CHECK(p.z() < 0);
+    p = zneg_xpos_yneg.get(); CHECK(p.x() > 0); CHECK(p.y() < 0); CHECK(p.z() < 0);
+  }
+}
+
+TEST_CASE("random direction theta", "[random][direction]") {
+  auto mintheta    = n4::random::direction{}.min_theta(CLHEP::halfpi); // max theta = pi implicit
+  auto maxtheta    = n4::random::direction{}.max_theta(CLHEP::halfpi); // min theta =  0 implicit
+  auto minmaxtheta = n4::random::direction{}.min_theta(CLHEP::halfpi/8).max_theta(CLHEP::halfpi/4);
+
+
+  G4ThreeVector p;
+  auto cos_pi8  = std::cos(CLHEP::halfpi/4);
+  auto cos_pi16 = std::cos(CLHEP::halfpi/8);
+  for (auto i=0; i<100; ++i) {
+    p =    mintheta.get(); CHECK(p.z() < 0);
+    p =    maxtheta.get(); CHECK(p.z() > 0);
+    p = minmaxtheta.get(); CHECK(p.z() > cos_pi8); CHECK(p.z() < cos_pi16);
+  }
+}
+
 #pragma GCC diagnostic pop
