@@ -1,9 +1,5 @@
 #pragma once
 
-#include <G4Box.hh>
-#include <G4ClassificationOfNewTrack.hh>
-#include <G4ParticleGun.hh>
-#include <G4StackManager.hh>
 #include <G4Track.hh>
 #include <G4UserEventAction.hh>
 #include <G4UserRunAction.hh>
@@ -11,13 +7,9 @@
 #include <G4UserSteppingAction.hh>
 #include <G4UserTrackingAction.hh>
 #include <G4VUserActionInitialization.hh>
-#include <G4VUserEventInformation.hh>
 #include <G4VUserDetectorConstruction.hh>
+#include <G4VUserEventInformation.hh>
 #include <G4VUserPrimaryGeneratorAction.hh>
-
-#include <globals.hh>
-
-#include <vector>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
