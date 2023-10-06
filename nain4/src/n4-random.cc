@@ -1,3 +1,4 @@
+#include <G4ThreeVector.hh>
 #include <n4-random.hh>
 
 #include <numeric>
@@ -8,6 +9,16 @@
 
 namespace nain4 {
 namespace random {
+
+G4ThreeVector direction::get() {
+  auto phi       = uniform(min_phi_      , max_phi_      );
+  auto cos_theta = uniform(min_cos_theta_, max_cos_theta_);
+  auto sin_theta = std::sqrt(1 - cos_theta*cos_theta);
+  return {sin_theta * std::cos(phi),
+          sin_theta * std::sin(phi),
+          cos_theta};
+}
+
 
 // Going with rejection sampling, for now
 // TODO: test done, now benchmark other approaches
