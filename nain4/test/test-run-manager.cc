@@ -190,9 +190,7 @@ TEST_CASE("without macropath", "[nain][run_manager][macropath]") {
   char *argv[] = {(char*)"progname-aaa", NULL};
 
   auto rm = n4::run_manager::create().ui("progname", 1, argv, false);
-
   auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
-  std::cerr << "XXX" << search_path << "XXX" << std::endl;
 
   CHECK(search_path == "");
 }
