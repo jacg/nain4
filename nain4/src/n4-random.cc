@@ -1,4 +1,6 @@
+#include <CLHEP/Geometry/Transform3D.h>
 #include <G4ThreeVector.hh>
+#include <cmath>
 #include <n4-random.hh>
 
 #include <numeric>
@@ -14,11 +16,27 @@ G4ThreeVector direction::get() {
   auto phi       = uniform(min_phi_      , max_phi_      );
   auto cos_theta = uniform(min_cos_theta_, max_cos_theta_);
   auto sin_theta = std::sqrt(1 - cos_theta*cos_theta);
-  return {sin_theta * std::cos(phi),
-          sin_theta * std::sin(phi),
-          cos_theta};
+  G4ThreeVector out = {sin_theta * std::cos(phi),
+                       sin_theta * std::sin(phi),
+                       cos_theta};
+
+  if (bidirectional_ && uniform() < 0.5       ) { out =   flip(out); }
+  if (axis_          != G4ThreeVector{0, 0, 1}) { out = rotate(out); }
+  return out;
 }
 
+G4ThreeVector direction::flip(const G4ThreeVector& in) {
+  return {-in.x(), -in.y(), -in.z()};
+}
+
+G4ThreeVector direction::rotate(const G4ThreeVector& in) {
+  if (!rot_matrix.has_value()) {
+    auto rot_axis = axis_.cross({0, 0, 1});
+    auto theta    = std::acos(axis_.z());
+    rot_matrix    = HepGeom::Rotate3D{-theta, rot_axis}.getRotation();
+  }
+  return rot_matrix.value() * in;
+}
 
 // Going with rejection sampling, for now
 // TODO: test done, now benchmark other approaches

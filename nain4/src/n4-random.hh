@@ -1,10 +1,13 @@
 #pragma once
 
+#include <CLHEP/Geometry/Transform3D.h>
 #include <CLHEP/Units/SystemOfUnits.h>
+#include <CLHEP/Vector/Rotation.h>
 #include <G4RandomDirection.hh>
 #include <G4ThreeVector.hh>
 #include <G4Types.hh>
 #include <Randomize.hh>
+#include <optional>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -22,22 +25,31 @@ inline G4double uniform_width     (G4double dx              ) { return uniform_h
 struct direction {
   G4ThreeVector get();
 
-#define SET(NAME) direction& NAME(G4double x) {NAME##_ = x ; return *this;}
-  SET(min_cos_theta)
-  SET(max_cos_theta)
-  SET(min_phi)
-  SET(max_phi)
+#define SET(NAME, TYPE) direction& NAME(TYPE x) {NAME##_ = x ; return *this;}
+  SET(min_cos_theta, G4double     )
+  SET(max_cos_theta, G4double     )
+  SET(min_phi      , G4double     )
+  SET(max_phi      , G4double     )
+  SET(axis         , G4ThreeVector)
 #undef SET
 
   // Might seem wrong, but it's not!
   direction& min_theta(G4double x) {max_cos_theta_ = std::cos(x); return *this;}
   direction& max_theta(G4double x) {min_cos_theta_ = std::cos(x); return *this;}
 
+  direction& bidirectional() {bidirectional_ = true; return *this; }
+
 private:
-  G4double min_cos_theta_ = -1;
-  G4double max_cos_theta_ =  1;
-  G4double min_phi_       =  0;
-  G4double max_phi_       = CLHEP::twopi;
+  G4ThreeVector axis_    {0, 0, 1};
+  G4bool   bidirectional_{false};
+  G4double min_cos_theta_{-1};
+  G4double max_cos_theta_{ 1};
+  G4double min_phi_      { 0};
+  G4double max_phi_      {CLHEP::twopi};
+  std::optional<CLHEP::HepRotation> rot_matrix;
+
+  G4ThreeVector flip  (const G4ThreeVector& in);
+  G4ThreeVector rotate(const G4ThreeVector& in);
 };
 
 
