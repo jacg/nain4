@@ -1947,6 +1947,51 @@ TEST_CASE("random direction axis", "[random][direction]") {
   }
 }
 
+TEST_CASE("random direction exclude", "[random][direction]") {
+  auto caps = n4::random::direction{}.min_theta(CLHEP::halfpi/3).max_theta(CLHEP::halfpi*5/3).exclude();
 
+  G4ThreeVector p;
+  auto sin_pi6  = std::sin(CLHEP::halfpi/3);
+  auto dir_bias = 0;
+  for (auto i=0; i<1; ++i) {
+    p  = caps.get();
+    dir_bias += p.z() > 0 ? 1 : -1;
+
+    CHECK(p.rho() < sin_pi6);
+  }
+  CHECK(dir_bias < 10);
+}
+
+
+TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
+  auto caps = n4::random::direction{}.min_theta(CLHEP::halfpi/3).bidirectional().exclude();
+
+  G4ThreeVector p;
+  auto sin_pi6  = std::sin(CLHEP::halfpi/3);
+  auto dir_bias = 0;
+  for (auto i=0; i<1; ++i) {
+    p  = caps.get();
+    dir_bias += p.z() > 0 ? 1 : -1;
+
+    CHECK(p.rho() < sin_pi6);
+  }
+  CHECK(dir_bias < 10);
+}
+
+
+TEST_CASE("random direction exclude axis", "[random][direction]") {
+  auto caps = n4::random::direction{}.min_theta(CLHEP::halfpi/3).axis({1, 0, 0}).exclude();
+
+  G4ThreeVector p;
+  auto cos_pi6  = std::cos(CLHEP::halfpi/3);
+  auto dir_bias = 0;
+  for (auto i=0; i<1; ++i) {
+    p  = caps.get();
+    dir_bias += p.z() > 0 ? 1 : -1;
+
+    CHECK(p.rho() > cos_pi6);
+  }
+  CHECK(dir_bias < 10);
+}
 
 #pragma GCC diagnostic pop
