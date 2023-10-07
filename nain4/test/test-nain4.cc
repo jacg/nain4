@@ -1917,4 +1917,36 @@ TEST_CASE("random direction theta", "[random][direction]") {
   }
 }
 
+TEST_CASE("random direction bidirectional", "[random][direction]") {
+  auto gen = n4::random::direction{}.max_theta(CLHEP::halfpi/3).bidirectional();
+
+  G4ThreeVector p;
+  auto dir_bias = 0;
+  auto sin_pi6 = std::sin(CLHEP::halfpi/3);
+  for (auto i=0; i<100; ++i) {
+    p = gen.get();
+    dir_bias += p.z() > 0 ? 1 : -1;
+    CHECK(p.rho() < sin_pi6);
+  }
+  CHECK(std::abs(dir_bias) < 10);
+}
+
+TEST_CASE("random direction axis", "[random][direction]") {
+  auto xpos = n4::random::direction{}.max_theta(CLHEP::halfpi/3).axis({ 1,  0, 0});
+  auto ypos = n4::random::direction{}.max_theta(CLHEP::halfpi/3).axis({ 0,  1, 0});
+  auto xneg = n4::random::direction{}.max_theta(CLHEP::halfpi/3).axis({-1,  0, 0});
+  auto yneg = n4::random::direction{}.max_theta(CLHEP::halfpi/3).axis({ 0, -1, 0});
+
+  G4ThreeVector p;
+  auto sin_pi6 = std::sin(CLHEP::halfpi/3);
+  for (auto i=0; i<100; ++i) {
+    p = xpos.get(); CHECK(p.x() > 0); CHECK(std::abs(p.z()) < sin_pi6);
+    p = ypos.get(); CHECK(p.y() > 0); CHECK(std::abs(p.z()) < sin_pi6);
+    p = xneg.get(); CHECK(p.x() < 0); CHECK(std::abs(p.z()) < sin_pi6);
+    p = yneg.get(); CHECK(p.y() < 0); CHECK(std::abs(p.z()) < sin_pi6);
+  }
+}
+
+
+
 #pragma GCC diagnostic pop
