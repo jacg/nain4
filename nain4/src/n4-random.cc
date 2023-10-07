@@ -13,6 +13,8 @@ namespace nain4 {
 namespace random {
 
 G4ThreeVector direction::get() {
+  if (exclude_) { return excluded(); }
+
   auto phi       = uniform(min_phi_      , max_phi_      );
   auto cos_theta = uniform(min_cos_theta_, max_cos_theta_);
   auto sin_theta = std::sqrt(1 - cos_theta*cos_theta);
@@ -34,8 +36,29 @@ G4ThreeVector direction::rotate(const G4ThreeVector& in) {
     auto rot_axis = axis_.cross({0, 0, 1});
     auto theta    = std::acos(axis_.z());
     rot_matrix    = HepGeom::Rotate3D{-theta, rot_axis}.getRotation();
+    if (exclude_) { rot_matrix = rot_matrix.value().inverse(); }
   }
   return rot_matrix.value() * in;
+}
+
+G4ThreeVector direction::excluded() {
+  while (true) {
+    auto original_dir = G4RandomDirection();
+    auto dir = axis_ != G4ThreeVector{0, 0, 1} ? rotate(original_dir) : original_dir;
+
+    auto must_be_excluded = [&] (const G4ThreeVector& d) {
+      auto costheta = d.cosTheta();
+      auto phi      = d.   phi  ();
+      return (costheta >= min_cos_theta_) &&
+             (costheta <= max_cos_theta_) &&
+             (phi      >= min_phi_      ) &&
+             (phi      <= max_phi_      );
+    };
+
+    if (                  must_be_excluded(     dir )) { continue; }
+    if (bidirectional_ && must_be_excluded(flip(dir))) { continue; }
+    return dir;
+  }
 }
 
 // Going with rejection sampling, for now
