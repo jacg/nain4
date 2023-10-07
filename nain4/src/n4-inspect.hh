@@ -26,6 +26,9 @@ IA event_number  ()       { return n4::run_manager::get().here_be_dragons() -> G
 #undef NAME
 #undef NAME_VRB
 
+template<class DOWN>
+const DOWN* find_solid(const G4String& name) { return static_cast<const DOWN*>(find_solid(name));}
+
 // Remove all, logical/physical volumes, solids and assemblies.
 inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeometry(true); }
 
