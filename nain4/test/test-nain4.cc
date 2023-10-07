@@ -1154,8 +1154,18 @@ TEST_CASE("nain find particle", "[nain][find][particle]") {
   auto convenient = nain4::find_particle(name);
   CHECK(convenient == pita);
   CHECK(convenient == solid);
- }
+}
 
+TEST_CASE("nain find solid downcast", "[nain][find][solid]") {
+  auto box  = n4::box ("box" ).cube(1)  .solid();
+  auto tubs = n4::tubs("tubs").r(1).z(2).solid();
+
+  auto found_box  = n4::find_solid<G4Box >("box" );
+  auto found_tubs = n4::find_solid<G4Tubs>("tubs");
+
+  CHECK(found_box  == box );
+  CHECK(found_tubs == tubs);
+}
 
 TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
   default_run_manager().run();
