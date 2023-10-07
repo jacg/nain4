@@ -38,10 +38,12 @@ struct direction {
   direction& max_theta(G4double x) {min_cos_theta_ = std::cos(x); return *this;}
 
   direction& bidirectional() {bidirectional_ = true; return *this; }
+  direction& exclude      () {exclude_       = true; return *this; }
 
 private:
   G4ThreeVector axis_    {0, 0, 1};
   G4bool   bidirectional_{false};
+  G4bool   exclude_      {false};
   G4double min_cos_theta_{-1};
   G4double max_cos_theta_{ 1};
   G4double min_phi_      { 0};
@@ -50,6 +52,7 @@ private:
 
   G4ThreeVector flip  (const G4ThreeVector& in);
   G4ThreeVector rotate(const G4ThreeVector& in);
+  G4ThreeVector excluded();
 };
 
 
