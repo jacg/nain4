@@ -165,39 +165,6 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
      .run();
 }
 
-TEST_CASE("cli macropath with values", "[nain][cli][macropath]") {
-  auto hush = n4::silence{std::cout};
-
-  char *argv[] = { (char*)"progname-aaa"
-                 , (char*)"--macro-path"
-                 , (char*)"path-aaa"
-                 , (char*)"--macro-path"
-                 , (char*)"path-bbb"
-                 , (char*)"path-ccc"
-                 , NULL
-                 };
-
-  auto rm = n4::run_manager::create().ui("progname", 6, argv, false);
-
-  auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
-  std::cerr << search_path << std::endl;
-
-  CHECK(search_path.find("path-aaa") != std::string::npos);
-  CHECK(search_path.find("path-bbb") != std::string::npos);
-  CHECK(search_path.find("path-ccc") != std::string::npos);
-}
-
-
-TEST_CASE("cli without macropath", "[nain][cli][macropath]") {
-  auto hush = n4::silence{std::cout};
-
-  char *argv[] = {(char*)"progname-aaa", NULL};
-
-  auto rm = n4::run_manager::create().ui("progname", 1, argv, false);
-  auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
-
-  CHECK(search_path == "");
-}
 
 // Utility for construction of argc/argv combination for use in n4::ui CLI tests
 struct argcv {
@@ -220,6 +187,28 @@ struct argcv {
 private:
   std::vector<std::unique_ptr<char[]>> owners;
 };
+
+TEST_CASE("cli macropath with values", "[nain][cli][macropath]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname-aaa", "--macro-path", "path-aaa", "--macro-path", "path-bbb", "path-ccc"};
+  auto rm = n4::run_manager::create().ui("progname", a.argc, a.argv, false);
+  auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
+  std::cerr << search_path << std::endl;
+
+  CHECK(search_path.find("path-aaa") != std::string::npos);
+  CHECK(search_path.find("path-bbb") != std::string::npos);
+  CHECK(search_path.find("path-ccc") != std::string::npos);
+}
+
+
+TEST_CASE("cli without macropath", "[nain][cli][macropath]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname-aaa"};
+  auto rm = n4::run_manager::create().ui("progname", a.argc, a.argv, false);
+  auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
+
+  CHECK(search_path == "");
+}
 
 TEST_CASE("cli no args", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
@@ -271,28 +260,25 @@ TEST_CASE("cli implicit vis macro not last", "[nain][cli]") {
 
 TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
-
-  char *argv[] = {(char*)"progname-aaa", (char*)"--macro-path", NULL};
+  argcv a{"progname-aaa","--macro-path"};
 
   using Catch::Matchers::Contains;
   // We tried
   //   REQUIRE_THROWS_WITH( n4::run_manager::create().ui("progname", 2, argv, false)
   //                      , Contains("Too few arguments") && Contains("--macro-path"));
   // and variations on the there but nothing worked sensibly.
-  REQUIRE_THROWS_AS(n4::run_manager::create().ui("progname", 2, argv, false), std::runtime_error);
+  REQUIRE_THROWS_AS(n4::run_manager::create().ui("progname", a.argc, a.argv, false), std::runtime_error);
 }
 
 TEST_CASE("apply command failure stops", "[nain][run_manager][command]") {
   auto hush = n4::silence{std::cout};
-
-  char *argv[] = {(char*)"progname-aaa", (char*)"--early", (char*)"/some/rubbish", NULL};
-
+  argcv a{"progname-aaa", "--early", "/some/rubbish"};
   using Catch::Matchers::Contains;
   // We tried
   //   REQUIRE_THROWS_WITH( n4::run_manager::create().ui("progname", 2, argv, false)
   //                      , Contains("Too few arguments") && Contains("--macro-path"));
   // and variations on the there but nothing worked sensibly.
-  REQUIRE_THROWS_AS(default_run_manager_with_ui_args(3, argv).run(), std::runtime_error);
+  REQUIRE_THROWS_AS(default_run_manager_with_ui_args(a.argc, a.argv).run(), std::runtime_error);
 
 }
 
@@ -313,10 +299,11 @@ TEST_CASE("run manager get geometry", "[run_manager][get_geometry]") {
     CHECK(geo_from_g4_rm == geo_from_n4_rm);
   };
 
-  char *argv[] = {(char*)"progname-aaa", (char*)"-n", (char*)"1", NULL};
+  argcv a{"progname-aaa", "-n", "1"};
+
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
-     .ui("progname", 3, argv, false)
+     .ui("progname", a.argc, a.argv, false)
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
      .actions(my_generator)
