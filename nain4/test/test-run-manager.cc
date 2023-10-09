@@ -340,10 +340,10 @@ TEST_CASE("run manager get run action", "[run_manager][get_run_action]") {
       -> set(new n4::stepping_action{[] (auto) {}});
   };
 
-  char *argv[] = {(char*)"progname-aaa", (char*)"-n", (char*)"1", NULL};
+  argcv fake_argv{"progname-aaa"};
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
-     .ui("progname", 3, argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics<FTFP_BERT>(0)
      .geometry(water_box)
      .actions(actions)
