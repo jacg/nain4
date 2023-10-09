@@ -217,6 +217,13 @@ TEST_CASE("cli explicit vis macro", "[nain][cli]") {
   auto rm = n4::run_manager::create().ui("progname", 3, argv, false);
 }
 
+TEST_CASE("cli implicit vis macro not last", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  char *argv[] = {(char*)"progname", (char*)"-g", (char*)"-n", (char*)"1", NULL};
+  std::cerr << "                                       progname -g -n 1" << std::endl;
+  auto rm = n4::run_manager::create().ui("progname", 4, argv, false);
+}
+
 
 
 TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
