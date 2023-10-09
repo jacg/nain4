@@ -27,6 +27,7 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_contains.hpp>
+
 #include <stdexcept>
 
 using Catch::Approx;
@@ -39,7 +40,8 @@ using Catch::Approx;
 
 #include <numeric>
 
-char *fake_argv[] = { (char*)"progname-aaa", NULL };
+
+n4::test::argcv fake_argv{"progname-aaa"};
 
 using namespace n4::test;
 
@@ -47,7 +49,7 @@ TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   auto rm = n4::run_manager::create()
-     .ui("progname", 1, fake_argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics(default_physics_lists)
      .geometry(water_box)
      .actions(do_nothing);
@@ -70,7 +72,7 @@ TEST_CASE("nain run_manager construct initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   n4::run_manager::create()
-     .ui("progname", 1, fake_argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics<FTFP_BERT>(0) // verbosity 0
      .geometry<dummy_geometry>(1., 2., 3.)
      .actions<dummy_actions>(10)
@@ -81,7 +83,7 @@ TEST_CASE("nain run_manager basic initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   n4::run_manager::create()
-     .ui("progname", 1, fake_argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics (new FTFP_BERT{0}) // verbosity 0
      .geometry(new dummy_geometry{1., 2., 3.})
      .actions<dummy_actions>(10)
@@ -154,27 +156,17 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
 
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
-     .ui("progname", 1, fake_argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
      .actions(do_nothing)
      .run();
 }
 
-TEST_CASE("macropath with values", "[nain][run_manager][macropath]") {
+TEST_CASE("cli macropath with values", "[nain][cli][macropath]") {
   auto hush = n4::silence{std::cout};
-
-  char *argv[] = { (char*)"progname-aaa"
-                 , (char*)"--macro-path"
-                 , (char*)"path-aaa"
-                 , (char*)"--macro-path"
-                 , (char*)"path-bbb"
-                 , (char*)"path-ccc"
-                 , NULL
-                 };
-
-  auto rm = n4::run_manager::create().ui("progname", 6, argv, false);
-
+  argcv a{"progname-aaa", "--macro-path", "path-aaa", "--macro-path", "path-bbb", "path-ccc"};
+  auto rm = n4::run_manager::create().ui("progname", a.argc, a.argv, false);
   auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
   std::cerr << search_path << std::endl;
 
@@ -183,45 +175,108 @@ TEST_CASE("macropath with values", "[nain][run_manager][macropath]") {
   CHECK(search_path.find("path-ccc") != std::string::npos);
 }
 
-
-TEST_CASE("without macropath", "[nain][run_manager][macropath]") {
+TEST_CASE("cli without macropath", "[nain][cli][macropath]") {
   auto hush = n4::silence{std::cout};
-
-  char *argv[] = {(char*)"progname-aaa", NULL};
-
-  auto rm = n4::run_manager::create().ui("progname", 1, argv, false);
-
+  argcv a{"progname-aaa"};
+  auto rm = n4::run_manager::create().ui("progname", a.argc, a.argv, false);
   auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
-  std::cerr << "XXX" << search_path << "XXX" << std::endl;
 
   CHECK(search_path == "");
 }
 
+TEST_CASE("cli no args", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(! q.n_events.has_value());
+  CHECK(! q.vis_macro.has_value());
+  CHECK(! q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 0);
+}
+
+TEST_CASE("cli implicit vis macro at end", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname", "-g"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(! q.n_events.has_value());
+  CHECK(  q.vis_macro.value() == "vis.mac");
+  CHECK(  q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 0);
+}
+
+TEST_CASE("cli explicit vis macro", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname", "-g", "aaa"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(! q.n_events.has_value());
+  CHECK(  q.vis_macro.value() == "aaa");
+  CHECK(  q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 0);
+}
+
+// TEST_CASE("cli implicit vis macro not last", "[nain][cli]") {
+//   auto hush = n4::silence{std::cout};
+//   argcv a{"progname", "-g", "-n", "1"};
+//   n4::ui ui{"automated-test", a.argc, a.argv, false};
+//   n4::test::query q{ui};
+//   CHECK(  q.n_events.value() == 1);
+//   CHECK(  q.vis_macro.value() == "vis.macro");
+//   CHECK(  q.use_graphics);
+//   CHECK(  q.early.size() == 0);
+//   CHECK(  q.late .size() == 0);
+// }
+
+TEST_CASE("cli implicit early multiple values", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname", "-e", "e1", "e2", "-n", "42", "--early", "e3", "e4"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(  q.n_events.value() == 42);
+  CHECK(! q.vis_macro.has_value());
+  CHECK(! q.use_graphics);
+  CHECK(  q.early.size() == 4);
+  CHECK(  q.late .size() == 0);
+}
+
+TEST_CASE("cli implicit late multiple values", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname", "--late", "l1", "l2", "-n", "42", "-l", "l3", "l4"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(  q.n_events.value() == 42);
+  CHECK(! q.vis_macro.has_value());
+  CHECK(! q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 4);
+}
 
 TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
-
-  char *argv[] = {(char*)"progname-aaa", (char*)"--macro-path", NULL};
+  argcv a{"progname-aaa","--macro-path"};
 
   using Catch::Matchers::Contains;
   // We tried
   //   REQUIRE_THROWS_WITH( n4::run_manager::create().ui("progname", 2, argv, false)
   //                      , Contains("Too few arguments") && Contains("--macro-path"));
   // and variations on the there but nothing worked sensibly.
-  REQUIRE_THROWS_AS(n4::run_manager::create().ui("progname", 2, argv, false), std::runtime_error);
+  REQUIRE_THROWS_AS(n4::run_manager::create().ui("progname", a.argc, a.argv, false), std::runtime_error);
 }
 
 TEST_CASE("apply command failure stops", "[nain][run_manager][command]") {
   auto hush = n4::silence{std::cout};
-
-  char *argv[] = {(char*)"progname-aaa", (char*)"--early", (char*)"/some/rubbish", NULL};
-
+  argcv a{"progname-aaa", "--early", "/some/rubbish"};
   using Catch::Matchers::Contains;
   // We tried
   //   REQUIRE_THROWS_WITH( n4::run_manager::create().ui("progname", 2, argv, false)
   //                      , Contains("Too few arguments") && Contains("--macro-path"));
   // and variations on the there but nothing worked sensibly.
-  REQUIRE_THROWS_AS(default_run_manager_with_ui_args(3, argv).run(), std::runtime_error);
+  REQUIRE_THROWS_AS(default_run_manager_with_ui_args(a.argc, a.argv).run(), std::runtime_error);
 
 }
 
@@ -242,10 +297,11 @@ TEST_CASE("run manager get geometry", "[run_manager][get_geometry]") {
     CHECK(geo_from_g4_rm == geo_from_n4_rm);
   };
 
-  char *argv[] = {(char*)"progname-aaa", (char*)"-n", (char*)"1", NULL};
+  argcv a{"progname-aaa", "-n", "1"};
+
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
-     .ui("progname", 3, argv, false)
+     .ui("progname", a.argc, a.argv, false)
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
      .actions(my_generator)
@@ -284,10 +340,10 @@ TEST_CASE("run manager get run action", "[run_manager][get_run_action]") {
       -> set(new n4::stepping_action{[] (auto) {}});
   };
 
-  char *argv[] = {(char*)"progname-aaa", (char*)"-n", (char*)"1", NULL};
+  argcv fake_argv{"progname-aaa"};
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
-     .ui("progname", 3, argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics<FTFP_BERT>(0)
      .geometry(water_box)
      .actions(actions)

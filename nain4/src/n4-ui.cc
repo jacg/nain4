@@ -11,6 +11,7 @@
 #include <argparse/argparse.hpp>
 
 #include <cstdlib>
+#include <initializer_list>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -33,7 +34,9 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
   args.add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
   args.add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
   args.add_argument("--late"    , "-l").metavar("ITEMS").help("execute ITEMS  after run manager instantiation").MULTIPLE;
-  args.add_argument("--vis"     , "-g").metavar("MACRO").help("switch from batch mode to GUI, executing MACRO").implicit_value(std::string{"vis.mac"});
+  args.add_argument("--vis"     , "-g").metavar("MACRO").help("switch from batch mode to GUI, executing MACRO")
+    .default_value(std::string{"vis.mac"})
+    ;
   args.add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE; // TODO metavar does not appear in help
 
   try {
@@ -59,12 +62,13 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   early{args.get<std::vector<std::string>>("--early")},
   late {args.get<std::vector<std::string>>("--late" )},
   vis_macro{},
+  use_graphics{args.is_used("-g")},
   argc{argc},
   argv{argv},
   g4_ui{*G4UImanager::GetUIpointer()}
 {
-  if (auto n = args.present("--beam-on")) { n_events = parse_beam_on(n.value()); }
-  if (args.is_used("-g")) { vis_macro = args.get("-g"); }
+  if (auto n = args.present("--beam-on")) { n_events  = parse_beam_on(n.value()); }
+  if (use_graphics                      ) { vis_macro = args.get("-g"); }
 
   // Here we use std::string because G4String does not work
   auto macro_paths = args.get<std::vector<std::string>>("--macro-path");
@@ -72,7 +76,11 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
     prepend_path(path);
   }
 
-  if (warn_empty_run && ! (n_events.has_value() || vis_macro.has_value())) {
+  auto padding = "                                       ";
+  std::cerr << padding << "IS -g USED? " << std::boolalpha << args.is_used("-g") << std::endl;
+  if (args.is_used("-g")) { std::cerr << padding << "vis macro === >" << args.get("-g") << std::endl; }
+
+  if (warn_empty_run && ! (n_events.has_value() || use_graphics)) {
     std::cerr << "'" + program_name + "' is not going to do anything interesting without some command-line arguments.\n\n";
     std::cerr << args << std::endl;
   }
@@ -80,11 +88,11 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
 }
 
 void ui::run() {
-  if (n_events.has_value() && !vis_macro.has_value()) {
+  if (n_events.has_value() && !use_graphics) {
     beam_on(n_events.value());
   }
 
-  if (vis_macro.has_value()) {
+  if (use_graphics) {
     G4UIExecutive ui_executive{argc, argv};
     G4VisExecutive vis_manager;
     vis_manager.Initialize();
@@ -125,6 +133,20 @@ void ui::command (const G4String& command, const G4String& prefix, const G4Strin
             << std::setw(15) << prefix << ' '
             << std::setw( 7) << kind
             << " accepted: (" << command  << ')' << std::endl;
+}
+
+test::argcv::argcv(std::initializer_list<std::string> args): argc{static_cast<int>(args.size())} {
+  argv = new char*[argc+1];
+  int i = 0;
+  for (const auto& arg: args) {
+    auto source = arg.c_str();
+    auto copy_of_arg_owned_by_us = std::make_unique<char[]>(std::strlen(source)+1); // +1 for NULL terminator
+    std::strcpy(copy_of_arg_owned_by_us.get(), source);
+    argv[i++] = copy_of_arg_owned_by_us.get();
+    owners.push_back(std::move(copy_of_arg_owned_by_us));
+  }
+  argv[i] = NULL;
+  //assert(i == argc);
 }
 
 } // namespace nain4

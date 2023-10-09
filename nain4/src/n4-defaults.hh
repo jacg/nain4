@@ -44,8 +44,8 @@ inline auto default_run_manager_with_ui_args(int argc, char** argv) {
 }
 
 inline auto default_run_manager() {
-  char *fake_argv[] = { (char*)"progname-ccc", NULL };
-  return default_run_manager_with_ui_args(1, fake_argv);
+  argcv fake_argv{"progname-ccc"};
+  return default_run_manager_with_ui_args(fake_argv.argc, fake_argv.argv);
 }
 } // namespace test
 } // namespace nain4

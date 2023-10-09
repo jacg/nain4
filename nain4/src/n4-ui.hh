@@ -6,10 +6,24 @@
 
 #include <argparse/argparse.hpp>
 
+#include <algorithm>
+#include <memory>
 #include <optional>
 
 
 namespace nain4 {
+
+namespace test {
+struct query;
+// Utility for construction of argc/argv combination for use in n4::ui CLI tests
+struct argcv {
+  int    argc;
+  char** argv;
+  argcv(std::initializer_list<std::string> args);
+private:
+  std::vector<std::unique_ptr<char[]>> owners;
+};
+}
 
 class ui {
 public:
@@ -32,12 +46,14 @@ public:
   void prepend_path(G4String const& path) { set_path(path + ":" + g4_ui.GetMacroSearchPath(    ));}
 
 private:
+  friend test::query;
   argparse::ArgumentParser args;
 
   std::optional<G4int>     n_events;
   std::vector<std::string> early;
   std::vector<std::string> late;
   std::optional<G4String>  vis_macro;
+  bool                     use_graphics;
 
   int    argc;
   char** argv;
@@ -45,6 +61,23 @@ private:
   G4UImanager& g4_ui;
 };
 
+namespace test {
+struct query {
+  query(const ui& ui)
+    : n_events    {ui.n_events}
+    , early       {ui.early}
+    , late        {ui.late}
+    , vis_macro   {ui.vis_macro}
+    , use_graphics{ui.use_graphics}
+  {}
+  std::optional<G4int>    n_events;
+  std::vector<std::string>early;
+  std::vector<std::string>late;
+  std::optional<G4String> vis_macro;
+  bool                    use_graphics;
+};
+
+} // namespace test
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
