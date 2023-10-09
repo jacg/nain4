@@ -258,6 +258,30 @@ TEST_CASE("cli implicit vis macro not last", "[nain][cli]") {
   CHECK(  q.late .size() == 0);
 }
 
+TEST_CASE("cli implicit early multiple values", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname", "-e", "e1", "e2", "-n", "42", "--early", "e3", "e4"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(  q.n_events.value() == 42);
+  CHECK(! q.vis_macro.has_value());
+  CHECK(! q.use_graphics);
+  CHECK(  q.early.size() == 4);
+  CHECK(  q.late .size() == 0);
+}
+
+TEST_CASE("cli implicit late multiple values", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname", "--late", "l1", "l2", "-n", "42", "-l", "l3", "l4"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(  q.n_events.value() == 42);
+  CHECK(! q.vis_macro.has_value());
+  CHECK(! q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 4);
+}
+
 TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
   argcv a{"progname-aaa","--macro-path"};
