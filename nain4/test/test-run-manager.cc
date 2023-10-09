@@ -27,6 +27,10 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_contains.hpp>
+
+#include <algorithm>
+#include <initializer_list>
+#include <memory>
 #include <stdexcept>
 
 using Catch::Approx;
@@ -195,6 +199,27 @@ TEST_CASE("cli without macropath", "[nain][cli][macropath]") {
   CHECK(search_path == "");
 }
 
+// Utility for construction of argc/argv combination for use in n4::ui CLI tests
+struct argcv {
+  int    argc;
+  char** argv;
+  argcv(std::initializer_list<std::string> args): argc{static_cast<int>(args.size())} {
+    argv = new char*[argc+1];
+
+    int i = 0;
+    for (const auto& arg: args) {
+      auto source = arg.c_str();
+      auto copy_of_arg_owned_by_us = std::make_unique<char[]>(std::strlen(source)+1); // +1 for NULL terminator
+      std::strcpy(copy_of_arg_owned_by_us.get(), source);
+      argv[i++] = copy_of_arg_owned_by_us.get();
+      owners.push_back(std::move(copy_of_arg_owned_by_us));
+    }
+    argv[i] = NULL;
+    //assert(i == argc);
+  }
+private:
+  std::vector<std::unique_ptr<char[]>> owners;
+};
 
 TEST_CASE("cli no args", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
