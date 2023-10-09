@@ -11,7 +11,7 @@
 
 namespace nain4 {
 
-namespace test { class query; }
+namespace test { struct query; }
 
 class ui {
 public:
@@ -50,15 +50,19 @@ private:
 };
 
 namespace test {
-class query {
-public:
-#define GET(TYPE, NAME) static const TYPE& NAME(const ui& ui) { return ui.NAME; }
-  GET(std::optional<G4int>    , n_events);
-  GET(std::vector<std::string>, early);
-  GET(std::vector<std::string>, late);
-  GET(std::optional<G4String> , vis_macro);
-  GET(bool                    , use_graphics);
-#undef GET
+struct query {
+  query(const ui& ui)
+    : n_events    {ui.n_events}
+    , early       {ui.early}
+    , late        {ui.late}
+    , vis_macro   {ui.vis_macro}
+    , use_graphics{ui.use_graphics}
+  {}
+  std::optional<G4int>    n_events;
+  std::vector<std::string>early;
+  std::vector<std::string>late;
+  std::optional<G4String> vis_macro;
+  bool                    use_graphics;
 };
 
 } // namespace test
