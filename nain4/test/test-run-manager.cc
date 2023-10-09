@@ -223,33 +223,51 @@ private:
 
 TEST_CASE("cli no args", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
-  char *argv[] = {(char*)"progname", NULL};
-  std::cerr << "                                       progname **no args**" << std::endl;
-  auto rm = n4::run_manager::create().ui("progname", 1, argv, false);
+  argcv a{"progname"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(! q.n_events.has_value());
+  CHECK(! q.vis_macro.has_value());
+  CHECK(! q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 0);
 }
 
-TEST_CASE("cli implicit vis macro", "[nain][cli]") {
+TEST_CASE("cli implicit vis macro at end", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
-  char *argv[] = {(char*)"progname", (char*)"-g", NULL};
-  std::cerr << "                                       progname -g" << std::endl;
-  auto rm = n4::run_manager::create().ui("progname", 2, argv, false);
+  argcv a{"progname", "-g"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(! q.n_events.has_value());
+  CHECK(  q.vis_macro.value() == "vis.mac");
+  CHECK(  q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 0);
 }
 
 TEST_CASE("cli explicit vis macro", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
-  char *argv[] = {(char*)"progname", (char*)"-g", (char*)"aaa", NULL};
-  std::cerr << "                                       progname -g aaa" << std::endl;
-  auto rm = n4::run_manager::create().ui("progname", 3, argv, false);
+  argcv a{"progname", "-g", "aaa"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(! q.n_events.has_value());
+  CHECK(  q.vis_macro.value() == "aaa");
+  CHECK(  q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 0);
 }
 
 TEST_CASE("cli implicit vis macro not last", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
-  char *argv[] = {(char*)"progname", (char*)"-g", (char*)"-n", (char*)"1", NULL};
-  std::cerr << "                                       progname -g -n 1" << std::endl;
-  auto rm = n4::run_manager::create().ui("progname", 4, argv, false);
+  argcv a{"progname", "-g", "-n", "1"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(  q.n_events.value() == 1);
+  CHECK(  q.vis_macro.value() == "vis.macro");
+  CHECK(  q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 0);
 }
-
-
 
 TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
