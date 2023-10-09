@@ -43,7 +43,29 @@ using Catch::Approx;
 
 #include <numeric>
 
-char *fake_argv[] = { (char*)"progname-aaa", NULL };
+// Utility for construction of argc/argv combination for use in n4::ui CLI tests
+struct argcv {
+  int    argc;
+  char** argv;
+  argcv(std::initializer_list<std::string> args): argc{static_cast<int>(args.size())} {
+    argv = new char*[argc+1];
+
+    int i = 0;
+    for (const auto& arg: args) {
+      auto source = arg.c_str();
+      auto copy_of_arg_owned_by_us = std::make_unique<char[]>(std::strlen(source)+1); // +1 for NULL terminator
+      std::strcpy(copy_of_arg_owned_by_us.get(), source);
+      argv[i++] = copy_of_arg_owned_by_us.get();
+      owners.push_back(std::move(copy_of_arg_owned_by_us));
+    }
+    argv[i] = NULL;
+    //assert(i == argc);
+  }
+private:
+  std::vector<std::unique_ptr<char[]>> owners;
+};
+
+argcv fake_argv{"progname-aaa"};
 
 using namespace n4::test;
 
@@ -51,7 +73,7 @@ TEST_CASE("nain run_manager build_fn initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   auto rm = n4::run_manager::create()
-     .ui("progname", 1, fake_argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics(default_physics_lists)
      .geometry(water_box)
      .actions(do_nothing);
@@ -74,7 +96,7 @@ TEST_CASE("nain run_manager construct initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   n4::run_manager::create()
-     .ui("progname", 1, fake_argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics<FTFP_BERT>(0) // verbosity 0
      .geometry<dummy_geometry>(1., 2., 3.)
      .actions<dummy_actions>(10)
@@ -85,7 +107,7 @@ TEST_CASE("nain run_manager basic initialization", "[nain][run_manager]") {
   auto hush = n4::silence{std::cout};
 
   n4::run_manager::create()
-     .ui("progname", 1, fake_argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics (new FTFP_BERT{0}) // verbosity 0
      .geometry(new dummy_geometry{1., 2., 3.})
      .actions<dummy_actions>(10)
@@ -158,35 +180,12 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
 
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
-     .ui("progname", 1, fake_argv, false)
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
      .physics<FTFP_BERT>(0)
      .geometry(my_geometry)
      .actions(do_nothing)
      .run();
 }
-
-
-// Utility for construction of argc/argv combination for use in n4::ui CLI tests
-struct argcv {
-  int    argc;
-  char** argv;
-  argcv(std::initializer_list<std::string> args): argc{static_cast<int>(args.size())} {
-    argv = new char*[argc+1];
-
-    int i = 0;
-    for (const auto& arg: args) {
-      auto source = arg.c_str();
-      auto copy_of_arg_owned_by_us = std::make_unique<char[]>(std::strlen(source)+1); // +1 for NULL terminator
-      std::strcpy(copy_of_arg_owned_by_us.get(), source);
-      argv[i++] = copy_of_arg_owned_by_us.get();
-      owners.push_back(std::move(copy_of_arg_owned_by_us));
-    }
-    argv[i] = NULL;
-    //assert(i == argc);
-  }
-private:
-  std::vector<std::unique_ptr<char[]>> owners;
-};
 
 TEST_CASE("cli macropath with values", "[nain][cli][macropath]") {
   auto hush = n4::silence{std::cout};
@@ -199,7 +198,6 @@ TEST_CASE("cli macropath with values", "[nain][cli][macropath]") {
   CHECK(search_path.find("path-bbb") != std::string::npos);
   CHECK(search_path.find("path-ccc") != std::string::npos);
 }
-
 
 TEST_CASE("cli without macropath", "[nain][cli][macropath]") {
   auto hush = n4::silence{std::cout};
