@@ -11,6 +11,8 @@
 
 namespace nain4 {
 
+namespace test { class query; }
+
 class ui {
 public:
   ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run);
@@ -32,6 +34,7 @@ public:
   void prepend_path(G4String const& path) { set_path(path + ":" + g4_ui.GetMacroSearchPath(    ));}
 
 private:
+  friend test::query;
   argparse::ArgumentParser args;
 
   std::optional<G4int>     n_events;
@@ -46,6 +49,19 @@ private:
   G4UImanager& g4_ui;
 };
 
+namespace test {
+class query {
+public:
+#define GET(TYPE, NAME) static const TYPE& NAME(const ui& ui) { return ui.NAME; }
+  GET(std::optional<G4int>    , n_events);
+  GET(std::vector<std::string>, early);
+  GET(std::vector<std::string>, late);
+  GET(std::optional<G4String> , vis_macro);
+  GET(bool                    , use_graphics);
+#undef GET
+};
+
+} // namespace test
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
