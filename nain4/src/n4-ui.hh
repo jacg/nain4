@@ -6,12 +6,24 @@
 
 #include <argparse/argparse.hpp>
 
+#include <algorithm>
+#include <memory>
 #include <optional>
 
 
 namespace nain4 {
 
-namespace test { struct query; }
+namespace test {
+struct query;
+// Utility for construction of argc/argv combination for use in n4::ui CLI tests
+struct argcv {
+  int    argc;
+  char** argv;
+  argcv(std::initializer_list<std::string> args);
+private:
+  std::vector<std::unique_ptr<char[]>> owners;
+};
+}
 
 class ui {
 public:

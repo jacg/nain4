@@ -11,6 +11,7 @@
 #include <argparse/argparse.hpp>
 
 #include <cstdlib>
+#include <initializer_list>
 #include <memory>
 #include <optional>
 #include <stdexcept>
@@ -132,6 +133,20 @@ void ui::command (const G4String& command, const G4String& prefix, const G4Strin
             << std::setw(15) << prefix << ' '
             << std::setw( 7) << kind
             << " accepted: (" << command  << ')' << std::endl;
+}
+
+test::argcv::argcv(std::initializer_list<std::string> args): argc{static_cast<int>(args.size())} {
+  argv = new char*[argc+1];
+  int i = 0;
+  for (const auto& arg: args) {
+    auto source = arg.c_str();
+    auto copy_of_arg_owned_by_us = std::make_unique<char[]>(std::strlen(source)+1); // +1 for NULL terminator
+    std::strcpy(copy_of_arg_owned_by_us.get(), source);
+    argv[i++] = copy_of_arg_owned_by_us.get();
+    owners.push_back(std::move(copy_of_arg_owned_by_us));
+  }
+  argv[i] = NULL;
+  //assert(i == argc);
 }
 
 } // namespace nain4
