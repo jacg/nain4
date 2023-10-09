@@ -161,7 +161,7 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
      .run();
 }
 
-TEST_CASE("macropath with values", "[nain][run_manager][macropath]") {
+TEST_CASE("cli macropath with values", "[nain][cli][macropath]") {
   auto hush = n4::silence{std::cout};
 
   char *argv[] = { (char*)"progname-aaa"
@@ -184,7 +184,7 @@ TEST_CASE("macropath with values", "[nain][run_manager][macropath]") {
 }
 
 
-TEST_CASE("without macropath", "[nain][run_manager][macropath]") {
+TEST_CASE("cli without macropath", "[nain][cli][macropath]") {
   auto hush = n4::silence{std::cout};
 
   char *argv[] = {(char*)"progname-aaa", NULL};
@@ -196,21 +196,21 @@ TEST_CASE("without macropath", "[nain][run_manager][macropath]") {
 }
 
 
-TEST_CASE("CLI1", "[nain][run_manager][cli]") {
+TEST_CASE("cli no args", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
   char *argv[] = {(char*)"progname", NULL};
   std::cerr << "                                       progname **no args**" << std::endl;
   auto rm = n4::run_manager::create().ui("progname", 1, argv, false);
 }
 
-TEST_CASE("CLI2", "[nain][run_manager][cli]") {
+TEST_CASE("cli implicit vis macro", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
   char *argv[] = {(char*)"progname", (char*)"-g", NULL};
   std::cerr << "                                       progname -g" << std::endl;
   auto rm = n4::run_manager::create().ui("progname", 2, argv, false);
 }
 
-TEST_CASE("CLI3", "[nain][run_manager][cli]") {
+TEST_CASE("cli explicit vis macro", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
   char *argv[] = {(char*)"progname", (char*)"-g", (char*)"aaa", NULL};
   std::cerr << "                                       progname -g aaa" << std::endl;
