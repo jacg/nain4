@@ -2036,10 +2036,10 @@ TEST_CASE("random direction axis", "[random][direction]") {
   const size_t N = 1000;
   auto sin_pi6 = std::sin(CLHEP::pi/6);
 
-  auto xpos = n4::random::direction{}.max_theta(halfpi/3).axis({ 1,  0, 0});
-  auto ypos = n4::random::direction{}.max_theta(halfpi/3).axis({ 0,  1, 0});
-  auto xneg = n4::random::direction{}.max_theta(halfpi/3).axis({-1,  0, 0});
-  auto yneg = n4::random::direction{}.max_theta(halfpi/3).axis({ 0, -1, 0});
+  auto xpos = n4::random::direction{}.max_theta(halfpi/3).axis({ 6,  0, 0});
+  auto ypos = n4::random::direction{}.max_theta(halfpi/3).axis({ 0,  4, 0});
+  auto xneg = n4::random::direction{}.max_theta(halfpi/3).axis({-8,  0, 0});
+  auto yneg = n4::random::direction{}.max_theta(halfpi/3).axis({ 0, -9, 0});
 
   threevec_stats xp{N, [&] { return xpos.get(); }};
   threevec_stats yp{N, [&] { return ypos.get(); }};
