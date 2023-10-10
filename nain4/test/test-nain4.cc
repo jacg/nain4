@@ -1929,33 +1929,60 @@ std::ostream& operator<<(std::ostream& out, const threevec_stats& s) {
 }
 
 TEST_CASE("random direction octants", "[random][direction]") {
-  using CLHEP::halfpi; using CLHEP::pi;
+  using CLHEP::halfpi;
   // costheta < 0 -> z < 0
   // costheta > 0 -> z > 0
   // 0pi/2 < phi < 1pi/2 -> x > 0, y > 0
   // 1pi/2 < phi < 2pi/2 -> x < 0, y > 0
   // 2pi/2 < phi < 3pi/2 -> x < 0, y < 0
   // 3pi/2 < phi < 4pi/2 -> x > 0, y < 0
-  auto xpos_ypos_zpos = n4::random::direction{}.min_cos_theta(0)                  .max_phi(  halfpi);
-  auto xpos_ypos_zneg = n4::random::direction{}.max_cos_theta(0)                  .max_phi(  halfpi);
-  auto xpos_yneg_zpos = n4::random::direction{}.min_cos_theta(0).min_phi(3*halfpi);
-  auto xpos_yneg_zneg = n4::random::direction{}.max_cos_theta(0).min_phi(3*halfpi);
-  auto xneg_ypos_zpos = n4::random::direction{}.min_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
-  auto xneg_ypos_zneg = n4::random::direction{}.max_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
-  auto xneg_yneg_zpos = n4::random::direction{}.min_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
-  auto xneg_yneg_zneg = n4::random::direction{}.max_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
 
-  G4ThreeVector p;
-  for (auto i=0; i<100; ++i) {
-    p = xpos_ypos_zpos.get(); CHECK(p.x() > 0); CHECK(p.y() > 0); CHECK(p.z() > 0);
-    p = xpos_ypos_zneg.get(); CHECK(p.x() > 0); CHECK(p.y() > 0); CHECK(p.z() < 0);
-    p = xpos_yneg_zpos.get(); CHECK(p.x() > 0); CHECK(p.y() < 0); CHECK(p.z() > 0);
-    p = xpos_yneg_zneg.get(); CHECK(p.x() > 0); CHECK(p.y() < 0); CHECK(p.z() < 0);
-    p = xneg_ypos_zpos.get(); CHECK(p.x() < 0); CHECK(p.y() > 0); CHECK(p.z() > 0);
-    p = xneg_ypos_zneg.get(); CHECK(p.x() < 0); CHECK(p.y() > 0); CHECK(p.z() < 0);
-    p = xneg_yneg_zpos.get(); CHECK(p.x() < 0); CHECK(p.y() < 0); CHECK(p.z() > 0);
-    p = xneg_yneg_zneg.get(); CHECK(p.x() < 0); CHECK(p.y() < 0); CHECK(p.z() < 0);
-  }
+  // Define generators for each octant
+  auto ppp = n4::random::direction{}.min_cos_theta(0)                  .max_phi(  halfpi);
+  auto ppn = n4::random::direction{}.max_cos_theta(0)                  .max_phi(  halfpi);
+  auto pnp = n4::random::direction{}.min_cos_theta(0).min_phi(3*halfpi);
+  auto pnn = n4::random::direction{}.max_cos_theta(0).min_phi(3*halfpi);
+  auto npp = n4::random::direction{}.min_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
+  auto npn = n4::random::direction{}.max_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
+  auto nnp = n4::random::direction{}.min_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
+  auto nnn = n4::random::direction{}.max_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
+
+  size_t N = 1000;
+
+  // Check that generated values are in the correct octant
+#define OCTANT(CMP_X,CMP_Y,CMP_Z) { \
+  CHECK(it.x_min CMP_X 0);          \
+  CHECK(it.y_min CMP_Y 0);          \
+  CHECK(it.z_min CMP_Z 0);          \
+}
+
+  // Check that generated values cover the whole octant
+#define SPREAD {        \
+  auto s = it.spread(); \
+  CHECK(s.x() > 0.99);  \
+  CHECK(s.y() > 0.99);  \
+  CHECK(s.z() > 0.99);  \
+}
+
+#define VERIFY(NAME,CMP_X,CMP_Y,CMP_Z) {            \
+  threevec_stats it{N, [&] { return NAME.get(); }}; \
+  std::cerr << #NAME << " " << it;                  \
+  OCTANT(CMP_X,CMP_Y,CMP_Z);                        \
+  SPREAD                                            \
+}
+
+  VERIFY(ppp, >, >, >)
+  VERIFY(ppn, >, >, <)
+  VERIFY(pnp, >, <, >)
+  VERIFY(pnn, >, <, <)
+  VERIFY(npp, <, >, >)
+  VERIFY(npn, <, >, <)
+  VERIFY(nnp, <, <, >)
+  VERIFY(nnn, <, <, <)
+
+#undef VERIFY
+#undef SPREAD
+#undef OCTANT
 }
 
 TEST_CASE("random direction theta", "[random][direction]") {
