@@ -2086,16 +2086,16 @@ TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
 
 TEST_CASE("random direction exclude axis", "[random][direction]") {
   using CLHEP::halfpi; using CLHEP::pi;
-  auto caps = n4::random::direction{}.min_theta(halfpi/3).axis({1, 0, 0}).exclude();
+  auto xbeam = n4::random::direction{}.min_theta(pi/6).axis({1, 0, 0}).exclude();
 
   G4ThreeVector p;
   auto cos_pi6  = std::cos(pi/6);
   auto dir_bias = 0;
-  for (auto i=0; i<1; ++i) {
-    p  = caps.get();
+  for (auto i=0; i<100; ++i) {
+    p  = xbeam.get();
     dir_bias += p.z() > 0 ? 1 : -1;
 
-    CHECK(p.rho() > cos_pi6);
+    CHECK(p.x() > cos_pi6);
   }
   CHECK(dir_bias < 10);
 }
