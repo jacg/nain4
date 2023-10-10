@@ -1908,8 +1908,8 @@ TEST_CASE("random direction theta", "[random][direction]") {
 
 
   G4ThreeVector p;
-  auto cos_pi8  = std::cos(CLHEP::halfpi/4);
-  auto cos_pi16 = std::cos(CLHEP::halfpi/8);
+  auto cos_pi8  = std::cos(CLHEP::pi/8);
+  auto cos_pi16 = std::cos(CLHEP::pi/16);
   for (auto i=0; i<100; ++i) {
     p =    mintheta.get(); CHECK(p.z() < 0);
     p =    maxtheta.get(); CHECK(p.z() > 0);
@@ -1922,7 +1922,7 @@ TEST_CASE("random direction bidirectional", "[random][direction]") {
 
   G4ThreeVector p;
   auto dir_bias = 0;
-  auto sin_pi6 = std::sin(CLHEP::halfpi/3);
+  auto sin_pi6 = std::sin(CLHEP::pi/6);
   for (auto i=0; i<100; ++i) {
     p = gen.get();
     dir_bias += p.z() > 0 ? 1 : -1;
@@ -1938,7 +1938,7 @@ TEST_CASE("random direction axis", "[random][direction]") {
   auto yneg = n4::random::direction{}.max_theta(CLHEP::halfpi/3).axis({ 0, -1, 0});
 
   G4ThreeVector p;
-  auto sin_pi6 = std::sin(CLHEP::halfpi/3);
+  auto sin_pi6 = std::sin(CLHEP::pi/6);
   for (auto i=0; i<100; ++i) {
     p = xpos.get(); CHECK(p.x() > 0); CHECK(std::abs(p.z()) < sin_pi6);
     p = ypos.get(); CHECK(p.y() > 0); CHECK(std::abs(p.z()) < sin_pi6);
@@ -1951,7 +1951,7 @@ TEST_CASE("random direction exclude", "[random][direction]") {
   auto caps = n4::random::direction{}.min_theta(CLHEP::halfpi/3).max_theta(CLHEP::halfpi*5/3).exclude();
 
   G4ThreeVector p;
-  auto sin_pi6  = std::sin(CLHEP::halfpi/3);
+  auto sin_pi6  = std::sin(CLHEP::pi/6);
   auto dir_bias = 0;
   for (auto i=0; i<1; ++i) {
     p  = caps.get();
@@ -1967,7 +1967,7 @@ TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
   auto caps = n4::random::direction{}.min_theta(CLHEP::halfpi/3).bidirectional().exclude();
 
   G4ThreeVector p;
-  auto sin_pi6  = std::sin(CLHEP::halfpi/3);
+  auto sin_pi6  = std::sin(CLHEP::pi/6);
   auto dir_bias = 0;
   for (auto i=0; i<1; ++i) {
     p  = caps.get();
@@ -1983,7 +1983,7 @@ TEST_CASE("random direction exclude axis", "[random][direction]") {
   auto caps = n4::random::direction{}.min_theta(CLHEP::halfpi/3).axis({1, 0, 0}).exclude();
 
   G4ThreeVector p;
-  auto cos_pi6  = std::cos(CLHEP::halfpi/3);
+  auto cos_pi6  = std::cos(CLHEP::pi/6);
   auto dir_bias = 0;
   for (auto i=0; i<1; ++i) {
     p  = caps.get();
