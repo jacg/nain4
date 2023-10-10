@@ -2032,20 +2032,24 @@ TEST_CASE("random direction bidirectional", "[random][direction]") {
 }
 
 TEST_CASE("random direction axis", "[random][direction]") {
-  using CLHEP::halfpi; using CLHEP::pi;
+  using CLHEP::halfpi;
+  const size_t N = 1000;
+  auto sin_pi6 = std::sin(CLHEP::pi/6);
+
   auto xpos = n4::random::direction{}.max_theta(halfpi/3).axis({ 1,  0, 0});
   auto ypos = n4::random::direction{}.max_theta(halfpi/3).axis({ 0,  1, 0});
   auto xneg = n4::random::direction{}.max_theta(halfpi/3).axis({-1,  0, 0});
   auto yneg = n4::random::direction{}.max_theta(halfpi/3).axis({ 0, -1, 0});
 
-  G4ThreeVector p;
-  auto sin_pi6 = std::sin(pi/6);
-  for (auto i=0; i<100; ++i) {
-    p = xpos.get(); CHECK(p.x() > 0); CHECK(std::abs(p.z()) < sin_pi6);
-    p = ypos.get(); CHECK(p.y() > 0); CHECK(std::abs(p.z()) < sin_pi6);
-    p = xneg.get(); CHECK(p.x() < 0); CHECK(std::abs(p.z()) < sin_pi6);
-    p = yneg.get(); CHECK(p.y() < 0); CHECK(std::abs(p.z()) < sin_pi6);
-  }
+  threevec_stats xp{N, [&] { return xpos.get(); }};
+  threevec_stats yp{N, [&] { return ypos.get(); }};
+  threevec_stats xn{N, [&] { return xneg.get(); }};
+  threevec_stats yn{N, [&] { return yneg.get(); }};
+
+  CHECK(xp.x_min >= 0); CHECK(xp.z_max < sin_pi6); CHECK(xp.z_min > -sin_pi6);
+  CHECK(yp.y_min >= 0); CHECK(yp.z_max < sin_pi6); CHECK(xp.z_min > -sin_pi6);
+  CHECK(xn.x_min <= 0); CHECK(xp.z_max < sin_pi6); CHECK(xp.z_min > -sin_pi6);
+  CHECK(yn.y_min <= 0); CHECK(yp.z_max < sin_pi6); CHECK(xp.z_min > -sin_pi6);
 }
 
 TEST_CASE("random direction exclude", "[random][direction]") {
