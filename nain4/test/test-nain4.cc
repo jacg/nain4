@@ -2041,19 +2041,27 @@ TEST_CASE("random direction axis", "[random][direction]") {
 }
 
 TEST_CASE("random direction exclude", "[random][direction]") {
-  using CLHEP::halfpi; using CLHEP::pi;
-  auto caps = n4::random::direction{}.min_theta(halfpi/3).max_theta(halfpi*5/3).exclude();
+  auto theta = pi/6;
+  auto sin_th = std::sin(theta);
+  auto cos_th = std::cos(theta);
+  size_t N = 10000;
 
-  G4ThreeVector p;
-  auto sin_pi6  = std::sin(pi/6);
-  auto dir_bias = 0;
-  for (auto i=0; i<1; ++i) {
-    p  = caps.get();
-    dir_bias += p.z() > 0 ? 1 : -1;
+  auto cup = n4::random::direction{}.min_theta(theta);
+  auto cap = n4::random::direction{}.min_theta(theta).exclude();
 
-    CHECK(p.rho() < sin_pi6);
-  }
-  CHECK(dir_bias < 10);
+  threevec_stats kup{N, [&] { return cup.get(); }};
+  threevec_stats kap{N, [&] { return cap.get(); }};
+
+  std::cerr << "cup\n" << kup;
+  std::cerr << "cap\n" << kap;
+
+  CHECK_THAT(kup.x_min, WithinRel(-1.0   , 0.05)); CHECK_THAT(kup.x_max, WithinRel(1.0         , 0.05));
+  CHECK_THAT(kup.y_min, WithinRel(-1.0   , 0.05)); CHECK_THAT(kup.y_max, WithinRel(1.0         , 0.05));
+  CHECK_THAT(kup.z_min, WithinRel(-1.0   , 0.05)); CHECK_THAT(kup.z_max, WithinRel(      cos_th, 0.05));
+
+  CHECK_THAT(kap.x_min, WithinRel(-sin_th, 0.05)); CHECK_THAT(kap.x_max, WithinRel(sin_th      , 0.05));
+  CHECK_THAT(kap.y_min, WithinRel(-sin_th, 0.05)); CHECK_THAT(kap.y_max, WithinRel(sin_th      , 0.05));
+  CHECK_THAT(kap.z_min, WithinRel(-1.0   , 0.05)); CHECK_THAT(kap.z_max, WithinRel(1.0 - cos_th, 0.05));
 }
 
 
