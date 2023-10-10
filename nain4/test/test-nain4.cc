@@ -1873,20 +1873,21 @@ TEST_CASE("random point in sphere", "[random][sphere]") {
 }
 
 TEST_CASE("random direction octants", "[random][direction]") {
+  using CLHEP::halfpi; using CLHEP::pi;
   // costheta < 0 -> z < 0
   // costheta > 0 -> z > 0
   // 0pi/2 < phi < 1pi/2 -> x > 0, y > 0
   // 1pi/2 < phi < 2pi/2 -> x < 0, y > 0
   // 2pi/2 < phi < 3pi/2 -> x < 0, y < 0
   // 3pi/2 < phi < 4pi/2 -> x > 0, y < 0
-  auto zpos_xpos_ypos = n4::random::direction{}.min_cos_theta(0)                         .max_phi(  CLHEP::halfpi);
-  auto zpos_xneg_ypos = n4::random::direction{}.min_cos_theta(0).min_phi(  CLHEP::halfpi).max_phi(2*CLHEP::halfpi);
-  auto zpos_xneg_yneg = n4::random::direction{}.min_cos_theta(0).min_phi(2*CLHEP::halfpi).max_phi(3*CLHEP::halfpi);
-  auto zpos_xpos_yneg = n4::random::direction{}.min_cos_theta(0).min_phi(3*CLHEP::halfpi);
-  auto zneg_xpos_ypos = n4::random::direction{}.max_cos_theta(0)                         .max_phi(  CLHEP::halfpi);
-  auto zneg_xneg_ypos = n4::random::direction{}.max_cos_theta(0).min_phi(  CLHEP::halfpi).max_phi(2*CLHEP::halfpi);
-  auto zneg_xneg_yneg = n4::random::direction{}.max_cos_theta(0).min_phi(2*CLHEP::halfpi).max_phi(3*CLHEP::halfpi);
-  auto zneg_xpos_yneg = n4::random::direction{}.max_cos_theta(0).min_phi(3*CLHEP::halfpi);
+  auto zpos_xpos_ypos = n4::random::direction{}.min_cos_theta(0)                  .max_phi(  halfpi);
+  auto zpos_xneg_ypos = n4::random::direction{}.min_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
+  auto zpos_xneg_yneg = n4::random::direction{}.min_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
+  auto zpos_xpos_yneg = n4::random::direction{}.min_cos_theta(0).min_phi(3*halfpi);
+  auto zneg_xpos_ypos = n4::random::direction{}.max_cos_theta(0)                  .max_phi(  halfpi);
+  auto zneg_xneg_ypos = n4::random::direction{}.max_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
+  auto zneg_xneg_yneg = n4::random::direction{}.max_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
+  auto zneg_xpos_yneg = n4::random::direction{}.max_cos_theta(0).min_phi(3*halfpi);
 
   G4ThreeVector p;
   for (auto i=0; i<100; ++i) {
@@ -1902,14 +1903,14 @@ TEST_CASE("random direction octants", "[random][direction]") {
 }
 
 TEST_CASE("random direction theta", "[random][direction]") {
-  auto mintheta    = n4::random::direction{}.min_theta(CLHEP::halfpi); // max theta = pi implicit
-  auto maxtheta    = n4::random::direction{}.max_theta(CLHEP::halfpi); // min theta =  0 implicit
-  auto minmaxtheta = n4::random::direction{}.min_theta(CLHEP::halfpi/8).max_theta(CLHEP::halfpi/4);
-
+  using CLHEP::halfpi; using CLHEP::pi;
+  auto mintheta    = n4::random::direction{}.min_theta(halfpi); // max theta = pi implicit
+  auto maxtheta    = n4::random::direction{}.max_theta(halfpi); // min theta =  0 implicit
+  auto minmaxtheta = n4::random::direction{}.min_theta(halfpi/8).max_theta(halfpi/4);
 
   G4ThreeVector p;
-  auto cos_pi8  = std::cos(CLHEP::pi/8);
-  auto cos_pi16 = std::cos(CLHEP::pi/16);
+  auto cos_pi8  = std::cos(pi/8);
+  auto cos_pi16 = std::cos(pi/16);
   for (auto i=0; i<100; ++i) {
     p =    mintheta.get(); CHECK(p.z() < 0);
     p =    maxtheta.get(); CHECK(p.z() > 0);
@@ -1918,11 +1919,12 @@ TEST_CASE("random direction theta", "[random][direction]") {
 }
 
 TEST_CASE("random direction bidirectional", "[random][direction]") {
-  auto gen = n4::random::direction{}.max_theta(CLHEP::halfpi/3).bidirectional();
+  using CLHEP::halfpi; using CLHEP::pi;
+  auto gen = n4::random::direction{}.max_theta(halfpi/3).bidirectional();
 
   G4ThreeVector p;
   auto dir_bias = 0;
-  auto sin_pi6 = std::sin(CLHEP::pi/6);
+  auto sin_pi6 = std::sin(pi/6);
   for (auto i=0; i<100; ++i) {
     p = gen.get();
     dir_bias += p.z() > 0 ? 1 : -1;
@@ -1932,13 +1934,14 @@ TEST_CASE("random direction bidirectional", "[random][direction]") {
 }
 
 TEST_CASE("random direction axis", "[random][direction]") {
-  auto xpos = n4::random::direction{}.max_theta(CLHEP::halfpi/3).axis({ 1,  0, 0});
-  auto ypos = n4::random::direction{}.max_theta(CLHEP::halfpi/3).axis({ 0,  1, 0});
-  auto xneg = n4::random::direction{}.max_theta(CLHEP::halfpi/3).axis({-1,  0, 0});
-  auto yneg = n4::random::direction{}.max_theta(CLHEP::halfpi/3).axis({ 0, -1, 0});
+  using CLHEP::halfpi; using CLHEP::pi;
+  auto xpos = n4::random::direction{}.max_theta(halfpi/3).axis({ 1,  0, 0});
+  auto ypos = n4::random::direction{}.max_theta(halfpi/3).axis({ 0,  1, 0});
+  auto xneg = n4::random::direction{}.max_theta(halfpi/3).axis({-1,  0, 0});
+  auto yneg = n4::random::direction{}.max_theta(halfpi/3).axis({ 0, -1, 0});
 
   G4ThreeVector p;
-  auto sin_pi6 = std::sin(CLHEP::pi/6);
+  auto sin_pi6 = std::sin(pi/6);
   for (auto i=0; i<100; ++i) {
     p = xpos.get(); CHECK(p.x() > 0); CHECK(std::abs(p.z()) < sin_pi6);
     p = ypos.get(); CHECK(p.y() > 0); CHECK(std::abs(p.z()) < sin_pi6);
@@ -1948,10 +1951,11 @@ TEST_CASE("random direction axis", "[random][direction]") {
 }
 
 TEST_CASE("random direction exclude", "[random][direction]") {
-  auto caps = n4::random::direction{}.min_theta(CLHEP::halfpi/3).max_theta(CLHEP::halfpi*5/3).exclude();
+  using CLHEP::halfpi; using CLHEP::pi;
+  auto caps = n4::random::direction{}.min_theta(halfpi/3).max_theta(halfpi*5/3).exclude();
 
   G4ThreeVector p;
-  auto sin_pi6  = std::sin(CLHEP::pi/6);
+  auto sin_pi6  = std::sin(pi/6);
   auto dir_bias = 0;
   for (auto i=0; i<1; ++i) {
     p  = caps.get();
@@ -1964,10 +1968,11 @@ TEST_CASE("random direction exclude", "[random][direction]") {
 
 
 TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
-  auto caps = n4::random::direction{}.min_theta(CLHEP::halfpi/3).bidirectional().exclude();
+  using CLHEP::halfpi; using CLHEP::pi;
+  auto caps = n4::random::direction{}.min_theta(halfpi/3).bidirectional().exclude();
 
   G4ThreeVector p;
-  auto sin_pi6  = std::sin(CLHEP::pi/6);
+  auto sin_pi6  = std::sin(pi/6);
   auto dir_bias = 0;
   for (auto i=0; i<1; ++i) {
     p  = caps.get();
@@ -1980,10 +1985,11 @@ TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
 
 
 TEST_CASE("random direction exclude axis", "[random][direction]") {
-  auto caps = n4::random::direction{}.min_theta(CLHEP::halfpi/3).axis({1, 0, 0}).exclude();
+  using CLHEP::halfpi; using CLHEP::pi;
+  auto caps = n4::random::direction{}.min_theta(halfpi/3).axis({1, 0, 0}).exclude();
 
   G4ThreeVector p;
-  auto cos_pi6  = std::cos(CLHEP::pi/6);
+  auto cos_pi6  = std::cos(pi/6);
   auto dir_bias = 0;
   for (auto i=0; i<1; ++i) {
     p  = caps.get();
