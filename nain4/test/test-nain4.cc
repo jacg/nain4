@@ -1991,14 +1991,15 @@ TEST_CASE("random direction theta", "[random][direction]") {
   auto maxtheta    = n4::random::direction{}.max_theta(halfpi); // min theta =  0 implicit
   auto minmaxtheta = n4::random::direction{}.min_theta(halfpi/8).max_theta(halfpi/4);
 
-  G4ThreeVector p;
-  auto cos_pi8  = std::cos(pi/8);
-  auto cos_pi16 = std::cos(pi/16);
-  for (auto i=0; i<100; ++i) {
-    p =    mintheta.get(); CHECK(p.z() < 0);
-    p =    maxtheta.get(); CHECK(p.z() > 0);
-    p = minmaxtheta.get(); CHECK(p.z() > cos_pi8); CHECK(p.z() < cos_pi16);
-  }
+  size_t N = 1000;
+  threevec_stats min   {N, [&] { return mintheta   .get(); }};
+  threevec_stats max   {N, [&] { return maxtheta   .get(); }};
+  threevec_stats minmax{N, [&] { return minmaxtheta.get(); }};
+
+  CHECK(min   .z_max < 0);
+  CHECK(max   .z_min > 0);
+  CHECK(minmax.z_min > std::cos(pi/ 8));
+  CHECK(minmax.z_max < std::cos(pi/16));
 }
 
 TEST_CASE("random direction bidirectional", "[random][direction]") {
