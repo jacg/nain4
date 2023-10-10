@@ -1881,24 +1881,24 @@ TEST_CASE("random direction octants", "[random][direction]") {
   // 2pi/2 < phi < 3pi/2 -> x < 0, y < 0
   // 3pi/2 < phi < 4pi/2 -> x > 0, y < 0
   auto xpos_ypos_zpos = n4::random::direction{}.min_cos_theta(0)                  .max_phi(  halfpi);
-  auto xneg_ypos_zpos = n4::random::direction{}.min_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
-  auto xneg_yneg_zpos = n4::random::direction{}.min_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
-  auto xpos_yneg_zpos = n4::random::direction{}.min_cos_theta(0).min_phi(3*halfpi);
   auto xpos_ypos_zneg = n4::random::direction{}.max_cos_theta(0)                  .max_phi(  halfpi);
-  auto xneg_ypos_zneg = n4::random::direction{}.max_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
-  auto xneg_yneg_zneg = n4::random::direction{}.max_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
+  auto xpos_yneg_zpos = n4::random::direction{}.min_cos_theta(0).min_phi(3*halfpi);
   auto xpos_yneg_zneg = n4::random::direction{}.max_cos_theta(0).min_phi(3*halfpi);
+  auto xneg_ypos_zpos = n4::random::direction{}.min_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
+  auto xneg_ypos_zneg = n4::random::direction{}.max_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
+  auto xneg_yneg_zpos = n4::random::direction{}.min_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
+  auto xneg_yneg_zneg = n4::random::direction{}.max_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
 
   G4ThreeVector p;
   for (auto i=0; i<100; ++i) {
     p = xpos_ypos_zpos.get(); CHECK(p.x() > 0); CHECK(p.y() > 0); CHECK(p.z() > 0);
-    p = xneg_ypos_zpos.get(); CHECK(p.x() < 0); CHECK(p.y() > 0); CHECK(p.z() > 0);
-    p = xneg_yneg_zpos.get(); CHECK(p.x() < 0); CHECK(p.y() < 0); CHECK(p.z() > 0);
-    p = xpos_yneg_zpos.get(); CHECK(p.x() > 0); CHECK(p.y() < 0); CHECK(p.z() > 0);
     p = xpos_ypos_zneg.get(); CHECK(p.x() > 0); CHECK(p.y() > 0); CHECK(p.z() < 0);
-    p = xneg_ypos_zneg.get(); CHECK(p.x() < 0); CHECK(p.y() > 0); CHECK(p.z() < 0);
-    p = xneg_yneg_zneg.get(); CHECK(p.x() < 0); CHECK(p.y() < 0); CHECK(p.z() < 0);
+    p = xpos_yneg_zpos.get(); CHECK(p.x() > 0); CHECK(p.y() < 0); CHECK(p.z() > 0);
     p = xpos_yneg_zneg.get(); CHECK(p.x() > 0); CHECK(p.y() < 0); CHECK(p.z() < 0);
+    p = xneg_ypos_zpos.get(); CHECK(p.x() < 0); CHECK(p.y() > 0); CHECK(p.z() > 0);
+    p = xneg_ypos_zneg.get(); CHECK(p.x() < 0); CHECK(p.y() > 0); CHECK(p.z() < 0);
+    p = xneg_yneg_zpos.get(); CHECK(p.x() < 0); CHECK(p.y() < 0); CHECK(p.z() > 0);
+    p = xneg_yneg_zneg.get(); CHECK(p.x() < 0); CHECK(p.y() < 0); CHECK(p.z() < 0);
   }
 }
 
