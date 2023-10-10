@@ -42,18 +42,18 @@ G4ThreeVector direction::rotate(const G4ThreeVector& in) {
 }
 
 G4ThreeVector direction::excluded() {
+  auto must_be_excluded = [&] (const G4ThreeVector& d) {
+    auto costheta = d.cosTheta();
+    auto phi      = d.   phi  (); if (phi < 0) { phi += CLHEP::twopi; }
+    return (costheta >= min_cos_theta_) &&
+           (costheta <= max_cos_theta_) &&
+           (phi      >= min_phi_      ) &&
+           (phi      <= max_phi_      );
+  };
   while (true) {
     auto original_dir = G4RandomDirection();
     auto dir = axis_ != G4ThreeVector{0, 0, 1} ? rotate(original_dir) : original_dir;
 
-    auto must_be_excluded = [&] (const G4ThreeVector& d) {
-      auto costheta = d.cosTheta();
-      auto phi      = d.   phi  (); if (phi < 0) { phi += CLHEP::twopi; }
-      return (costheta >= min_cos_theta_) &&
-             (costheta <= max_cos_theta_) &&
-             (phi      >= min_phi_      ) &&
-             (phi      <= max_phi_      );
-    };
 
     if (                  must_be_excluded(     dir )) { continue; }
     if (bidirectional_ && must_be_excluded(flip(dir))) { continue; }
