@@ -2061,7 +2061,7 @@ TEST_CASE("random direction exclude", "[random][direction]") {
 
   CHECK_THAT(kap.x_min, WithinRel(-sin_th, 0.05)); CHECK_THAT(kap.x_max, WithinRel(sin_th      , 0.05));
   CHECK_THAT(kap.y_min, WithinRel(-sin_th, 0.05)); CHECK_THAT(kap.y_max, WithinRel(sin_th      , 0.05));
-  CHECK_THAT(kap.z_min, WithinRel(-1.0   , 0.05)); CHECK_THAT(kap.z_max, WithinRel(1.0 - cos_th, 0.05));
+  CHECK_THAT(kap.z_min, WithinRel( cos_th, 0.05)); CHECK_THAT(kap.z_max, WithinRel(1.0         , 0.05));
 }
 
 
