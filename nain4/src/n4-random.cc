@@ -48,7 +48,7 @@ G4ThreeVector direction::excluded() {
 
     auto must_be_excluded = [&] (const G4ThreeVector& d) {
       auto costheta = d.cosTheta();
-      auto phi      = d.   phi  ();
+      auto phi      = d.   phi  (); if (phi < 0) { phi += CLHEP::twopi; }
       return (costheta >= min_cos_theta_) &&
              (costheta <= max_cos_theta_) &&
              (phi      >= min_phi_      ) &&
