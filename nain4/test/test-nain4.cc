@@ -37,8 +37,11 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <cmath>
+#include <limits>
 #include <numeric>
 #include <stdexcept>
 #include <type_traits>
@@ -2003,18 +2006,29 @@ TEST_CASE("random direction theta", "[random][direction]") {
 }
 
 TEST_CASE("random direction bidirectional", "[random][direction]") {
-  using CLHEP::halfpi; using CLHEP::pi;
-  auto gen = n4::random::direction{}.max_theta(halfpi/3).bidirectional();
+  using CLHEP::halfpi;
+  using Catch::Matchers::WithinAbs; using Catch::Matchers::WithinRel;
+  auto pi_by_6 = CLHEP::pi/6;
+  auto sin_pi_by6 = std::sin(pi_by_6);
+  auto gen = n4::random::direction{}.max_theta(pi_by_6).bidirectional();
 
-  G4ThreeVector p;
-  auto dir_bias = 0;
-  auto sin_pi6 = std::sin(pi/6);
-  for (auto i=0; i<100; ++i) {
-    p = gen.get();
-    dir_bias += p.z() > 0 ? 1 : -1;
-    CHECK(p.rho() < sin_pi6);
-  }
-  CHECK(std::abs(dir_bias) < 10);
+  auto max_rho = -std::numeric_limits<double>::infinity();
+  threevec_stats stats{1000, [&] {
+    auto v = gen.get();
+    max_rho = std::max(max_rho, v.rho());
+    return v;
+  }};
+
+  // Check that there is no directional bias
+  CHECK_THAT(stats.mean().x(), WithinAbs(0, 0.05));
+  CHECK_THAT(stats.mean().y(), WithinAbs(0, 0.05));
+  CHECK_THAT(stats.mean().z(), WithinAbs(0, 0.05));
+  // Check that user-imposed limits are respected
+  CHECK(max_rho < pi_by_6);
+  CHECK_THAT(stats.x_min, WithinRel(-sin_pi_by6, 0.03));
+  CHECK_THAT(stats.x_max, WithinRel( sin_pi_by6, 0.03));
+  CHECK_THAT(stats.y_min, WithinRel(-sin_pi_by6, 0.03));
+  CHECK_THAT(stats.y_max, WithinRel( sin_pi_by6, 0.03));
 }
 
 TEST_CASE("random direction axis", "[random][direction]") {
