@@ -36,7 +36,6 @@ G4ThreeVector direction::rotate(const G4ThreeVector& in) {
     auto rot_axis = axis_.cross({0, 0, 1});
     auto theta    = std::acos(axis_.z());
     rot_matrix    = HepGeom::Rotate3D{-theta, rot_axis}.getRotation();
-    if (exclude_) { rot_matrix = rot_matrix.value().inverse(); }
   }
   return rot_matrix.value() * in;
 }
@@ -50,14 +49,13 @@ G4ThreeVector direction::excluded() {
            (phi      >= min_phi_      ) &&
            (phi      <= max_phi_      );
   };
-  while (true) {
-    auto original_dir = G4RandomDirection();
-    auto dir = axis_ != G4ThreeVector{0, 0, 1} ? rotate(original_dir) : original_dir;
 
+  while (true) {
+    auto dir = G4RandomDirection();
 
     if (                  must_be_excluded(     dir )) { continue; }
     if (bidirectional_ && must_be_excluded(flip(dir))) { continue; }
-    return dir;
+    return axis_ != G4ThreeVector{0, 0, 1} ? rotate(dir) : dir;
   }
 }
 
