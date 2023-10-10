@@ -55,8 +55,9 @@
 // this gives rise to the apparently superfluous division by the same unit on
 // both sides of an equation, in the source code.
 
-using Catch::Approx;
-using namespace Catch::Matchers;
+using Catch::Approx; // TODO replace Approx with Matchers
+using Catch::Matchers::WithinAbs; using Catch::Matchers::WithinRel; using Catch::Matchers::WithinULP;
+using CLHEP::pi; using CLHEP::halfpi; using CLHEP::twopi;
 using namespace n4::test;
 
 TEST_CASE("nain material", "[nain][material]") {
@@ -458,7 +459,6 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto sphere_l = n4::sphere("sphere_l").r(r).volume(water);
   auto sphere_p = n4::sphere("sphere_p").r(r).place  (water).at(xc, yc, zc).now();
 
-  using CLHEP::pi;
   CHECK(sphere_l -> TotalVolumeEntities() == 1);
   CHECK(sphere_l -> GetMass() / kg        == Approx(4 * pi / 3 * r * r * r * density / kg));
   CHECK(sphere_l -> GetMaterial()         == water);
@@ -471,7 +471,6 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   CHECK(sphere_p -> GetTranslation() . y() / m == yc / m);
   CHECK(sphere_p -> GetTranslation() . z() / m == zc / m);
 
-  using CLHEP::twopi;
   auto start   = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto spherer = [&] (auto name) { return n4::sphere(name).r(1); };
   auto phi_s   = spherer("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
@@ -558,7 +557,6 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
 }
 
 TEST_CASE("nain sphere orb", "[nain][sphere][orb]") {
-  using CLHEP::twopi;
   auto is_sphere = [](auto thing) { CHECK(dynamic_cast<G4Sphere*>(thing)); };
   auto is_orb    = [](auto thing) { CHECK(dynamic_cast<G4Orb   *>(thing)); };
 
@@ -613,7 +611,6 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   auto tubs_l = n4::tubs("tubs_l").r(r).z(z).volume(water);
   auto tubs_p = n4::tubs("tubs_p").r(r).z(z).place (water).at(xc, yc, zc).now();
 
-  using CLHEP::pi;
   CHECK(tubs_l -> TotalVolumeEntities() == 1);
   CHECK(tubs_l -> GetMass() / kg        == Approx(pi * r * r * z * density / kg));
   CHECK(tubs_l -> GetMaterial()         == water);
@@ -626,7 +623,6 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   CHECK(tubs_p -> GetTranslation() . y() / m == yc / m);
   CHECK(tubs_p -> GetTranslation() . z() / m == zc / m);
 
-  using CLHEP::twopi;
   auto start  = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto tubsrz = [&] (auto name) { return n4::tubs(name).r(1).z(1); };
   auto phi_s  = tubsrz("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
@@ -702,7 +698,6 @@ TEST_CASE("nain cons", "[nain][cons]") {
   auto cons_l = n4::cons("cons_l").r1(r1).r2(r2).z(z).volume(water);
   auto cons_p = n4::cons("cons_p").r1(r1).r2(r2).z(z).place (water).at(xc, yc, zc).now();
 
-  using CLHEP::pi;
   // V = (1/3) * π * h * (r² + r * R + R²)
   auto volume = pi * 1/3 * z * (r1*r1 + r1*r2 + r2*r2);
 
@@ -724,7 +719,6 @@ TEST_CASE("nain cons", "[nain][cons]") {
   CHECK(cons_p -> GetTranslation() . y() / m == yc / m);
   CHECK(cons_p -> GetTranslation() . z() / m == zc / m);
 
-  using CLHEP::twopi;
   auto start  = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto consrz = [&] (auto name) { return n4::cons(name).r1(1).r2(2).z(1); };
   auto phi_s  = consrz("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
@@ -1832,7 +1826,6 @@ double shell_ratio(double n) {
 
 
 TEST_CASE("random point in sphere", "[random][sphere]") {
-  using CLHEP::twopi;
   G4double const r_max = 3.456;
   size_t   const N_bins = 10;
   size_t   const N_per_bin = 1e5;
@@ -1932,7 +1925,6 @@ std::ostream& operator<<(std::ostream& out, const threevec_stats& s) {
 }
 
 TEST_CASE("random direction octants", "[random][direction]") {
-  using CLHEP::halfpi;
   // costheta < 0 -> z < 0
   // costheta > 0 -> z > 0
   // 0pi/2 < phi < 1pi/2 -> x > 0, y > 0
@@ -1989,7 +1981,6 @@ TEST_CASE("random direction octants", "[random][direction]") {
 }
 
 TEST_CASE("random direction theta", "[random][direction]") {
-  using CLHEP::halfpi; using CLHEP::pi;
   auto mintheta    = n4::random::direction{}.min_theta(halfpi); // max theta = pi implicit
   auto maxtheta    = n4::random::direction{}.max_theta(halfpi); // min theta =  0 implicit
   auto minmaxtheta = n4::random::direction{}.min_theta(halfpi/8).max_theta(halfpi/4);
@@ -2006,8 +1997,6 @@ TEST_CASE("random direction theta", "[random][direction]") {
 }
 
 TEST_CASE("random direction bidirectional", "[random][direction]") {
-  using CLHEP::halfpi;
-  using Catch::Matchers::WithinAbs; using Catch::Matchers::WithinRel;
   auto pi_by_6 = CLHEP::pi/6;
   auto sin_pi_by6 = std::sin(pi_by_6);
   auto gen = n4::random::direction{}.max_theta(pi_by_6).bidirectional();
@@ -2032,7 +2021,6 @@ TEST_CASE("random direction bidirectional", "[random][direction]") {
 }
 
 TEST_CASE("random direction axis", "[random][direction]") {
-  using CLHEP::halfpi;
   const size_t N = 1000;
   auto sin_pi6 = std::sin(CLHEP::pi/6);
 
