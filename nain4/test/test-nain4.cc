@@ -1997,7 +1997,7 @@ TEST_CASE("random direction octants", "[random][direction]") {
 }
 
 TEST_CASE("random direction theta", "[random][direction]") {
-  auto a = 0.3*twopi, b = 0.4*twopi, c = 0.7*twopi, d = 0.8*twopi;
+  auto a = 0.3*pi, b = 0.4*pi, c = 0.7*pi, d = 0.8*pi;
   auto mintheta    = n4::random::direction{}.min_theta(a); auto implicit_theta_max = pi;
   auto maxtheta    = n4::random::direction{}.max_theta(b); auto implicit_theta_min = 0;
   auto minmaxtheta = n4::random::direction{}.min_theta(c).max_theta(d);
