@@ -32,6 +32,7 @@ struct direction {
   SET(max_phi      , G4double     )
   SET(axis         , G4ThreeVector)
 #undef SET
+  direction& axis(G4double x, G4double y, G4double z) { return axis({x,y,z}); }
 
   // Might seem wrong, but it's not!
   direction& min_theta(G4double x) {max_cos_theta_ = std::cos(x); return *this;}
