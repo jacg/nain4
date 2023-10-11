@@ -55,7 +55,7 @@ struct direction {
   direction& exclude      () {exclude_       = true; return *this; }
 
 private:
-  G4ThreeVector axis_    {0, 0, 1};
+  std::optional<G4ThreeVector> axis_{};
   G4bool   bidirectional_{false};
   G4bool   exclude_      {false};
   G4double min_cos_theta_{-1};
