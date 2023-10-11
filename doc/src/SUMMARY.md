@@ -8,6 +8,7 @@
   - [How start a `nain4`-based project](./how-to/start-a-nain4-based-project.md)
   - [How to build a minimal `nain4` app](./how-to/build-a-minimal-nain4-app.md)
   - [How to upgrade your `nain4` dependency](./how-to/upgrade-nain4.md)
+  - [How to generate random numbers](./how-to/generate_random_numbers.md)
 - [Explanation](./explanation.md)
   - [Placement: laziness and accumulation](./explanation/placement-laziness-and-accumulation.md)
   - [Displacements and rotations are not commutative](./explanation/displacements-and-rotations-are-not-commutative.md)
