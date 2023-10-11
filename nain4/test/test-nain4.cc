@@ -2123,4 +2123,38 @@ TEST_CASE("random direction exclude axis", "[random][direction]") {
   CHECK_THAT(s.mean().z(), WithinAbs(0, 0.05));
 }
 
+TEST_CASE("random direction ranges", "[random][direction]") {
+  auto costh_min = -1;
+  auto costh_max =  1;
+  auto th_min = 0;
+  auto th_max = CLHEP::pi;
+  auto phi_min = 0;
+  auto phi_max = CLHEP::twopi;
+  auto a = 0.25;
+  auto b = 0.50;
+  auto eps = 1e-5;
+
+#define R n4::random::direction{}
+  REQUIRE_THROWS_AS(R.min_cos_theta(costh_min - eps)   , std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_cos_theta(costh_max + eps)   , std::runtime_error);
+  REQUIRE_THROWS_AS(R.min_cos_theta(b).max_cos_theta(a), std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_cos_theta(a).min_cos_theta(b), std::runtime_error);
+
+  REQUIRE_THROWS_AS(R.min_theta(th_min - eps)  , std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_theta(th_max + eps)  , std::runtime_error);
+  REQUIRE_THROWS_AS(R.min_theta(b).max_theta(a), std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_theta(a).min_theta(b), std::runtime_error);
+
+  REQUIRE_THROWS_AS(R.min_phi(phi_min - eps), std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_phi(phi_max + eps), std::runtime_error);
+  REQUIRE_THROWS_AS(R.min_phi(b).max_phi(a) , std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_phi(a).min_phi(b) , std::runtime_error);
+
+  // equal upper and lower limit should work
+  REQUIRE_NOTHROW(R.min_cos_theta(a).max_cos_theta(a));
+  //REQUIRE_NOTHROW(R.min_theta    (a).max_theta    (a)); // floating point mess
+  REQUIRE_NOTHROW(R.min_phi      (a).max_phi      (a));
+#undef R
+}
+
 #pragma GCC diagnostic pop
