@@ -104,6 +104,13 @@ jobs:
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" run-client-app-output
 
+      - name: Test nix run client app with space-containing arg
+        run: |
+          nix run ~/work/my-project# -- -n 14 --early "/my/bubble_radius 0.2 m" | tee run-client-app-output
+          PATTERN="end of event 14"
+          echo Looking for "'$PATTERN'" in output of 'just'
+          grep "$PATTERN" run-client-app-output
+
       - name: Run client-side tests
         run: nix develop .#${{ matrix.devshell }}  -c just test-client-side
 

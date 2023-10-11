@@ -23,7 +23,9 @@ struct argcv {
 private:
   std::vector<std::unique_ptr<char[]>> owners;
 };
-}
+
+void report_args(std::ostream&, int argc, char** argv);
+} // namespace test
 
 class ui {
 public:

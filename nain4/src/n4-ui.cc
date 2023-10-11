@@ -149,6 +149,13 @@ test::argcv::argcv(std::initializer_list<std::string> args): argc{static_cast<in
   //assert(i == argc);
 }
 
+void test::report_args(std::ostream& out, int argc, char **argv) {
+  out << "argc: " << argc << std::endl;
+  for (int i = 0; i < argc; i++) {
+    out << i << "  " << argv[i] << std::endl;
+  }
+}
+
 } // namespace nain4
 
 #pragma GCC diagnostic pop
