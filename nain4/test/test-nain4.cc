@@ -2008,19 +2008,14 @@ TEST_CASE("random direction bidirectional", "[random][direction]") {
   auto sin_th = std::sin(theta);
   auto gen = n4::random::direction{}.max_theta(theta).bidirectional();
 
-  auto max_rho = -std::numeric_limits<double>::infinity();
-  threevec_stats stats{1000, [&] {
-    auto v = gen.get();
-    max_rho = std::max(max_rho, v.rho());
-    return v;
-  }};
+  threevec_stats stats{1000, [&] { return gen.get(); }};
 
   // Check that there is no directional bias
   CHECK_THAT(stats.mean().x(), WithinAbs(0, 0.05));
   CHECK_THAT(stats.mean().y(), WithinAbs(0, 0.05));
   CHECK_THAT(stats.mean().z(), WithinAbs(0, 0.05));
   // Check that user-imposed limits are respected
-  CHECK(max_rho < theta);
+  CHECK(stats.rho_max < theta);
   CHECK_THAT(stats.x_min, WithinRel(-sin_th, 0.03));
   CHECK_THAT(stats.x_max, WithinRel( sin_th, 0.03));
   CHECK_THAT(stats.y_min, WithinRel(-sin_th, 0.03));
