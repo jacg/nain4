@@ -1997,19 +1997,25 @@ TEST_CASE("random direction octants", "[random][direction]") {
 }
 
 TEST_CASE("random direction theta", "[random][direction]") {
-  auto mintheta    = n4::random::direction{}.min_theta(halfpi); // max theta = pi implicit
-  auto maxtheta    = n4::random::direction{}.max_theta(halfpi); // min theta =  0 implicit
-  auto minmaxtheta = n4::random::direction{}.min_theta(halfpi/8).max_theta(halfpi/4);
+  auto a = 0.3*twopi, b = 0.4*twopi, c = 0.7*twopi, d = 0.8*twopi;
+  auto mintheta    = n4::random::direction{}.min_theta(a); auto implicit_theta_max = pi;
+  auto maxtheta    = n4::random::direction{}.max_theta(b); auto implicit_theta_min = 0;
+  auto minmaxtheta = n4::random::direction{}.min_theta(c).max_theta(d);
 
   size_t N = 1000;
   threevec_stats min   {N, [&] { return mintheta   .get(); }};
   threevec_stats max   {N, [&] { return maxtheta   .get(); }};
   threevec_stats minmax{N, [&] { return minmaxtheta.get(); }};
 
-  CHECK(min   .z_max < 0);
-  CHECK(max   .z_min > 0);
-  CHECK(minmax.z_min > std::cos(pi/ 8));
-  CHECK(minmax.z_max < std::cos(pi/16));
+  auto check = [&] (auto label, const threevec_stats& stats, auto theta_min, auto theta_max) {
+    std::cerr << label << std::endl << stats;
+    CHECK_THAT(stats.z_min, WithinRel(std::cos(theta_max), 0.02));
+    CHECK_THAT(stats.z_max, WithinRel(std::cos(theta_min), 0.02));
+  };
+
+  check("min"   , min   , a                 , implicit_theta_max);
+  check("max"   , max   , implicit_theta_min, b                 );
+  check("minmax", minmax, c                 , d                 );
 }
 
 TEST_CASE("random direction bidirectional", "[random][direction]") {
