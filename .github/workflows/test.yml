@@ -99,15 +99,8 @@ jobs:
 
       - name: Test nix run client app
         run: |
-          nix run ~/work/my-project# -- --beam-on 13 | tee run-client-app-output
+          nix run ~/work/my-project# -- -n 13 --early "/my/bubble_radius 0.2 m" | tee run-client-app-output
           PATTERN="end of event 13"
-          echo Looking for "'$PATTERN'" in output of 'just'
-          grep "$PATTERN" run-client-app-output
-
-      - name: Test nix run client app with space-containing arg
-        run: |
-          nix run ~/work/my-project# -- -n 14 --early "/my/bubble_radius 0.2 m" | tee run-client-app-output
-          PATTERN="end of event 14"
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" run-client-app-output
 
