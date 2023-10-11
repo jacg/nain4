@@ -8,6 +8,7 @@
 #include <G4Types.hh>
 #include <Randomize.hh>
 #include <optional>
+#include <stdexcept>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -25,18 +26,30 @@ inline G4double uniform_width     (G4double dx              ) { return uniform_h
 struct direction {
   G4ThreeVector get();
 
-#define SET(NAME, TYPE) direction& NAME(TYPE x) {NAME##_ = x ; return *this;}
-  SET(min_cos_theta, G4double     )
-  SET(max_cos_theta, G4double     )
-  SET(min_phi      , G4double     )
-  SET(max_phi      , G4double     )
-  SET(axis         , G4ThreeVector)
+#define CHECK_RANGE(NAME, X, LOWER, UPPER)                \
+  if ( (X < LOWER) || (X > UPPER) ) {                     \
+    throw std::runtime_error("Invalid limit for " #NAME); \
+  }
+#define SET(NAME, LOWER, UPPER)        \
+  direction& NAME(G4double x) {        \
+    CHECK_RANGE(NAME, x, LOWER, UPPER) \
+    NAME##_ = x ;                      \
+  return *this;                        \
+}
+
+  SET(min_cos_theta,             -1, max_cos_theta_)
+  SET(max_cos_theta, min_cos_theta_,              1)
+  SET(min_phi      ,              0, max_phi_      )
+  SET(max_phi      ,       min_phi_, CLHEP::twopi  )
+#undef CHECK_RANGE
 #undef SET
+
+  direction& axis(G4ThreeVector zaxis               ) { if (zaxis != G4ThreeVector{0, 0, 1}) {axis_ = zaxis;} return *this;}
   direction& axis(G4double x, G4double y, G4double z) { return axis({x,y,z}); }
 
   // Might seem wrong, but it's not!
-  direction& min_theta(G4double x) {max_cos_theta_ = std::cos(x); return *this;}
-  direction& max_theta(G4double x) {min_cos_theta_ = std::cos(x); return *this;}
+  direction& min_theta(G4double x) {max_cos_theta(std::cos(x)); return *this;}
+  direction& max_theta(G4double x) {min_cos_theta(std::cos(x)); return *this;}
 
   direction& bidirectional() {bidirectional_ = true; return *this; }
   direction& exclude      () {exclude_       = true; return *this; }
