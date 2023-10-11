@@ -41,18 +41,27 @@ struct direction {
   SET(max_cos_theta, min_cos_theta_,              1)
   SET(min_phi      ,              0, max_phi_      )
   SET(max_phi      ,       min_phi_, CLHEP::twopi  )
-#undef CHECK_RANGE
-#undef SET
 
   direction& axis(G4ThreeVector zaxis               ) { if (zaxis != G4ThreeVector{0, 0, 1}) {axis_ = zaxis;} return *this;}
   direction& axis(G4double x, G4double y, G4double z) { return axis({x,y,z}); }
 
   // Might seem wrong, but it's not!
-  direction& min_theta(G4double x) {max_cos_theta(std::cos(x)); return *this;}
-  direction& max_theta(G4double x) {min_cos_theta(std::cos(x)); return *this;}
+  direction& min_theta(G4double x) {
+    CHECK_RANGE(min_theta, x, 0, std::acos(min_cos_theta_))
+    max_cos_theta(std::cos(x));
+    return *this;
+  }
+  direction& max_theta(G4double x) {
+    CHECK_RANGE(max_theta, x, std::acos(max_cos_theta_), CLHEP::pi)
+    min_cos_theta(std::cos(x));
+    return *this;
+  }
 
   direction& bidirectional() {bidirectional_ = true; return *this; }
   direction& exclude      () {exclude_       = true; return *this; }
+
+#undef CHECK_RANGE
+#undef SET
 
 private:
   std::optional<G4ThreeVector> axis_{};
