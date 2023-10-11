@@ -2092,19 +2092,18 @@ TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
 
 
 TEST_CASE("random direction exclude axis", "[random][direction]") {
-  using CLHEP::halfpi; using CLHEP::pi;
-  auto xbeam = n4::random::direction{}.min_theta(pi/6).axis({1, 0, 0}).exclude();
+  auto theta = pi/6;
+  auto cos_th = std::cos(theta);
 
-  G4ThreeVector p;
-  auto cos_pi6  = std::cos(pi/6);
-  auto dir_bias = 0;
-  for (auto i=0; i<100; ++i) {
-    p  = xbeam.get();
-    dir_bias += p.z() > 0 ? 1 : -1;
+  auto xbeam = n4::random::direction{}.min_theta(theta).axis({1, 0, 0}).exclude();
+  threevec_stats s{1000, [&] { return xbeam.get(); }};
+  std::cerr << "xbeam\n" << s;
 
-    CHECK(p.x() > cos_pi6);
-  }
-  CHECK(dir_bias < 10);
+  // Check that user-imposed limits are respected
+  CHECK_THAT(s.x_min, WithinRel(cos_th, 0.05));
+  // Check that there is no directional bias (except in x, where it is user-imposed)
+  CHECK_THAT(s.mean().y(), WithinAbs(0, 0.05));
+  CHECK_THAT(s.mean().z(), WithinAbs(0, 0.05));
 }
 
 #pragma GCC diagnostic pop
