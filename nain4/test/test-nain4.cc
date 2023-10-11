@@ -2073,21 +2073,21 @@ TEST_CASE("random direction exclude", "[random][direction]") {
 
 
 TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
-  using CLHEP::halfpi; using CLHEP::pi;
+  auto theta = pi/6;
+  auto sin_th = std::sin(theta);
+  auto cos_th = std::cos(theta);
+
   auto no_caps = n4::random::direction{}.max_theta(pi/6).bidirectional().exclude();
+  threevec_stats s{1000, [&] { return no_caps.get(); }};
+  std::cerr << "no_caps\n" << s;
 
-  G4ThreeVector p;
-  auto sin_pi6  = std::sin(pi/6);
-  auto cos_pi6  = std::cos(pi/6);
-  auto dir_bias = 0;
-  for (auto i=0; i<100; ++i) {
-    p  = no_caps.get();
-    dir_bias += p.z() > 0 ? 1 : -1;
-
-    CHECK(std::abs(p.z()) < cos_pi6);
-    CHECK(p.rho() > sin_pi6);
-  }
-  CHECK(dir_bias < 10);
+  // Check that user-imposed limits are respected
+  CHECK_THAT(s.  z_max, WithinRel(cos_th, 0.05)); CHECK_THAT(s.z_min, WithinRel(-cos_th, 0.05));
+  CHECK_THAT(s.rho_min, WithinRel(sin_th, 0.03));
+  // Check that there is no directional bias
+  CHECK_THAT(s.mean().x(), WithinAbs(0, 0.05));
+  CHECK_THAT(s.mean().y(), WithinAbs(0, 0.05));
+  CHECK_THAT(s.mean().z(), WithinAbs(0, 0.05));
 }
 
 
