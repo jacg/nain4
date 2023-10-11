@@ -2015,6 +2015,7 @@ TEST_CASE("random direction theta", "[random][direction]") {
 TEST_CASE("random direction bidirectional", "[random][direction]") {
   auto theta = pi/6;
   auto sin_th = std::sin(theta);
+  auto cos_th = std::cos(theta);
   auto gen = n4::random::direction{}.max_theta(theta).bidirectional();
 
   threevec_stats stats{1000, [&] { return gen.get(); }};
@@ -2025,11 +2026,13 @@ TEST_CASE("random direction bidirectional", "[random][direction]") {
   CHECK_THAT(stats.mean().y(), WithinAbs(0, 0.02));
   CHECK_THAT(stats.mean().z(), WithinAbs(0, 0.02));
   // Check that user-imposed limits are respected
-  CHECK_THAT(stats.rho_max, WithinRel( sin_th, 0.03));
-  CHECK_THAT(stats.  x_min, WithinRel(-sin_th, 0.03));
-  CHECK_THAT(stats.  x_max, WithinRel( sin_th, 0.03));
-  CHECK_THAT(stats.  y_min, WithinRel(-sin_th, 0.03));
-  CHECK_THAT(stats.  y_max, WithinRel( sin_th, 0.03));
+  CHECK_THAT(stats.rho_max,     WithinRel( sin_th, 0.03));
+  CHECK_THAT(stats.  x_min,     WithinRel(-sin_th, 0.03));
+  CHECK_THAT(stats.  x_max,     WithinRel( sin_th, 0.03));
+  CHECK_THAT(stats.  y_min,     WithinRel(-sin_th, 0.03));
+  CHECK_THAT(stats.  y_max,     WithinRel( sin_th, 0.03));
+  CHECK_THAT(stats.  z_min_abs, WithinRel( cos_th, 0.03));
+
 }
 
 TEST_CASE("random direction axis", "[random][direction]") {
