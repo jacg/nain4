@@ -2004,9 +2004,9 @@ TEST_CASE("random direction theta", "[random][direction]") {
 }
 
 TEST_CASE("random direction bidirectional", "[random][direction]") {
-  auto pi_by_6 = CLHEP::pi/6;
-  auto sin_pi_by6 = std::sin(pi_by_6);
-  auto gen = n4::random::direction{}.max_theta(pi_by_6).bidirectional();
+  auto theta = pi/6;
+  auto sin_th = std::sin(theta);
+  auto gen = n4::random::direction{}.max_theta(theta).bidirectional();
 
   auto max_rho = -std::numeric_limits<double>::infinity();
   threevec_stats stats{1000, [&] {
@@ -2020,31 +2020,32 @@ TEST_CASE("random direction bidirectional", "[random][direction]") {
   CHECK_THAT(stats.mean().y(), WithinAbs(0, 0.05));
   CHECK_THAT(stats.mean().z(), WithinAbs(0, 0.05));
   // Check that user-imposed limits are respected
-  CHECK(max_rho < pi_by_6);
-  CHECK_THAT(stats.x_min, WithinRel(-sin_pi_by6, 0.03));
-  CHECK_THAT(stats.x_max, WithinRel( sin_pi_by6, 0.03));
-  CHECK_THAT(stats.y_min, WithinRel(-sin_pi_by6, 0.03));
-  CHECK_THAT(stats.y_max, WithinRel( sin_pi_by6, 0.03));
+  CHECK(max_rho < theta);
+  CHECK_THAT(stats.x_min, WithinRel(-sin_th, 0.03));
+  CHECK_THAT(stats.x_max, WithinRel( sin_th, 0.03));
+  CHECK_THAT(stats.y_min, WithinRel(-sin_th, 0.03));
+  CHECK_THAT(stats.y_max, WithinRel( sin_th, 0.03));
 }
 
 TEST_CASE("random direction axis", "[random][direction]") {
   const size_t N = 1000;
-  auto sin_pi6 = std::sin(CLHEP::pi/6);
+  auto theta = pi/6;
+  auto sin_th = std::sin(theta);
 
-  auto xpos = n4::random::direction{}.max_theta(halfpi/3).axis({ 6,  0, 0});
-  auto ypos = n4::random::direction{}.max_theta(halfpi/3).axis({ 0,  4, 0});
-  auto xneg = n4::random::direction{}.max_theta(halfpi/3).axis({-8,  0, 0});
-  auto yneg = n4::random::direction{}.max_theta(halfpi/3).axis({ 0, -9, 0});
+  auto xpos = n4::random::direction{}.max_theta(theta).axis({ 6,  0, 0});
+  auto ypos = n4::random::direction{}.max_theta(theta).axis({ 0,  4, 0});
+  auto xneg = n4::random::direction{}.max_theta(theta).axis({-8,  0, 0});
+  auto yneg = n4::random::direction{}.max_theta(theta).axis({ 0, -9, 0});
 
   threevec_stats xp{N, [&] { return xpos.get(); }};
   threevec_stats yp{N, [&] { return ypos.get(); }};
   threevec_stats xn{N, [&] { return xneg.get(); }};
   threevec_stats yn{N, [&] { return yneg.get(); }};
 
-  CHECK(xp.x_min >= 0); CHECK(xp.z_max < sin_pi6); CHECK(xp.z_min > -sin_pi6);
-  CHECK(yp.y_min >= 0); CHECK(yp.z_max < sin_pi6); CHECK(xp.z_min > -sin_pi6);
-  CHECK(xn.x_min <= 0); CHECK(xp.z_max < sin_pi6); CHECK(xp.z_min > -sin_pi6);
-  CHECK(yn.y_min <= 0); CHECK(yp.z_max < sin_pi6); CHECK(xp.z_min > -sin_pi6);
+  CHECK(xp.x_min >= 0); CHECK(xp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
+  CHECK(yp.y_min >= 0); CHECK(yp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
+  CHECK(xn.x_min <= 0); CHECK(xp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
+  CHECK(yn.y_min <= 0); CHECK(yp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
 }
 
 TEST_CASE("random direction exclude", "[random][direction]") {
