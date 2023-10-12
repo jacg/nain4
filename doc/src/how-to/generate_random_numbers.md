@@ -3,8 +3,7 @@
 `nain4` offers a range of utilities to generate random numbers. This includes
 scalars, tuples and 3-vectors. All these methods are declared in the
 [header](../reference/headers.md) `<n4-random.hh>` which is transitively
-included by `<n4-utils.hh>`. They are gathered in the namespace `nain4::random`
-and exported to the namespaces `nain4` and `n4`.
+included by `<n4-utils.hh>`. They are gathered in the namespace `nain4::random`.
 
 
 ## Scalars
@@ -28,70 +27,77 @@ The methods described in this section generate a single number.
   `p_true` of being `true`.
 - `fair_die(n_sides)`: generates a random unsigned integer in the
   range [0, `n_sides - 1`] with equal probability.
-- `biased_choice(weights)`: provides a generator of unsigned integers
-  in the range [0, `weights.size() - 1`] with given `weights`. The
-  generator must be called to obtain a number.
+- `gen = biased_choice(weights)`: provides a generator of unsigned integers
+  in the range [0, `weights.size() - 1`] with given `weights`. The
+  generator must be called to obtain a number: `random_number = gen()`.
 
 
 ## Tuples
 
-- `random_in_disc(r)`: generates a pair of floating point numbers `{x, y}` that satisfy `x^2 + y^2 <= r^2`.
+- `random_in_disc(r)`: generates a pair of floating point numbers `{x, y}` that satisfy `x^2 + y^2 <= r^2`.
 
 ## 3-vectors
 
 The methods described in this section generate `G4ThreeVector`s.
 
-- `random_in_sphere(r)`: generates a vector of floating point numbers `{x, y, z}` that satisfy `x^2 + y^2 + z^2 <= r^2`.
+- `random_in_sphere(r)`: generates a vector of floating point numbers `{x, y, z}` that satisfy `x^2 + y^2 + z^2 <= r^2`.
 
 ### Directions
 
-`nain4` provides the `direction` class to help generate random
-directions. The default state of this tool is to generate vectors
-homogeneously in 4π, but it can be configured to restrict the
-generation to certain directions. The following methods describe how
-to restrict the directionality. Unless otherwise stated, θ is the
-polar angle measured with respect to the positive z-axis and φ is the
-azimuthal angle measured with respect to the x axis
-counterclockwise. Use `.get()` to generate a random number.
+`nain4` provides the `direction` builder to help generate random directions. By
+default this tool generates unit vectors distributed isotropically in 4π, but it
+can be configured to restrict the generation to certain directions.
 
-- `min_cos_theta(cos_th)`/`max_cos_theta(cos_th)`: set the
-  bounds for the cosine of theta angle such that `min_cos_theta <=
-  cos_theta < max_cos_theta`.
+The general usage pattern is
 
-- `min_theta(th)`/`max_theta(th)`: set the bounds for the theta angle such
-  that `min_theta <= theta < max_theta`.
+```c++
+auto generator = n4::random::direction{}.<optional extra specifications>;
+auto one_random_unit_vector = generator.get();
+```
 
-- `min_phi(p)`/`max_phi(p)`: set the bounds for the phi angle such that
-  `min_phi <= phi < max_phi`.
+The `<optional extra specifications>` are described below. `θ` (theta) is the
+polar angle measured with respect to the positive z-axis and φ (phi) is the
+azimuthal angle with `φ=0` in the plane of the positive x-axis and increasing
+towards the positive y-axis, unless the axes are re-oriented with
+`.rotate_{x,y,z}`.
 
-- `axis`: rotate the reference frame such that the z-axis is aligned
-  with `axis`. θ will be measured with respect to the rotated z axis
-  and φ with respect to the rotated x axis (which I don't know how
-  it's defined. either x or y is `axis.cross(zaxis)`).
+The following specifiers (with hopefully self-explanatory names) restrict the angles of the generated directions
+
+- `{min,max}_theta(<angle in radians>)` or `(<angle in degrees> * deg)`
+  + range: `[0, π]` or `[0, 180°]`
+
+- `{min,max}_cos_theta(<ratio>)` range: `[-1, 1]`
+
+- `{min,max}_phi(<angle in radians>)` or `(<angle in degrees> * deg)`
+  + range: `[0, 2π]` or `[0, 360°]`
+
+- `rotate_{x,y,z}(<angle in radians>)` or `(<angle in degrees> * deg)`
+
+  rotation around the specified axis. range: `[0, 2π]` or `[0, 360°]`
+- `rotate(<G4RotationMatrix>)`
 
 - `bidirectional()`: accept both the current selection and its
-  fully-mirrored counterpart.
+  reflection in the origin.
 
-- `exclude()`: invert the selection. It generates directions that do
-  not satisfy any of the selected criteria. Bear in mind that this
-  method is more computationally expensive as it needs to generate
-  directions until the result not rejected. Very restricted
-  directionalities are discouraged.
+- `exclude()`: invert the selection. Generates the complement of the selected
+  criteria. Bear in mind that this method is more computationally expensive as
+  it needs to generate directions until the result is not rejected. Very
+  restricted directionalities are discouraged.
 
 #### Examples
 
-- Isotropic emission: `n4::direction()`
+TODO: add pictures
 
-- Opening angle wrt the positive z axis:
-  `n4::direction().max_theta(theta)`
+- Isotropic emission: `n4::direction{}`
 
-- Opening angle wrt the negative x axis:
-  `n4::direction().max_theta(theta).axis({-1, 0, 0})`
+- Opening angle around the positive z axis: `n4::direction().max_theta(theta)`
+
+- Opening angle around the positive x axis: `n4::direction().max_theta(theta).rotate_y(90 * deg)`
 
 - Only one octant:
   `n4::direction().min_cos_theta(0).min_phi(CLHEP::halfpi).max_phi(CLHEP::pi)`
 
-- Back-to-back beams wrt the positive z axis with some opening angle:
+- Back-to-back beams around the positive z axis with some opening angle:
   `n4::direction().max_theta(theta).bidirectional()`
 
 - Isotropic except for some small angle around the negative z-axis:
