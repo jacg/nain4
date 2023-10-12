@@ -45,32 +45,49 @@ The methods described in this section generate `G4ThreeVector`s.
 
 ### Directions
 
-`nain4` provides the `direction` class to help generate random
-directions. The default state of this tool is to generate vectors
-homogeneously in 4π, but it can be configured to restrict the
-generation to certain directions. The following methods describe how
-to restrict the directionality. Unless otherwise stated, θ is the
-polar angle measured with respect to the positive z-axis and φ is the
-azimuthal angle measured with respect to the x axis
-counterclockwise. Use `.get()` to generate a random number.
+`nain4` provides the `direction` builder to help generate random directions. By
+default this tool generates unit vectors distributed isotropically in 4π, but it
+can be configured to restrict the generation to certain directions.
 
-- `min_cos_theta(cos_th)`/`max_cos_theta(cos_th)`: set the
-  bounds for the cosine of theta angle such that `min_cos_theta <=
-  cos_theta < max_cos_theta`.
+The general usage pattern is
 
-- `min_theta(th)`/`max_theta(th)`: set the bounds for the theta angle such
-  that `min_theta <= theta < max_theta`.
+```c++
+auto generator = n4::random::direction{}.<optional extra specifications>;
+auto one_random_unit_vector = generator.get();
+```
 
-- `min_phi(p)`/`max_phi(p)`: set the bounds for the phi angle such that
-  `min_phi <= phi < max_phi`.
+The `<optional extra specifications>` are described below. `θ` (theta) is the
+polar angle measured with respect to the positive z-axis and φ (phi) is the
+azimuthal angle with `φ=0` in the plane of the positive x-axis and increasing
+towards the positive y-axis, unless the axes are re-oriented with `.axis` or
+`.????`.
 
-- `axis`: rotate the reference frame such that the z-axis is aligned
+The following specifiers (with hopefully self-explanatory names) restrict the angles of the generated directions
+
+- `min_theta(<angle in radians>)` TODO what happens if you pass <0
+- `max_theta(<angle in radians>)` TODO what happens if you pass >π
+- `min_theta_deg(<angle in degrees>)` TODO missing
+- `max_theta_deg(<angle in degrees>)` TODO missing
+- `min_cos_theta(<ratio>)`
+- `max_cos_theta(<ratio>)`
+
+TODO what happens if max < min
+
+- `min_phi(<angle in radians>)` TODO what is the domain and what happens if you give a value outside
+- `max_phi(<angle in radians>)` TODO what is the domain and what happens if you give a value outside
+
+
+- `axis`: TODO we should consider replacing this with `rot_{x,y,z}` etc.
+
+
+  rotate the reference frame such that the z-axis is aligned
   with `axis`. θ will be measured with respect to the rotated z axis
   and φ with respect to the rotated x axis (which I don't know how
   it's defined. either x or y is `axis.cross(zaxis)`).
 
+
 - `bidirectional()`: accept both the current selection and its
-  fully-mirrored counterpart.
+  reflection in the origin.
 
 - `exclude()`: invert the selection. It generates directions that do
   not satisfy any of the selected criteria. Bear in mind that this
@@ -78,15 +95,17 @@ counterclockwise. Use `.get()` to generate a random number.
   directions until the result not rejected. Very restricted
   directionalities are discouraged.
 
+  TODO: hmm, can we not do better than rejection sampling here?
+
 #### Examples
 
-- Isotropic emission: `n4::direction()`
+- Isotropic emission: `n4::direction{}`
 
-- Opening angle wrt the positive z axis:
-  `n4::direction().max_theta(theta)`
+- Opening angle wrt the positive z axis: `n4::direction().max_theta(theta)`
 
 - Opening angle wrt the negative x axis:
-  `n4::direction().max_theta(theta).axis({-1, 0, 0})`
+  + `n4::direction().max_theta(theta).axis(-1, 0, 0)`
+  + `n4::direction().max_theta(theta).axis(g4_three_vec_with_above_components)`
 
 - Only one octant:
   `n4::direction().min_cos_theta(0).min_phi(CLHEP::halfpi).max_phi(CLHEP::pi)`
