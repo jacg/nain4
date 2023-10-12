@@ -1,9 +1,10 @@
 # How to generate random numbers
 
-`nain4` offers a range of utilities to generate random numbers. This
-includes scalars, tuples and 3-vectors. All these methods are
-gathered in the namespace `nain4::random` and exported to
-the namespaces `nain4` and `n4`.
+`nain4` offers a range of utilities to generate random numbers. This includes
+scalars, tuples and 3-vectors. All these methods are declared in the
+[header](../reference/headers.md) `<n4-random.hh>` which is transitively
+included by `<n4-utils.hh>`. They are gathered in the namespace `nain4::random`
+and exported to the namespaces `nain4` and `n4`.
 
 
 ## Scalars
