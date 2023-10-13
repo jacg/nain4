@@ -9,6 +9,8 @@ project( 'nain4-test'
                            ]
        )
 
+install_prefix = get_option('prefix')
+
 nain4  = dependency( 'nain4'
                    , method  : 'pkg-config'
                    , required: true
@@ -34,7 +36,8 @@ geant4 = dependency( 'Geant4'
                                , 'Geant4::G4VRML'             , 'Geant4::G4gl2ps'       , 'Geant4::G4GMocren'
                                , 'Geant4::G4vis_management'   , 'Geant4::G4modeling'    , 'Geant4::G4OpenGL'
                                , 'Geant4::G4UIVisDefinitions'
-                               ])
+                               ]
+                   )
 
 nain4_test_deps    = [nain4, geant4, catch2]
 nain4_test_include = include_directories('.')
@@ -47,9 +50,24 @@ nain4_test_sources = [ 'test-nain4.cc'
 geant4_include = geant4.get_variable(cmake    : 'Geant4_INCLUDE_DIRS')
 nain4_include  =  nain4.get_variable(pkgconfig: 'includedir'         )
 
-nain4_test_exe = executable( 'nain4-test'
+test_executable = 'nain4-test'
+
+nain4_test_exe = executable( test_executable
                            , nain4_test_sources
                            , include_directories: [nain4_test_include, nain4_include, geant4_include]
                            , dependencies       : nain4_test_deps
                            , install            : true
                            )
+
+conf_data = configuration_data({
+'install_prefix'  : install_prefix,
+'test_executable' : test_executable,
+})
+
+configure_file(
+  input         : 'run-each-test-in-separate-process.sh.in',
+  output        : 'run-each-test-in-separate-process.sh',
+  configuration : conf_data,
+  install       : true,
+  install_dir   : install_prefix
+)

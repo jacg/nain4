@@ -15,7 +15,7 @@ NPASSED=0
 NFAILED=0
 FAILED=
 
-EXE=@CMAKE_INSTALL_PREFIX@/bin/@TEST_EXECUTABLE@
+EXE=@install_prefix@/bin/@test_executable@
 
 while read -r testname
 do
