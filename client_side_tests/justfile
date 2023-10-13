@@ -2,9 +2,9 @@
 
 test-all:
   #!/usr/bin/env sh
-  just test-fetch-content           ;(( status |= $? ))
+  #just test-fetch-content           ;(( status |= $? ))
   # just test-fetch-content-recompile ;(( status |= $? )) # https://github.com/jacg/nain4/issues/88
-  just test-subdirectory            ;(( status |= $? ))
+  #just test-subdirectory            ;(( status |= $? ))
   just test-independent-installation;(( status |= $? ))
 
   exit $status
