@@ -4,7 +4,7 @@ project( 'my-n4-project'
        , default_options : [ 'buildtype=debugoptimized'
                            , 'debug=true'
                            , 'optimization=2'
-                           , 'cpp_std=c++17'
+                           , 'cpp_std=c++20'
                            , 'prefix=@0@/../install/app/'.format(meson.source_root())
                            ]
        )

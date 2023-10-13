@@ -4,7 +4,7 @@ project( 'nain4-test'
        , default_options : [ 'buildtype=debugoptimized'
                            , 'debug=true'
                            , 'optimization=2'
-                           , 'cpp_std=c++17'
+                           , 'cpp_std=c++20'
                            , 'prefix=@0@/../../install/nain4-test'.format(meson.source_root())
                            ]
        )

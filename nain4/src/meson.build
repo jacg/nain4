@@ -5,7 +5,7 @@ project( 'nain4'
                            , 'debug=true'
                            , 'optimization=2'
                            , 'default_library=shared'
-                           , 'cpp_std=c++17'
+                           , 'cpp_std=c++20'
                            , 'prefix=@0@/../../install/nain4'.format(meson.source_root())
                            , 'libdir=lib' # removes architecture from path
                            ]
