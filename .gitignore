@@ -18,6 +18,7 @@ G4History.macro
 /g4-examples/*
 !/g4-examples/justfile
 
-/n4-examples/*/src/CMakeLists.txt
+/n4-examples/*/src/meson.build
+/n4-examples/*/src/globber.sh
 /n4-examples/*/build
 /n4-examples/*/install

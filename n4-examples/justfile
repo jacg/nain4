@@ -7,14 +7,16 @@ clean NAME:
   rm -rf {{NAME}}/src/CMakeLists.txt
 
 prepare NAME:
-  sed 's/XXX/{{NAME}}/g' CMakeLists.txt > {{NAME}}/src/CMakeLists.txt
+  sed 's/XXX/{{NAME}}/g' meson.build > {{NAME}}/src/meson.build
+  cp globber.sh {{NAME}}/src/
 
 install NAME: (prepare NAME)
-  cmake -S {{NAME}}/src -B {{NAME}}/build
-  cmake --build {{NAME}}/build --target install
+  meson setup {{NAME}}/build {{NAME}}/src
+  meson compile -C {{NAME}}/build
+  meson install -C {{NAME}}/build
 
 run NAME *ARGS: (install NAME)
-  ./{{NAME}}/install/example-{{NAME}} {{ARGS}} --macro-path {{NAME}}/macs
+  ./{{NAME}}/install/bin/example-{{NAME}} {{ARGS}} --macro-path {{NAME}}/macs
 
 run-all:
   for example in `just list-available-examples`; do \
