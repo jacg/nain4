@@ -9,7 +9,7 @@ project( 'my-n4-project'
                            ]
        )
 
-nain4  = dependency( 'nain4'
+nain4  = dependency( 'Nain4'
                    , method  : 'pkg-config'
                    , required: true
                    )

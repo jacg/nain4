@@ -11,7 +11,7 @@ project( 'nain4-test'
 
 install_prefix = get_option('prefix')
 
-nain4  = dependency( 'nain4'
+nain4  = dependency( 'Nain4'
                    , method  : 'pkg-config'
                    , required: true
                    )
