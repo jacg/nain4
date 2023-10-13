@@ -15,6 +15,7 @@ project( 'nain4'
 geant4 = dependency( 'Geant4'
                    , method  : 'cmake'
                    , required: true
+                   , components: ['ui_all', 'vis_all']
                    , modules : [ 'Geant4::G4ptl'              , 'Geant4::G4analysis'    , 'Geant4::G4digits_hits'
                                , 'Geant4::G4error_propagation', 'Geant4::G4event'       , 'Geant4::G4tools'
                                , 'Geant4::G3toG4'             , 'Geant4::G4geometry'    , 'Geant4::G4global'
