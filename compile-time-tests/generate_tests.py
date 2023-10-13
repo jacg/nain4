@@ -140,20 +140,21 @@ reset_colour   = "\033[0m"
 for (test_name, (error_match, snippet)) in tests.items():
     test_folder_name = test_name.replace(" ", "_")
     test_folder      = os.path.join(main_folder, test_folder_name)
+    build_folder     = os.path.join(main_folder, test_folder_name, "build")
     filename         = os.path.join(test_folder, "main.cc")
 
     os.mkdir(test_folder)
     shutil.copy("compile_time_common.hh", test_folder)
-    shutil.copy("CMakeLists.txt"        , test_folder)
+    shutil.copy("meson.build"           , test_folder)
 
     open(filename, "w").write(test_template.format(snippet=snippet))
-    command = "NAIN4_INSTALL={1} cmake -S {0} -B {0} && cmake --build {0}"
-    process = subprocess.run( command.format(test_folder, nain4)
+    command = "PKG_CONFIG_PATH={2}:$PKG_CONFIG_PATH meson setup {1} {0} && meson compile -C {1}"
+    process = subprocess.run( command.format(test_folder, build_folder, nain4)
                             , capture_output = True
                             , shell          = True)
 
     compiled    = process.returncode == 0
-    found_match = found(error_match, process.stderr.decode())
+    found_match = found(error_match, process.stdout.decode())
     failed      = compiled or not found_match
     n_failed   += int(failed)
 
