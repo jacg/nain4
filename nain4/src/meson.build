@@ -75,7 +75,7 @@ nain4_sources = [ 'n4-boolean-shape.cc'
 
 geant4_include = geant4.get_variable(cmake: 'Geant4_INCLUDE_DIRS')
 
-nain4_lib = shared_library( 'Nain4'
+nain4_lib = shared_library( 'nain4'
                           , nain4_sources
                           , include_directories: [nain4_include, geant4_include]
                           , dependencies       : nain4_deps
@@ -90,9 +90,9 @@ install_headers(nain4_includes)
 
 pkg = import('pkgconfig')
 pkg.generate( nain4_lib
-            , description: 'Nain4'
-            , name       : 'Nain4'
-            , filebase   : 'Nain4'
+            , description: 'nain4'
+            , name       : 'nain4'
+            , filebase   : 'nain4'
             )
 
 
@@ -105,8 +105,7 @@ conf_data = configuration_data({
 })
 
 cmake.configure_package_config_file(
-  name          : 'Nain4',
-  input         : 'Nain4Config.cmake.in',
-#  output        : 'Nain4Config.cmake',
+  name          : 'nain4',
+  input         : 'nain4Config.cmake.in',
   configuration : conf_data,
 )

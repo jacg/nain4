@@ -21,7 +21,7 @@ include(FetchContent)
 set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE BOOL "Cache package contents to avoid unnecessary downloads")
 
 FetchContent_Declare(
-  Nain4
+  nain4
   GIT_REPOSITORY https://github.com/${USERNAME}/nain4.git
   GIT_TAG        ${COMMIT_HASH}
   # make sure that no other nain4 installation is used
@@ -29,7 +29,7 @@ FetchContent_Declare(
   SOURCE_SUBDIR nain4/src
 )
 
-FetchContent_MakeAvailable(Nain4)
+FetchContent_MakeAvailable(nain4)
 # ANCHOR_END: fetch
 
 find_package(Geant4 REQUIRED ui_all vis_all)
@@ -41,7 +41,7 @@ add_executable(client_exe main.cc)
 target_link_libraries(
 client_exe
 PRIVATE
-Nain4
+nain4
 ${Geant4_LIBRARIES}
 )
 # ANCHOR_END: link

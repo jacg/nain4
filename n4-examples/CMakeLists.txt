@@ -31,9 +31,9 @@ include_directories(${PROJECT_SOURCE_DIR})
 FILE(GLOB SOURCES ${PROJECT_SOURCE_DIR}/*.cc)
 FILE(GLOB HEADERS ${PROJECT_SOURCE_DIR}/*.hh)
 
-set(Nain4_DIR "../../../install/nain4/lib/cmake/Nain4")
+set(nain4_DIR "../../../install/nain4/lib/cmake/nain4")
 
-find_package(Nain4 REQUIRED)
+find_package(nain4 REQUIRED)
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
@@ -61,7 +61,7 @@ target_link_libraries(
   ${EXE}
   PUBLIC
   ${Geant4_LIBRARIES}
-  Nain4
+  nain4
 )
 
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${EXE}

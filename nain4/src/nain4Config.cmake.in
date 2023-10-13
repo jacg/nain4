@@ -3,7 +3,7 @@
 # Set variables for include directories and library dependencies
 set(NAIN4_INCLUDE_DIRS "@install_prefix@/include/")
 set(NAIN4_LIB_DIRS "@install_prefix@/lib")
-set(NAIN4_LIBRARIES "Nain4")
+set(NAIN4_LIBRARIES "nain4")
 
 include_directories(${NAIN4_INCLUDE_DIRS})
 link_directories(${NAIN4_LIB_DIRS})

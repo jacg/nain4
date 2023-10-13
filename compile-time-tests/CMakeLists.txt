@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(Nain4_DIR "$ENV{NAIN4_INSTALL}/lib/cmake/Nain4/")
-find_package(Nain4 REQUIRED)
+set(nain4_DIR "$ENV{NAIN4_INSTALL}/lib/cmake/nain4/")
+find_package(nain4 REQUIRED)
 
 find_package(Geant4 REQUIRED ui_all vis_all)
 include(${Geant4_USE_FILE})
@@ -16,6 +16,6 @@ add_executable(compile_time_test main.cc)
 target_link_libraries(
 compile_time_test
 PRIVATE
-Nain4
+nain4
 ${Geant4_LIBRARIES}
 )
