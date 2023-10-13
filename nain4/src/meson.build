@@ -94,3 +94,19 @@ pkg.generate( nain4_lib
             , name       : 'nain4'
             , filebase   : 'nain4'
             )
+
+
+cmake = import('cmake')
+
+install_prefix = get_option('prefix')
+
+conf_data = configuration_data({
+'install_prefix'  : install_prefix,
+})
+
+cmake.configure_package_config_file(
+  name          : 'Nain4',
+  input         : 'Nain4Config.cmake.in',
+#  output        : 'Nain4Config.cmake',
+  configuration : conf_data,
+)
