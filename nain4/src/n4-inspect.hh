@@ -6,6 +6,8 @@
 #include <G4PhysicalVolumeStore.hh>
 #include <G4SolidStore.hh>
 #include <G4ParticleTable.hh>
+#include <stdexcept>
+#include <typeinfo>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -27,7 +29,19 @@ IA event_number  ()       { return n4::run_manager::get().here_be_dragons() -> G
 #undef NAME_VRB
 
 template<class DOWN>
-const DOWN* find_solid(const G4String& name) { return static_cast<const DOWN*>(find_solid(name));}
+const DOWN* find_solid(const G4String& name) {
+  auto found = find_solid(name);
+  if (!found) {
+    throw std::runtime_error("solid " + name + " not found");
+  }
+  try {
+    return static_cast<const DOWN*>(find_solid(name));
+  }
+  catch (std::bad_cast) {
+    std::cerr << "solid " + name + " could not be casted to " + typeid(DOWN).name() << std::endl;
+    throw;
+  }
+}
 
 // Remove all, logical/physical volumes, solids and assemblies.
 inline void clear_geometry() { G4RunManager::GetRunManager() -> ReinitializeGeometry(true); }
