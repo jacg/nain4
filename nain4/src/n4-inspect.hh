@@ -30,17 +30,16 @@ IA event_number  ()       { return n4::run_manager::get().here_be_dragons() -> G
 
 template<class DOWN>
 const DOWN* find_solid(const G4String& name) {
+
   auto found = find_solid(name);
   if (!found) {
     throw std::runtime_error("solid " + name + " not found");
   }
-  try {
-    return static_cast<const DOWN*>(find_solid(name));
+  auto down = dynamic_cast<const DOWN*>(find_solid(name));
+  if (!down) {
+    throw std::runtime_error("solid " + name + " cannot be downcasted to " + typeid(DOWN).name());
   }
-  catch (std::bad_cast) {
-    std::cerr << "solid " + name + " could not be casted to " + typeid(DOWN).name() << std::endl;
-    throw;
-  }
+  return down;
 }
 
 // Remove all, logical/physical volumes, solids and assemblies.
