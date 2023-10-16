@@ -96,6 +96,11 @@
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
       QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
+      shellHook = ''
+          export NAIN4_LIB=$PWD/install/nain4/lib/
+          export LD_LIBRARY_PATH=$NAIN4_LIB:$LD_LIBRARY_PATH;
+          export PKG_CONFIG_PATH=$NAIN4_LIB/pkgconfig:$PKG_CONFIG_PATH;
+      '';
     };
 
     devShells.gcc = pkgs.mkShell {
@@ -107,6 +112,11 @@
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
       QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
+      shellHook = ''
+          export NAIN4_LIB=$PWD/install/nain4/lib
+          export LD_LIBRARY_PATH=$NAIN4_LIB:$LD_LIBRARY_PATH;
+          export PKG_CONFIG_PATH=$NAIN4_LIB/pkgconfig:$PKG_CONFIG_PATH;
+      '';
     };
 
     devShell = self.devShells.clang;
@@ -174,7 +184,7 @@
       build-prop = with pkgs; [ ]; # extra-cmake-modules ?
       test       = with pkgs; [ catch2_3 ];
       run        = with pkgs; [ ];
-      run-prop   = with pkgs; [ just geant4-data cmake my-geant4 qt5.wrapQtAppsHook argparse ];
+      run-prop   = with pkgs; [ just geant4-data meson ninja cmake pkg-config my-geant4 qt5.wrapQtAppsHook argparse ];
       g4-data-package = pkgs.geant4.data;
     };
 

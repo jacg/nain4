@@ -17,6 +17,6 @@ add_executable(client_exe main.cc)
 target_link_libraries(
 client_exe
 PRIVATE
-Nain4
+nain4
 ${Geant4_LIBRARIES}
 )
