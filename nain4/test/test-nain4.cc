@@ -37,6 +37,7 @@
 
 #include <cmath>
 #include <numeric>
+#include <stdexcept>
 #include <type_traits>
 
 #pragma GCC diagnostic push
@@ -1165,6 +1166,16 @@ TEST_CASE("nain find solid downcast", "[nain][find][solid]") {
 
   CHECK(found_box  == box );
   CHECK(found_tubs == tubs);
+}
+
+
+TEST_CASE("nain find solid downcast not found", "[nain][find][solid]") {
+  REQUIRE_THROWS_AS(n4::find_solid<G4Box>("does_not_exist"), std::runtime_error);
+}
+
+TEST_CASE("nain find solid downcast bad cast", "[nain][find][solid]") {
+  n4::box("box").cube(1).solid();
+  REQUIRE_THROWS_AS(n4::find_solid<G4Tubs>("box"), std::runtime_error);
 }
 
 TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
