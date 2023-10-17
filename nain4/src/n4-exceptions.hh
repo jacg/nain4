@@ -14,8 +14,8 @@ namespace exceptions {
   "########################################################\n" \
   "\n\n"
 
-struct n4_exception : std::exception {
-  n4_exception(const std::string& name, const std::string& from, const std::string& message)
+struct exception : std::exception {
+  exception(const std::string& name, const std::string& from, const std::string& message)
   : message(WRAP(name, from, message)) {}
   const char* what() const noexcept { return message.c_str();}
 
@@ -23,14 +23,14 @@ private:
   std::string message;
 };
 
-#define N4_EXCEPTION(NAME)                                  \
-struct NAME : n4_exception {                                \
+#define EXCEPTION(NAME)                                     \
+struct NAME : exception {                                   \
   NAME(const std::string& from, const std::string& message) \
-    : n4_exception(#NAME, from, message) {}                 \
+    : exception(#NAME, from, message) {}                    \
 };
 
-N4_EXCEPTION(not_found)
-N4_EXCEPTION(bad_cast)
+EXCEPTION(not_found)
+EXCEPTION(bad_cast)
 
 #undef N4_EXCEPTION
 #undef WRAP
