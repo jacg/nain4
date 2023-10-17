@@ -56,7 +56,7 @@
     # TODO: switch to clang environment
     packages.nain4 = pkgs.stdenv.mkDerivation {
       pname = "nain4";
-      version = "0.1.10";
+      version = "0.2.0";
       src = "${self}/nain4/src";
 
                 nativeBuildInputs = self.deps.build;      # local              build environment
@@ -82,7 +82,7 @@
 
     packages.nain4-tests = pkgs.stdenv.mkDerivation {
       pname = "nain4-tests";
-      version = "0.1.10";
+      version = "0.2.0";
       src = "${self}/nain4/test";
       nativeBuildInputs = with self; [ packages.nain4 ] ++ deps.build ++ deps.test;
     };

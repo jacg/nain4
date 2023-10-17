@@ -1,6 +1,6 @@
 project( 'nain4'
        , 'cpp'
-       , version : 'v0.1.10'
+       , version : 'v0.2.0'
        , default_options : [ 'buildtype=debugoptimized'
                            , 'debug=true'
                            , 'optimization=2'
