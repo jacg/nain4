@@ -38,7 +38,7 @@ const DOWN* find_solid(const G4String& name) {
   }
   auto down = dynamic_cast<const DOWN*>(find_solid(name));
   if (!down) {
-    throw n4::exceptions::bad_cast("find_solid", "solid " + name + " cannot be downcasted to " + typeid(DOWN).name());
+    throw n4::exceptions::bad_cast("find_solid", "solid " + name + " cannot be downcast to " + typeid(DOWN).name());
   }
   return down;
 }
