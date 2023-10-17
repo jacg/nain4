@@ -1,5 +1,6 @@
 #pragma once
 
+#include <n4-exceptions.hh>
 #include <n4-run-manager.hh>
 
 #include <G4LogicalVolumeStore.hh>
@@ -33,11 +34,11 @@ const DOWN* find_solid(const G4String& name) {
 
   auto found = find_solid(name);
   if (!found) {
-    throw std::runtime_error("solid " + name + " not found");
+    throw n4::exceptions::not_found("find_solid", "solid " + name + " not found");
   }
   auto down = dynamic_cast<const DOWN*>(find_solid(name));
   if (!down) {
-    throw std::runtime_error("solid " + name + " cannot be downcasted to " + typeid(DOWN).name());
+    throw n4::exceptions::bad_cast("find_solid", "solid " + name + " cannot be downcasted to " + typeid(DOWN).name());
   }
   return down;
 }

@@ -1,4 +1,5 @@
 #include <n4-defaults.hh>
+#include <n4-exceptions.hh>
 #include <n4-shape.hh>
 #include <n4-boolean-shape.hh>
 #include <n4-utils.hh>
@@ -1170,12 +1171,12 @@ TEST_CASE("nain find solid downcast", "[nain][find][solid]") {
 
 
 TEST_CASE("nain find solid downcast not found", "[nain][find][solid]") {
-  REQUIRE_THROWS_AS(n4::find_solid<G4Box>("does_not_exist"), std::runtime_error);
+  REQUIRE_THROWS_AS(n4::find_solid<G4Box>("does_not_exist"), n4::exceptions::not_found);
 }
 
 TEST_CASE("nain find solid downcast bad cast", "[nain][find][solid]") {
   n4::box("box").cube(1).solid();
-  REQUIRE_THROWS_AS(n4::find_solid<G4Tubs>("box"), std::runtime_error);
+  REQUIRE_THROWS_AS(n4::find_solid<G4Tubs>("box"), n4::exceptions::bad_cast);
 }
 
 TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
