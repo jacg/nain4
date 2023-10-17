@@ -16,7 +16,7 @@ As your program grows and is split into multiple files, and you gain more experi
 
 + `<n4-main.hh>`
 
-   Groups together utilities that are required to write the `main` function of a `nain4` application. These are also available via the separate headers: 
+   Groups together utilities that are required to write the `main` function of a `nain4` application. These are also available via the separate headers:
    + `<n4-run-manager.hh>`: `nain4` interface for configuring the Geant4 run manager
    + `<n4-mandatory.hh>`: `nain4` utilities for concise implementation of the user-defined classes that must be registered with the run manager
 
@@ -34,6 +34,7 @@ As your program grows and is split into multiple files, and you gain more experi
 
   Various ready-made conveniences to alleviate the tedium and verbosity of oft-encountered tasks.  These are also available via the separate headers:
   + `<n4-constants.hh>`: physical constants not provided by `CLHEP`
+  + `<n4-exceptions.hh>`: custom n4 exceptions for better error handling
   + `<n4-inspect.hh>`: finding existing geometry components, materials, etc.
   + `<n4-random.hh>`: random number generation
   + `<n4-sequences.hh>`: convenient creation of sequences of numerical data
