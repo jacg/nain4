@@ -34,7 +34,7 @@ As your program grows and is split into multiple files, and you gain more experi
 
   Various ready-made conveniences to alleviate the tedium and verbosity of oft-encountered tasks.  These are also available via the separate headers:
   + `<n4-constants.hh>`: physical constants not provided by `CLHEP`
-  + `<n4-exceptions.hh>`: custom n4 exceptions for better error handling
+  + `<n4-exceptions.hh>`: exceptions relating to situations arising in nain4 code
   + `<n4-inspect.hh>`: finding existing geometry components, materials, etc.
   + `<n4-random.hh>`: random number generation
   + `<n4-sequences.hh>`: convenient creation of sequences of numerical data
