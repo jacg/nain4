@@ -10,7 +10,7 @@
 
   dev-shell-packages = with nain4;
     [ nain4.packages.nain4 ] ++
-    deps.build-prop ++ deps.test ++ deps.run-prop
+    deps.dev ++ deps.build-prop ++ deps.test ++ deps.run-prop
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
