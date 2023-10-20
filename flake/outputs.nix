@@ -87,7 +87,7 @@
       nativeBuildInputs = with self; [ packages.nain4 ] ++ deps.build ++ deps.test;
     };
 
-    devShells.clang = pkgs.mkShell.override { stdenv = pkgs.clang_16.stdenv; } {
+    devShells.clang = pkgs.mkShell.override { stdenv = clang_16.stdenv; } {
       name = "nain4-clang-devenv";
 
       packages = dev-shell-packages ++ [ clang_16 ];
