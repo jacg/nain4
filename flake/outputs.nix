@@ -174,9 +174,7 @@
       dev = with pkgs; [
         just
         clang-tools
-        cmake-language-server
         mdbook
-        gnused # For hacking CMAKE_EXPORT stuff into CMakeLists.txt
       ];
 
       # The -prop variants are to be propagated to downstream packages
