@@ -179,6 +179,23 @@
         just
         clang-tools
         mdbook
+        (mdbook-admonish.overrideAttrs (oldAttrs: rec {
+          pname = "mdbook-admonish";
+          version = "1.10.2";
+
+          src = fetchFromGitHub {
+            owner = "tommilligan";
+            repo = pname;
+            rev = "v${version}";
+            hash = "sha256-2c1wSij2MDRdrqxN+cmnFO0z6mH/fgeg9E3cm+8ssww=";
+          };
+
+          cargoDeps = oldAttrs.cargoDeps.overrideAttrs (pkgs.lib.const {
+            name = "${pname}-vendor.tar.gz";
+            inherit src;
+            outputHash = "sha256-V37uLhXL1xHHiqJch0VFMm87jsIfB6HL3bVODb/RAqs=";
+          });
+        }))
       ];
 
       # The -prop variants are to be propagated to downstream packages
