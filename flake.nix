@@ -1,5 +1,5 @@
 {
-  description = "Playing with G4 examples";
+  description = "An abstraction layer on top of Geant4";
 
   inputs = {
     nixpkgs         .url = "github:NixOS/nixpkgs/nixos-23.05";
