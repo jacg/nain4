@@ -2,7 +2,11 @@
 , nixpkgs # <---- This `nixpkgs` has systems removed e.g. legacyPackages.zlib
 , ...
 }: let
-  inherit (nixpkgs.legacyPackages) pkgs;
+
+  pkgs = (nixpkgs.legacyPackages.extend (import ./overlays/argparse.nix));
+  # Would prefer something along the lines of
+  #    pkgs = import nixpkgs { overlays = [ (import ./overlays/argparse.nix) ]; };
+  # but not sure how to get it to work with `nosys`
 
   g4 = { thread ? false , inventor ? false , qt ? false, xm ? false, ogl ? false, python ? false, raytrace ? false }:
     (pkgs.geant4.override {

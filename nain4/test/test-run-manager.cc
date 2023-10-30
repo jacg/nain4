@@ -220,17 +220,17 @@ TEST_CASE("cli explicit vis macro", "[nain][cli]") {
   CHECK(  q.late .size() == 0);
 }
 
-// TEST_CASE("cli implicit vis macro not last", "[nain][cli]") {
-//   auto hush = n4::silence{std::cout};
-//   argcv a{"progname", "-g", "-n", "1"};
-//   n4::ui ui{"automated-test", a.argc, a.argv, false};
-//   n4::test::query q{ui};
-//   CHECK(  q.n_events.value() == 1);
-//   CHECK(  q.vis_macro.value() == "vis.macro");
-//   CHECK(  q.use_graphics);
-//   CHECK(  q.early.size() == 0);
-//   CHECK(  q.late .size() == 0);
-// }
+TEST_CASE("cli implicit vis macro not last", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname", "-g", "-n", "1"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(  q.n_events.value() == 1);
+  CHECK(  q.vis_macro.value() == "vis.mac");
+  CHECK(  q.use_graphics);
+  CHECK(  q.early.size() == 0);
+  CHECK(  q.late .size() == 0);
+}
 
 TEST_CASE("cli implicit early multiple values", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
