@@ -1,5 +1,4 @@
-#ifndef SHARED_HH
-#define SHARED_HH
+#pragma once
 
 #include <G4GenericMessenger.hh>
 #include <G4SystemOfUnits.hh>
@@ -37,5 +36,3 @@ struct output {
   std::ofstream    time_data_files[2];
   std::ofstream    edep_data_files[2];
 };
-
-#endif // SHARED_HH

@@ -1,5 +1,4 @@
-#ifndef MATERIALS_HH
-#define MATERIALS_HH
+#pragma once
 
 #include "shared.hh"
 
@@ -8,5 +7,3 @@
 G4Material*    csi_with_properties(const config& config);
 G4Material*    air_with_properties();
 G4Material* teflon_with_properties();
-
-#endif // MATERIALS_HH
