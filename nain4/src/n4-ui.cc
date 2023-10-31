@@ -105,16 +105,25 @@ void ui::run() {
 
 void ui::run_many(const std::vector<std::string> macros_and_commands, const G4String& prefix) {
   for (const auto& item: macros_and_commands) {
-    if (item.ends_with(".mac")) { run_macro(item, "CLI-"+prefix           ); }
-    else                        { command  (item, "CLI-"+prefix, "command"); }
+    if (item.ends_with(".mac")) { run_macro(item, "CLI-"+prefix               ); }
+    else                        { command  (item, "CLI-"+prefix, kind::command); }
   }
 }
 
 void ui::run_macro(const G4String& filename, const G4String& prefix) {
-  command("/control/execute " + filename, prefix, "macro");
+  command("/control/execute " + filename, prefix, kind::macro);
 }
 
-void ui::command (const G4String& command, const G4String& prefix, const G4String& kind) {
+
+std::string ui::repr(const kind kind) {
+  switch (kind) {
+    case kind::command: return "command";
+    case kind::macro  : return "macro";
+    case kind::beam_on: return "beam_on";
+  }
+}
+
+void ui::command (const G4String& command, const G4String& prefix, const kind kind) {
   auto status = g4_ui.ApplyCommand(command);
   if (status != fCommandSucceeded) {
     std::string reason =
@@ -125,13 +134,13 @@ void ui::command (const G4String& command, const G4String& prefix, const G4Strin
       (status == fParameterOutOfCandidates) ? "parameter not in accepted set" :
       (status == fAliasNotFound)            ? "alias not found"               :
                                               "this should not have happened!";
-    std::string message{prefix + ' ' + kind + " rejected: (" + command + ") because: " + reason};
+    std::string message{prefix + ' ' + repr(kind) + " rejected: (" + command + ") because: " + reason};
     std::cerr << message << std::endl;
     throw std::runtime_error{message};
   }
   std::cout << "nain4::ui:"
             << std::setw(15) << prefix << ' '
-            << std::setw( 7) << kind
+            << std::setw( 7) << repr(kind)
             << " accepted: (" << command  << ')' << std::endl;
 }
 

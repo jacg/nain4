@@ -117,9 +117,10 @@ private:
       ui.run();
       return run_manager::rm_instance;
     }
-    ready apply_command   (const G4String& command ) { ui.command  (command , "late", "command" ); return std::move(*this); }
-    ready apply_late_macro(const G4String& filename) { ui.run_macro(filename, "late"            ); return std::move(*this); }
-    ready apply_cli_late  (                        ) { ui.run_late (                            ); return std::move(*this); }
+    ui::kind command = ui::kind::command;
+    ready apply_command   (const G4String& command_) { ui.command  (command_, "late", command ); return std::move(*this); }
+    ready apply_late_macro(const G4String& filename) { ui.run_macro(filename, "late"          ); return std::move(*this); }
+    ready apply_cli_late  (                        ) { ui.run_late (                          ); return std::move(*this); }
   };
 
   struct set_actions {
@@ -147,10 +148,11 @@ private:
 
   struct set_physics {
     CORE(set_physics)
-    set_physics apply_command    (const G4String& command ) { ui.command  (command , "early", "command"); return std::move(*this); }
-    set_physics apply_early_macro(const G4String& filename) { ui.run_macro(filename, "early"           ); return std::move(*this); }
-    set_physics apply_cli_early  (                        ) { ui.run_early(                            ); return std::move(*this); }
-    set_physics macro_path       (const G4String& path    ) { ui.prepend_path(path)                     ; return std::move(*this); }
+    ui::kind command = ui::kind::command;
+    set_physics apply_command    (const G4String& command_) { ui.command  (command_, "early", command); return std::move(*this); }
+    set_physics apply_early_macro(const G4String& filename) { ui.run_macro(filename, "early"         ); return std::move(*this); }
+    set_physics apply_cli_early  (                        ) { ui.run_early(                          ); return std::move(*this); }
+    set_physics macro_path       (const G4String& path    ) { ui.prepend_path(path)                   ; return std::move(*this); }
 
     using fn_type = std::function<G4VUserPhysicsList* ()>;
     NEXT_STATE_BASIC(set_geometry, physics, G4VUserPhysicsList)
