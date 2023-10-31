@@ -29,6 +29,10 @@ jobs:
         devshell: [ clang, gcc ]
         #allow-fail: [false]
 
+        exclude:
+          - os: macos-12
+            devshell: gcc
+
     steps:
       - uses: actions/checkout@v3.5.3
         with:
