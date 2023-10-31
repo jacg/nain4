@@ -79,13 +79,14 @@ void gamma_interaction_z_pos(std::vector<std::vector<G4double>>& gamma_zs, G4Ste
 
 void open_files(output& output) {
   auto seed = std::to_string(G4Random::getTheSeed());
-  std::filesystem::create_directory("output");
-  output.gamma_z_data_files[0].open("output/z_pos_0_seed_" + seed + ".csv");
-  output.gamma_z_data_files[1].open("output/z_pos_1_seed_" + seed + ".csv");
-  output.   time_data_files[0].open("output/times_0_seed_" + seed + ".csv");
-  output.   time_data_files[1].open("output/times_1_seed_" + seed + ".csv");
-  output.   edep_data_files[0].open("output/edeps_0_seed_" + seed + ".csv");
-  output.   edep_data_files[1].open("output/edeps_1_seed_" + seed + ".csv");
+  std::string dir{"output-double-sipm"};
+  std::filesystem::create_directory(dir);
+  output.gamma_z_data_files[0].open(dir + "/z_pos_0_seed_" + seed + ".csv");
+  output.gamma_z_data_files[1].open(dir + "/z_pos_1_seed_" + seed + ".csv");
+  output.   time_data_files[0].open(dir + "/times_0_seed_" + seed + ".csv");
+  output.   time_data_files[1].open(dir + "/times_1_seed_" + seed + ".csv");
+  output.   edep_data_files[0].open(dir + "/edeps_0_seed_" + seed + ".csv");
+  output.   edep_data_files[1].open(dir + "/edeps_1_seed_" + seed + ".csv");
 }
 
 void close_files(output& output) {

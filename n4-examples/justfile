@@ -1,7 +1,7 @@
 # -*-Makefile-*-
 
 list-available-examples:
-  @ls -d */ | tr -d "\/"
+  @ls -d */ | rg -v output- | tr -d "\/"
 
 clean NAME:
   rm -rf {{NAME}}/{build,install}
