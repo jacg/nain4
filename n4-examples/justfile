@@ -1,5 +1,7 @@
 # -*-Makefile-*-
 
+set positional-arguments := true
+
 list-available-examples:
   @ls -d */ | rg -v output- | tr -d "\/"
 
@@ -17,7 +19,7 @@ install NAME: (prepare NAME)
   meson install -C {{NAME}}/build
 
 run NAME *ARGS: (install NAME)
-  ./{{NAME}}/install/bin/example-{{NAME}} {{ARGS}} --macro-path {{NAME}}/macs
+  ./{{NAME}}/install/bin/example-{{NAME}} "${@:2}"  --macro-path {{NAME}}/macs
 
 run-all:
   for example in `just list-available-examples`; do \
