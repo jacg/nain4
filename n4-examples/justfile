@@ -1,3 +1,4 @@
+# -*-Makefile-*-
 
 list-available-examples:
   @ls -d */ | tr -d "\/"
