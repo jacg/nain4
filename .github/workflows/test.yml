@@ -86,7 +86,7 @@ jobs:
           PATTERN="end of event 12"
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" build-and-run-client-package-output
-        continue-on-error: true
+        continue-on-error: true # see issue # https://github.com/jacg/nain4/issues/161
 
       - name: Test variables set by nain4 setupHook
         run: |
