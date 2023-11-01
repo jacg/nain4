@@ -104,7 +104,7 @@ n4::sensitive_detector* sensitive_detector(G4int n_sipms, data& data) {
       auto side = copy_no < n_sipms ? 0 : 1;
       data.times_of_arrival[side].push_back(time);
     }
-    return true;
+    return true; // See https://jacg.github.io/nain4/explanation/process-hits-return-value.html
   };
   return new n4::sensitive_detector{"Detector", process_hits};
 }
