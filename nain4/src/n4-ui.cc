@@ -78,16 +78,12 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
     prepend_path(path);
   }
 
-  auto padding = "                                       ";
-  std::cerr << padding << "IS -g or --vis USED? " << std::boolalpha << args.is_used("--vis") << std::endl;
   if (args.is_used("--vis")) {
     auto& items = vis; // = args.get<std::vector<std::string>>("--vis");
 
     auto is_macro = [](const auto& e) { return e.ends_with(".mac"); };
     bool macro_file_specified = std::find_if(begin(items), end(items), is_macro) != end(items);
     if (! macro_file_specified) { items.insert(begin(items), default_vis_macro); }
-
-    for (const auto& item : items) { std::cerr << padding << "vis ===> " << item << std::endl; }
   }
 
   if (warn_empty_run && ! (n_events.has_value() || use_graphics)) {
