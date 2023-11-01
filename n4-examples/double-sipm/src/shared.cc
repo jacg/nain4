@@ -15,9 +15,13 @@ config::config() : msngr{new G4GenericMessenger{this, "/my/", "MY configuration 
   new G4UnitDefinition("1/MeV","1/MeV", "1/Energy", 1/MeV);
   msngr -> DeclarePropertyWithUnit("csi_scint_yield", "1/MeV", csi_scint_yield);
 
-  msngr -> DeclareProperty("cold" , cold);
-  msngr -> DeclareProperty("debug", debug);
-
+#define PROPERTY(name) msngr -> DeclareProperty(#name, name)
+  PROPERTY(cold);
+  PROPERTY(debug);
+  PROPERTY(verbosity_phys_list);
+  PROPERTY(verbosity_em);
+  PROPERTY(verbosity_optical);
+#undef PROPERTY
   msngr -> DeclareMethod("random_seed", &config::set_random_seed);
 }
 

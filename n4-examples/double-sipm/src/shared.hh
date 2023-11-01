@@ -17,6 +17,9 @@ struct config {
   G4String particle        = "e-";
   G4bool   cold            = false;
   static G4bool debug;
+  G4int verbosity_phys_list;
+  G4int verbosity_em;
+  G4int verbosity_optical;
 
 private:
   void set_random_seed(G4long seed);
