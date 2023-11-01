@@ -1,7 +1,6 @@
 # -*-Makefile-*-
 
 default:
-    just clean # Remove this once exploratory development is done
     just test-nain4
 
 test PATTERN *FLAGS: install-tests
