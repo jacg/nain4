@@ -56,6 +56,9 @@ jobs:
       - name: Compile nain4
         run: nix develop .#${{ matrix.devshell }} -c just install-nain4 | tee compilation-log
 
+      - name: Count warnings
+        run: bash ~/work/nain4/nain4/scripts/count-warnings.sh compilation-log 0 do-not-fail-here
+
       - name: Test nain4
         run: nix develop .#${{ matrix.devshell }} -c just test-nain4 -v
 
@@ -117,14 +120,4 @@ jobs:
         run: nix develop .#${{ matrix.devshell }}  -c just g4-examples/run-examples-that-work
 
       - name: Fail if too many warnings
-        run: |
-          WARNING_COUNT=$(grep -io warning compilation-log | wc -l)
-          ACCEPTABLE_NUMBER_OF_WARNINGS=0
-          if (( $WARNING_COUNT > $ACCEPTABLE_NUMBER_OF_WARNINGS ))
-          then
-              echo too many warnings: $WARNING_COUNT
-              echo
-              echo
-              grep -iC2 warning compilation-log
-              false
-          fi
+        run: bash ~/work/nain4/nain4/scripts/count-warnings.sh compilation-log 0 fail
