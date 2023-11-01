@@ -123,5 +123,8 @@ jobs:
           if (( $WARNING_COUNT > $ACCEPTABLE_NUMBER_OF_WARNINGS ))
           then
               echo too many warnings: $WARNING_COUNT
+              echo
+              echo
+              grep -iC2 warning compilation-log
               false
           fi
