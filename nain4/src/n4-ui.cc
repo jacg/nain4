@@ -127,6 +127,7 @@ std::string ui::repr(const kind kind) {
     case kind::macro  : return "macro";
     case kind::beam_on: return "beam_on";
   }
+  return "UNREACHABLE";
 }
 
 void ui::command (const G4String& command, const G4String& prefix, const kind kind) {
