@@ -93,6 +93,8 @@ int main(int argc, char* argv[]) {
 
   my my;
 
+  G4int physics_verbosity = 0;
+
   // The trailing slash after '/my_geometry' is CRUCIAL: without it, the
   // messenger violates the principle of least surprise.
   auto messenger = new G4GenericMessenger{nullptr, "/my/", "docs: bla bla bla"};
@@ -102,6 +104,7 @@ int main(int argc, char* argv[]) {
   messenger -> DeclarePropertyWithUnit("particle_energy"   , "keV", my.particle_energy);
   messenger -> DeclareProperty        ("particle"          ,        my.particle_name  );
   messenger -> DeclareProperty        ("particle_direction",        my.particle_dir   );
+  messenger -> DeclareProperty        ("physics_verbosity" ,        physics_verbosity );
 
   // ANCHOR: create_run_manager
   n4::run_manager::create()
@@ -112,7 +115,7 @@ int main(int argc, char* argv[]) {
     .apply_cli_early() // CLI --early executed at this point
     // .apply_command(...) // also possible after apply_early_macro
 
-    .physics<FTFP_BERT>(0) // verbosity 0
+    .physics<FTFP_BERT>(physics_verbosity)
     .geometry([&] { return my_geometry(my); })
     .actions(create_actions(my, n_event))
 
