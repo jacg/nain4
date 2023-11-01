@@ -32,12 +32,15 @@
 #include <memory>
 #include <string>
 
+// TODO: this has internal linkage. Make it external and share it with geometry
+const config config;
+
 auto physics_list() {
-  auto physics_list =             new FTFP_BERT{0};
-  physics_list ->  ReplacePhysics(new G4EmStandardPhysics_option4{0});
-  physics_list -> RegisterPhysics(new G4OpticalPhysics{0});
+  auto physics_list =             new FTFP_BERT                  {config.verbosity_phys_list};
+  physics_list ->  ReplacePhysics(new G4EmStandardPhysics_option4{config.verbosity_em});
+  physics_list -> RegisterPhysics(new G4OpticalPhysics           {config.verbosity_optical});
   return physics_list;
-}
+};
 
 // Add energies deposited in this step to running totals of deposited energies in whole event
 void add_step_edep(std::vector<G4double>& total_edep, G4Step const* step) {
@@ -159,9 +162,7 @@ auto actions(data& data, output& output) {
     -> set(new n4::stepping_action{[&] (auto step) { accumulate_energy(data, step); } });
 }
 
-
 int main(int argc, char *argv[]) {
-  config config;
   data     data;
   output output;
 
