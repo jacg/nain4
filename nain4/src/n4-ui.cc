@@ -34,6 +34,7 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
   args.add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
   args.add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
   args.add_argument("--late"    , "-l").metavar("ITEMS").help("execute ITEMS  after run manager instantiation").MULTIPLE;
+  args.add_argument("--xxx"     , "-x").metavar("ITEMS").help("execute").MULTIPLE;
   args.add_argument("--vis"     , "-g").metavar("MACRO").help("switch from batch mode to GUI, executing MACRO")
     .default_value(std::string{"vis.mac"})
     ;
@@ -61,6 +62,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   n_events{},
   early{args.get<std::vector<std::string>>("--early")},
   late {args.get<std::vector<std::string>>("--late" )},
+  xxx  {args.get<std::vector<std::string>>("--xxx"  )},
   vis_macro{},
   use_graphics{args.is_used("-g")},
   argc{argc},
@@ -97,10 +99,10 @@ void ui::run() {
     G4VisExecutive vis_manager;
     vis_manager.Initialize();
     run_vis_macro();
+    run_xxx();
     if (n_events.has_value()) { beam_on(n_events.value()); }
     ui_executive.SessionStart();
   }
-
 }
 
 void ui::run_many(const std::vector<std::string> macros_and_commands, const G4String& prefix) {

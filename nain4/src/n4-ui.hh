@@ -39,6 +39,7 @@ public:
   void beam_on  (      G4int     n       ) { command("/run/beamOn " + std::to_string(n), "", kind::beam_on); }
   void run_early() { run_many(early, "early"); }
   void run_late () { run_many(late , "late" ); }
+  void run_xxx  () { run_many(xxx  , "xxx"  ); }
   void run_vis_macro() { if ( vis_macro.has_value()) { run_macro(vis_macro.value(), "vis macro"); }}
 
   // Parsing the macro search path every time something is prepended
@@ -56,6 +57,7 @@ private:
   std::optional<G4int>     n_events;
   std::vector<std::string> early;
   std::vector<std::string> late;
+  std::vector<std::string> xxx;
   std::optional<G4String>  vis_macro;
   bool                     use_graphics;
 
