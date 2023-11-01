@@ -39,7 +39,7 @@ public:
   void beam_on  (      G4int     n       ) { command("/run/beamOn " + std::to_string(n), "", kind::beam_on); }
   void run_early() { run_many(early, "early"); }
   void run_late () { run_many(late , "late" ); }
-  void run_vis_macro() { if ( vis_macro.has_value()) { run_macro(vis_macro.value(), "vis macro"); }}
+  void run_vis  () { run_many(vis  , "vis"  ); }
 
   // Parsing the macro search path every time something is prepended
   // to the search path is technically unnecessary and introduces some
@@ -56,7 +56,7 @@ private:
   std::optional<G4int>     n_events;
   std::vector<std::string> early;
   std::vector<std::string> late;
-  std::optional<G4String>  vis_macro;
+  std::vector<std::string> vis;
   bool                     use_graphics;
 
   int    argc;
@@ -71,13 +71,13 @@ struct query {
     : n_events    {ui.n_events}
     , early       {ui.early}
     , late        {ui.late}
-    , vis_macro   {ui.vis_macro}
+    , vis         {ui.vis}
     , use_graphics{ui.use_graphics}
   {}
   std::optional<G4int>    n_events;
   std::vector<std::string>early;
   std::vector<std::string>late;
-  std::optional<G4String> vis_macro;
+  std::vector<std::string>vis;
   bool                    use_graphics;
 };
 

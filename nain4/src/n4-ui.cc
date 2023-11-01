@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <n4-ui.hh>
 #include <n4-run-manager.hh>
 
@@ -28,16 +29,18 @@ unsigned parse_beam_on(const std::string&  arg) {
 }
 
 #define MULTIPLE nargs(argparse::nargs_pattern::at_least_one).append()
+#define ANY      nargs(argparse::nargs_pattern::any         ).append()
+
+const std::string default_vis_macro{"vis.mac"};
 
 argparse::ArgumentParser define_args(const std::string& program_name, int argc, char** argv) {
   argparse::ArgumentParser args{program_name};
   args.add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
   args.add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
   args.add_argument("--late"    , "-l").metavar("ITEMS").help("execute ITEMS  after run manager instantiation").MULTIPLE;
-  args.add_argument("--vis"     , "-g").metavar("MACRO").help("switch from batch mode to GUI, executing MACRO")
-    .default_value(std::string{"vis.mac"})
-    ;
-  args.add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE; // TODO metavar does not appear in help
+  args.add_argument("--vis"     , "-g").metavar("ITEMS").help("switch from batch mode to GUI, executing ITEMS").ANY
+    .default_value(std::vector<std::string>{default_vis_macro});
+  args.add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE;
 
   try {
     args.parse_args(argc, argv);
@@ -52,6 +55,8 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
 
 #undef MULTIPLE
 
+bool is_macro(const std::string& e) { return e.ends_with(".mac"); };
+
 namespace nain4 {
 
 // TODO forward to private constructor that accepts parser as parameter, for direct initialization
@@ -61,14 +66,13 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   n_events{},
   early{args.get<std::vector<std::string>>("--early")},
   late {args.get<std::vector<std::string>>("--late" )},
-  vis_macro{},
-  use_graphics{args.is_used("-g")},
+  vis  {args.get<std::vector<std::string>>("--vis"  )},
+  use_graphics{args.is_used("--vis")},
   argc{argc},
   argv{argv},
   g4_ui{*G4UImanager::GetUIpointer()}
 {
   if (auto n = args.present("--beam-on")) { n_events  = parse_beam_on(n.value()); }
-  if (use_graphics                      ) { vis_macro = args.get("-g"); }
 
   // Here we use std::string because G4String does not work
   auto macro_paths = args.get<std::vector<std::string>>("--macro-path");
@@ -76,9 +80,12 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
     prepend_path(path);
   }
 
-  auto padding = "                                       ";
-  std::cerr << padding << "IS -g USED? " << std::boolalpha << args.is_used("-g") << std::endl;
-  if (args.is_used("-g")) { std::cerr << padding << "vis macro === >" << args.get("-g") << std::endl; }
+  if (args.is_used("--vis")) {
+    auto& items = vis; // = args.get<std::vector<std::string>>("--vis");
+
+    bool macro_file_specified = std::find_if(begin(items), end(items), is_macro) != end(items);
+    if (! macro_file_specified) { items.insert(begin(items), default_vis_macro); }
+  }
 
   if (warn_empty_run && ! (n_events.has_value() || use_graphics)) {
     std::cerr << "'" + program_name + "' is not going to do anything interesting without some command-line arguments.\n\n";
@@ -96,17 +103,16 @@ void ui::run() {
     G4UIExecutive ui_executive{argc, argv};
     G4VisExecutive vis_manager;
     vis_manager.Initialize();
-    run_vis_macro();
+    run_vis();
     if (n_events.has_value()) { beam_on(n_events.value()); }
     ui_executive.SessionStart();
   }
-
 }
 
 void ui::run_many(const std::vector<std::string> macros_and_commands, const G4String& prefix) {
   for (const auto& item: macros_and_commands) {
-    if (item.ends_with(".mac")) { run_macro(item, "CLI-"+prefix               ); }
-    else                        { command  (item, "CLI-"+prefix, kind::command); }
+    if (is_macro(item)) { run_macro(item, "CLI-"+prefix               ); }
+    else                { command  (item, "CLI-"+prefix, kind::command); }
   }
 }
 

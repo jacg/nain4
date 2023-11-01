@@ -41,7 +41,7 @@ using Catch::Approx;
 #include <numeric>
 
 
-n4::test::argcv fake_argv{"progname-aaa"};
+n4::test::argcv fake_argv{"progname-aaa.mac"};
 
 using namespace n4::test;
 
@@ -165,19 +165,19 @@ TEST_CASE("nain run_manager exactly_one_world_volumes", "[nain][run_manager]") {
 
 TEST_CASE("cli macropath with values", "[nain][cli][macropath]") {
   auto hush = n4::silence{std::cout};
-  argcv a{"progname-aaa", "--macro-path", "path-aaa", "--macro-path", "path-bbb", "path-ccc"};
+  argcv a{"progname-aaa.mac", "--macro-path", "path-aaa.mac", "--macro-path", "path-bbb", "path-ccc"};
   auto rm = n4::run_manager::create().ui("progname", a.argc, a.argv, false);
   auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
   std::cerr << search_path << std::endl;
 
-  CHECK(search_path.find("path-aaa") != std::string::npos);
+  CHECK(search_path.find("path-aaa.mac") != std::string::npos);
   CHECK(search_path.find("path-bbb") != std::string::npos);
   CHECK(search_path.find("path-ccc") != std::string::npos);
 }
 
 TEST_CASE("cli without macropath", "[nain][cli][macropath]") {
   auto hush = n4::silence{std::cout};
-  argcv a{"progname-aaa"};
+  argcv a{"progname-aaa.mac"};
   auto rm = n4::run_manager::create().ui("progname", a.argc, a.argv, false);
   auto search_path = G4UImanager::GetUIpointer() -> GetMacroSearchPath();
 
@@ -190,7 +190,7 @@ TEST_CASE("cli no args", "[nain][cli]") {
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(! q.n_events.has_value());
-  CHECK(! q.vis_macro.has_value());
+  CHECK(  q.vis == std::vector<std::string>{"vis.mac"}); // TODO remove once convince that it's irrelevant now
   CHECK(! q.use_graphics);
   CHECK(  q.early.size() == 0);
   CHECK(  q.late .size() == 0);
@@ -202,7 +202,7 @@ TEST_CASE("cli implicit vis macro at end", "[nain][cli]") {
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(! q.n_events.has_value());
-  CHECK(  q.vis_macro.value() == "vis.mac");
+  CHECK(  q.vis == std::vector<std::string>{"vis.mac"});
   CHECK(  q.use_graphics);
   CHECK(  q.early.size() == 0);
   CHECK(  q.late .size() == 0);
@@ -210,11 +210,11 @@ TEST_CASE("cli implicit vis macro at end", "[nain][cli]") {
 
 TEST_CASE("cli explicit vis macro", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
-  argcv a{"progname", "-g", "aaa"};
+  argcv a{"progname", "-g", "aaa.mac"};
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(! q.n_events.has_value());
-  CHECK(  q.vis_macro.value() == "aaa");
+  CHECK(  q.vis == std::vector<std::string>{"aaa.mac"});
   CHECK(  q.use_graphics);
   CHECK(  q.early.size() == 0);
   CHECK(  q.late .size() == 0);
@@ -226,7 +226,7 @@ TEST_CASE("cli implicit vis macro not last", "[nain][cli]") {
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(  q.n_events.value() == 1);
-  CHECK(  q.vis_macro.value() == "vis.mac");
+  CHECK(  q.vis == std::vector<std::string>{"vis.mac"});
   CHECK(  q.use_graphics);
   CHECK(  q.early.size() == 0);
   CHECK(  q.late .size() == 0);
@@ -234,14 +234,32 @@ TEST_CASE("cli implicit vis macro not last", "[nain][cli]") {
 
 TEST_CASE("cli explicit vis macro not last", "[nain][cli]") {
   auto hush = n4::silence{std::cout};
-  argcv a{"progname", "-g", "bbb", "-n", "1"};
+  argcv a{"progname", "-g", "bbb.mac", "-n", "1"};
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(  q.n_events.value() == 1);
-  CHECK(  q.vis_macro.value() == "bbb");
+  CHECK(  q.vis == std::vector<std::string>{"bbb.mac"});
   CHECK(  q.use_graphics);
   CHECK(  q.early.size() == 0);
   CHECK(  q.late .size() == 0);
+}
+
+TEST_CASE("cli vis override with explicit macro", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname", "-g", "ccc.mac", "--vis", "/some/override"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(  q.vis == std::vector<std::string>{"ccc.mac", "/some/override"});
+  CHECK(  q.use_graphics);
+}
+
+TEST_CASE("cli vis override leaves default macro", "[nain][cli]") {
+  auto hush = n4::silence{std::cout};
+  argcv a{"progname", "-g", "/some/override"};
+  n4::ui ui{"automated-test", a.argc, a.argv, false};
+  n4::test::query q{ui};
+  CHECK(  q.vis == std::vector<std::string>{"vis.mac", "/some/override"});
+  CHECK(  q.use_graphics);
 }
 
 TEST_CASE("cli implicit early multiple values", "[nain][cli]") {
@@ -250,7 +268,7 @@ TEST_CASE("cli implicit early multiple values", "[nain][cli]") {
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(  q.n_events.value() == 42);
-  CHECK(! q.vis_macro.has_value());
+  CHECK(  q.vis == std::vector<std::string>{"vis.mac"});
   CHECK(! q.use_graphics);
   CHECK(  q.early.size() == 4);
   CHECK(  q.late .size() == 0);
@@ -262,7 +280,7 @@ TEST_CASE("cli implicit late multiple values", "[nain][cli]") {
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(  q.n_events.value() == 42);
-  CHECK(! q.vis_macro.has_value());
+  CHECK(  q.vis == std::vector<std::string>{"vis.mac"});
   CHECK(! q.use_graphics);
   CHECK(  q.early.size() == 0);
   CHECK(  q.late .size() == 4);
@@ -270,7 +288,7 @@ TEST_CASE("cli implicit late multiple values", "[nain][cli]") {
 
 TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
-  argcv a{"progname-aaa","--macro-path"};
+  argcv a{"progname-aaa.mac","--macro-path"};
 
   using Catch::Matchers::Contains;
   // We tried
@@ -282,7 +300,7 @@ TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
 
 TEST_CASE("apply command failure stops", "[nain][run_manager][command]") {
   auto hush = n4::silence{std::cout};
-  argcv a{"progname-aaa", "--early", "/some/rubbish"};
+  argcv a{"progname-aaa.mac", "--early", "/some/rubbish"};
   using Catch::Matchers::Contains;
   // We tried
   //   REQUIRE_THROWS_WITH( n4::run_manager::create().ui("progname", 2, argv, false)
@@ -309,7 +327,7 @@ TEST_CASE("run manager get geometry", "[run_manager][get_geometry]") {
     CHECK(geo_from_g4_rm == geo_from_n4_rm);
   };
 
-  argcv a{"progname-aaa", "-n", "1"};
+  argcv a{"progname-aaa.mac", "-n", "1"};
 
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
@@ -352,7 +370,7 @@ TEST_CASE("run manager get run action", "[run_manager][get_run_action]") {
       -> set(new n4::stepping_action{[] (auto) {}});
   };
 
-  argcv fake_argv{"progname-aaa"};
+  argcv fake_argv{"progname-aaa.mac"};
   auto hush = n4::silence{std::cout};
   n4::run_manager::create()
      .ui("progname", fake_argv.argc, fake_argv.argv, false)
