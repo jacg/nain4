@@ -101,7 +101,7 @@ public:
 
     ++detected_particles;
 
-    return true; // TODO what is the meaning of this?
+    return true; // See https://jacg.github.io/nain4/explanation/process-hits-return-value.html
   }
 
   void reset_observations() {
