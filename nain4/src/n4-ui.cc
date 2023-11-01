@@ -55,6 +55,8 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
 
 #undef MULTIPLE
 
+bool is_macro(const std::string& e) { return e.ends_with(".mac"); };
+
 namespace nain4 {
 
 // TODO forward to private constructor that accepts parser as parameter, for direct initialization
@@ -81,7 +83,6 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
   if (args.is_used("--vis")) {
     auto& items = vis; // = args.get<std::vector<std::string>>("--vis");
 
-    auto is_macro = [](const auto& e) { return e.ends_with(".mac"); };
     bool macro_file_specified = std::find_if(begin(items), end(items), is_macro) != end(items);
     if (! macro_file_specified) { items.insert(begin(items), default_vis_macro); }
   }
@@ -110,8 +111,8 @@ void ui::run() {
 
 void ui::run_many(const std::vector<std::string> macros_and_commands, const G4String& prefix) {
   for (const auto& item: macros_and_commands) {
-    if (item.ends_with(".mac")) { run_macro(item, "CLI-"+prefix               ); }
-    else                        { command  (item, "CLI-"+prefix, kind::command); }
+    if (is_macro(item)) { run_macro(item, "CLI-"+prefix               ); }
+    else                { command  (item, "CLI-"+prefix, kind::command); }
   }
 }
 
