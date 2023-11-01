@@ -1,36 +1,10 @@
 # -*-Makefile-*-
 
 test-all:
-  #!/usr/bin/env sh
-  #just test-fetch-content           ;(( status |= $? ))
-  # just test-fetch-content-recompile ;(( status |= $? )) # https://github.com/jacg/nain4/issues/88
-  #just test-subdirectory            ;(( status |= $? ))
-  just test-independent-installation;(( status |= $? ))
-
-  exit $status
-
-
-test-fetch-content:
-  just execute test_fetch_content.sh "using fetch content"
-
-
-test-fetch-content-recompile:
-  just execute test_fetch_content_recompile.sh "a second time without a network"
-
-
-test-subdirectory:
-  just execute test_subdirectory.sh "using nain4 as a subdirectory"
-
-
-test-independent-installation:
-  just execute test_independent_installation.sh "using an independent installation of nain4"
-
-
-execute test_name *label:
   #!/usr/bin/env bash
-  bash {{test_name}}
+  bash test_independent_installation.sh
   status=$?
-  just print $status {{label}}
+  just print $status "using an independent installation of nain4"
   exit $status
 
 
