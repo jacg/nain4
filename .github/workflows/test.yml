@@ -50,7 +50,7 @@ jobs:
           # If you chose API tokens for write access OR if you have a private cache
           authToken: '${{ secrets.CACHIX_JACG_NAIN4 }}'
 
-      - name: Nix build
+      - name: Build nix development environment
         run: nix develop
 
       - name: Compile nain4
