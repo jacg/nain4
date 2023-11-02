@@ -56,6 +56,13 @@
     pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
 
+  client-dev-shell-packages =
+    [ self.packages.nain4 ] ++ self.deps.dev-prop ++
+    pkgs.lib.optionals pkgs.stdenv.isDarwin []    ++
+    pkgs.lib.optionals pkgs.stdenv.isLinux  []
+  ;
+
+
   in {
 
     packages.default = self.packages.nain4;
@@ -182,6 +189,7 @@
       dev        = with pkgs; [ mdbook ];   dev-prop = with pkgs; [ just clang-tools catch2_3 ] ++ self.deps.build-prop;
       build      = with pkgs; [ ];        build-prop = with pkgs; [ meson ninja cmake pkg-config argparse ];
       run        = with pkgs; [ ];          run-prop = with pkgs; [ just geant4-data my-geant4 qt5.wrapQtAppsHook ];
+      dev-shell-packages = client-dev-shell-packages;
       g4-data-package = pkgs.geant4.data; # Needed for exporting G4*DATA envvars in client app
     };
 

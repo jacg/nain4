@@ -5,12 +5,6 @@
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
 
-  dev-shell-packages =
-    [ nain4.packages.nain4 ] ++ nain4.deps.dev-prop
-    ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
-    ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
-  ;
-
   in {
 
     packages.default = self.packages.CHANGEME-my-package;
@@ -62,8 +56,7 @@
     # Activated by `nix develop <URL to this flake>#clang`
     devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } {
       name = "my-nain4-app-clang-devenv";
-
-      packages = dev-shell-packages ++ [ nain4.packages.clang_16 ];
+      packages = nain4.deps.dev-shell-packages ++ [ nain4.packages.clang_16 ];
     };
 
     # Activated by `nix develop <URL to this flake>#gcc`
