@@ -62,6 +62,17 @@
     pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
 
+  shell-shared = {
+    G4_DIR = "${pkgs.geant4}";
+      G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
+      QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
+
+      shellHook = ''
+          export NAIN4_LIB=$PWD/install/nain4/lib
+          export LD_LIBRARY_PATH=$NAIN4_LIB:$LD_LIBRARY_PATH;
+          export PKG_CONFIG_PATH=$NAIN4_LIB/pkgconfig:$PKG_CONFIG_PATH;
+      '';
+    };
 
   in {
 
@@ -94,37 +105,15 @@
       nativeBuildInputs = with self; [ packages.nain4 ] ++ deps.build ++ deps.test;
     };
 
-    devShells.clang = pkgs.mkShell.override { stdenv = clang_16.stdenv; } {
-      name = "nain4-clang-devenv";
-
-      packages = dev-shell-packages ++ [ clang_16 ];
-
-      G4_DIR = "${pkgs.geant4}";
-      G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
-      QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
-
-      shellHook = ''
-          export NAIN4_LIB=$PWD/install/nain4/lib/
-          export LD_LIBRARY_PATH=$NAIN4_LIB:$LD_LIBRARY_PATH;
-          export PKG_CONFIG_PATH=$NAIN4_LIB/pkgconfig:$PKG_CONFIG_PATH;
-      '';
-    };
-
-    devShells.gcc = pkgs.mkShell {
+    devShells.gcc = pkgs.mkShell                                          (shell-shared // {
       name = "nain4-gcc-devenv";
-
       packages = dev-shell-packages;
+    });
 
-      G4_DIR = "${pkgs.geant4}";
-      G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
-      QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
-
-      shellHook = ''
-          export NAIN4_LIB=$PWD/install/nain4/lib
-          export LD_LIBRARY_PATH=$NAIN4_LIB:$LD_LIBRARY_PATH;
-          export PKG_CONFIG_PATH=$NAIN4_LIB/pkgconfig:$PKG_CONFIG_PATH;
-      '';
-    };
+    devShells.clang = pkgs.mkShell.override { stdenv = clang_16.stdenv; } (shell-shared // {
+      name = "nain4-clang-devenv";
+      packages = dev-shell-packages ++ [ clang_16 ];
+    });
 
     devShell = self.devShells.clang;
 
