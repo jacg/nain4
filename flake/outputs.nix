@@ -48,10 +48,20 @@
              }
              else pkgs.llvmPackages_16.clang;
 
-  dev-shell-packages = with self.deps; dev ++ build ++ build-prop ++ test ++ run ++ run-prop
-                       ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
-                       ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
+  dev-shell-packages = with self.deps;
+    dev   ++   dev-prop ++
+    build ++ build-prop ++
+    run   ++   run-prop ++
+    pkgs.lib.optionals pkgs.stdenv.isDarwin [] ++
+    pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
+
+  client-dev-shell-packages =
+    [ self.packages.nain4 ] ++ self.deps.dev-prop ++
+    pkgs.lib.optionals pkgs.stdenv.isDarwin []    ++
+    pkgs.lib.optionals pkgs.stdenv.isLinux  []
+  ;
+
 
   in {
 
@@ -63,10 +73,10 @@
       version = "0.2.0";
       src = "${self}/nain4/src";
 
-                nativeBuildInputs = self.deps.build;      # local              build environment
-      propagatedNativeBuildInputs = self.deps.build-prop; # local and client   build environment # appears NOT to propagate!
-                      buildInputs = self.deps.run;        # local            runtime environment
-      propagatedBuildInputs       = self.deps.run-prop;   # local and client runtime environment
+                nativeBuildInputs = self.deps.build;      # local            build             environment
+      propagatedNativeBuildInputs = self.deps.build-prop; # local and client build             environment # appears NOT to propagate!
+                      buildInputs = self.deps.run;        # local            build and runtime environment
+      propagatedBuildInputs       = self.deps.run-prop;   # local and client build and runtime environment
 
       hook_g4_dir = "${pkgs.geant4}";
       hook_g4_examples = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
@@ -175,19 +185,14 @@
     _contains-systems = { systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ]; };
 
     deps = {
-      dev = with pkgs; [
-        just
-        clang-tools
-        mdbook
-      ];
-
-      # The -prop variants are to be propagated to downstream packages
-      build      = with pkgs; [ ];
-      build-prop = with pkgs; [ ]; # extra-cmake-modules ?
-      test       = with pkgs; [ catch2_3 ];
-      run        = with pkgs; [ ];
-      run-prop   = with pkgs; [ just geant4-data meson ninja cmake pkg-config my-geant4 qt5.wrapQtAppsHook argparse ];
-      g4-data-package = pkgs.geant4.data;
+      dev-shell-packages = client-dev-shell-packages;
+      g4-data-package = pkgs.geant4.data; # Needed for exporting G4*DATA envvars in client app
+      # TODO: leave for now, in case client needs it, but make these purely
+      # internal once we're happy that everything works
+      # The -prop variants are to be propagated to downstream packages (either by Nix (build, run) or by us (dev, test))
+      dev        = with pkgs; [ mdbook ];   dev-prop = with pkgs; [ just clang-tools catch2_3 ] ++ self.deps.build-prop;
+      build      = with pkgs; [ ];        build-prop = with pkgs; [ meson ninja cmake pkg-config argparse ];
+      run        = with pkgs; [ ];          run-prop = with pkgs; [ just geant4-data my-geant4 qt5.wrapQtAppsHook ];
     };
 
   }
