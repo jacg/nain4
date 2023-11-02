@@ -185,12 +185,14 @@
     _contains-systems = { systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ]; };
 
     deps = {
+      dev-shell-packages = client-dev-shell-packages;
+      g4-data-package = pkgs.geant4.data; # Needed for exporting G4*DATA envvars in client app
+      # TODO: leave for now, in case client needs it, but make these purely
+      # internal once we're happy that everything works
       # The -prop variants are to be propagated to downstream packages (either by Nix (build, run) or by us (dev, test))
       dev        = with pkgs; [ mdbook ];   dev-prop = with pkgs; [ just clang-tools catch2_3 ] ++ self.deps.build-prop;
       build      = with pkgs; [ ];        build-prop = with pkgs; [ meson ninja cmake pkg-config argparse ];
       run        = with pkgs; [ ];          run-prop = with pkgs; [ just geant4-data my-geant4 qt5.wrapQtAppsHook ];
-      dev-shell-packages = client-dev-shell-packages;
-      g4-data-package = pkgs.geant4.data; # Needed for exporting G4*DATA envvars in client app
     };
 
   }
