@@ -5,10 +5,8 @@
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
 
-  dev-shell-packages = with nain4;
-    [ nain4.packages.nain4 ] ++
-  # deps.dev-prop ++ deps.build-prop ++ deps.test-prop ++ deps.run-prop
-    deps.dev-prop                    ++ deps.test-prop
+  dev-shell-packages =
+    [ nain4.packages.nain4 ] ++ nain4.deps.dev-prop
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;

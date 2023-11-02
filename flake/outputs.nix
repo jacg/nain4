@@ -51,7 +51,6 @@
   dev-shell-packages = with self.deps;
     dev   ++   dev-prop ++
     build ++ build-prop ++
-    test  ++  test-prop ++
     run   ++   run-prop ++
     pkgs.lib.optionals pkgs.stdenv.isDarwin [] ++
     pkgs.lib.optionals pkgs.stdenv.isLinux  []
@@ -180,9 +179,8 @@
 
     deps = {
       # The -prop variants are to be propagated to downstream packages (either by Nix (build, run) or by us (dev, test))
-      dev        = with pkgs; [ mdbook ];   dev-prop = with pkgs; [ just clang-tools ] ++ self.deps.build-prop;
+      dev        = with pkgs; [ mdbook ];   dev-prop = with pkgs; [ just clang-tools catch2_3 ] ++ self.deps.build-prop;
       build      = with pkgs; [ ];        build-prop = with pkgs; [ meson ninja cmake pkg-config argparse ];
-      test       = with pkgs; [ ];         test-prop = with pkgs; [ catch2_3 ];
       run        = with pkgs; [ ];          run-prop = with pkgs; [ just geant4-data my-geant4 qt5.wrapQtAppsHook ];
       g4-data-package = pkgs.geant4.data; # Needed for exporting G4*DATA envvars in client app
     };
