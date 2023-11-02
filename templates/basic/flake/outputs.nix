@@ -5,12 +5,10 @@
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
 
-
-  # TODO inject nain4 itself into most of these:
-
   dev-shell-packages = with nain4;
     [ nain4.packages.nain4 ] ++
-    deps.dev ++ deps.build-prop ++ deps.test ++ deps.run-prop
+  # deps.dev-prop ++ deps.build-prop ++ deps.test-prop ++ deps.run-prop
+    deps.dev-prop                    ++ deps.test-prop
     ++ pkgs.lib.optionals pkgs.stdenv.isDarwin []
     ++ pkgs.lib.optionals pkgs.stdenv.isLinux  []
   ;
@@ -19,13 +17,15 @@
 
     packages.default = self.packages.CHANGEME-my-package;
 
+    # Executed by `nix run <URL of this flake>#CHANGEME-my-package -- <args?>`
     # TODO: switch to clang environment
     packages.CHANGEME-my-package = pkgs.stdenv.mkDerivation {
       # CHANGEME-pname: replace "CHANGEME-my-package" with a name better-suited to your project
       pname = "CHANGEME-my-package";
       version = "0.0.0";
       src = "${self}/src";
-      nativeBuildInputs = [ nain4.packages.nain4 ];
+      nativeBuildInputs = [];
+      buildInputs = [ nain4.packages.nain4 ];
     };
 
     # Executed by `nix run <URL of this flake> -- <args?>`
@@ -65,10 +65,7 @@
     devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } {
       name = "my-nain4-app-clang-devenv";
 
-      packages = dev-shell-packages ++ [
-        nain4.packages.nain4
-        nain4.packages.clang_16
-      ];
+      packages = dev-shell-packages ++ [ nain4.packages.clang_16 ];
     };
 
     # Activated by `nix develop <URL to this flake>#gcc`
