@@ -1557,6 +1557,36 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   CHECK(with_rot       -> EstimateCubicVolume(n, eps) == 0 );
 }
 
+TEST_CASE("boolean transform", "[boolean][transform]") {
+  auto l           = 3*m;
+  auto rotation    = G4RotationMatrix{}; rotation.rotateY(90 * deg);
+  auto translation = G4ThreeVector{0., 0., l/4};
+  auto transform   = G4Transform3D{rotation, translation};
+
+  auto usolid1 = n4::box("box11").xy(1*m).z(  l)
+    .sub(        n4::box("box12").yz(1*m).x(l/4))
+    .transform(transform)
+    .solid();
+
+  auto usolid2 = n4::box("box21").xy(1*m).z(  l)
+    .sub(        n4::box("box22").yz(1*m).x(l/4))
+    .trans(transform)
+    .solid();
+
+  auto n    = 100000;
+  auto eps  = 1e-3;
+  auto vbox = l * 1*m * 1*m;
+
+  // The small box is 1/4 of the big box, so the result is two
+  // disconnected boxes: one with 1/2 volume and another one with 1/4
+  // volume
+  CHECK( usolid1 -> EstimateCubicVolume(n, eps) / m3 == Approx(3*vbox/4 / m3).margin(3e-3));
+  CHECK( usolid1 -> EstimateCubicVolume(n, eps) / m3 == Approx(3*vbox/4 / m3).margin(3e-3));
+  CHECK( usolid2 -> EstimateCubicVolume(n, eps) / m3 == Approx(3*vbox/4 / m3).margin(3e-3));
+  CHECK( usolid2 -> EstimateCubicVolume(n, eps) / m3 == Approx(3*vbox/4 / m3).margin(3e-3));
+}
+
+
 TEST_CASE("nain envelope_of", "[nain][envelope_of]") {
   auto material_1 = n4::material("G4_Fe");
   auto material_2 = n4::material("G4_Au");

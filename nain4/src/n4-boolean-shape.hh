@@ -1,5 +1,6 @@
 #pragma once
 
+#include "G4Transform3D.hh"
 #include <n4-shape.hh>
 
 #include <type_traits>
@@ -16,10 +17,14 @@ struct boolean_shape : shape {
   friend shape;
   G4VSolid* solid() const override;
 
+
+  boolean_shape& trans    (G4Transform3D&    t )  { return transform(t); }
+  boolean_shape& transform(G4Transform3D&    t )  { transformation =                   t         * transformation; return *this; }
+  boolean_shape& rotate   (G4RotationMatrix& r )  { transformation = HepGeom::Rotate3D{r}        * transformation; return *this; }
   boolean_shape& rotate_x(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateX(delta);             return rotate(rot);}
   boolean_shape& rotate_y(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateY(delta);             return rotate(rot);}
   boolean_shape& rotate_z(double delta         )  { auto rot = G4RotationMatrix{}; rot.rotateZ(delta);             return rotate(rot);}
-  boolean_shape& rotate  (G4RotationMatrix& r  )  { transformation = HepGeom::Rotate3D{r}        * transformation; return *this; }
+
   boolean_shape& rot     (G4RotationMatrix& r  )  { return rotate(r); }
   boolean_shape& rot_x   (double delta         )  { return rotate_x(delta); }
   boolean_shape& rot_y   (double delta         )  { return rotate_y(delta); }
