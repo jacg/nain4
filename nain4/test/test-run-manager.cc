@@ -190,7 +190,6 @@ TEST_CASE("cli no args", "[nain][cli]") {
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(! q.n_events.has_value());
-  CHECK(  q.vis == std::vector<std::string>{"vis.mac"}); // TODO remove once convince that it's irrelevant now
   CHECK(! q.use_graphics);
   CHECK(  q.early.size() == 0);
   CHECK(  q.late .size() == 0);
@@ -268,7 +267,6 @@ TEST_CASE("cli implicit early multiple values", "[nain][cli]") {
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(  q.n_events.value() == 42);
-  CHECK(  q.vis == std::vector<std::string>{"vis.mac"});
   CHECK(! q.use_graphics);
   CHECK(  q.early.size() == 4);
   CHECK(  q.late .size() == 0);
@@ -280,7 +278,6 @@ TEST_CASE("cli implicit late multiple values", "[nain][cli]") {
   n4::ui ui{"automated-test", a.argc, a.argv, false};
   n4::test::query q{ui};
   CHECK(  q.n_events.value() == 42);
-  CHECK(  q.vis == std::vector<std::string>{"vis.mac"});
   CHECK(! q.use_graphics);
   CHECK(  q.early.size() == 0);
   CHECK(  q.late .size() == 4);
