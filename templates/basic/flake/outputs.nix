@@ -51,8 +51,6 @@
     # Used by `direnv` when entering this directory (also by `nix develop <URL to this flake>`)
     devShell = self.devShells.clang;
 
-    # TODO Create functions which generate the shells
-
     # Activated by `nix develop <URL to this flake>#clang`
     devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } {
       name = "my-nain4-app-clang-devenv";

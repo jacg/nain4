@@ -73,6 +73,8 @@
       version = "0.2.0";
       src = "${self}/nain4/src";
 
+      # https://nixos.org/guides/nix-pills/basic-dependencies-and-hooks#id1470
+      # propagatedBuildInputs ... will be used as buildInputs by dependencies
                 nativeBuildInputs = self.deps.build;      # local            build             environment
       propagatedNativeBuildInputs = self.deps.build-prop; # local and client build             environment # appears NOT to propagate!
                       buildInputs = self.deps.run;        # local            build and runtime environment
@@ -83,15 +85,6 @@
       hook_qt_stuff = "${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
       setupHook = ./nain4-hook.sh;
 
-      # https://nixos.org/guides/nix-pills/basic-dependencies-and-hooks#id1470
-      # TODO propagatedBuildInputs ... will be used as buildInputs by dependencies
-
-      # meta = with pkgs.lib; {
-      #   description = "An API that makes it easier to write Geant4 application code.";
-      #   homepage = "https://jacg.github.io/nain4/";
-      #   # license = licenses.TODO;
-      #   platforms = platforms.unix;
-      # };
     };
 
     packages.nain4-tests = pkgs.stdenv.mkDerivation {
@@ -137,7 +130,6 @@
 
     packages.geant4 = my-geant4;
     packages.clang_16 = clang_16;
-
 
     # Executed by `nix run <URL of this flake> -- <args?>`
     # TODO apps.default = { type = "app"; program = "..."; };
