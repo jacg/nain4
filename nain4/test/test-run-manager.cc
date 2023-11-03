@@ -293,13 +293,8 @@ TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
 TEST_CASE("apply command failure stops", "[nain][run_manager][command]") {
   auto hush = n4::silence{std::cout};
   argcv a{"progname-aaa.mac", "--early", "/some/rubbish"};
-  using Catch::Matchers::Contains;
-  // We tried
-  //   REQUIRE_THROWS_WITH( n4::run_manager::create().ui("progname", 2, argv, false)
-  //                      , Contains("Too few arguments") && Contains("--macro-path"));
-  // and variations on the there but nothing worked sensibly.
-  REQUIRE_THROWS_AS(default_run_manager_with_ui_args(a.argc, a.argv).run(), std::runtime_error);
-
+  auto it = n4::ui("progname", a.argc, a.argv, false).run_early();
+  CHECK(it.has_value());
 }
 
 TEST_CASE("run manager get geometry", "[run_manager][get_geometry]") {

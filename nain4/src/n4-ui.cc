@@ -54,6 +54,13 @@ nain4::internal::cli_and_err nain4::internal::define_args(const std::string& pro
 
 bool is_macro(const std::string& e) { return e.ends_with(".mac"); };
 
+void nain4::internal::exit_on_err(nain4::internal::may_err err) {
+  if (err.has_value()) {
+    std::cerr << "\n\n" << err.value().what() << "\n\n";
+    exit(EXIT_FAILURE);
+  }
+}
+
 argparse::ArgumentParser return_or_exit(nain4::internal::cli_and_err yyy) {
   if (yyy.err.has_value()) {
     std::cerr
@@ -112,21 +119,24 @@ void ui::run() {
     G4UIExecutive ui_executive{argc, argv};
     G4VisExecutive vis_manager;
     vis_manager.Initialize();
-    run_vis();
+    internal::exit_on_err(run_vis());
     if (n_events.has_value()) { beam_on(n_events.value()); }
     ui_executive.SessionStart();
   }
 }
 
-void ui::run_many(const std::vector<std::string> macros_and_commands, const G4String& prefix) {
+internal::may_err ui::run_many(const std::vector<std::string> macros_and_commands, const G4String& prefix) {
   for (const auto& item: macros_and_commands) {
-    if (is_macro(item)) { run_macro(item, "CLI-"+prefix               ); }
-    else                { command  (item, "CLI-"+prefix, kind::command); }
+    auto error = is_macro(item)                     ?
+      run_macro(item, "CLI-"+prefix               ) :
+      command  (item, "CLI-"+prefix, kind::command) ;
+    if (error.has_value()) { return error; }
   }
+  return {};
 }
 
-void ui::run_macro(const G4String& filename, const G4String& prefix) {
-  command("/control/execute " + filename, prefix, kind::macro);
+internal::may_err ui::run_macro(const G4String& filename, const G4String& prefix) {
+  return command("/control/execute " + filename, prefix, kind::macro);
 }
 
 
@@ -139,7 +149,7 @@ std::string ui::repr(const kind kind) {
   return "UNREACHABLE";
 }
 
-void ui::command (const G4String& command, const G4String& prefix, const kind kind) {
+internal::may_err ui::command (const G4String& command, const G4String& prefix, const kind kind) {
   auto status = g4_ui.ApplyCommand(command);
   if (status != fCommandSucceeded) {
     std::string reason =
@@ -152,12 +162,13 @@ void ui::command (const G4String& command, const G4String& prefix, const kind ki
                                               "this should not have happened!";
     std::string message{prefix + ' ' + repr(kind) + " rejected: (" + command + ") because: " + reason};
     std::cerr << message << std::endl;
-    throw std::runtime_error{message};
+    return std::runtime_error{message};
   }
   std::cout << "nain4::ui:"
             << std::setw(15) << prefix << ' '
             << std::setw( 7) << repr(kind)
             << " accepted: (" << command  << ')' << std::endl;
+  return {};
 }
 
 test::argcv::argcv(std::initializer_list<std::string> args): argc{static_cast<int>(args.size())} {
