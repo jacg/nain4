@@ -286,13 +286,8 @@ TEST_CASE("cli implicit late multiple values", "[nain][cli]") {
 TEST_CASE("macropath without value", "[nain][run_manager][macropath]") {
   auto hush = n4::silence{std::cout};
   argcv a{"progname-aaa.mac","--macro-path"};
-
-  using Catch::Matchers::Contains;
-  // We tried
-  //   REQUIRE_THROWS_WITH( n4::run_manager::create().ui("progname", 2, argv, false)
-  //                      , Contains("Too few arguments") && Contains("--macro-path"));
-  // and variations on the there but nothing worked sensibly.
-  REQUIRE_THROWS_AS(n4::run_manager::create().ui("progname", a.argc, a.argv, false), std::runtime_error);
+  auto cli_with_maybe_err = n4::internal::define_args("progname", a.argc, a.argv);
+  CHECK(cli_with_maybe_err.err.has_value());
 }
 
 TEST_CASE("apply command failure stops", "[nain][run_manager][command]") {

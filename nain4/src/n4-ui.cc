@@ -33,7 +33,7 @@ unsigned parse_beam_on(const std::string&  arg) {
 
 const std::string default_vis_macro{"vis.mac"};
 
-argparse::ArgumentParser define_args(const std::string& program_name, int argc, char** argv) {
+nain4::internal::cli_and_err nain4::internal::define_args(const std::string& program_name, int argc, char** argv) {
   argparse::ArgumentParser args{program_name};
   args.add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
   args.add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
@@ -45,43 +45,51 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
   try {
     args.parse_args(argc, argv);
   } catch(const std::runtime_error& err) {
-    std::cerr
-      << args
-      << "\n\nCLI arguments error: " << err.what() << "\n\n";
-    exit(EXIT_FAILURE);
+    return nain4::internal::cli_and_err{args, {err}};
   }
-
-  return args;
+  return nain4::internal::cli_and_err{args, {}};
 }
 
 #undef MULTIPLE
 
 bool is_macro(const std::string& e) { return e.ends_with(".mac"); };
 
+argparse::ArgumentParser return_or_exit(nain4::internal::cli_and_err yyy) {
+  if (yyy.err.has_value()) {
+    std::cerr
+      << yyy.cli
+      << "\n\nCLI arguments error: " << yyy.err.value().what() << "\n\n";
+    exit(EXIT_FAILURE);
+  }
+  return yyy.cli;
+}
+
 namespace nain4 {
 
 // TODO forward to private constructor that accepts parser as parameter, for direct initialization
 ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run)
+  : ui(program_name, argc, argv, return_or_exit(internal::define_args(program_name, argc, argv)), warn_empty_run) {}
+
+ui::ui(const std::string& program_name, int argc, char** argv, argparse::ArgumentParser cli, bool warn_empty_run)
 :
-  args{define_args(program_name, argc, argv)},
   n_events{},
-  early{args.get<std::vector<std::string>>("--early")},
-  late {args.get<std::vector<std::string>>("--late" )},
-  vis  {args.get<std::vector<std::string>>("--vis"  )},
-  use_graphics{args.is_used("--vis")},
+  early{cli.get<std::vector<std::string>>("--early")},
+  late {cli.get<std::vector<std::string>>("--late" )},
+  vis  {cli.get<std::vector<std::string>>("--vis"  )},
+  use_graphics{cli.is_used("--vis")},
   argc{argc},
   argv{argv},
   g4_ui{*G4UImanager::GetUIpointer()}
 {
-  if (auto n = args.present("--beam-on")) { n_events  = parse_beam_on(n.value()); }
+  if (auto n = cli.present("--beam-on")) { n_events  = parse_beam_on(n.value()); }
 
   // Here we use std::string because G4String does not work
-  auto macro_paths = args.get<std::vector<std::string>>("--macro-path");
+  auto macro_paths = cli.get<std::vector<std::string>>("--macro-path");
   for (auto& path : macro_paths) {
     prepend_path(path);
   }
 
-  if (args.is_used("--vis")) {
+  if (cli.is_used("--vis")) {
     auto& items = vis; // = args.get<std::vector<std::string>>("--vis");
 
     bool macro_file_specified = std::find_if(begin(items), end(items), is_macro) != end(items);
@@ -90,7 +98,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
 
   if (warn_empty_run && ! (n_events.has_value() || use_graphics)) {
     std::cerr << "'" + program_name + "' is not going to do anything interesting without some command-line arguments.\n\n";
-    std::cerr << args << std::endl;
+    std::cerr << cli << std::endl;
   }
 
 }

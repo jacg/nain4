@@ -27,11 +27,17 @@ private:
 void report_args(std::ostream&, int argc, char** argv);
 } // namespace test
 
+namespace internal {
+struct cli_and_err { argparse::ArgumentParser cli; std::optional<std::runtime_error> err; };
+cli_and_err define_args(const std::string& program_name, int argc, char** argv);
+} // namespace internal
+
 class ui {
 public:
   enum class kind { command, macro, beam_on };
   std::string repr(const kind kind);
-  ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run);
+  ui(const std::string& program_name, int argc, char** argv, argparse::ArgumentParser, bool warn_empty_run);
+  ui(const std::string& program_name, int argc, char** argv,                           bool warn_empty_run);
   void run();
   void run_many (const std::vector<std::string> macros_and_commands, const G4String& prefix);
   void run_macro(const G4String& filename, const G4String& prefix);
@@ -51,7 +57,6 @@ public:
 
 private:
   friend test::query;
-  argparse::ArgumentParser args;
 
   std::optional<G4int>     n_events;
   std::vector<std::string> early;
