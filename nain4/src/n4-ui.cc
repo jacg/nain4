@@ -45,9 +45,10 @@ argparse::ArgumentParser define_args(const std::string& program_name, int argc, 
   try {
     args.parse_args(argc, argv);
   } catch(const std::runtime_error& err) {
-    std::cerr << err.what() << std::endl;
-    std::cerr << args;
-    throw err;
+    std::cerr
+      << args
+      << "\n\nCLI arguments error: " << err.what() << "\n\n";
+    exit(EXIT_FAILURE);
   }
 
   return args;
