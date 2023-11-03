@@ -27,19 +27,29 @@ private:
 void report_args(std::ostream&, int argc, char** argv);
 } // namespace test
 
+namespace internal {
+struct cli_and_err { argparse::ArgumentParser cli; std::optional<std::runtime_error> err; };
+cli_and_err define_args(const std::string& program_name, int argc, char** argv);
+using may_err = std::optional<std::exception>;
+void exit_on_err(may_err);
+} // namespace internal
+
 class ui {
+private:
+  using may_err = internal::may_err;
 public:
   enum class kind { command, macro, beam_on };
   std::string repr(const kind kind);
-  ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run);
+  ui(const std::string& program_name, int argc, char** argv, argparse::ArgumentParser, bool warn_empty_run);
+  ui(const std::string& program_name, int argc, char** argv,                           bool warn_empty_run);
   void run();
-  void run_many (const std::vector<std::string> macros_and_commands, const G4String& prefix);
-  void run_macro(const G4String& filename, const G4String& prefix);
-  void command  (const G4String& command , const G4String& prefix, const kind kind);
-  void beam_on  (      G4int     n       ) { command("/run/beamOn " + std::to_string(n), "", kind::beam_on); }
-  void run_early() { run_many(early, "early"); }
-  void run_late () { run_many(late , "late" ); }
-  void run_vis  () { run_many(vis  , "vis"  ); }
+  may_err run_many (const std::vector<std::string> macros_and_commands, const G4String& prefix);
+  may_err run_macro(const G4String& filename, const G4String& prefix);
+  may_err command  (const G4String& command , const G4String& prefix, const kind kind);
+  may_err beam_on  (      G4int     n       ) { return command("/run/beamOn " + std::to_string(n), "", kind::beam_on); }
+  may_err run_early() { return run_many(early, "early"); }
+  may_err run_late () { return run_many(late , "late" ); }
+  may_err run_vis  () { return run_many(vis  , "vis"  ); }
 
   // Parsing the macro search path every time something is prepended
   // to the search path is technically unnecessary and introduces some
@@ -51,7 +61,6 @@ public:
 
 private:
   friend test::query;
-  argparse::ArgumentParser args;
 
   std::optional<G4int>     n_events;
   std::vector<std::string> early;
