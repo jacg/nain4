@@ -3,8 +3,9 @@ final: prev: {
     src = prev.fetchFromGitHub {
       owner = "p-ranav";
       repo = "argparse";
-      rev = "d28188f4d542b07de9bad3e89aa53d8bf1a53a09";
-      hash = "sha256-kIR59nva1QIpMjZ3ATc6rXgqNd2p8WKLzug7cqyEUiU=";
+      rev = "62052fefcb552e138a9d9e2807e883edcb09569a";
+      hash = "sha256-eiq1yWYLBu8CdHZR0awKF4LcKHC73K/Nvg7sXiJ9g68=";
     };
+    patches = [../patches/argparse-size_t.patch];
   });
 }

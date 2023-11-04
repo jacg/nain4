@@ -1,0 +1,21 @@
+diff --git a/include/argparse/argparse.hpp b/include/argparse/argparse.hpp
+index fa31ef0..164198b 100644
+--- a/include/argparse/argparse.hpp
++++ b/include/argparse/argparse.hpp
+@@ -457,12 +457,12 @@ int get_levenshtein_distance(const StringType &s1, const StringType &s2) {
+   std::vector<std::vector<int>> dp(s1.size() + 1,
+                                    std::vector<int>(s2.size() + 1, 0));
+ 
+-  for (int i = 0; i <= s1.size(); ++i) {
+-    for (int j = 0; j <= s2.size(); ++j) {
++  for (unsigned long i = 0; i <= s1.size(); ++i) {
++    for (unsigned long j = 0; j <= s2.size(); ++j) {
+       if (i == 0) {
+-        dp[i][j] = j;
++        dp[i][j] = static_cast<int>(j);
+       } else if (j == 0) {
+-        dp[i][j] = i;
++        dp[i][j] = static_cast<int>(i);
+       } else if (s1[i - 1] == s2[j - 1]) {
+         dp[i][j] = dp[i - 1][j - 1];
+       } else {
