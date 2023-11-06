@@ -50,7 +50,7 @@ public : ui(const std::string& program_name, int argc, char** argv,             
     return ui("prog-name", args.argc, args.argv, false);
   }
 
-  void run();
+  void run(std::optional<unsigned> n = std::nullopt);
   may_err run_many (const std::vector<std::string> macros_and_commands, const G4String& prefix);
   may_err run_macro(const G4String& filename, const G4String& prefix);
   may_err command  (const G4String& command , const G4String& prefix, const kind kind);
