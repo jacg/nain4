@@ -3,8 +3,14 @@
 # Needed to make `"$@"` usable in recipes
 set positional-arguments := true
 
-test:
+default:
   just run --beam-on 10
+
+test:
+  meson setup build/test test
+  meson compile -C build/test
+  meson install -C build/test
+  ./install/test/bin/CHANGEME-my-n4-test
 
 build:
   meson setup build/app src
