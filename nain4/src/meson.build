@@ -12,6 +12,9 @@ project( 'nain4'
        )
 
 
+argparse = dependency( 'argparse'
+                     , method : 'pkg-config')
+
 geant4 = dependency( 'Geant4'
                    , method  : 'cmake'
                    , required: true
@@ -30,7 +33,7 @@ geant4 = dependency( 'Geant4'
                                , 'Geant4::G4UIVisDefinitions'
                                ])
 
-nain4_deps    = [geant4]
+nain4_deps    = [argparse, geant4]
 nain4_include = include_directories('.')
 
 nain4_includes = [ 'n4-all.hh'
