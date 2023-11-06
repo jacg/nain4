@@ -57,7 +57,7 @@ void check_world_volume();
 class run_manager {
   using G4RM = std::unique_ptr<G4RunManager>;
 
-  run_manager(G4RM g4_manager) : g4_manager{std::move(g4_manager)} {
+  run_manager(G4RM g4_manager, n4::ui ui) : g4_manager{std::move(g4_manager)}, ui{std::move(ui)} {
     rm_instance = this;
   }
 
@@ -67,6 +67,7 @@ public:
 
 private:
   G4RM g4_manager;
+  n4::ui ui;
   static run_manager*   rm_instance;
   static bool         create_called;
 
@@ -82,7 +83,7 @@ private:
     n4::ui ui;                               \
     THIS_STATE(G4RM g4_manager, n4::ui ui) : \
       g4_manager{std::move(g4_manager)},     \
-      ui     {std::move(ui     )}            \
+      ui        {std::move(ui        )}      \
       { }                                    \
   public:
 
