@@ -80,15 +80,16 @@ private:
 // that clients cannot create their own; by making run_manager a
 // friend, each state can build the next because the states are
 // members of run_manager as is the create method.
-#define CORE(THIS_STATE)                     \
-    friend run_manager;                      \
-  private:                                   \
-    G4RM g4_manager;                         \
-    n4::ui ui;                               \
-    THIS_STATE(G4RM g4_manager, n4::ui ui) : \
-      g4_manager{std::move(g4_manager)},     \
-      ui        {std::move(ui        )}      \
-      { }                                    \
+#define CORE(THIS_STATE)                                         \
+    friend run_manager;                                          \
+    G4RunManager* here_be_dragons() { return g4_manager.get(); } \
+  private:                                                       \
+    G4RM g4_manager;                                             \
+    n4::ui ui;                                                   \
+    THIS_STATE(G4RM g4_manager, n4::ui ui) :                     \
+      g4_manager{std::move(g4_manager)},                         \
+      ui        {std::move(ui        )}                          \
+      { }                                                        \
   public:
 
 
