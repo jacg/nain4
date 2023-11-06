@@ -61,7 +61,11 @@ class run_manager {
     rm_instance = this;
   }
 
+  struct ready;
 public:
+  template<class T> ready replace_geometry(T);
+  template<class T> ready replace_actions (T);
+
   run_manager(run_manager& ) = delete;
   run_manager(run_manager&&) = default;
 
@@ -117,8 +121,14 @@ private:
     run_manager* run() {
       g4_manager -> Initialize();
       check_world_volume();
-      run_manager::rm_instance = new run_manager{std::move(g4_manager)};
-      ui.run();
+
+      // replace_geometry and replace_actions go back in the typestate
+      // graph, therefore rm_instance might already exist. To prevent
+      // a memory leak, we delete it
+      if (run_manager::rm_instance) { delete run_manager::rm_instance; }
+      run_manager::rm_instance = new run_manager{std::move(g4_manager), std::move(ui)};
+
+      run_manager::rm_instance -> ui.run();
       return run_manager::rm_instance;
     }
     ui::kind command = ui::kind::command;
@@ -237,6 +247,20 @@ public:
   G4RunManager* here_be_dragons() { return g4_manager.get(); }
 };
 
+
+template<class T>
+run_manager::ready run_manager::replace_geometry(T geometry) {
+  g4_manager -> ReinitializeGeometry(true);
+  return set_geometry{std::move(g4_manager), std::move(ui)}
+    .geometry(geometry)
+    .actions((G4VUserActionInitialization*) G4RunManager::GetRunManager() -> GetUserActionInitialization());
+}
+
+template<class T>
+run_manager::ready run_manager::replace_actions(T actions) {
+  return set_actions{std::move(g4_manager), std::move(ui)}
+    .actions(actions);
+}
 
 #pragma GCC diagnostic pop
 

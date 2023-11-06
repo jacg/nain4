@@ -1,5 +1,6 @@
 #include <n4-run-manager.hh>
 
+#include "G4RunManager.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include <G4ThreeVector.hh>
