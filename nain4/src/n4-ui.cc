@@ -78,7 +78,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_r
 {}
 
 ui::ui(const std::string& program_name, int argc, char** argv, unique_argparse cli, bool warn_empty_run)
-  : n_events{}
+  : n_events{std::nullopt}
   , early{cli->get<std::vector<std::string>>("--early")}
   , late {cli->get<std::vector<std::string>>("--late" )}
   , vis  {cli->get<std::vector<std::string>>("--vis"  )}
