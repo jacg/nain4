@@ -34,20 +34,20 @@ unsigned parse_beam_on(const std::string&  arg) {
 const std::string default_vis_macro{"vis.mac"};
 
 nain4::internal::cli_and_err nain4::internal::define_args(const std::string& program_name, int argc, char** argv) {
-  auto args = std::make_unique<argparse::ArgumentParser>(program_name);
-  args->add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
-  args->add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
-  args->add_argument("--late"    , "-l").metavar("ITEMS").help("execute ITEMS  after run manager instantiation").MULTIPLE;
-  args->add_argument("--vis"     , "-g").metavar("ITEMS").help("switch from batch mode to GUI, executing ITEMS").ANY
+  auto cli = std::make_unique<argparse::ArgumentParser>(program_name);
+  cli->add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
+  cli->add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
+  cli->add_argument("--late"    , "-l").metavar("ITEMS").help("execute ITEMS  after run manager instantiation").MULTIPLE;
+  cli->add_argument("--vis"     , "-g").metavar("ITEMS").help("switch from batch mode to GUI, executing ITEMS").ANY
     .default_value(std::vector<std::string>{default_vis_macro});
-  args->add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE;
+  cli->add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE;
 
   try {
-    args->parse_args(argc, argv);
+    cli->parse_args(argc, argv);
   } catch(const std::runtime_error& err) {
-    return nain4::internal::cli_and_err{std::move(args), {err}};
+    return nain4::internal::cli_and_err{std::move(cli), {err}};
   }
-  return nain4::internal::cli_and_err{std::move(args), {}};
+  return nain4::internal::cli_and_err{std::move(cli), {}};
 }
 
 #undef MULTIPLE
