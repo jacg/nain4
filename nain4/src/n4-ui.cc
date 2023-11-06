@@ -34,20 +34,20 @@ unsigned parse_beam_on(const std::string&  arg) {
 const std::string default_vis_macro{"vis.mac"};
 
 nain4::internal::cli_and_err nain4::internal::define_args(const std::string& program_name, int argc, char** argv) {
-  argparse::ArgumentParser args{program_name};
-  args.add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
-  args.add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
-  args.add_argument("--late"    , "-l").metavar("ITEMS").help("execute ITEMS  after run manager instantiation").MULTIPLE;
-  args.add_argument("--vis"     , "-g").metavar("ITEMS").help("switch from batch mode to GUI, executing ITEMS").ANY
+  auto args = std::make_unique<argparse::ArgumentParser>(program_name);
+  args->add_argument("--beam-on" , "-n").metavar("N"    ).help("/run/beamOn N");
+  args->add_argument("--early"   , "-e").metavar("ITEMS").help("execute ITEMS before run manager instantiation").MULTIPLE;
+  args->add_argument("--late"    , "-l").metavar("ITEMS").help("execute ITEMS  after run manager instantiation").MULTIPLE;
+  args->add_argument("--vis"     , "-g").metavar("ITEMS").help("switch from batch mode to GUI, executing ITEMS").ANY
     .default_value(std::vector<std::string>{default_vis_macro});
-  args.add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE;
+  args->add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE;
 
   try {
-    args.parse_args(argc, argv);
+    args->parse_args(argc, argv);
   } catch(const std::runtime_error& err) {
-    return nain4::internal::cli_and_err{args, {err}};
+    return nain4::internal::cli_and_err{std::move(args), {err}};
   }
-  return nain4::internal::cli_and_err{args, {}};
+  return nain4::internal::cli_and_err{std::move(args), {}};
 }
 
 #undef MULTIPLE
@@ -61,41 +61,41 @@ void nain4::internal::exit_on_err(nain4::internal::may_err err) {
   }
 }
 
-argparse::ArgumentParser return_or_exit(nain4::internal::cli_and_err yyy) {
+n4::unique_argparse return_or_exit(nain4::internal::cli_and_err yyy) {
   if (yyy.err.has_value()) {
     std::cerr
       << yyy.cli
       << "\n\nCLI arguments error: " << yyy.err.value().what() << "\n\n";
     exit(EXIT_FAILURE);
   }
-  return yyy.cli;
+  return std::move(yyy.cli);
 }
 
 namespace nain4 {
 
 ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run)
-  : ui(program_name, argc, argv, return_or_exit(internal::define_args(program_name, argc, argv)), warn_empty_run) {}
+  : ui(program_name, argc, argv, return_or_exit(internal::define_args(program_name, argc, argv)), warn_empty_run)
+{}
 
-ui::ui(const std::string& program_name, int argc, char** argv, argparse::ArgumentParser cli, bool warn_empty_run)
-:
-  n_events{},
-  early{cli.get<std::vector<std::string>>("--early")},
-  late {cli.get<std::vector<std::string>>("--late" )},
-  vis  {cli.get<std::vector<std::string>>("--vis"  )},
-  use_graphics{cli.is_used("--vis")},
-  argc{argc},
-  argv{argv},
-  g4_ui{*G4UImanager::GetUIpointer()}
+ui::ui(const std::string& program_name, int argc, char** argv, unique_argparse cli, bool warn_empty_run)
+  : n_events{}
+  , early{cli->get<std::vector<std::string>>("--early")}
+  , late {cli->get<std::vector<std::string>>("--late" )}
+  , vis  {cli->get<std::vector<std::string>>("--vis"  )}
+  , use_graphics{cli->is_used("--vis")}
+  , argc{argc}
+  , argv{argv}
+  , g4_ui{*G4UImanager::GetUIpointer()}
 {
-  if (auto n = cli.present("--beam-on")) { n_events  = parse_beam_on(n.value()); }
+  if (auto n = cli->present("--beam-on")) { n_events  = parse_beam_on(n.value()); }
 
   // Here we use std::string because G4String does not work
-  auto macro_paths = cli.get<std::vector<std::string>>("--macro-path");
+  auto macro_paths = cli->get<std::vector<std::string>>("--macro-path");
   for (auto& path : macro_paths) {
     prepend_path(path);
   }
 
-  if (cli.is_used("--vis")) {
+  if (cli->is_used("--vis")) {
     auto& items = vis; // = args.get<std::vector<std::string>>("--vis");
 
     bool macro_file_specified = std::find_if(begin(items), end(items), is_macro) != end(items);
