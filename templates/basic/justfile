@@ -1,5 +1,6 @@
 # -*-Makefile-*-
 
+# Needed to make `"$@"` usable in recipes
 set positional-arguments := true
 
 test:
