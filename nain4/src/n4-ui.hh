@@ -13,6 +13,8 @@
 
 namespace nain4 {
 
+using unique_argparse = std::unique_ptr<argparse::ArgumentParser>;
+
 namespace test {
 struct query;
 // Utility for construction of argc/argv combination for use in n4::ui CLI tests
@@ -28,7 +30,7 @@ void report_args(std::ostream&, int argc, char** argv);
 } // namespace test
 
 namespace internal {
-struct cli_and_err { argparse::ArgumentParser cli; std::optional<std::runtime_error> err; };
+struct cli_and_err { unique_argparse cli; std::optional<std::runtime_error> err; };
 cli_and_err define_args(const std::string& program_name, int argc, char** argv);
 using may_err = std::optional<std::exception>;
 void exit_on_err(may_err);
@@ -40,8 +42,8 @@ private:
 public:
   enum class kind { command, macro, beam_on };
   std::string repr(const kind kind);
-  ui(const std::string& program_name, int argc, char** argv, argparse::ArgumentParser, bool warn_empty_run);
-  ui(const std::string& program_name, int argc, char** argv,                           bool warn_empty_run);
+  ui(const std::string& program_name, int argc, char** argv, unique_argparse, bool warn_empty_run);
+  ui(const std::string& program_name, int argc, char** argv,                  bool warn_empty_run);
   void run();
   may_err run_many (const std::vector<std::string> macros_and_commands, const G4String& prefix);
   may_err run_macro(const G4String& filename, const G4String& prefix);
