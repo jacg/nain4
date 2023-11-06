@@ -177,6 +177,10 @@ private:
       auto ui = n4::ui(program_name, argc, argv, warn_empty_run);
       return {std::move(g4_manager), std::move(ui)};
     }
+    set_physics fake_ui() {
+      auto ui = n4::ui::fake_ui();
+      return {std::move(g4_manager), std::move(ui)};
+    }
   };
 
 
