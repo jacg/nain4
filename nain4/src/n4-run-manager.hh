@@ -236,3 +236,5 @@ public:
 #pragma GCC diagnostic pop
 
 } // namespace nain4
+
+namespace n4 { using namespace nain4; }
