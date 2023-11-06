@@ -29,9 +29,12 @@ namespace nain4 {
 // configured before initialization.
 // Usage:
 // auto run_manager = n4::run_manager::create()
+//                       .ui(prog-name, argc, argv) // or .no_ui() for tests
+//                       .apply_cli_early()
 //                       .physics (...)
 //                       .geometry(...)
 //                       .actions (...)
+//                       .apply_cli_late()
 //                       .run();
 
 // At each step we provide three alternative styles of providing the required
