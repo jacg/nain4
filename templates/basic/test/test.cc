@@ -170,23 +170,19 @@ TEST_CASE("liquid xenon properties", "[xenon][properties]") {
     auto rm = n4::run_manager::create()
       .fake_ui ()
       .physics (our_optical_physics)
-      .geometry(nullptr)
+      .geometry(xe_sphere(1))
       .actions(create_actions)
+      .run()
       ;
 
-    auto g4_rm  = rm.here_be_dragons();
     auto events = 10000;
     auto radii  = n4::scale_by(cm, {1, 2, 3, 4, 5, 6, 7, 8});
 
     // --- Infer attenuation length by gathering statistics for given radius -------------
-    auto check_att_length = [&unscathed, g4_rm, &xe_sphere, events] (auto radius) {
+    auto check_att_length = [&unscathed, rm, &xe_sphere, events] (auto radius) {
       unscathed = 0;
 
-      // rm -> replace_geometry(xe_sphere(radius)).run(events):
-      n4::clear_geometry();
-      g4_rm -> SetUserInitialization(new n4::geometry{xe_sphere(radius)});
-      g4_rm -> Initialize();
-      g4_rm -> BeamOn(events);
+      rm -> replace_geometry(xe_sphere(radius)).run(events);
 
       auto ratio = unscathed / (1.0 * events);
       auto expected_attenuation_length = 3.74 * cm;
