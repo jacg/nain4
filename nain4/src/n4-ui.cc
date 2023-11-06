@@ -73,7 +73,6 @@ argparse::ArgumentParser return_or_exit(nain4::internal::cli_and_err yyy) {
 
 namespace nain4 {
 
-// TODO forward to private constructor that accepts parser as parameter, for direct initialization
 ui::ui(const std::string& program_name, int argc, char** argv, bool warn_empty_run)
   : ui(program_name, argc, argv, return_or_exit(internal::define_args(program_name, argc, argv)), warn_empty_run) {}
 
