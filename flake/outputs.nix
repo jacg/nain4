@@ -136,6 +136,7 @@
         chmod -R u+w $DIRECTORY
         nix develop $DIRECTORY -c true # create flake.lock
         cd $DIRECTORY
+        ${pkgs.ripgrep}/bin/rg "ANCHOR" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i '/ANCHOR/d'
         git -c init.defaultBranch=master init -q
         # TODO: protect against user not having set git user.{name,email}
         git add .
