@@ -41,11 +41,13 @@ catch2 = dependency( 'catch2'
 my_test_deps    = [nain4, geant4, catch2]
 my_test_include = include_directories('../src')
 my_test_sources = ['catch2-main-test.cc', 'test-LXe.cc', '../src/LXe.cc']
+c2_demo_sources = ['catch2-main-test.cc', 'test-catch2-demo.cc']
 
 geant4_include = geant4.get_variable(cmake    : 'Geant4_INCLUDE_DIRS')
 nain4_include  =  nain4.get_variable(pkgconfig: 'includedir'         )
 
 test_executable = 'CHANGEME-my-n4-test'
+demo_executable = 'catch2-demo-test'
 
 my_test_exe = executable( test_executable
                         , my_test_sources
@@ -53,6 +55,14 @@ my_test_exe = executable( test_executable
                         , dependencies       : my_test_deps
                         , install            : true
                         )
+
+c2_demo_exe = executable( demo_executable
+                        , c2_demo_sources
+                        , include_directories: []
+                        , dependencies       : [catch2]
+                        , install            : true
+                        )
+
 conf_data = configuration_data({
 'install_prefix'  : install_prefix,
 'test_executable' : test_executable,

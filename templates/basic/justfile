@@ -12,6 +12,13 @@ test *REST:
   meson install -C build/test
   sh install/test/run-each-test-in-separate-process.sh "$@"
 
+catch2-demo *REST:
+  echo "$@"
+  meson setup build/test test
+  meson compile -C build/test
+  meson install -C build/test
+  install/test/bin/catch2-demo-test "$@"
+
 build:
   meson setup build/app src
   meson compile -C build/app
