@@ -38,7 +38,7 @@ catch2 = dependency( 'catch2'
 
 my_test_deps    = [nain4, geant4, catch2]
 my_test_include = include_directories('../src')
-my_test_sources = ['test.cc', 'catch2-main-test.cc', '../src/LXe.cc']
+my_test_sources = ['catch2-main-test.cc', 'test-LXe.cc', '../src/LXe.cc']
 
 geant4_include = geant4.get_variable(cmake    : 'Geant4_INCLUDE_DIRS')
 nain4_include  =  nain4.get_variable(pkgconfig: 'includedir'         )
