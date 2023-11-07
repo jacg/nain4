@@ -74,6 +74,13 @@ jobs:
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" just-output
 
+      - name: Check that mdbook ANCHORs have been stripped from bootstrapped project
+        run: |
+          nix profile install nixpkgs#ripgrep
+          echo LOOKING FOR ANY REMAINING ANCHORS
+          rg ANCHOR ~/work/my-project | tee remaining-anchors
+          ! test -s remaining-anchors
+
       - name: Test nix build client package
         run: |
           nix build   ~/work/my-project#
