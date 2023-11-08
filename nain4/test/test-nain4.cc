@@ -3,6 +3,7 @@
 #include <n4-shape.hh>
 #include <n4-boolean-shape.hh>
 #include <n4-utils.hh>
+#include <n4-sequences.hh>
 #include <n4-volume.hh>
 #include <n4-geometry-iterators.hh>
 #include <n4-material.hh>
@@ -34,6 +35,7 @@
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <cmath>
@@ -51,6 +53,7 @@
 // both sides of an equation, in the source code.
 
 using Catch::Approx;
+using namespace Catch::Matchers;
 using namespace n4::test;
 
 TEST_CASE("nain material", "[nain][material]") {
@@ -1643,6 +1646,80 @@ TEST_CASE("nain map", "[nain][map]") {
   CHECK( mapped_fn        == std::vector<int>{ff(a), ff(b), ff(c), ff(d)} );
 
 }
+
+TEST_CASE("nain interpolate", "[nain][interpolate]") {
+  auto f = [] (auto x) { return -x; };
+  const unsigned n_points    = 11;
+  const unsigned n_intervals = n_points - 1;
+  const double   lower       = -3.1;
+  const double   upper       = 42.6;
+  const double   delta       = (upper - lower) / n_intervals;
+
+  auto [xs, ys] = n4::interpolate(f, n_points, lower, upper);
+
+  SECTION("number of elements") {
+    CHECK(xs.size() == n_points);
+    CHECK(ys.size() == n_points);
+  }
+
+  SECTION("range") {
+    auto [x_min, x_max] = std::minmax_element(begin(xs), end(xs));
+    auto [y_min, y_max] = std::minmax_element(begin(ys), end(ys));
+
+    CHECK_THAT(*x_min, WithinULP(    lower,  1));
+    CHECK_THAT(*x_max, WithinULP(    upper,  1));
+    CHECK_THAT(*x_min, WithinULP(xs.front(), 1));
+    CHECK_THAT(*x_max, WithinULP(xs. back(), 1));
+
+    CHECK_THAT(*y_min, WithinULP(   -upper,  1));
+    CHECK_THAT(*y_max, WithinULP(   -lower,  1));
+    CHECK_THAT(*y_min, WithinULP(ys. back(), 1));
+    CHECK_THAT(*y_max, WithinULP(ys.front(), 1));
+  }
+
+  SECTION("element order") {
+    double last;
+
+    last = xs.front();
+    for (auto i=1; i<xs.size(); i++) {
+      CHECK(last < xs[i]);
+      last = xs[i];
+    }
+
+    last = ys.front();
+    for (auto i=1; i<ys.size(); i++) {
+      CHECK(last > ys[i]);
+      last = ys[i];
+    }
+  }
+
+  SECTION("distance between elements") {
+    for (auto i=1; i<xs.size()-1; i++) { CHECK_THAT(xs[i+1] - xs[i], WithinULP( delta, 3)); }
+    for (auto i=1; i<ys.size()-1; i++) { CHECK_THAT(ys[i+1] - ys[i], WithinULP(-delta, 3)); }
+  }
+
+}
+
+TEST_CASE("nain interpolate values", "[nain][interpolate]") {
+  auto f = [] (auto x) { return -x*x*x + 1; };
+  const unsigned n_points    =  7;
+  const unsigned n_intervals = n_points - 1;
+  const double   lower       = -2;
+  const double   upper       =  3;
+  const double   range       = upper - lower;
+  const double   delta       = range / n_intervals;
+
+  auto [xs, ys]   = n4::interpolate(f, n_points, lower, upper);
+
+  for (auto i=0; i<ys.size(); i++) {
+    auto xi = lower + i * delta;
+    auto yi = f(xi);
+
+    CHECK_THAT(xi, WithinULP(xs[i], 4));
+    CHECK_THAT(yi, WithinULP(ys[i], 1));
+  }
+}
+
 
 // TODO can the overlap check tests be automated? G4 raises an exception when an
 // overlap is detected, and we do not know how to observe that in Catch2
