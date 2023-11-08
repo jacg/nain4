@@ -55,11 +55,11 @@ template<class O, class I, class F> std::vector<O> map(F f, I const& input) {
   return output;
 }
 
-// returns the tuple ([x0, x1, ... , xN], [f(x0), f(x1), ... , f(xN)])
+// returns the tuple ([x1, x2, ... , xN], [f(x1), f(x2), ... , f(xN)])
 template<class F> auto interpolate(F f, size_t N, double min, double max) {
-  std::vector<double> xs(N+1);
-  std::vector<double> ys(N+1);
-  auto step = (max - min) / N;
+  std::vector<double> xs(N);
+  std::vector<double> ys(N);
+  auto step = (max - min) / (N-1);
   size_t n = 0;
   generate (begin(xs), end(xs), [min, step, &n](){ return  min + (n++ * step); });
   transform(begin(xs), end(xs), begin(ys), f);

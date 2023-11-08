@@ -1649,16 +1649,17 @@ TEST_CASE("nain map", "[nain][map]") {
 
 TEST_CASE("nain interpolate", "[nain][interpolate]") {
   auto f = [] (auto x) { return -x; };
-  const unsigned n_points = 11;
-  const double   lower    = -3.1;
-  const double   upper    = 42.6;
-  const double   delta    = (upper - lower) / n_points;
+  const unsigned n_points    = 11;
+  const unsigned n_intervals = n_points - 1;
+  const double   lower       = -3.1;
+  const double   upper       = 42.6;
+  const double   delta       = (upper - lower) / n_intervals;
 
   auto [xs, ys] = n4::interpolate(f, n_points, lower, upper);
 
   SECTION("number of elements") {
-    CHECK(xs.size() == n_points + 1);
-    CHECK(ys.size() == n_points + 1);
+    CHECK(xs.size() == n_points);
+    CHECK(ys.size() == n_points);
   }
 
   SECTION("range") {
@@ -1701,11 +1702,12 @@ TEST_CASE("nain interpolate", "[nain][interpolate]") {
 
 TEST_CASE("nain interpolate values", "[nain][interpolate]") {
   auto f = [] (auto x) { return -x*x*x + 1; };
-  const unsigned n_points  =  7;
-  const double   lower     = -2;
-  const double   upper     =  3;
-  const double   range     = upper - lower;
-  const double   delta     = range / n_points;
+  const unsigned n_points    =  7;
+  const unsigned n_intervals = n_points - 1;
+  const double   lower       = -2;
+  const double   upper       =  3;
+  const double   range       = upper - lower;
+  const double   delta       = range / n_intervals;
 
   auto [xs, ys]   = n4::interpolate(f, n_points, lower, upper);
 
