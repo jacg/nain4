@@ -57,16 +57,21 @@ void check_world_volume();
 class run_manager {
   using G4RM = std::unique_ptr<G4RunManager>;
 
-  run_manager(G4RM g4_manager) : g4_manager{std::move(g4_manager)} {
+  run_manager(G4RM g4_manager, n4::ui ui) : g4_manager{std::move(g4_manager)}, ui{std::move(ui)} {
     rm_instance = this;
   }
 
+  struct ready;
 public:
+  template<class T> ready replace_geometry(T);
+  template<class T> ready replace_actions (T);
+
   run_manager(run_manager& ) = delete;
   run_manager(run_manager&&) = default;
 
 private:
   G4RM g4_manager;
+  n4::ui ui;
   static run_manager*   rm_instance;
   static bool         create_called;
 
@@ -75,15 +80,16 @@ private:
 // that clients cannot create their own; by making run_manager a
 // friend, each state can build the next because the states are
 // members of run_manager as is the create method.
-#define CORE(THIS_STATE)                     \
-    friend run_manager;                      \
-  private:                                   \
-    G4RM g4_manager;                         \
-    n4::ui ui;                               \
-    THIS_STATE(G4RM g4_manager, n4::ui ui) : \
-      g4_manager{std::move(g4_manager)},     \
-      ui     {std::move(ui     )}            \
-      { }                                    \
+#define CORE(THIS_STATE)                                         \
+    friend run_manager;                                          \
+    G4RunManager* here_be_dragons() { return g4_manager.get(); } \
+  private:                                                       \
+    G4RM g4_manager;                                             \
+    n4::ui ui;                                                   \
+    THIS_STATE(G4RM g4_manager, n4::ui ui) :                     \
+      g4_manager{std::move(g4_manager)},                         \
+      ui        {std::move(ui        )}                          \
+      { }                                                        \
   public:
 
 
@@ -116,8 +122,14 @@ private:
     run_manager* run() {
       g4_manager -> Initialize();
       check_world_volume();
-      run_manager::rm_instance = new run_manager{std::move(g4_manager)};
-      ui.run();
+
+      // replace_geometry and replace_actions go back in the typestate
+      // graph, therefore rm_instance might already exist. To prevent
+      // a memory leak, we delete it
+      if (run_manager::rm_instance) { delete run_manager::rm_instance; }
+      run_manager::rm_instance = new run_manager{std::move(g4_manager), std::move(ui)};
+
+      run_manager::rm_instance -> ui.run();
       return run_manager::rm_instance;
     }
     ui::kind command = ui::kind::command;
@@ -177,6 +189,10 @@ private:
       auto ui = n4::ui(program_name, argc, argv, warn_empty_run);
       return {std::move(g4_manager), std::move(ui)};
     }
+    set_physics fake_ui() {
+      auto ui = n4::ui::fake_ui();
+      return {std::move(g4_manager), std::move(ui)};
+    }
   };
 
 
@@ -232,6 +248,20 @@ public:
   G4RunManager* here_be_dragons() { return g4_manager.get(); }
 };
 
+
+template<class T>
+run_manager::ready run_manager::replace_geometry(T geometry) {
+  g4_manager -> ReinitializeGeometry(true);
+  return set_geometry{std::move(g4_manager), std::move(ui)}
+    .geometry(geometry)
+    .actions((G4VUserActionInitialization*) G4RunManager::GetRunManager() -> GetUserActionInitialization());
+}
+
+template<class T>
+run_manager::ready run_manager::replace_actions(T actions) {
+  return set_actions{std::move(g4_manager), std::move(ui)}
+    .actions(actions);
+}
 
 #pragma GCC diagnostic pop
 

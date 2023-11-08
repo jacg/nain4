@@ -42,8 +42,14 @@ private:
 public:
   enum class kind { command, macro, beam_on };
   std::string repr(const kind kind);
-  ui(const std::string& program_name, int argc, char** argv, unique_argparse, bool warn_empty_run);
-  ui(const std::string& program_name, int argc, char** argv,                  bool warn_empty_run);
+private: ui(const std::string& program_name, int argc, char** argv, unique_argparse, bool warn_empty_run);
+public : ui(const std::string& program_name, int argc, char** argv,                  bool warn_empty_run);
+
+  static ui fake_ui() {
+    test::argcv args{"prog-name"};
+    return ui("prog-name", args.argc, args.argv, false);
+  }
+
   void run();
   may_err run_many (const std::vector<std::string> macros_and_commands, const G4String& prefix);
   may_err run_macro(const G4String& filename, const G4String& prefix);
