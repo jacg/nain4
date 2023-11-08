@@ -55,7 +55,7 @@ template<class O, class I, class F> std::vector<O> map(F f, I const& input) {
   return output;
 }
 
-// returns the tuple [x, f(x)]
+// returns the tuple ([x0, x1, ... , xN], [f(x0), f(x1), ... , f(xN)])
 template<class F> auto interpolate(F f, size_t N, double min, double max) {
   std::vector<double> xs(N+1);
   std::vector<double> ys(N+1);
