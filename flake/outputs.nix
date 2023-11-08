@@ -132,11 +132,14 @@
       program = "${pkgs.writeShellScript "bootstrap.sh" ''
         DIRECTORY=$1
         mkdir -p $DIRECTORY
-        ${pkgs.coreutils}/bin/cp -Tr ${self}/templates/basic $DIRECTORY
-        chmod -R u+w $DIRECTORY
-        nix develop $DIRECTORY -c true # create flake.lock
-        cd $DIRECTORY
+        FQ_DIRECTORY=$(${pkgs.coreutils}/bin/readlink -f $DIRECTORY)
+        ${pkgs.coreutils}/bin/cp -Tr ${self}/templates/basic                                    $FQ_DIRECTORY
+        ${pkgs.coreutils}/bin/cp     ${self}/nain4/test/run-each-test-in-separate-process.sh.in $FQ_DIRECTORY
+        chmod -R u+w $FQ_DIRECTORY
+        nix develop  $FQ_DIRECTORY -c true # create flake.lock
+        cd           $FQ_DIRECTORY
         ${pkgs.ripgrep}/bin/rg "ANCHOR" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i '/ANCHOR/d'
+
         git -c init.defaultBranch=master init -q
         # TODO: protect against user not having set git user.{name,email}
         git add .
