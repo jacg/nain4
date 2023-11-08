@@ -3,6 +3,7 @@
 #include <n4-shape.hh>
 #include <n4-boolean-shape.hh>
 #include <n4-utils.hh>
+#include <n4-sequences.hh>
 #include <n4-volume.hh>
 #include <n4-geometry-iterators.hh>
 #include <n4-material.hh>
@@ -34,6 +35,7 @@
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <cmath>
@@ -51,6 +53,7 @@
 // both sides of an equation, in the source code.
 
 using Catch::Approx;
+using namespace Catch::Matchers;
 using namespace n4::test;
 
 TEST_CASE("nain material", "[nain][material]") {
@@ -1643,6 +1646,74 @@ TEST_CASE("nain map", "[nain][map]") {
   CHECK( mapped_fn        == std::vector<int>{ff(a), ff(b), ff(c), ff(d)} );
 
 }
+
+TEST_CASE("nain interpolate", "[nain][interpolate]") {
+  auto f        = [] (auto x) { return -x; };
+  auto n_points = 123;
+  auto lower    = 0;
+  auto upper    = 42;
+  auto [x, y]   = n4::interpolate(f, n_points, lower, upper);
+
+  SECTION("number of elements") {
+    CHECK(x.size() == n_points + 1);
+    CHECK(y.size() == n_points + 1);
+  }
+
+  SECTION("range") {
+    auto [x_min, x_max] = std::minmax_element(begin(x), end(x));
+    auto [y_min, y_max] = std::minmax_element(begin(y), end(y));
+
+    CHECK_THAT(*x_min, WithinRel(    lower, 1e-8));
+    CHECK_THAT(*x_max, WithinRel(    upper, 1e-8));
+    CHECK_THAT(*x_min, WithinRel(x.front(), 1e-8));
+    CHECK_THAT(*x_max, WithinRel(x. back(), 1e-8));
+
+    CHECK_THAT(*y_min, WithinRel(   -upper, 1e-8));
+    CHECK_THAT(*y_max, WithinRel(   -lower, 1e-8));
+    CHECK_THAT(*y_min, WithinRel(y. back(), 1e-8));
+    CHECK_THAT(*y_max, WithinRel(y.front(), 1e-8));
+  }
+
+  SECTION("element order") {
+    double last;
+
+    last = x.front();
+    for (auto i=1; i<x.size(); i++) {
+      CHECK(last < x[i]);
+      last = x[i];
+    }
+
+    last = y.front();
+    for (auto i=1; i<y.size(); i++) {
+      CHECK(last > y[i]);
+      last = y[i];
+    }
+  }
+
+  SECTION("distance between elements") {
+    auto delta = x[1] - x[0];
+    for (auto i=1; i<x.size()-1; i++) { CHECK_THAT(x[i+1] - x[i], WithinRel( delta, 1e-8)); }
+    for (auto i=1; i<y.size()-1; i++) { CHECK_THAT(y[i+1] - y[i], WithinRel(-delta, 1e-8)); }
+  }
+
+}
+
+TEST_CASE("nain interpolate values", "[nain][interpolate]") {
+  auto f        = [] (auto x) { return -x*x*x + 1; };
+  auto n_points = 100;
+  auto lower    = 0;
+  auto upper    = 1;
+  auto [x, y]   = n4::interpolate(f, n_points, lower, upper);
+
+  for (auto i=0; i<y.size(); i++) {
+    auto xi = 0 + i / 100.;
+    auto yi = f(xi);
+
+    CHECK_THAT(xi, WithinRel(x[i], 1e-8));
+    CHECK_THAT(yi, WithinRel(y[i], 1e-8));
+  }
+}
+
 
 // TODO can the overlap check tests be automated? G4 raises an exception when an
 // overlap is detected, and we do not know how to observe that in Catch2
