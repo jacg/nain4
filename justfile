@@ -6,7 +6,7 @@ default:
 test PATTERN *FLAGS: install-tests
     sh install/nain4-test/run-each-test-in-separate-process.sh {{PATTERN}} {{FLAGS}}
 
-test-nain4 *FLAGS: install-tests
+test-nain4 *FLAGS:
     just test '' {{FLAGS}}
 
 clean:
