@@ -1,13 +1,15 @@
-project( 'my-n4-project'
+project( 'my-n4-project-tests'
        , 'cpp'
        , version : 'v0.0.0'
        , default_options : [ 'buildtype=debugoptimized'
                            , 'debug=true'
                            , 'optimization=2'
                            , 'cpp_std=c++20'
-                           , 'prefix=@0@/../install/app/'.format(meson.source_root())
+                           , 'prefix=@0@/../install/test/'.format(meson.source_root())
                            ]
        )
+
+install_prefix = get_option('prefix')
 
 nain4  = dependency( 'nain4'
                    , method  : 'pkg-config'
@@ -32,16 +34,44 @@ geant4 = dependency( 'Geant4'
                                , 'Geant4::G4UIVisDefinitions'
                                ])
 
-my_app_deps    = [nain4, geant4]
-my_app_include = include_directories('.')
-my_app_sources = ['n4app.cc', 'LXe.cc']
+catch2 = dependency( 'catch2'
+                   , method   : 'pkg-config'
+                   , required : true)
+
+my_test_deps    = [nain4, geant4, catch2]
+my_test_include = include_directories('../src')
+my_test_sources = ['catch2-main-test.cc', 'test-LXe.cc', '../src/LXe.cc']
+c2_demo_sources = ['catch2-main-test.cc', 'test-catch2-demo.cc']
 
 geant4_include = geant4.get_variable(cmake    : 'Geant4_INCLUDE_DIRS')
 nain4_include  =  nain4.get_variable(pkgconfig: 'includedir'         )
 
-my_app_exe = executable( 'CHANGEME-my-n4-prog'
-                       , my_app_sources
-                       , include_directories: [my_app_include, nain4_include, geant4_include]
-                       , dependencies       : my_app_deps
-                       , install            : true
-                       )
+test_executable = 'CHANGEME-my-n4-test'
+demo_executable = 'catch2-demo-test'
+
+my_test_exe = executable( test_executable
+                        , my_test_sources
+                        , include_directories: [my_test_include, nain4_include, geant4_include]
+                        , dependencies       : my_test_deps
+                        , install            : true
+                        )
+
+c2_demo_exe = executable( demo_executable
+                        , c2_demo_sources
+                        , include_directories: []
+                        , dependencies       : [catch2]
+                        , install            : true
+                        )
+
+conf_data = configuration_data({
+'install_prefix'  : install_prefix,
+'test_executable' : test_executable,
+})
+
+configure_file(
+  input         : '../run-each-test-in-separate-process.sh.in',
+  output        :    'run-each-test-in-separate-process.sh',
+  configuration : conf_data,
+  install       : true,
+  install_dir   : install_prefix
+)

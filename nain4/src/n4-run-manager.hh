@@ -119,7 +119,8 @@ private:
 
   struct ready {
     CORE(ready)
-    run_manager* run() {
+    run_manager* run(unsigned n) {return run(std::optional<unsigned>{n}); }
+    run_manager* run(std::optional<unsigned> n_events = std::nullopt) {
       g4_manager -> Initialize();
       check_world_volume();
 
@@ -129,7 +130,7 @@ private:
       if (run_manager::rm_instance) { delete run_manager::rm_instance; }
       run_manager::rm_instance = new run_manager{std::move(g4_manager), std::move(ui)};
 
-      run_manager::rm_instance -> ui.run();
+      run_manager::rm_instance -> ui.run(n_events);
       return run_manager::rm_instance;
     }
     ui::kind command = ui::kind::command;

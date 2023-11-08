@@ -109,7 +109,9 @@ ui::ui(const std::string& program_name, int argc, char** argv, unique_argparse c
 
 }
 
-void ui::run() {
+void ui::run(std::optional<unsigned> n) {
+  if (n.has_value()) { n_events = static_cast<int>(n.value()); }
+
   if (n_events.has_value() && !use_graphics) {
     beam_on(n_events.value());
   }
