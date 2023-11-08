@@ -55,6 +55,17 @@ template<class O, class I, class F> std::vector<O> map(F f, I const& input) {
   return output;
 }
 
+// TODO add tests for `interpolate`
+template<class F> auto interpolate(F f, size_t N, double min, double max) {
+  std::vector<double> xs(N);
+  std::vector<double> ys(N);
+  auto step = (max - min) / N;
+  size_t n = 0;
+  generate (begin(xs), end(xs), [min, step, &n](){ return  min + (n++ * step); });
+  transform(begin(xs), end(xs), begin(ys), f);
+  return make_tuple(xs, ys);
+}
+
 // --------------------------------------------------------------------------------
 // Utility for creating a vector of physical quantity data, without having to
 // repeat the physical unit in each element.
