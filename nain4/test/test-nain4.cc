@@ -1648,69 +1648,73 @@ TEST_CASE("nain map", "[nain][map]") {
 }
 
 TEST_CASE("nain interpolate", "[nain][interpolate]") {
-  auto f        = [] (auto x) { return -x; };
-  auto n_points = 123;
-  auto lower    = 0;
-  auto upper    = 42;
-  auto [x, y]   = n4::interpolate(f, n_points, lower, upper);
+  auto f = [] (auto x) { return -x; };
+  const unsigned n_points = 11;
+  const double   lower    = -3.1;
+  const double   upper    = 42.6;
+  const double   delta    = (upper - lower) / n_points;
+
+  auto [xs, ys] = n4::interpolate(f, n_points, lower, upper);
 
   SECTION("number of elements") {
-    CHECK(x.size() == n_points + 1);
-    CHECK(y.size() == n_points + 1);
+    CHECK(xs.size() == n_points + 1);
+    CHECK(ys.size() == n_points + 1);
   }
 
   SECTION("range") {
-    auto [x_min, x_max] = std::minmax_element(begin(x), end(x));
-    auto [y_min, y_max] = std::minmax_element(begin(y), end(y));
+    auto [x_min, x_max] = std::minmax_element(begin(xs), end(xs));
+    auto [y_min, y_max] = std::minmax_element(begin(ys), end(ys));
 
-    CHECK_THAT(*x_min, WithinRel(    lower, 1e-8));
-    CHECK_THAT(*x_max, WithinRel(    upper, 1e-8));
-    CHECK_THAT(*x_min, WithinRel(x.front(), 1e-8));
-    CHECK_THAT(*x_max, WithinRel(x. back(), 1e-8));
+    CHECK_THAT(*x_min, WithinULP(    lower,  1));
+    CHECK_THAT(*x_max, WithinULP(    upper,  1));
+    CHECK_THAT(*x_min, WithinULP(xs.front(), 1));
+    CHECK_THAT(*x_max, WithinULP(xs. back(), 1));
 
-    CHECK_THAT(*y_min, WithinRel(   -upper, 1e-8));
-    CHECK_THAT(*y_max, WithinRel(   -lower, 1e-8));
-    CHECK_THAT(*y_min, WithinRel(y. back(), 1e-8));
-    CHECK_THAT(*y_max, WithinRel(y.front(), 1e-8));
+    CHECK_THAT(*y_min, WithinULP(   -upper,  1));
+    CHECK_THAT(*y_max, WithinULP(   -lower,  1));
+    CHECK_THAT(*y_min, WithinULP(ys. back(), 1));
+    CHECK_THAT(*y_max, WithinULP(ys.front(), 1));
   }
 
   SECTION("element order") {
     double last;
 
-    last = x.front();
-    for (auto i=1; i<x.size(); i++) {
-      CHECK(last < x[i]);
-      last = x[i];
+    last = xs.front();
+    for (auto i=1; i<xs.size(); i++) {
+      CHECK(last < xs[i]);
+      last = xs[i];
     }
 
-    last = y.front();
-    for (auto i=1; i<y.size(); i++) {
-      CHECK(last > y[i]);
-      last = y[i];
+    last = ys.front();
+    for (auto i=1; i<ys.size(); i++) {
+      CHECK(last > ys[i]);
+      last = ys[i];
     }
   }
 
   SECTION("distance between elements") {
-    auto delta = x[1] - x[0];
-    for (auto i=1; i<x.size()-1; i++) { CHECK_THAT(x[i+1] - x[i], WithinRel( delta, 1e-8)); }
-    for (auto i=1; i<y.size()-1; i++) { CHECK_THAT(y[i+1] - y[i], WithinRel(-delta, 1e-8)); }
+    for (auto i=1; i<xs.size()-1; i++) { CHECK_THAT(xs[i+1] - xs[i], WithinULP( delta, 3)); }
+    for (auto i=1; i<ys.size()-1; i++) { CHECK_THAT(ys[i+1] - ys[i], WithinULP(-delta, 3)); }
   }
 
 }
 
 TEST_CASE("nain interpolate values", "[nain][interpolate]") {
-  auto f        = [] (auto x) { return -x*x*x + 1; };
-  auto n_points = 100;
-  auto lower    = 0;
-  auto upper    = 1;
-  auto [x, y]   = n4::interpolate(f, n_points, lower, upper);
+  auto f = [] (auto x) { return -x*x*x + 1; };
+  const unsigned n_points  =  7;
+  const double   lower     = -2;
+  const double   upper     =  3;
+  const double   range     = upper - lower;
+  const double   delta     = range / n_points;
 
-  for (auto i=0; i<y.size(); i++) {
-    auto xi = 0 + i / 100.;
+  auto [xs, ys]   = n4::interpolate(f, n_points, lower, upper);
+
+  for (auto i=0; i<ys.size(); i++) {
+    auto xi = lower + i * delta;
     auto yi = f(xi);
 
-    CHECK_THAT(xi, WithinRel(x[i], 1e-8));
-    CHECK_THAT(yi, WithinRel(y[i], 1e-8));
+    CHECK_THAT(xi, WithinULP(xs[i], 4));
+    CHECK_THAT(yi, WithinULP(ys[i], 1));
   }
 }
 
