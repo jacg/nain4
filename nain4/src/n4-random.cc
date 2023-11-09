@@ -22,8 +22,8 @@ G4ThreeVector direction::get() {
                        sin_theta * std::sin(phi),
                        cos_theta};
 
-  if (bidirectional_ && uniform() < 0.5) { out =   flip(out); }
-  if (axis_.has_value()                ) { out = rotate(out); }
+  if (bidirectional_ && uniform() < 0.5) { out =          flip(out); }
+  if (rotate_                          ) { out = rotate_vector(out); }
   return out;
 }
 
@@ -31,13 +31,8 @@ G4ThreeVector direction::flip(const G4ThreeVector& in) {
   return {-in.x(), -in.y(), -in.z()};
 }
 
-G4ThreeVector direction::rotate(const G4ThreeVector& in) {
-  if (!rot_matrix.has_value()) {
-    auto rot_axis = axis_.value().cross({0, 0, 1});
-    auto theta    = std::acos(axis_.value().z());
-    rot_matrix    = HepGeom::Rotate3D{-theta, rot_axis}.getRotation();
-  }
-  return rot_matrix.value() * in;
+G4ThreeVector direction::rotate_vector(const G4ThreeVector& in) {
+  return rotation * in;
 }
 
 G4ThreeVector direction::excluded() {
@@ -55,7 +50,7 @@ G4ThreeVector direction::excluded() {
 
     if (                  must_be_excluded(     dir )) { continue; }
     if (bidirectional_ && must_be_excluded(flip(dir))) { continue; }
-    return axis_.has_value() ? rotate(dir) : dir;
+    return rotate_ ? rotate_vector(dir) : dir;
   }
 }
 

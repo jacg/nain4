@@ -1,5 +1,6 @@
 #pragma once
 
+#include "G4RotationMatrix.hh"
 #include <CLHEP/Geometry/Transform3D.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <CLHEP/Vector/Rotation.h>
@@ -42,8 +43,10 @@ struct direction {
   SET(min_phi      ,              0, max_phi_      )
   SET(max_phi      ,       min_phi_, CLHEP::twopi  )
 
-  direction& axis(G4ThreeVector zaxis               ) { if (zaxis != G4ThreeVector{0, 0, 1}) {axis_ = zaxis;} return *this;}
-  direction& axis(G4double x, G4double y, G4double z) { return axis({x,y,z}); }
+  direction& rotate  (G4RotationMatrix&     m){ rotate_=true; rotation = m * rotation            ; return       *this;}
+  direction& rotate_x(G4double          delta){ auto rot = G4RotationMatrix{}; rot.rotateX(delta); return rotate(rot);}
+  direction& rotate_y(G4double          delta){ auto rot = G4RotationMatrix{}; rot.rotateY(delta); return rotate(rot);}
+  direction& rotate_z(G4double          delta){ auto rot = G4RotationMatrix{}; rot.rotateZ(delta); return rotate(rot);}
 
   // Might seem wrong, but it's not!
   direction& min_theta(G4double x) {
@@ -64,17 +67,18 @@ struct direction {
 #undef SET
 
 private:
-  std::optional<G4ThreeVector> axis_{};
+  G4RotationMatrix rotation = CLHEP::HepRotation::IDENTITY;
+  G4bool           rotate_ {false};
+
   G4bool   bidirectional_{false};
   G4bool   exclude_      {false};
   G4double min_cos_theta_{-1};
   G4double max_cos_theta_{ 1};
   G4double min_phi_      { 0};
   G4double max_phi_      {CLHEP::twopi};
-  std::optional<CLHEP::HepRotation> rot_matrix;
 
-  G4ThreeVector flip  (const G4ThreeVector& in);
-  G4ThreeVector rotate(const G4ThreeVector& in);
+  G4ThreeVector flip         (const G4ThreeVector& in);
+  G4ThreeVector rotate_vector(const G4ThreeVector& in);
   G4ThreeVector excluded();
 };
 
