@@ -81,67 +81,74 @@ The whole[^2] B1 example is translated into nain4
 [here](https://github.com/jacg/nain4/blob/master/n4-examples/B1/src/b1.cc), and,
 even though it is written in a style that places almost every argument on a
 separate line, it fits in a single file in under 150 lines, compared to the 1138
-lines spread over 13 files in the original Geant4 rendition. 13
+lines spread over 13 files in the original Geant4 rendition.
 
 
 [^2]: This is not *strictly* true. The original B1 example caters for multiprocessing. As we actively discourage (TODO link to section in docs) using multiprocessing in Geant4, this translation into nain4 is not *exactly* equivalent. However, the differences are absolutely minimal.
 
-# The Nix flake
+# Getting started
 
-## Getting started
 1. [install nix](https://determinate.systems/posts/determinate-nix-installer)
 
    ```bash
    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
    ```
 
-2. Clone this repository: `git clone https://github.com/jacg/nain4`
+2. Bootstrap a new `nain4` project:
+   ```sh
+   nix run github:jacg/nain4#bootstrap-client-project path/to/your-new-project
+   ```
+   This will create a new directory in `path/to/your-new-project`. Adapt this
+   path to your needs before executing the command.
 
 3. `cd` into it
 
-4. Type `nix develop`
+4. Type `nix develop` [^3]
 
-   This step will take a while, the very first time you do it: it will download and compile Geant4. Thereafter, the build result is cached, and subsequent invocations should take under a second.
+   This step will take a while, the very first time you do it: it will download
+   and compile Geant4. Thereafter, the build result is cached, and subsequent
+   invocations should take under a second.
 
-5. Type `just g4-examples/run B1`.
+5. Type `just run -g -n 10`.
 
-   This step compiles and runs the `basic/B1` example that is distributed with Geant4, in interactive mode. A visualization window should pop up.
+   This step compiles the example application in your new project and runs it in
+   interactive mode. A visualization window should pop up.
 
-If all this worked, hooray! You have an environment in which you can execute the Geant4 examples, and develop and run your own Geant4 code.
+[^3]: see the section on [direnv](#automatic-environment-switching-with-direnv) for a more ergonomic alternative
+
+If all this worked, hooray! You have a git repository containing a development
+environment in which you can use to evolve, test and deploy your `nain4`-based
+Geant4 application.
 
 If not, read on to see possible problems and fixes.
 
-## Operating systems
+# Automatic environment switching with `direnv`
 
-+ Linux: This code is developed and tested on Linux. If the above procedure didn't work, it's a bug. Please report it.
-
-+ Windows: It should work equally well in WSL2 on Windows.
-
-  Caveat: if you are going to install Nix in multi-user mode, make sure that `systemd` is enabled. In short, this requires you to ensure that the file `/etc/wsl.conf` exists in your in-WSL linux and that it contains the lines
-  ```bash
-  [boot]
-  systemd=true
-  ```
-+ MacOS: Everything seems to work on macOS, with both Intel processors and Apple Silicon, but it has not been tested extensively.
-
-## Ergonomics
-
-### Automatic environment switching with `direnv`
-
-As is stands you have to write `nix develop` in order to activate the environment necessary to run and develop this code. What is more, `nix develop` places you in a minimal bash shell in which any personal configurations you may be used to, will be missing.
+As it stands you have to write `nix develop` in order to activate the
+environment necessary to run and develop this code. What is more, `nix develop`
+places you in a minimal bash shell in which any personal configurations you may
+be used to, will be missing.
 
 Both of these problems can be fixed with [direnv](https://direnv.net/) which:
-  * automatically enables the environment when you enter the directory (asking your permission, the first time)
-  * updates the environment in whatever shell you happen to be using, thus allowing you to enjoy your previous settings.
+
+  * automatically enables the environment when you enter the directory (asking
+    your permission, the first time)
+  * updates the environment in whatever shell you happen to be using, thus
+    allowing you to enjoy your previous settings.
 
 To use `direnv`:
 
-1. Make sure that it is [installed](https://direnv.net/docs/installation.html) on your system.
+1. Make sure that it is [installed](https://direnv.net/docs/installation.html)
+   on your system. If you have got this far, then you have already installed the
+   Nix package manager on your machine, so you could use it to install `direnv`
+   like this:
+   ```sh
+   nix profile install nixpkgs#direnv
+   ```
 
-2. Don't forget to [hook](https://direnv.net/docs/hook.html) it into your shell.
-   Depending on which shell you are using, this will involve adding
-   one of the following lines to the end of your shell configuration
-   file:
+2. Don't forget to [hook](https://direnv.net/docs/hook.html) `direnv` into your
+   shell. Depending on which shell you are using, this will involve adding *one*
+   of the following lines to the end of your shell configuration file:
 
    ```bash
    eval "$(direnv hook bash)"  # in ~/.bashrc
@@ -156,52 +163,33 @@ allow` in the shell. The message that `direnv` gives you at this stage
 is pretty clear, but it's usually written in red, thus you might get
 the mistaken impression that there is an error.
 
-## Geant 4 configuration
+# Operating systems
 
-Various configuration options of Geant4 itself can be changed by editing `flake.nix` here:
++ Linux: This code is developed and tested on Linux. If the above procedure
+  didn't work, it's a bug. Please report it.
 
-``` nix
-(geant4.override {
-  enableMultiThreading = false;
-  enableInventor       = false;
-  enableQt             = true;
-  enableXM             = false;
-  enableOpenGLX11      = true;
-  enablePython         = false;
-  enableRaytracerX11   = false;
-})
-```
++ Windows: It should work equally well in WSL2 on Windows.
 
-If you change the Geant4 configuration (if you are using `direnv`, it will notice the change, and automatically switch to the new configuration (recompiling Geant4, if this is a configuration not seen before) at your next shell prompt).
+  Caveat: if you are going to install Nix in multi-user mode, make sure that `systemd` is enabled. In short, this requires you to ensure that the file `/etc/wsl.conf` exists in your in-WSL linux and that it contains the lines
+  ```bash
+  [boot]
+  systemd=true
+  ```
++ MacOS: Everything seems to work on macOS, with both Intel processors and Apple
+  Silicon, but it has not been tested as extensively as on Linux.
 
-Be sure to expunge any examples you had compiled with a differently-configured Geant4, otherwise you may get mysterious problems.
+# Graphics drivers
 
-## Standard Geant4 examples
+The interactive mode uses a Qt-based GUI. This requires the correct graphics
+drivers to be installed in a location known to Nix. This should work out of the box on
 
-This repository also allows you to run and edit the standard Geant4 examples. For example,
++ NixOS
++ MacOS
 
-```bash
-just g4-examples/run B1
-```
+On other systems, that is to say non-NixOS Linuxes and WSL2 on Windows, the
+environment will try to use [`nixGL`](https://github.com/nix-community/nixGL) to
+provide the appropriate drivers. WARNING: the first time `nixGL` is needed, it
+will take a *long* time to download and compile.
 
-This should copy the sources of the most basic example that is distributed with Geant4, into the `g4-examples` directory, configure it, compile it and execute it.
 
-If all goes well, an image of a detector should appear. Try typing `/run/beamOn 10` in the `Session` box, and some simulated events should appear on the image.
-
-You should be able to modify the source code (for example increase the value of `env_sizeZ` in `B1/src/DetectorConstruction.cc` (change it from 30 to 130, to make the change obvious)) and run your modified version by repeating the earlier command `just G4-examples/run B1`.
-
-### Running other examples
-
-Many of the other examples can be run in the same way: `just g4-examples/run <example-name>`.
-
-+ Some of them will fail because they require Geant4 to be compiled with multithreading enabled. By default, multithreading is disabled in `flake.nix`.
-
-+ Others will fail because the internal organization of the example differs from that of the simple ones, which is assumed by `just g4-examples/run`.
-
-  In many of these cases it should be fairly easy to figure out how to compile and execute the example by hand. The procedure tends to me something like
-
-  1. Create a `build` subirectory the example's top-level directory
-  2. `cd` into the newly-created `build` directory
-  3. `cmake -S . -B build`
-  4. `cmake --build build -j`
-  5. Find the executable which was produced by the previous step, and execute it by preceding its name with `./` In the case of the B1 example, this would be `./exampleB1`.
+<!-- # TODO Running examples -->
