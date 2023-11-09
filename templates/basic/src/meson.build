@@ -32,16 +32,26 @@ geant4 = dependency( 'Geant4'
                                , 'Geant4::G4UIVisDefinitions'
                                ])
 
-my_app_deps    = [nain4, geant4]
-my_app_include = include_directories('.')
-my_app_sources = ['n4app.cc', 'my-lib.cc', 'LXe.cc']
-
 geant4_include = geant4.get_variable(cmake    : 'Geant4_INCLUDE_DIRS')
 nain4_include  =  nain4.get_variable(pkgconfig: 'includedir'         )
 
-my_app_exe = executable( 'CHANGEME-my-n4-prog'
-                       , my_app_sources
-                       , include_directories: [my_app_include, nain4_include, geant4_include]
-                       , dependencies       : my_app_deps
-                       , install            : true
-                       )
+my_lib_deps    = [nain4, geant4]
+my_lib_include = include_directories('.')
+my_lib_sources = ['my-lib.cc', 'LXe.cc']
+my_lib         = shared_library( 'my-lib'
+                               , my_lib_sources
+                               , include_directories: [my_lib_include, nain4_include, geant4_include]
+                               , dependencies       : my_lib_deps
+                               , install            : true
+                               )
+
+my_app_deps    = [nain4, geant4, my_lib]
+my_app_include = include_directories('.')
+my_app_sources = ['n4app.cc', 'my-lib.cc']
+my_app_exe     = executable( 'CHANGEME-my-n4-prog'
+                           , my_app_sources
+                           , include_directories: [my_app_include, nain4_include, geant4_include]
+                           , dependencies       : [nain4, geant4]
+                           , link_with          : [my_lib]
+                           , install            : true
+                           )
