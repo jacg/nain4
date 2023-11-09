@@ -1,6 +1,21 @@
 #include "G4PVPlacement.hh"
 #include <my-lib.hh>
 
+my::my()
+  // The trailing slash after '/my_geometry' is CRUCIAL: without it, the
+  // messenger violates the principle of least surprise.
+  : messenger{new G4GenericMessenger{nullptr, "/my/", "docs: bla bla bla"}}
+{
+  messenger -> DeclarePropertyWithUnit("straw_radius"      , "m"  , this ->  straw_radius  );
+  messenger -> DeclarePropertyWithUnit("bubble_radius"     , "m"  , this -> bubble_radius  );
+  messenger -> DeclarePropertyWithUnit("socket_rot"        , "deg", this -> socket_rot     );
+  messenger -> DeclarePropertyWithUnit("particle_energy"   , "keV", this -> particle_energy);
+  messenger -> DeclareProperty        ("particle"          ,        this -> particle_name  );
+  messenger -> DeclareProperty        ("particle_direction",        this -> particle_dir   );
+  messenger -> DeclareProperty        ("physics_verbosity" ,        this -> phys_verbosity );
+}
+
+
 // ANCHOR: my_generator
 std::function<void (G4Event*)> my_generator(const my& my) {
   return [&](G4Event* event) {

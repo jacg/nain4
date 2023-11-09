@@ -16,17 +16,6 @@ int main(int argc, char* argv[]) {
 
   G4int physics_verbosity = 0;
 
-  // The trailing slash after '/my_geometry' is CRUCIAL: without it, the
-  // messenger violates the principle of least surprise.
-  auto messenger = new G4GenericMessenger{nullptr, "/my/", "docs: bla bla bla"};
-  messenger -> DeclarePropertyWithUnit("straw_radius"      , "m"  , my. straw_radius  );
-  messenger -> DeclarePropertyWithUnit("bubble_radius"     , "m"  , my.bubble_radius  );
-  messenger -> DeclarePropertyWithUnit("socket_rot"        , "deg", my.socket_rot     );
-  messenger -> DeclarePropertyWithUnit("particle_energy"   , "keV", my.particle_energy);
-  messenger -> DeclareProperty        ("particle"          ,        my.particle_name  );
-  messenger -> DeclareProperty        ("particle_direction",        my.particle_dir   );
-  messenger -> DeclareProperty        ("physics_verbosity" ,        physics_verbosity );
-
   // ANCHOR: create_run_manager
   n4::run_manager::create()
     .ui("my-program-name", argc, argv)
