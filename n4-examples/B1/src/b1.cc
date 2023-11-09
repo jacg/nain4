@@ -3,11 +3,9 @@
 #include <G4ParticleGun.hh>
 #include <G4SteppingVerbose.hh>
 #include <G4UnitsTable.hh>
-
 #include <QBBC.hh>
 
 #include <cstdlib>
-
 
 auto geometry() {
   // Envelope parameters
@@ -47,8 +45,7 @@ auto geometry() {
     .at(0, -1*cm, 7*cm)
     .now();
 
-  //always return the physical World
-  return world;
+  return world;  //always return the physical World
 }
 
 
