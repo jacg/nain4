@@ -1,5 +1,7 @@
 [![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
+![GHA tests](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)
+
 This repository is going to be the home of `nain4`. The process of extracting it from the repository of the project in which it was born, has just started, so this is very much a Work In Progress.
 
 The documentation for `nain4` is gradually being written [here](https://jacg.github.io/nain4/).
