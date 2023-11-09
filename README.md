@@ -2,27 +2,34 @@
 
 ![GHA tests](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)
 
-This repository is going to be the home of `nain4`. The process of extracting it from the repository of the project in which it was born, has just started, so this is very much a Work In Progress.
-
-The documentation for `nain4` is gradually being written [here](https://jacg.github.io/nain4/).
-
 # What is this?
 
-This repository contains two orthogonal but related products:
+`nain4` is an API and accompanying set of libraries whose aim is to make it
+easier to write, test and deploy [Geant4](https://geant4.web.cern.ch/)
+applications.
 
-1. `nain4`
+# Documentation
 
-   Utilities that make writing and testing Geant4 applications much easier.
+The documentation for `nain4` is gradually being written
+[here](https://jacg.github.io/nain4/).
 
-2. A [Nix](https://zero-to-nix.com/) flake for easy provision of Geant4 user and application-developer environments.
+# Nix
 
-   The value proposition is: If *you* [install nix](https://determinate.systems/posts/determinate-nix-installer) on your machine *we* can provide a zero-effort means of installing Geant4 plus dependencies and development tools.
+Nain4 uses [`Nix`](https://nixos.org/) to manage dependencies, installation and
+provision of the development environment. The value proposition is: If *you*
+[install nix](https://determinate.systems/posts/determinate-nix-installer) on
+your machine *we* can provide a zero-effort means of installing Geant4 plus
+dependencies and development tools, and making sure that everything has
+compatible versions and works together in harmony[^1].
 
-The flake is not necessary to *use* `nain4`, but an installation of Geant4 is necessary to *test* `nain4`.
+[^1]: Somewhere in the repository, we have provided the means to install nain4
+    without the use of Nix, but we do not have the resources or the motivation
+    to maintain this. If something in `nain4` is broken when using it via Nix,
+    then we will aim to fix it; if something is broken when using `nain4`
+    without Nix, then we won't be able to help.
 
-Providing an easy means of using `nain4` without the flake is a top priority, but the extraction of `nain4` from its parent repository has only just begun, so this is not ready yet.
-
-If you manage to persuade `cmake` to treat the contents of `<this-repo>/nain4/` as a package or library (sorry, not sure of the exact cmake nomencladure) in your Geant4 application, then it should work.
+For HPC systems on which installing Nix might be problematic, we provide the
+means to generate Singularity/[Apptainer](https://apptainer.org/) containers.
 
 # `nain4`
 
@@ -69,6 +76,15 @@ These 13 lines of code (without comments or blank lines) correspond to 62 lines 
 In Geant4's interfaces, you have to remember (or look up) the order of the parameters of the shape constructors, and you must provide values for each parameter, even when you want to use an obvious default value (such as inner `radius` being zero, or `phi` covering `2π`); in `nain4` the parameters have clear names and can be provided in any order that you find convenient; obvious default values can be omitted.
 
 Geant4 obliges you to express everything in (frequently annoying) half-lengths; `nain4` gives you the choice: `.x` vs `.half_x`.
+
+The whole[^2] B1 example is translated into nain4
+[here](https://github.com/jacg/nain4/blob/master/n4-examples/B1/src/b1.cc), and,
+even though it is written in a style that places almost every argument on a
+separate line, it fits in a single file in under 150 lines, compared to the 1138
+lines spread over 13 files in the original Geant4 rendition. 13
+
+
+[^2]: This is not *strictly* true. The original B1 example caters for multiprocessing. As we actively discourage (TODO link to section in docs) using multiprocessing in Geant4, this translation into nain4 is not *exactly* equivalent. However, the differences are absolutely minimal.
 
 # The Nix flake
 
