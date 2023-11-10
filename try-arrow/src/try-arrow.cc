@@ -164,19 +164,16 @@ arrow::Status read_data_files() {
 
 }
 
+arrow::Status arrow_main() {
+  ARROW_RETURN_NOT_OK(generate_data_files());
+  ARROW_RETURN_NOT_OK(    read_data_files());
+}
+
 int main() {
-
-  arrow::Status st = generate_data_files();
+  arrow::Status st = arrow_main();
   if (!st.ok()) {
     std::cerr << st << std::endl;
     return EXIT_FAILURE;
   }
-
-  st = read_data_files();
-  if (!st.ok()) {
-    std::cerr << st << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  std::cout << "OK ->" << std::endl;
+  std::cout << "DONE" << std::endl;
 }
