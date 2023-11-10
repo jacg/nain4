@@ -69,6 +69,17 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_parquet(std::string filename) 
   return arrow::Result<std::shared_ptr<arrow::Table>>(table);
 }
 
+arrow::Result<std::shared_ptr<arrow::RecordBatch>> read_arrow(std::string filename) {
+  std::shared_ptr<arrow::io::ReadableFile> infile;
+  ARROW_ASSIGN_OR_RAISE(infile, arrow::io::ReadableFile::Open(filename, arrow::default_memory_pool()));
+  ARROW_ASSIGN_OR_RAISE(auto ipc_reader, arrow::ipc::RecordBatchFileReader::Open(infile));
+  // Using the reader, we can read Record Batches. Note that this is specific to IPC;
+  // for other formats, we focus on Tables, but here, RecordBatches are used.
+  std::shared_ptr<arrow::RecordBatch> rbatch;
+  ARROW_ASSIGN_OR_RAISE(rbatch, ipc_reader -> ReadRecordBatch(0));
+  return arrow::Result<std::shared_ptr<arrow::RecordBatch>>(rbatch);
+}
+
 arrow::Status GenerateDataFiles() {
   arrow::Int8Builder int8builder;
   int8_t days_raw[5] = {1, 12, 17, 23, 28};
@@ -141,6 +152,9 @@ arrow::Status xxx() {
 
   ARROW_ASSIGN_OR_RAISE(auto table, read_parquet("test_in_table.parquet"));
   std::cout << table -> ToString() << std::endl;
+
+  ARROW_ASSIGN_OR_RAISE(rbatch, read_arrow("test_in_rbatch.arrow"));
+  std::cout << rbatch -> ToString() << std::endl;
 
   return arrow::Status::OK();
 
