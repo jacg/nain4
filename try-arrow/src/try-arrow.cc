@@ -48,10 +48,9 @@ arrow::Status write_csv(
   return arrow::Status::OK();
 }
 
-template<class T>
 arrow::Status write_parquet(
   std::string filename,
-  std::shared_ptr<T> data,
+  std::shared_ptr<arrow::Table> data,
   int64_t chunk_size = parquet::DEFAULT_MAX_ROW_GROUP_LENGTH
 ) {
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
