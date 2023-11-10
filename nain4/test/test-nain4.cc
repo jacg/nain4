@@ -2041,17 +2041,15 @@ TEST_CASE("random direction bidirectional", "[random][direction]") {
 
 }
 
-TEST_CASE("random direction axis", "[random][direction]") {
+TEST_CASE("random direction rotate", "[random][direction]") {
   const size_t N = 1000;
   auto theta = pi/6;
   auto sin_th = std::sin(theta);
 
-  // Magnitudes irrelevant, only direction matters
-  // Testing 2 overloads: (G4Threevec) and (double, double, double)
-  auto xpos = n4::random::direction{}.max_theta(theta).axis({ 6,  0, 0});
-  auto ypos = n4::random::direction{}.max_theta(theta).axis(  0,  4, 0 );
-  auto xneg = n4::random::direction{}.max_theta(theta).axis({-8,  0, 0});
-  auto yneg = n4::random::direction{}.max_theta(theta).axis(  0, -9, 0 );
+  auto xpos = n4::random::direction{}.max_theta(theta).rotate_y( halfpi);
+  auto ypos = n4::random::direction{}.max_theta(theta).rotate_x(-halfpi);
+  auto xneg = n4::random::direction{}.max_theta(theta).rotate_y(-halfpi);
+  auto yneg = n4::random::direction{}.max_theta(theta).rotate_x( halfpi);
 
   threevec_stats xp{N, [&] { return xpos.get(); }};
   threevec_stats yp{N, [&] { return ypos.get(); }};
@@ -2108,11 +2106,11 @@ TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
 }
 
 
-TEST_CASE("random direction exclude axis", "[random][direction]") {
+TEST_CASE("random direction exclude rotate", "[random][direction]") {
   auto theta = pi/6;
   auto cos_th = std::cos(theta);
 
-  auto xbeam = n4::random::direction{}.min_theta(theta).axis({1, 0, 0}).exclude();
+  auto xbeam = n4::random::direction{}.min_theta(theta).rotate_y(halfpi).exclude();
   threevec_stats s{1000, [&] { return xbeam.get(); }};
   std::cerr << "xbeam\n" << s;
 
