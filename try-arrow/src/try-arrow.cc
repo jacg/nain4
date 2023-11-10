@@ -1,4 +1,3 @@
-#include "parquet/properties.h"
 #include <arrow/api.h>
 
 #include <arrow/io/api.h>
@@ -61,25 +60,15 @@ arrow::Status write_parquet(
   return arrow::Status::OK();
 }
 
-// template<class T>
-// arrow::Status write_parquet(
-//   std::string filename,
-//   std::shared_ptr<T> data,
-//   int64_t chunk_size = parquet::DEFAULT_MAX_ROW_GROUP_LENGTH
-// ) {
-//   std::shared_ptr<arrow::io::FileOutputStream> outfile;
-//   ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open(filename));
-//   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(*data, arrow::default_memory_pool(), outfile, chunk_size));
-//   return arrow::Status::OK();
-// }
-
-  // std::shared_ptr<arrow::io::ReadableFile> infile;
-
-  // ARROW_ASSIGN_OR_RAISE(infile, arrow::io::ReadableFile::Open("test_in.arrow", arrow::default_memory_pool()));
-  // ARROW_ASSIGN_OR_RAISE(auto ipc_reader, arrow::ipc::RecordBatchFileReader::Open(infile));
-  // ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::RecordBatch> rbatch, ipc_reader -> ReadRecordBatch(0));
-
-
+arrow::Result<std::shared_ptr<arrow::Table>> read_parquet(std::string filename) {
+  std::shared_ptr<arrow::io::ReadableFile> infile;
+  ARROW_ASSIGN_OR_RAISE(infile, arrow::io::ReadableFile::Open(filename));
+  std::unique_ptr<parquet::arrow::FileReader> reader;
+  PARQUET_THROW_NOT_OK(parquet::arrow::OpenFile(infile, arrow::default_memory_pool(), &reader));
+  std::shared_ptr<arrow::Table> table;
+  PARQUET_THROW_NOT_OK(reader->ReadTable(&table));
+  return arrow::Result<std::shared_ptr<arrow::Table>>(table);
+}
 
 arrow::Status GenerateDataFiles() {
   arrow::Int8Builder int8builder;
@@ -104,7 +93,7 @@ arrow::Status GenerateDataFiles() {
   auto schema      = arrow::schema({field_day, field_month, field_year});
 
   auto rbatch = arrow::RecordBatch::Make(schema, days->length(), {days, months, years});
-  std::cout << rbatch -> ToString() << std::endl;
+  //std::cout << rbatch -> ToString() << std::endl;
 
   ARROW_RETURN_NOT_OK(int8builder.AppendValues({6, 12, 3, 30, 22}));
   std::shared_ptr<arrow::Array> days2;
@@ -123,7 +112,7 @@ arrow::Status GenerateDataFiles() {
   auto  year_chunks = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{years , years2 });
 
   auto table = arrow::Table      ::Make(schema, {day_chunks, month_chunks, year_chunks}, 10);
-  std::cout << table -> ToString() << std::endl;
+  //std::cout << table -> ToString() << std::endl;
 
   ARROW_RETURN_NOT_OK(write_arrow  ("test_in_table.arrow"  , table));
   ARROW_RETURN_NOT_OK(write_csv    ("test_in_table.csv"    , table));
@@ -151,16 +140,10 @@ arrow::Status xxx() {
   ARROW_RETURN_NOT_OK(ipc_writer -> WriteRecordBatch(*rbatch));
   ARROW_RETURN_NOT_OK(ipc_writer -> Close());
 
-  // std::shared_ptr<arrow::Table> csv_table;
-  // ARROW_ASSIGN_OR_RAISE(
-  //   auto csv_reader,
-  //   arrow::csv::TableReader::Make( arrow::io::default_io_context()
-  //                                , infile
-  //                                , arrow::csv::   ReadOptions::Defaults()
-  //                                , arrow::csv::  ParseOptions::Defaults()
-  //                                , arrow::csv::ConvertOptions::Defaults()));
-  // ARROW_ASSIGN_OR_RAISE(csv_table, csv_reader -> Read());
+  ARROW_ASSIGN_OR_RAISE(auto table, read_parquet("test_in_table.parquet"));
+  std::cout << table -> ToString() << std::endl;
 
+  return arrow::Status::OK();
 
 }
 
