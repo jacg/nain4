@@ -80,7 +80,22 @@ arrow::Result<std::shared_ptr<arrow::RecordBatch>> read_arrow(std::string filena
   return arrow::Result<std::shared_ptr<arrow::RecordBatch>>(rbatch);
 }
 
-arrow::Status GenerateDataFiles() {
+arrow::Result<std::shared_ptr<arrow::Table>> read_csv(std::string filename) {
+  std::shared_ptr<arrow::io::ReadableFile> infile;
+  ARROW_ASSIGN_OR_RAISE(infile, arrow::io::ReadableFile::Open("test_in.csv"));
+  std::shared_ptr<arrow::Table> csv_table;
+  ARROW_ASSIGN_OR_RAISE(
+      auto csv_reader, arrow::csv::TableReader::Make(
+        arrow::io::default_io_context(), infile,
+        arrow::csv::   ReadOptions::Defaults(),
+        arrow::csv::  ParseOptions::Defaults(),
+        arrow::csv::ConvertOptions::Defaults()));
+  std::shared_ptr<arrow::Table> table;
+  ARROW_ASSIGN_OR_RAISE(table, csv_reader->Read())
+  return arrow::Result<std::shared_ptr<arrow::Table>>(table);
+}
+
+arrow::Status generate_data_files() {
   arrow::Int8Builder int8builder;
   int8_t days_raw[5] = {1, 12, 17, 23, 28};
   ARROW_RETURN_NOT_OK(int8builder.AppendValues(days_raw, 5));
@@ -137,24 +152,13 @@ arrow::Status GenerateDataFiles() {
 
 
 
-arrow::Status xxx() {
-  std::shared_ptr<arrow::io::ReadableFile> infile;
+arrow::Status read_data_files() {
 
-  ARROW_ASSIGN_OR_RAISE(infile, arrow::io::ReadableFile::Open("test_in.arrow", arrow::default_memory_pool()));
-  ARROW_ASSIGN_OR_RAISE(auto ipc_reader, arrow::ipc::RecordBatchFileReader::Open(infile));
-  ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::RecordBatch> rbatch, ipc_reader -> ReadRecordBatch(0));
+  ARROW_ASSIGN_OR_RAISE(auto  table, read_csv    ("test_in_table.csv"    ));  //std::cout << table  -> ToString() << std::endl;
+  ARROW_ASSIGN_OR_RAISE(      table, read_parquet("test_in_table.parquet"));    std::cout << table  -> ToString() << std::endl;
 
-  std::shared_ptr<arrow::io::FileOutputStream> outfile;
-  ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open("test_out.arrow"));
-  ARROW_ASSIGN_OR_RAISE(auto ipc_writer, arrow::ipc::MakeFileWriter(outfile, rbatch -> schema()));
-  ARROW_RETURN_NOT_OK(ipc_writer -> WriteRecordBatch(*rbatch));
-  ARROW_RETURN_NOT_OK(ipc_writer -> Close());
-
-  ARROW_ASSIGN_OR_RAISE(auto table, read_parquet("test_in_table.parquet"));
-  std::cout << table -> ToString() << std::endl;
-
-  ARROW_ASSIGN_OR_RAISE(rbatch, read_arrow("test_in_rbatch.arrow"));
-  std::cout << rbatch -> ToString() << std::endl;
+  ARROW_ASSIGN_OR_RAISE(auto rbatch, read_arrow  ("test_in_rbatch.arrow" ));  //std::cout << rbatch -> ToString() << std::endl;
+  ARROW_ASSIGN_OR_RAISE(      table, read_csv    ("test_in_rbatch.csv"   ));  //std::cout << table  -> ToString() << std::endl;
 
   return arrow::Status::OK();
 
@@ -162,13 +166,13 @@ arrow::Status xxx() {
 
 int main() {
 
-  arrow::Status st = GenerateDataFiles();
+  arrow::Status st = generate_data_files();
   if (!st.ok()) {
     std::cerr << st << std::endl;
     return EXIT_FAILURE;
   }
 
-  st = xxx();
+  st = read_data_files();
   if (!st.ok()) {
     std::cerr << st << std::endl;
     return EXIT_FAILURE;
