@@ -2152,9 +2152,9 @@ TEST_CASE("random direction ranges", "[random][direction]") {
   auto costh_min = -1;
   auto costh_max =  1;
   auto th_min = 0;
-  auto th_max = CLHEP::pi;
+  auto th_max = pi;
   auto phi_min = 0;
-  auto phi_max = CLHEP::twopi;
+  auto phi_max = twopi;
   auto a = 0.25;
   auto b = 0.50;
   auto eps = 1e-5;
