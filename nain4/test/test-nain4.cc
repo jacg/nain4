@@ -2062,6 +2062,33 @@ TEST_CASE("random direction rotate", "[random][direction]") {
   CHECK(yn.y_min <= 0); CHECK(yp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
 }
 
+
+TEST_CASE("random direction rotate twice", "[random][direction]") {
+  // z pointing to (1, 1, 0)
+  const size_t N  = 100000;
+  auto theta_open = pi/8;
+  auto theta_rot  = pi/4;
+  auto x_min =  std::sin(theta_rot) - std::cos(theta_open);
+  auto x_max =  std::sin(theta_rot) + std::cos(theta_open);
+  auto y_min =  std::sin(theta_rot) - std::sin(theta_open);
+  auto y_max =  std::sin(theta_rot) + std::sin(theta_open);
+  auto z_min =                      - std::sin(theta_open);
+  auto z_max =                        std::sin(theta_open);
+
+  auto octant = n4::random::direction{}.max_theta(theta_open).rotate_y(pi/2).rotate_z(pi/4);
+  threevec_stats st{N, [&] { return octant.get(); }};
+
+  std::cout << st << std::endl;
+  CHECK(st.x_min >= x_min);
+  CHECK(st.x_max <= x_max);
+  CHECK(st.y_min >= y_min);
+  CHECK(st.y_max <= y_max);
+  CHECK(st.z_min >= z_min);
+  CHECK(st.z_max <= z_max);
+}
+
+
+
 TEST_CASE("random direction exclude", "[random][direction]") {
   auto theta = pi/6;
   auto sin_th = std::sin(theta);
