@@ -1,0 +1,12 @@
+# -*-Makefile-*-
+
+run: install
+    build/try-arrow
+
+install:
+    meson setup build src
+    meson compile -C build
+    meson install -C build
+
+clean:
+    rm build ../install/try-arrow -rf
