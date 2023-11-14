@@ -168,7 +168,7 @@
         REPLACE () {
           OLD=$1
           NEW=$2
-          ${pkgs.ripgrep}/bin/rg "$OLD" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i "s|$OLD|$NEW|g"
+          ${pkgs.ripgrep}/bin/rg --hidden "$OLD" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i "s|$OLD|$NEW|g"
         }
         REPLACE "CHANGEME-EXE"                           ''${BASE_NAME}
         REPLACE "CHANGEME-PROJECT-NAME"                  ''${BASE_NAME}
