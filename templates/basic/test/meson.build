@@ -1,4 +1,4 @@
-project( 'my-n4-project-tests'
+project( 'CHANGEME-TESTS-PROJECT-NAME'
        , 'cpp'
        , version : 'v0.0.0'
        , default_options : [ 'buildtype=debugoptimized'
@@ -46,7 +46,7 @@ c2_demo_sources = ['catch2-main-test.cc', 'test-catch2-demo.cc']
 geant4_include = geant4.get_variable(cmake    : 'Geant4_INCLUDE_DIRS')
 nain4_include  =  nain4.get_variable(pkgconfig: 'includedir'         )
 
-test_executable = 'CHANGEME-my-n4-test'
+test_executable = 'CHANGEME-PROJECT-TEST-EXE'
 demo_executable = 'catch2-demo-test'
 
 my_test_exe = executable( test_executable

@@ -1,4 +1,4 @@
-project( 'my-n4-project'
+project( 'CHANGEME-PROJECT-NAME'
        , 'cpp'
        , version : 'v0.0.0'
        , default_options : [ 'buildtype=debugoptimized'
@@ -39,7 +39,7 @@ my_app_sources = ['n4app.cc', 'LXe.cc']
 geant4_include = geant4.get_variable(cmake    : 'Geant4_INCLUDE_DIRS')
 nain4_include  =  nain4.get_variable(pkgconfig: 'includedir'         )
 
-my_app_exe = executable( 'CHANGEME-my-n4-prog'
+my_app_exe = executable( 'CHANGEME-EXE'
                        , my_app_sources
                        , include_directories: [my_app_include, nain4_include, geant4_include]
                        , dependencies       : my_app_deps
