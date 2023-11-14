@@ -255,6 +255,7 @@ public:
 template<class T>
 run_manager::ready run_manager::replace_geometry(T geometry) {
   DBG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAAAAAAA");
+  DBG("g4_manager: " << g4_manager);
   g4_manager -> ReinitializeGeometry(true);
   DBG("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
   return set_geometry{std::move(g4_manager), std::move(ui)}
