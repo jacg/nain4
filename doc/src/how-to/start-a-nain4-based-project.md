@@ -8,55 +8,64 @@ not, please see [Install nix](./install-nix.md).
 In order to create a `nain4`-based project use `bootstrap-client-project` like this:
 
 ```bash
-nix run github:jacg/nain4#bootstrap-client-project path/to/your/project
+nix run github:jacg/nain4#bootstrap-client-project path/to/your/project your-chosen-name "one line project description"
 ```
-
-where `path/to/your/project` should not exist before you run the command.
-
+where
++ `path/to/your/project` should not exist before you run the command.
++ `your-chosen-name` should be replaced with a name of your choice: this should
+  be a valid identifier in both `bash` and the `Nix` language, so, roughly
+  speaking, it should not contain any spaces, slashes or other dodgy characters.
+  It will be used to name various things within your project.
++ `"one line project description"` should be replaced with some text of your
+  choice. Don't forget the quotes.
 
 ## Basic usage
-+ `just run 100`: run the application in batch mode with `/run/beamOn 100`
-+ `just run macs/run.mac`: run the application using the macro file `macs/run.mac`
-+ `just run`: run the application with the interactive GUI
-  WARNING: this will probably crash unless you are running on
+
++ `just run -n 100`: run the application in batch mode with `/run/beamOn 100`
++ `just run -g`: run the application with the interactive GUI
+  WARNING: unless you are running on
   + `NixOS`
-  + `macOS`
-  To run the GUI on other OSes you need to use a graphics hardware
-  abstraction helper. There is a `just` recipe which automatically
-  includes this for you:
-  ```bash
-  just view
-  ```
-  The first time you use it, it will take a while to compile.
+  + `macOS` this will probably take a long time the first time you try it, as it
+  will download and compile `nixGL` which is used to detect graphics hardware
+  automatically and guarantee the presence of the required graphics drivers. On
+  subsequent runs, this overhead will disappear.
++ TODO: describe the early/late CLI options
++ TODO: describe the macro path CLI options
 
 ## Project contents
 
 Your bootstrapped project will contain the following files
 
-// TO BE UPDATED WITH TESTS
 ```
-your-project-folder
+path/to/your/project
+├── execute-with-nixgl-if-needed.sh
 ├── flake
-│   └── outputs.nix
+│  └── outputs.nix
 ├── flake.lock
 ├── flake.nix
 ├── justfile
 ├── macs
-│   ├── run.mac
-│   └── vis.mac
-└── src
-    ├── CMakeLists.txt
-    └── n4app.cc
+│  ├── early-cli.mac
+│  ├── early-hard-wired.mac
+│  ├── late-cli.mac
+│  ├── late-hard-wired.mac
+│  ├── run.mac
+│  ├── vis.mac
+│  └── vis2.mac
+├── run-each-test-in-separate-process.sh.in
+├── src
+│  ├── LXe.cc
+│  ├── LXe.hh
+│  ├── meson.build
+│  └── n4app.cc
+└── test
+   ├── catch2-main-test.cc
+   ├── meson.build
+   ├── test-catch2-demo.cc
+   └── test-LXe.cc
 ```
 
-+ `src/n4app.cc` contains the entire c++ source code of your
-  project. As the project grows, you may wish to break this up into
-  smaller source files. You can add as many header (`.hh`) and
-  implementation (`.cc`) files as you wish.
-
-+ `src/CMakeLists.txt` is responsible for the details of the build
-  process. If you do not change the directory structure of your
-  project, you should not need to change this file.
++ TODO: discuss the contents of `src` and `test`
 
 + The `macs` directory contains Geant4 macro files, used to provide
   some app configuration parameters at runtime.
