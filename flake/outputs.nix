@@ -178,8 +178,6 @@
         REPLACE "CHANGEME-APP"                           ''${BASE_NAME}
         REPLACE "CHANGEME-ONE-LINE-PROJECT-DESCRIPTION" "''${DESCRIPTION}"
 
-        #${pkgs.ripgrep}/bin/rg "CHANGEME-EXE" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i "s|CHANGEME-EXE|$ROOT|g"
-
         git -c init.defaultBranch=master init -q
         # TODO: protect against user not having set git user.{name,email}
         git add .
