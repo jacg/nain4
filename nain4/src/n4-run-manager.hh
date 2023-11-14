@@ -250,9 +250,13 @@ public:
 };
 
 
+#define DBG(stuff) std::cerr << stuff << std::endl
+
 template<class T>
 run_manager::ready run_manager::replace_geometry(T geometry) {
+  DBG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAAAAAAA");
   g4_manager -> ReinitializeGeometry(true);
+  DBG("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
   return set_geometry{std::move(g4_manager), std::move(ui)}
     .geometry(geometry)
     .actions((G4VUserActionInitialization*) G4RunManager::GetRunManager() -> GetUserActionInitialization());
