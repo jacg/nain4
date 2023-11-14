@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
 
   // ANCHOR: create_run_manager
   n4::run_manager::create()
-    .ui("my-program-name", argc, argv)
+    .ui("CHANGEME-EXE", argc, argv)
     .macro_path("macs")
     .apply_command("/my/straw_radius 0.5 m")
     .apply_early_macro("early-hard-wired.mac")
