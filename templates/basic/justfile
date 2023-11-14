@@ -22,9 +22,11 @@ catch2-demo *REST:
 build:
   meson setup build/app src
   meson compile -C build/app
+
+install: build
   meson install -C build/app
 
-run *ARGS: build
+run *ARGS: install
   #!/usr/bin/env sh
   sh execute-with-nixgl-if-needed.sh ./install/app/bin/CHANGEME-EXE "$@"
   exit $?
