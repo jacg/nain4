@@ -131,6 +131,19 @@
       # nix run github:jacg/nain4#bootstrap-client-project project-name author etc
       program = "${pkgs.writeShellScript "bootstrap.sh" ''
         DIRECTORY=$1
+        BASE_NAME=$2
+        DESCRIPTION=$3
+        if [[ -z $DESCRIPTION ]];
+        then
+          echo Missing argument to bootstrap-client-project
+          echo
+          echo Usage:
+          echo
+          echo "REQUIRED  first argument: directory where new project will be placed                   provided: $DIRECTORY"
+          echo "REQUIRED second argument: project identifier \(may not contain spaces, slashes, etc.\) provided: $BASE_NAME"
+          echo "REQUIRED  third argument: IN QUOTES single-line description of project"
+          exit 1
+        fi
         mkdir -p $DIRECTORY
         FQ_DIRECTORY=$(${pkgs.coreutils}/bin/readlink -f $DIRECTORY)
         ${pkgs.coreutils}/bin/cp -Tr ${self}/templates/basic                                    $FQ_DIRECTORY
@@ -139,6 +152,21 @@
         nix develop  $FQ_DIRECTORY -c true # create flake.lock
         cd           $FQ_DIRECTORY
         ${pkgs.ripgrep}/bin/rg "ANCHOR" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i '/ANCHOR/d'
+
+        REPLACE () {
+          OLD=$1
+          NEW=$2
+          ${pkgs.ripgrep}/bin/rg "$OLD" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i "s|$OLD|$NEW|g"
+        }
+        REPLACE "CHANGEME-EXE"                           ''${BASE_NAME}
+        REPLACE "CHANGEME-PROJECT-NAME"                  ''${BASE_NAME}
+        REPLACE "CHANGEME-TESTS-PROJECT-NAME"            ''${BASE_NAME}-tests
+        REPLACE "CHANGEME-PROJECT-TEST-EXE"              ''${BASE_NAME}-test
+        REPLACE "CHANGEME-PACKAGE"                       ''${BASE_NAME}
+        REPLACE "CHANGEME-APP"                           ''${BASE_NAME}
+        REPLACE "CHANGEME-ONE-LINE-PROJECT-DESCRIPTION" "''${DESCRIPTION}"
+
+        #${pkgs.ripgrep}/bin/rg "CHANGEME-EXE" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i "s|CHANGEME-EXE|$ROOT|g"
 
         git -c init.defaultBranch=master init -q
         # TODO: protect against user not having set git user.{name,email}

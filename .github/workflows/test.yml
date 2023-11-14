@@ -67,7 +67,7 @@ jobs:
           cd ~/work
           git config --global user.name Tester
           git config --global user.email tester@testing.org
-          nix run github:jacg/nain4#bootstrap-client-project my-project
+          nix run github:jacg/nain4#bootstrap-client-project my-project name-chosen-by-me "description of my project"
           cd my-project
           nix develop -c just | tee just-output
           PATTERN="end of event 10"
