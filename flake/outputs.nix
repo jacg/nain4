@@ -3,10 +3,21 @@
 , ...
 }: let
 
-  pkgs = (nixpkgs.legacyPackages.extend (import ./overlays/argparse.nix));
+  pkgs = (nixpkgs.legacyPackages
+    .extend (import ./overlays/argparse.nix))
+    .extend add-debug-symbols-to-geant4;
   # Would prefer something along the lines of
   #    pkgs = import nixpkgs { overlays = [ (import ./overlays/argparse.nix) ]; };
   # but not sure how to get it to work with `nosys`
+
+  add-debug-symbols-to-geant4 = final: previous: {
+    geant4 = previous.geant4.overrideAttrs (old: {
+      dontStrip = true;
+      NIX_CFLAGS_COMPILE =
+        (if builtins.hasAttr "NIX_CFLAGS_COMPILE" old then old.NIX_CFLAGS_COMPILE else "")
+        + " -ggdb -Wa,--compress-debug-sections";
+    });
+  };
 
   g4 = { thread ? false , inventor ? false , qt ? false, xm ? false, ogl ? false, python ? false, raytrace ? false }:
     (pkgs.geant4.override {
