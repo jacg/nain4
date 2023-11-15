@@ -132,8 +132,16 @@ jobs:
       - name: Check for presence of debug symbols in Geant4
         run: |
           if ${{ matrix.os == 'macos-12' }}
-          then echo TODO figure out how to test for debug symbols on macOS
-          else rg --files-with-matches debug_info result/lib/libG4*.so
+          then
+            if rg --files-with-matches debug_info result/lib/libG4*.so
+            then echo DEBUG SYMBOLS FOUND
+            else echo FAILING BECAUSE DEBUG SYMBOLS NOT FOUND; false
+            fi
+          else
+            if rg --files-with-matches debug_info result/lib/libG4*.so
+            then echo DEBUG SYMBOLS FOUND
+            else echo FAILING BECAUSE DEBUG SYMBOLS NOT FOUND; false
+            fi
           fi
 
       - name: Fail if too many warnings
