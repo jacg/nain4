@@ -126,5 +126,13 @@ jobs:
       - name: Run G4 examples
         run: nix develop .#${{ matrix.devshell }}  -c just g4-examples/run-examples-that-work
 
+      - name: Check for presence of debug symbols
+        run: |
+          nix build ./#geant4
+          if ${{ matrix.os == 'macos-12' }}
+          then echo TODO figure out how to test for debug symbols on macOS
+          else rg --files-with-matches debug_info result/lib/libG4*.so
+          fi
+
       - name: Fail if too many warnings
         run: bash ~/work/nain4/nain4/scripts/count-warnings.sh compilation-log 0 fail
