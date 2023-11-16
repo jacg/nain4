@@ -1,3 +1,6 @@
+#include <CLHEP/Geometry/Transform3D.h>
+#include <G4ThreeVector.hh>
+#include <cmath>
 #include <n4-random.hh>
 
 #include <numeric>
@@ -8,6 +11,48 @@
 
 namespace nain4 {
 namespace random {
+
+G4ThreeVector direction::get() {
+  if (exclude_) { return excluded(); }
+
+  auto phi       = uniform(min_phi_      , max_phi_      );
+  auto cos_theta = uniform(min_cos_theta_, max_cos_theta_);
+  auto sin_theta = std::sqrt(1 - cos_theta*cos_theta);
+  G4ThreeVector out = {sin_theta * std::cos(phi),
+                       sin_theta * std::sin(phi),
+                       cos_theta};
+
+  if (bidirectional_ && uniform() < 0.5) { out =          flip(out); }
+  if (rotate_                          ) { out = rotate_vector(out); }
+  return out;
+}
+
+G4ThreeVector direction::flip(const G4ThreeVector& in) {
+  return {-in.x(), -in.y(), -in.z()};
+}
+
+G4ThreeVector direction::rotate_vector(const G4ThreeVector& in) {
+  return rotation * in;
+}
+
+G4ThreeVector direction::excluded() {
+  auto must_be_excluded = [&] (const G4ThreeVector& d) {
+    auto costheta = d.cosTheta();
+    auto phi      = d.   phi  (); if (phi < 0) { phi += CLHEP::twopi; }
+    return (costheta >= min_cos_theta_) &&
+           (costheta <= max_cos_theta_) &&
+           (phi      >= min_phi_      ) &&
+           (phi      <= max_phi_      );
+  };
+
+  while (true) {
+    auto dir = G4RandomDirection();
+
+    if (                  must_be_excluded(     dir )) { continue; }
+    if (bidirectional_ && must_be_excluded(flip(dir))) { continue; }
+    return rotate_ ? rotate_vector(dir) : dir;
+  }
+}
 
 // Going with rejection sampling, for now
 // TODO: test done, now benchmark other approaches

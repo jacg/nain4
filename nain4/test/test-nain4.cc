@@ -37,8 +37,11 @@
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <cmath>
+#include <limits>
 #include <numeric>
 #include <stdexcept>
 #include <type_traits>
@@ -52,8 +55,9 @@
 // this gives rise to the apparently superfluous division by the same unit on
 // both sides of an equation, in the source code.
 
-using Catch::Approx;
-using namespace Catch::Matchers;
+using Catch::Approx; // TODO replace Approx with Matchers
+using Catch::Matchers::WithinAbs; using Catch::Matchers::WithinRel; using Catch::Matchers::WithinULP;
+using CLHEP::pi; using CLHEP::halfpi; using CLHEP::twopi;
 using namespace n4::test;
 
 TEST_CASE("nain material", "[nain][material]") {
@@ -455,7 +459,6 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto sphere_l = n4::sphere("sphere_l").r(r).volume(water);
   auto sphere_p = n4::sphere("sphere_p").r(r).place  (water).at(xc, yc, zc).now();
 
-  using CLHEP::pi;
   CHECK(sphere_l -> TotalVolumeEntities() == 1);
   CHECK(sphere_l -> GetMass() / kg        == Approx(4 * pi / 3 * r * r * r * density / kg));
   CHECK(sphere_l -> GetMaterial()         == water);
@@ -468,7 +471,6 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   CHECK(sphere_p -> GetTranslation() . y() / m == yc / m);
   CHECK(sphere_p -> GetTranslation() . z() / m == zc / m);
 
-  using CLHEP::twopi;
   auto start   = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto spherer = [&] (auto name) { return n4::sphere(name).r(1); };
   auto phi_s   = spherer("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
@@ -555,7 +557,6 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
 }
 
 TEST_CASE("nain sphere orb", "[nain][sphere][orb]") {
-  using CLHEP::twopi;
   auto is_sphere = [](auto thing) { CHECK(dynamic_cast<G4Sphere*>(thing)); };
   auto is_orb    = [](auto thing) { CHECK(dynamic_cast<G4Orb   *>(thing)); };
 
@@ -610,7 +611,6 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   auto tubs_l = n4::tubs("tubs_l").r(r).z(z).volume(water);
   auto tubs_p = n4::tubs("tubs_p").r(r).z(z).place (water).at(xc, yc, zc).now();
 
-  using CLHEP::pi;
   CHECK(tubs_l -> TotalVolumeEntities() == 1);
   CHECK(tubs_l -> GetMass() / kg        == Approx(pi * r * r * z * density / kg));
   CHECK(tubs_l -> GetMaterial()         == water);
@@ -623,7 +623,6 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   CHECK(tubs_p -> GetTranslation() . y() / m == yc / m);
   CHECK(tubs_p -> GetTranslation() . z() / m == zc / m);
 
-  using CLHEP::twopi;
   auto start  = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto tubsrz = [&] (auto name) { return n4::tubs(name).r(1).z(1); };
   auto phi_s  = tubsrz("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
@@ -699,7 +698,6 @@ TEST_CASE("nain cons", "[nain][cons]") {
   auto cons_l = n4::cons("cons_l").r1(r1).r2(r2).z(z).volume(water);
   auto cons_p = n4::cons("cons_p").r1(r1).r2(r2).z(z).place (water).at(xc, yc, zc).now();
 
-  using CLHEP::pi;
   // V = (1/3) * π * h * (r² + r * R + R²)
   auto volume = pi * 1/3 * z * (r1*r1 + r1*r2 + r2*r2);
 
@@ -721,7 +719,6 @@ TEST_CASE("nain cons", "[nain][cons]") {
   CHECK(cons_p -> GetTranslation() . y() / m == yc / m);
   CHECK(cons_p -> GetTranslation() . z() / m == zc / m);
 
-  using CLHEP::twopi;
   auto start  = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto consrz = [&] (auto name) { return n4::cons(name).r1(1).r2(2).z(1); };
   auto phi_s  = consrz("phi_s" ).phi_start(start) /*.end(360)*/   .solid();
@@ -1829,7 +1826,6 @@ double shell_ratio(double n) {
 
 
 TEST_CASE("random point in sphere", "[random][sphere]") {
-  using CLHEP::twopi;
   G4double const r_max = 3.456;
   size_t   const N_bins = 10;
   size_t   const N_per_bin = 1e5;
@@ -1870,6 +1866,312 @@ TEST_CASE("random point in sphere", "[random][sphere]") {
   check_around_axis(y_hits);
   check_around_axis(z_hits);
 
+}
+
+// Helper for writing tests about randomly-generated 3D vectors
+struct threevec_stats {
+  using sampler = std::function<G4ThreeVector()>;
+  using V3 = G4ThreeVector;
+  struct minmaxsum { V3 min; V3 max; V3 sum; V3 min_abs; double min_rho; double max_rho; };
+  friend std::ostream& operator<<(std::ostream&, const threevec_stats&);
+
+  // Generate data by providing the number of desired samples and a zero-arg function that gets one sample
+  threevec_stats(size_t n, sampler sampler) : threevec_stats{take_samples(n, sampler)} { count = n; }
+
+  G4ThreeVector mean()   const { return { x_sum / count, y_sum / count, z_sum / count}; }
+  G4ThreeVector spread() const { return { x_max - x_min, y_max - y_min, z_max - z_min}; }
+
+  const double x_min    , y_min    , z_min    ;
+  const double x_max    , y_max    , z_max    ;
+  const double x_sum    , y_sum    , z_sum    ;
+  const double x_min_abs, y_min_abs, z_min_abs;
+  const double rho_min, rho_max;
+
+  private:
+  size_t count;
+
+  // Delegatee constructor, allows exposing public CONST min/max/sum
+  threevec_stats(minmaxsum s)
+    : x_min    {s.min    .x()}, y_min    {s.min    .y()}, z_min    {s.min    .z()}
+    , x_max    {s.max    .x()}, y_max    {s.max    .y()}, z_max    {s.max    .z()}
+    , x_sum    {s.sum    .x()}, y_sum    {s.sum    .y()}, z_sum    {s.sum    .z()}
+    , x_min_abs{s.min_abs.x()}, y_min_abs{s.min_abs.y()}, z_min_abs{s.min_abs.z()}
+    , rho_min{s.min_rho}, rho_max{s.max_rho}
+    {}
+
+  minmaxsum take_samples(size_t n, sampler get_one_sample) {
+    double min_x    , min_y    , min_z    ;
+    double max_x    , max_y    , max_z    ;
+    double sum_x    , sum_y    , sum_z    ;
+    double min_x_abs, min_y_abs, min_z_abs;
+    double max_rho, min_rho;
+    min_x     = min_y     = min_z = min_rho = +std::numeric_limits<double>::infinity();
+    max_x     = max_y     = max_z = max_rho = -std::numeric_limits<double>::infinity();
+    sum_x     = sum_y     = sum_z           = 0;
+    min_x_abs = min_y_abs = min_z_abs       = +std::numeric_limits<double>::infinity();
+    for (size_t i=0; i<n; i++) {
+      auto v = get_one_sample();
+      auto rho = v.rho();
+      min_rho   = std::min(min_rho, rho);               max_rho   = std::max(max_rho, rho);
+      min_x     = std::min(min_x, v.x());               max_x     = std::max(max_x, v.x());         sum_x += v.x();
+      min_y     = std::min(min_y, v.y());               max_y     = std::max(max_y, v.y());         sum_y += v.y();
+      min_z     = std::min(min_z, v.z());               max_z     = std::max(max_z, v.z());         sum_z += v.z();
+      min_x_abs = std::min(min_x_abs, std::abs(v.x()));
+      min_y_abs = std::min(min_y_abs, std::abs(v.y()));
+      min_z_abs = std::min(min_z_abs, std::abs(v.z()));
+    }
+    return minmaxsum{{min_x    , min_y    , min_z     },
+                     {max_x    , max_y    , max_z     },
+                     {sum_x    , sum_y    , sum_z     },
+                     {min_x_abs, min_y_abs, min_z_abs },
+                     min_rho, max_rho};
+  }
+};
+
+std::ostream& operator<<(std::ostream& out, const threevec_stats& s) {
+  auto w = std::setw(15);
+  return out
+    << "samples: " << s.count << std::endl
+    << "    " << w <<      "min"<< w <<      "max"<< w <<  "spread"      << w <<   "mean"     << w << "min abs"   << std::endl
+    << "x  :" << w << s.  x_min << w << s.  x_max << w << s.spread().x() << w << s.mean().x() << w << s.x_min_abs << std::endl
+    << "y  :" << w << s.  y_min << w << s.  y_max << w << s.spread().y() << w << s.mean().y() << w << s.y_min_abs << std::endl
+    << "z  :" << w << s.  z_min << w << s.  z_max << w << s.spread().z() << w << s.mean().z() << w << s.z_min_abs << std::endl
+    << "rho:" << w << s.rho_min << w << s.rho_max
+    << std::endl;
+}
+
+TEST_CASE("random direction octants", "[random][direction]") {
+  // costheta < 0 -> z < 0
+  // costheta > 0 -> z > 0
+  // 0pi/2 < phi < 1pi/2 -> x > 0, y > 0
+  // 1pi/2 < phi < 2pi/2 -> x < 0, y > 0
+  // 2pi/2 < phi < 3pi/2 -> x < 0, y < 0
+  // 3pi/2 < phi < 4pi/2 -> x > 0, y < 0
+
+  // Define generators for each octant
+  auto ppp = n4::random::direction{}.min_cos_theta(0)                  .max_phi(  halfpi);
+  auto ppn = n4::random::direction{}.max_cos_theta(0)                  .max_phi(  halfpi);
+  auto pnp = n4::random::direction{}.min_cos_theta(0).min_phi(3*halfpi);
+  auto pnn = n4::random::direction{}.max_cos_theta(0).min_phi(3*halfpi);
+  auto npp = n4::random::direction{}.min_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
+  auto npn = n4::random::direction{}.max_cos_theta(0).min_phi(  halfpi).max_phi(2*halfpi);
+  auto nnp = n4::random::direction{}.min_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
+  auto nnn = n4::random::direction{}.max_cos_theta(0).min_phi(2*halfpi).max_phi(3*halfpi);
+
+  size_t N = 1000;
+
+  // Check that generated values are in the correct octant
+#define OCTANT(CMP_X,CMP_Y,CMP_Z) { \
+  CHECK(it.x_min CMP_X 0);          \
+  CHECK(it.y_min CMP_Y 0);          \
+  CHECK(it.z_min CMP_Z 0);          \
+}
+
+  // Check that generated values cover the whole octant
+#define SPREAD {        \
+  auto s = it.spread(); \
+  CHECK(s.x() > 0.99);  \
+  CHECK(s.y() > 0.99);  \
+  CHECK(s.z() > 0.99);  \
+}
+
+#define VERIFY(NAME,CMP_X,CMP_Y,CMP_Z) {            \
+  threevec_stats it{N, [&] { return NAME.get(); }}; \
+  std::cerr << #NAME << " " << it;                  \
+  OCTANT(CMP_X,CMP_Y,CMP_Z);                        \
+  SPREAD                                            \
+}
+
+  VERIFY(ppp, >, >, >)
+  VERIFY(ppn, >, >, <)
+  VERIFY(pnp, >, <, >)
+  VERIFY(pnn, >, <, <)
+  VERIFY(npp, <, >, >)
+  VERIFY(npn, <, >, <)
+  VERIFY(nnp, <, <, >)
+  VERIFY(nnn, <, <, <)
+
+#undef VERIFY
+#undef SPREAD
+#undef OCTANT
+}
+
+TEST_CASE("random direction theta", "[random][direction]") {
+  auto a = 0.3*pi, b = 0.4*pi, c = 0.7*pi, d = 0.8*pi;
+  auto mintheta    = n4::random::direction{}.min_theta(a); auto implicit_theta_max = pi;
+  auto maxtheta    = n4::random::direction{}.max_theta(b); auto implicit_theta_min = 0;
+  auto minmaxtheta = n4::random::direction{}.min_theta(c).max_theta(d);
+
+  size_t N = 1000;
+  threevec_stats min   {N, [&] { return mintheta   .get(); }};
+  threevec_stats max   {N, [&] { return maxtheta   .get(); }};
+  threevec_stats minmax{N, [&] { return minmaxtheta.get(); }};
+
+  auto check = [&] (auto label, const threevec_stats& stats, auto theta_min, auto theta_max) {
+    std::cerr << label << std::endl << stats;
+    CHECK_THAT(stats.z_min, WithinRel(std::cos(theta_max), 0.02));
+    CHECK_THAT(stats.z_max, WithinRel(std::cos(theta_min), 0.02));
+  };
+
+  check("min"   , min   , a                 , implicit_theta_max);
+  check("max"   , max   , implicit_theta_min, b                 );
+  check("minmax", minmax, c                 , d                 );
+}
+
+TEST_CASE("random direction bidirectional", "[random][direction]") {
+  auto theta = pi/6;
+  auto sin_th = std::sin(theta);
+  auto cos_th = std::cos(theta);
+  auto gen = n4::random::direction{}.max_theta(theta).bidirectional();
+
+  threevec_stats stats{1000, [&] { return gen.get(); }};
+  std::cerr << stats;
+
+  // Check that there is no directional bias
+  CHECK_THAT(stats.mean().x(), WithinAbs(0, 0.02));
+  CHECK_THAT(stats.mean().y(), WithinAbs(0, 0.02));
+  CHECK_THAT(stats.mean().z(), WithinAbs(0, 0.02));
+  // Check that user-imposed limits are respected
+  CHECK_THAT(stats.rho_max,     WithinRel( sin_th, 0.03));
+  CHECK_THAT(stats.  x_min,     WithinRel(-sin_th, 0.03));
+  CHECK_THAT(stats.  x_max,     WithinRel( sin_th, 0.03));
+  CHECK_THAT(stats.  y_min,     WithinRel(-sin_th, 0.03));
+  CHECK_THAT(stats.  y_max,     WithinRel( sin_th, 0.03));
+  CHECK_THAT(stats.  z_min_abs, WithinRel( cos_th, 0.03));
+
+}
+
+TEST_CASE("random direction rotate", "[random][direction]") {
+  const size_t N = 1000;
+  auto theta = pi/6;
+  auto sin_th = std::sin(theta);
+
+  auto xpos = n4::random::direction{}.max_theta(theta).rotate_y( halfpi);
+  auto ypos = n4::random::direction{}.max_theta(theta).rotate_x(-halfpi);
+  auto xneg = n4::random::direction{}.max_theta(theta).rotate_y(-halfpi);
+  auto yneg = n4::random::direction{}.max_theta(theta).rotate_x( halfpi);
+
+  threevec_stats xp{N, [&] { return xpos.get(); }};
+  threevec_stats yp{N, [&] { return ypos.get(); }};
+  threevec_stats xn{N, [&] { return xneg.get(); }};
+  threevec_stats yn{N, [&] { return yneg.get(); }};
+
+  CHECK(xp.x_min >= 0); CHECK(xp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
+  CHECK(yp.y_min >= 0); CHECK(yp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
+  CHECK(xn.x_min <= 0); CHECK(xp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
+  CHECK(yn.y_min <= 0); CHECK(yp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
+}
+
+TEST_CASE("random direction rotate twice", "[random][direction]") {
+  // z pointing to (1, 1, 0)
+  const size_t N  = 100000;
+  auto theta_open = pi/8;
+  auto theta_rot  = pi/4;
+  auto x_min =  std::sin(theta_rot) - std::cos(theta_open);
+  auto x_max =  std::sin(theta_rot) + std::cos(theta_open);
+  auto y_min =  std::sin(theta_rot) - std::sin(theta_open);
+  auto y_max =  std::sin(theta_rot) + std::sin(theta_open);
+  auto z_min =                      - std::sin(theta_open);
+  auto z_max =                        std::sin(theta_open);
+
+  auto cap = n4::random::direction{}.max_theta(theta_open).rotate_y(pi/2).rotate_z(pi/4);
+  threevec_stats st{N, [&] { return cap.get(); }};
+
+  std::cerr << "cap stats\n" << st << std::endl;
+  CHECK(st.x_min >= x_min);  CHECK(st.x_max <= x_max);
+  CHECK(st.y_min >= y_min);  CHECK(st.y_max <= y_max);
+  CHECK(st.z_min >= z_min);  CHECK(st.z_max <= z_max);
+}
+
+TEST_CASE("random direction exclude", "[random][direction]") {
+  auto theta = pi/6;
+  auto sin_th = std::sin(theta);
+  auto cos_th = std::cos(theta);
+  size_t N = 10000;
+
+  auto cup = n4::random::direction{}.min_theta(theta);
+  auto cap = n4::random::direction{}.min_theta(theta).exclude();
+
+  threevec_stats kup{N, [&] { return cup.get(); }};
+  threevec_stats kap{N, [&] { return cap.get(); }};
+
+  std::cerr << "cup\n" << kup;
+  std::cerr << "cap\n" << kap;
+
+  CHECK_THAT(kup.x_min, WithinRel(-1.0   , 0.05)); CHECK_THAT(kup.x_max, WithinRel(1.0         , 0.05));
+  CHECK_THAT(kup.y_min, WithinRel(-1.0   , 0.05)); CHECK_THAT(kup.y_max, WithinRel(1.0         , 0.05));
+  CHECK_THAT(kup.z_min, WithinRel(-1.0   , 0.05)); CHECK_THAT(kup.z_max, WithinRel(      cos_th, 0.05));
+
+  CHECK_THAT(kap.x_min, WithinRel(-sin_th, 0.05)); CHECK_THAT(kap.x_max, WithinRel(sin_th      , 0.05));
+  CHECK_THAT(kap.y_min, WithinRel(-sin_th, 0.05)); CHECK_THAT(kap.y_max, WithinRel(sin_th      , 0.05));
+  CHECK_THAT(kap.z_min, WithinRel( cos_th, 0.05)); CHECK_THAT(kap.z_max, WithinRel(1.0         , 0.05));
+}
+
+TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
+  auto theta = pi/6;
+  auto sin_th = std::sin(theta);
+  auto cos_th = std::cos(theta);
+
+  auto no_caps = n4::random::direction{}.max_theta(pi/6).bidirectional().exclude();
+  threevec_stats s{1000, [&] { return no_caps.get(); }};
+  std::cerr << "no_caps\n" << s;
+
+  // Check that user-imposed limits are respected
+  CHECK_THAT(s.  z_max, WithinRel(cos_th, 0.05)); CHECK_THAT(s.z_min, WithinRel(-cos_th, 0.05));
+  CHECK_THAT(s.rho_min, WithinRel(sin_th, 0.03));
+  // Check that there is no directional bias
+  CHECK_THAT(s.mean().x(), WithinAbs(0, 0.05));
+  CHECK_THAT(s.mean().y(), WithinAbs(0, 0.05));
+  CHECK_THAT(s.mean().z(), WithinAbs(0, 0.05));
+}
+
+TEST_CASE("random direction exclude rotate", "[random][direction]") {
+  auto theta = pi/6;
+  auto cos_th = std::cos(theta);
+
+  auto xbeam = n4::random::direction{}.min_theta(theta).rotate_y(halfpi).exclude();
+  threevec_stats s{1000, [&] { return xbeam.get(); }};
+  std::cerr << "xbeam\n" << s;
+
+  // Check that user-imposed limits are respected
+  CHECK_THAT(s.x_min, WithinRel(cos_th, 0.05));
+  // Check that there is no directional bias (except in x, where it is user-imposed)
+  CHECK_THAT(s.mean().y(), WithinAbs(0, 0.05));
+  CHECK_THAT(s.mean().z(), WithinAbs(0, 0.05));
+}
+
+TEST_CASE("random direction ranges", "[random][direction]") {
+  auto costh_min = -1;
+  auto costh_max =  1;
+  auto th_min = 0;
+  auto th_max = pi;
+  auto phi_min = 0;
+  auto phi_max = twopi;
+  auto a = 0.25;
+  auto b = 0.50;
+  auto eps = 1e-5;
+
+#define R n4::random::direction{}
+  REQUIRE_THROWS_AS(R.min_cos_theta(costh_min - eps)   , std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_cos_theta(costh_max + eps)   , std::runtime_error);
+  REQUIRE_THROWS_AS(R.min_cos_theta(b).max_cos_theta(a), std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_cos_theta(a).min_cos_theta(b), std::runtime_error);
+
+  REQUIRE_THROWS_AS(R.min_theta(th_min - eps)  , std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_theta(th_max + eps)  , std::runtime_error);
+  REQUIRE_THROWS_AS(R.min_theta(b).max_theta(a), std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_theta(a).min_theta(b), std::runtime_error);
+
+  REQUIRE_THROWS_AS(R.min_phi(phi_min - eps), std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_phi(phi_max + eps), std::runtime_error);
+  REQUIRE_THROWS_AS(R.min_phi(b).max_phi(a) , std::runtime_error);
+  REQUIRE_THROWS_AS(R.max_phi(a).min_phi(b) , std::runtime_error);
+
+  // equal upper and lower limit should work
+  REQUIRE_NOTHROW(R.min_cos_theta(a).max_cos_theta(a));
+  //REQUIRE_NOTHROW(R.min_theta    (a).max_theta    (a)); // floating point mess
+  REQUIRE_NOTHROW(R.min_phi      (a).max_phi      (a));
+#undef R
 }
 
 #pragma GCC diagnostic pop
