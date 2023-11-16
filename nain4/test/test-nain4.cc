@@ -2062,7 +2062,6 @@ TEST_CASE("random direction rotate", "[random][direction]") {
   CHECK(yn.y_min <= 0); CHECK(yp.z_max < sin_th); CHECK(xp.z_min > -sin_th);
 }
 
-
 TEST_CASE("random direction rotate twice", "[random][direction]") {
   // z pointing to (1, 1, 0)
   const size_t N  = 100000;
@@ -2086,8 +2085,6 @@ TEST_CASE("random direction rotate twice", "[random][direction]") {
   CHECK(st.z_min >= z_min);
   CHECK(st.z_max <= z_max);
 }
-
-
 
 TEST_CASE("random direction exclude", "[random][direction]") {
   auto theta = pi/6;
@@ -2113,7 +2110,6 @@ TEST_CASE("random direction exclude", "[random][direction]") {
   CHECK_THAT(kap.z_min, WithinRel( cos_th, 0.05)); CHECK_THAT(kap.z_max, WithinRel(1.0         , 0.05));
 }
 
-
 TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
   auto theta = pi/6;
   auto sin_th = std::sin(theta);
@@ -2131,7 +2127,6 @@ TEST_CASE("random direction exclude bidirectional", "[random][direction]") {
   CHECK_THAT(s.mean().y(), WithinAbs(0, 0.05));
   CHECK_THAT(s.mean().z(), WithinAbs(0, 0.05));
 }
-
 
 TEST_CASE("random direction exclude rotate", "[random][direction]") {
   auto theta = pi/6;
