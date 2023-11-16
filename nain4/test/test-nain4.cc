@@ -409,19 +409,19 @@ TEST_CASE("nain box", "[nain][box]") {
   auto box_vec      = n4::box("box_vec").     xyz({lx, ly, lz});
   auto box_vec_half = n4::box("box_vec").half_xyz({lx, ly, lz});
 
-  CHECK_THAT(box_xy      -> GetXHalfLength(),   Within1ULP(box_xy      -> GetYHalfLength()));
-  CHECK_THAT(box_xy      -> GetXHalfLength(), ! Within1ULP(box_xy      -> GetZHalfLength()));
-  CHECK_THAT(box_xz      -> GetXHalfLength(),   Within1ULP(box_xz      -> GetZHalfLength()));
-  CHECK_THAT(box_xz      -> GetXHalfLength(), ! Within1ULP(box_xz      -> GetYHalfLength()));
-  CHECK_THAT(box_yz      -> GetYHalfLength(),   Within1ULP(box_yz      -> GetZHalfLength()));
-  CHECK_THAT(box_yz      -> GetYHalfLength(), ! Within1ULP(box_yz      -> GetXHalfLength()));
+#define CHECK_SQUARE_PROFILE(SOLID, SQR1, SQR2, DIFF)                                                \
+    CHECK_THAT(SOLID -> Get ##SQR1## HalfLength(),   Within1ULP(SOLID-> Get ##SQR2## HalfLength())); \
+    CHECK_THAT(SOLID -> Get ##SQR1## HalfLength(), ! Within1ULP(SOLID-> Get ##DIFF## HalfLength()));
 
-  CHECK_THAT(box_half_xy -> GetXHalfLength(),   Within1ULP(box_half_xy -> GetYHalfLength()));
-  CHECK_THAT(box_half_xy -> GetXHalfLength(), ! Within1ULP(box_half_xy -> GetZHalfLength()));
-  CHECK_THAT(box_half_xz -> GetXHalfLength(),   Within1ULP(box_half_xz -> GetZHalfLength()));
-  CHECK_THAT(box_half_xz -> GetXHalfLength(), ! Within1ULP(box_half_xz -> GetYHalfLength()));
-  CHECK_THAT(box_half_yz -> GetYHalfLength(),   Within1ULP(box_half_yz -> GetZHalfLength()));
-  CHECK_THAT(box_half_yz -> GetYHalfLength(), ! Within1ULP(box_half_yz -> GetXHalfLength()));
+  CHECK_SQUARE_PROFILE(box_xy, X, Y, Z);
+  CHECK_SQUARE_PROFILE(box_xz, X, Z, Y);
+  CHECK_SQUARE_PROFILE(box_yz, Y, Z, X);
+
+  CHECK_SQUARE_PROFILE(box_half_xy, X, Y, Z);
+  CHECK_SQUARE_PROFILE(box_half_xz, X, Z, Y);
+  CHECK_SQUARE_PROFILE(box_half_yz, Y, Z, X);
+
+#undef CHECK_SQUARE_PROFILE
 
   CHECK_THAT(box_h -> GetCubicVolume() / m3, Within1ULP(box_s -> GetCubicVolume() / m3));
   CHECK_THAT(box_h -> GetSurfaceArea() / m2, Within1ULP(box_s -> GetSurfaceArea() / m2));
