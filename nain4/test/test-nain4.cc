@@ -1586,17 +1586,20 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   // Cannot use GetCubicVolume because gives nonsense
   auto n   = 100000;
   auto eps = 1e-3;
-  CHECK_THAT(without_rot_xy -> EstimateCubicVolume(n, eps) , ! WithinAbs(0, eps));
-  CHECK_THAT(without_rot_zx -> EstimateCubicVolume(n, eps) , ! WithinAbs(0, eps));
-  CHECK_THAT(without_rot_yz -> EstimateCubicVolume(n, eps) , ! WithinAbs(0, eps));
-  CHECK_THAT(with_rotate_x  -> EstimateCubicVolume(n, eps) ,   WithinAbs(0, eps));
-  CHECK_THAT(with_rotate_y  -> EstimateCubicVolume(n, eps) ,   WithinAbs(0, eps));
-  CHECK_THAT(with_rotate_z  -> EstimateCubicVolume(n, eps) ,   WithinAbs(0, eps));
-  CHECK_THAT(with_rotate    -> EstimateCubicVolume(n, eps) ,   WithinAbs(0, eps));
-  CHECK_THAT(with_rot_x     -> EstimateCubicVolume(n, eps) ,   WithinAbs(0, eps));
-  CHECK_THAT(with_rot_y     -> EstimateCubicVolume(n, eps) ,   WithinAbs(0, eps));
-  CHECK_THAT(with_rot_z     -> EstimateCubicVolume(n, eps) ,   WithinAbs(0, eps));
-  CHECK_THAT(with_rot       -> EstimateCubicVolume(n, eps) ,   WithinAbs(0, eps));
+  auto nonzero_volume = [=] (auto solid) { CHECK_THAT(solid -> EstimateCubicVolume(n, eps), ! WithinAbs(0, eps)); };
+  auto    zero_volume = [=] (auto solid) { CHECK_THAT(solid -> EstimateCubicVolume(n, eps),   WithinAbs(0, eps)); };
+
+  nonzero_volume(without_rot_xy);
+  nonzero_volume(without_rot_zx);
+  nonzero_volume(without_rot_yz);
+     zero_volume(with_rotate_x );
+     zero_volume(with_rotate_y );
+     zero_volume(with_rotate_z );
+     zero_volume(with_rotate   );
+     zero_volume(with_rot_x    );
+     zero_volume(with_rot_y    );
+     zero_volume(with_rot_z    );
+     zero_volume(with_rot      );
 }
 
 TEST_CASE("boolean transform", "[boolean][transform]") {
