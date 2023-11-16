@@ -1529,19 +1529,21 @@ TEST_CASE("nain boolean at", "[nain][geometry][boolean][at]") {
   auto at_xz   = box.intersect(box).at_x(lx)         .at_z(lz).solid();
   auto at_yz   = box.intersect(box)         .at_y(ly).at_z(lz).solid();
   auto at_xyz  = box.intersect(box).at_x(lx).at_y(ly).at_z(lz).solid();
-  auto n   = 10000;
-  auto eps = 1e-3;
 
   // When displaced, the volumes do not overlap at all, resulting in a null volume
   // Cannot use GetCubicVolume because gives nonsense
-  CHECK_THAT(at_full -> EstimateCubicVolume(n, eps), WithinAbs(0, 1e-3));
-  CHECK_THAT(at_x    -> EstimateCubicVolume(n, eps), WithinAbs(0, 1e-3));
-  CHECK_THAT(at_y    -> EstimateCubicVolume(n, eps), WithinAbs(0, 1e-3));
-  CHECK_THAT(at_z    -> EstimateCubicVolume(n, eps), WithinAbs(0, 1e-3));
-  CHECK_THAT(at_xy   -> EstimateCubicVolume(n, eps), WithinAbs(0, 1e-3));
-  CHECK_THAT(at_xz   -> EstimateCubicVolume(n, eps), WithinAbs(0, 1e-3));
-  CHECK_THAT(at_yz   -> EstimateCubicVolume(n, eps), WithinAbs(0, 1e-3));
-  CHECK_THAT(at_xyz  -> EstimateCubicVolume(n, eps), WithinAbs(0, 1e-3));
+  auto n   = 10000;
+  auto eps = 1e-3;
+  auto check_zero_volume = [=] (auto solid) { CHECK_THAT(solid -> EstimateCubicVolume(n, eps) / m3, WithinAbs(0, eps)); };
+
+  check_zero_volume(at_full);
+  check_zero_volume(at_x   );
+  check_zero_volume(at_y   );
+  check_zero_volume(at_z   );
+  check_zero_volume(at_xy  );
+  check_zero_volume(at_xz  );
+  check_zero_volume(at_yz  );
+  check_zero_volume(at_xyz );
 }
 
 TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
