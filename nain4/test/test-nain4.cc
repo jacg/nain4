@@ -58,6 +58,19 @@ using namespace n4::test;
 
 inline Catch::Matchers::WithinUlpsMatcher Within1ULP(double x) { return WithinULP(x, 1); }
 
+inline void check_all_within1ULP(std::vector<double> x, double ref) {
+  for (auto& xi: x) {
+    CHECK_THAT(xi, Within1ULP(ref));
+  }
+}
+
+inline void check_all_within1ULP(std::vector<double> x, std::vector<double> ref) {
+  REQUIRE(x.size() == ref.size());
+  for (auto i = 0; i<x.size(); i++) {
+    CHECK_THAT(x[i], Within1ULP(ref[i]));
+  }
+}
+
 TEST_CASE("nain material", "[nain][material]") {
 
   // nain4::material finds the same materials as the verbose G4 style
@@ -1124,13 +1137,13 @@ TEST_CASE("nain place", "[nain][place]") {
 }
 
 TEST_CASE("nain scale_by", "[nain][scale_by]") {
-  CHECK(nain4::scale_by(eV, {1, 2.3, 4.5}) == std::vector<G4double>{1*eV, 2.3*eV, 4.5*eV});
-  CHECK(nain4::scale_by(cm, {6, 7})        == std::vector<G4double>{6*cm, 7*cm});
+  check_all_within1ULP(n4::scale_by(eV, {1, 2.3, 4.5}), {1*eV, 2.3*eV, 4.5*eV});
+  check_all_within1ULP(n4::scale_by(cm, {6, 7       }), {6*cm, 7*cm          });
 }
 
 TEST_CASE("nain const_over", "[nain][const_over]") {
-  CHECK(nain4::const_over(2*3*4, {2., 3., 4.}) == std::vector<G4double>{3*4, 2*4, 2*3});
-  CHECK(nain4::const_over(   1., {10, 100})    == std::vector<G4double>{0.1, 0.01});
+  check_all_within1ULP(n4::const_over(2*3*4, {2., 3., 4.}), {3*4, 2*4, 2*3});
+  check_all_within1ULP(n4::const_over(   1., {10, 100   }), {0.1, 0.01    });
 }
 
 TEST_CASE("nain unpack", "[nain4][unpack]") {
@@ -1687,7 +1700,7 @@ TEST_CASE("nain linspace", "[nain][linspace]") {
   auto n_entries = 11 ;
 
   auto values = n4::linspace(start, stop, n_entries);
-  CHECK( values == std::vector<double>{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5} );
+  check_all_within1ULP(values, {0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5});
 
   auto one_item = n4::linspace(0.3, 0.4, 1);
   REQUIRE   (one_item.size() == 1);
