@@ -155,10 +155,11 @@
           echo "REQUIRED  third argument: IN QUOTES single-line description of project"
           exit 1
         fi
-        mkdir -p $DIRECTORY
+        mkdir -p $DIRECTORY/scripts
         FQ_DIRECTORY=$(${pkgs.coreutils}/bin/readlink -f $DIRECTORY)
         ${pkgs.coreutils}/bin/cp -Tr ${self}/templates/basic                                    $FQ_DIRECTORY
         ${pkgs.coreutils}/bin/cp     ${self}/nain4/test/run-each-test-in-separate-process.sh.in $FQ_DIRECTORY
+        ${pkgs.coreutils}/bin/cp     ${self}/scripts/count-warnings.sh                          $FQ_DIRECTORY/scripts
         chmod -R u+w $FQ_DIRECTORY
         nix develop  $FQ_DIRECTORY -c true # create flake.lock
         cd           $FQ_DIRECTORY
@@ -167,7 +168,7 @@
         REPLACE () {
           OLD=$1
           NEW=$2
-          ${pkgs.ripgrep}/bin/rg "$OLD" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i "s|$OLD|$NEW|g"
+          ${pkgs.ripgrep}/bin/rg --hidden "$OLD" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i "s|$OLD|$NEW|g"
         }
         REPLACE "CHANGEME-EXE"                           ''${BASE_NAME}
         REPLACE "CHANGEME-PROJECT-NAME"                  ''${BASE_NAME}
@@ -176,8 +177,6 @@
         REPLACE "CHANGEME-PACKAGE"                       ''${BASE_NAME}
         REPLACE "CHANGEME-APP"                           ''${BASE_NAME}
         REPLACE "CHANGEME-ONE-LINE-PROJECT-DESCRIPTION" "''${DESCRIPTION}"
-
-        #${pkgs.ripgrep}/bin/rg "CHANGEME-EXE" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i "s|CHANGEME-EXE|$ROOT|g"
 
         git -c init.defaultBranch=master init -q
         # TODO: protect against user not having set git user.{name,email}

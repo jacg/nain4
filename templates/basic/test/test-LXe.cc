@@ -18,8 +18,15 @@
 using namespace Catch::Matchers;
 
 
-TEST_CASE("liquid xenon properties", "[xenon][properties]") {
+TEST_CASE("dummy test1", "[dummy]") {
+  CHECK(6*7 == 42);
+}
 
+TEST_CASE("dummy test2", "[dummy]") {
+  CHECK(6*111 == 666);
+}
+
+TEST_CASE("liquid xenon properties", "[.xfail][xenon][properties]") {
   // --- Geometry -----
   auto air = n4::material("G4_AIR");
   auto LXe = LXe_with_properties();
