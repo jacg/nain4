@@ -2074,16 +2074,13 @@ TEST_CASE("random direction rotate twice", "[random][direction]") {
   auto z_min =                      - std::sin(theta_open);
   auto z_max =                        std::sin(theta_open);
 
-  auto octant = n4::random::direction{}.max_theta(theta_open).rotate_y(pi/2).rotate_z(pi/4);
-  threevec_stats st{N, [&] { return octant.get(); }};
+  auto cap = n4::random::direction{}.max_theta(theta_open).rotate_y(pi/2).rotate_z(pi/4);
+  threevec_stats st{N, [&] { return cap.get(); }};
 
-  std::cout << st << std::endl;
-  CHECK(st.x_min >= x_min);
-  CHECK(st.x_max <= x_max);
-  CHECK(st.y_min >= y_min);
-  CHECK(st.y_max <= y_max);
-  CHECK(st.z_min >= z_min);
-  CHECK(st.z_max <= z_max);
+  std::cerr << "cap stats\n" << st << std::endl;
+  CHECK(st.x_min >= x_min);  CHECK(st.x_max <= x_max);
+  CHECK(st.y_min >= y_min);  CHECK(st.y_max <= y_max);
+  CHECK(st.z_min >= z_min);  CHECK(st.z_max <= z_max);
 }
 
 TEST_CASE("random direction exclude", "[random][direction]") {
