@@ -25,7 +25,7 @@ inline G4double uniform_half_width(G4double dx              ) { return uniform(-
 inline G4double uniform_width     (G4double dx              ) { return uniform_half_width(dx/2); }
 
 struct direction {
-  G4ThreeVector get();
+  G4ThreeVector get() const;
 
 #define CHECK_RANGE(NAME, X, LOWER, UPPER)                \
   if ( (X < LOWER) || (X > UPPER) ) {                     \
@@ -77,9 +77,9 @@ private:
   G4double min_phi_      { 0};
   G4double max_phi_      {CLHEP::twopi};
 
-  G4ThreeVector flip         (const G4ThreeVector& in);
-  G4ThreeVector rotate_vector(const G4ThreeVector& in);
-  G4ThreeVector excluded();
+  G4ThreeVector flip         (const G4ThreeVector& in) const;
+  G4ThreeVector rotate_vector(const G4ThreeVector& in) const;
+  G4ThreeVector excluded     (                       ) const;
 };
 
 

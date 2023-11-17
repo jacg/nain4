@@ -12,7 +12,7 @@
 namespace nain4 {
 namespace random {
 
-G4ThreeVector direction::get() {
+G4ThreeVector direction::get() const {
   if (exclude_) { return excluded(); }
 
   auto phi       = uniform(min_phi_      , max_phi_      );
@@ -27,15 +27,15 @@ G4ThreeVector direction::get() {
   return out;
 }
 
-G4ThreeVector direction::flip(const G4ThreeVector& in) {
+G4ThreeVector direction::flip(const G4ThreeVector& in) const {
   return {-in.x(), -in.y(), -in.z()};
 }
 
-G4ThreeVector direction::rotate_vector(const G4ThreeVector& in) {
+G4ThreeVector direction::rotate_vector(const G4ThreeVector& in) const {
   return rotation * in;
 }
 
-G4ThreeVector direction::excluded() {
+G4ThreeVector direction::excluded() const {
   auto must_be_excluded = [&] (const G4ThreeVector& d) {
     auto costheta = d.cosTheta();
     auto phi      = d.   phi  (); if (phi < 0) { phi += CLHEP::twopi; }
