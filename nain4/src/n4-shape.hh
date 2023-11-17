@@ -122,13 +122,15 @@ public:                                                                 \
 private:                                                                \
   OPT_DOUBLE half_z ## N ## _;
 
-#define HAS_XYZ(TYPE)                                                        \
-  HAS_X(TYPE,)                                                               \
-  HAS_Y(TYPE,)                                                               \
-  HAS_Z(TYPE,)                                                               \
-public:                                                                      \
-  TYPE&      xyz(G4D x, G4D y, G4D z) { return this ->     x(x).y(y).z(z); } \
-  TYPE& half_xyz(G4D x, G4D y, G4D z) { return this -> xyz(x*2, y*2, z*2); }
+#define HAS_XYZ(TYPE)                                                                      \
+  HAS_X(TYPE,)                                                                             \
+  HAS_Y(TYPE,)                                                                             \
+  HAS_Z(TYPE,)                                                                             \
+public:                                                                                    \
+  TYPE&      xyz(G4D x, G4D y, G4D z   ) { return this ->        x(x).y(y).z(z);         } \
+  TYPE& half_xyz(G4D x, G4D y, G4D z   ) { return this ->      xyz(x*2, y*2, z*2);       } \
+  TYPE&      xyz(const G4ThreeVector& v) { return this ->      xyz(v.x(), v.y(), v.z()); } \
+  TYPE& half_xyz(const G4ThreeVector& v) { return this -> half_xyz(v.x(), v.y(), v.z()); }
 
 // ---- Interfaces for specific G4VSolids -------------------------------------------------------------
 struct box : shape {
