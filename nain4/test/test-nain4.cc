@@ -389,6 +389,9 @@ TEST_CASE("nain box", "[nain][box]") {
   auto box_half_xz = n4::box("box_xz").half_xz(lxz).y(ly).solid();
   auto box_half_yz = n4::box("box_yz").half_yz(lyz).x(lx).solid();
 
+  auto box_vec      = n4::box("box_vec").     xyz({lx, ly, lz});
+  auto box_vec_half = n4::box("box_vec").half_xyz({lx, ly, lz});
+
   CHECK(box_xy      -> GetXHalfLength()   ==   box_xy      -> GetYHalfLength());
   CHECK(box_xy      -> GetXHalfLength()   !=   box_xy      -> GetZHalfLength());
   CHECK(box_xz      -> GetXHalfLength()   ==   box_xz      -> GetZHalfLength());
@@ -437,8 +440,10 @@ TEST_CASE("nain box", "[nain][box]") {
     CHECK(box -> GetZHalfLength() / m  == lz / 2 / m);
   };
 
-  check_dimensions(n4::box("box_xyz")     .     xyz(lx  , ly  , lz  ).solid());
-  check_dimensions(n4::box("box_half_xyz").half_xyz(lx/2, ly/2, lz/2).solid());
+  check_dimensions(n4::box("box_xyz")     .     xyz( lx  , ly  , lz   ).solid());
+  check_dimensions(n4::box("box_half_xyz").half_xyz( lx/2, ly/2, lz/2 ).solid());
+  check_dimensions(n4::box("box_vec")     .     xyz({lx  , ly  , lz  }).solid());
+  check_dimensions(n4::box("box_half_vec").half_xyz({lx/2, ly/2, lz/2}).solid());
 }
 
 TEST_CASE("nain sphere", "[nain][sphere]") {
