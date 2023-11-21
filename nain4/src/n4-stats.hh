@@ -36,6 +36,20 @@ std_dev_population(const CONTAINER& data) {
   return std::sqrt(sum(squared_deltas) / data.size());
 }
 
+template<class CONTAINER>
+std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
+std_dev_sample(const CONTAINER& data) {
+  if (data.size() < 2) { return {}; }
+  auto average = stats::mean(data);
+  if (! average.has_value()) { return {}; }
+  auto mean = average.value();
+  auto squared_deltas = n4::map<typename CONTAINER::value_type>(
+      [mean](const auto x) { auto dx = x-mean; return dx*dx; },
+      data
+);
+  return std::sqrt(sum(squared_deltas) / (data.size() - 1));
+}
+
 }
 } // namespace nain4
 

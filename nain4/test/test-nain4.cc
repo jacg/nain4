@@ -2230,4 +2230,26 @@ TEST_CASE("stats std_dev population", "[stats][std_dev][population]") {
   check_case({2, 4, 4, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 12, 12, 14}, std::sqrt(10));
 }
 
+TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
+  using n4::stats::std_dev_sample;
+
+  // Standard deviations of empty containers
+  CHECK(! std_dev_sample(std::vector       <int>   {}).has_value());
+  CHECK(! std_dev_sample(std::unordered_set<int>   {}).has_value());
+  CHECK(! std_dev_sample(std::vector       <float> {}).has_value());
+  CHECK(! std_dev_sample(std::unordered_set<double>{}).has_value());
+
+  // Standard deviations of single-element containers
+  CHECK(! std_dev_sample(std::vector      <double>{4.2}).has_value());
+  CHECK(! std_dev_sample(std::unordered_set<float>{7.9}).has_value());
+
+  // Standard deviations of multi-element containers
+  auto check_case = [] (std::vector<double> data, double expected, uint64_t ulp=1) {
+    CHECK_THAT(std_dev_sample(data).value(), WithinULP(expected, ulp));
+  };
+  check_case({1, 5   }, std::sqrt( 8));
+  check_case({2, 4   }, std::sqrt( 2));
+  check_case({1, 2, 9}, std::sqrt(19));
+}
+
 #pragma GCC diagnostic pop
