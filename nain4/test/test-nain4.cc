@@ -1,12 +1,4 @@
-#include <n4-defaults.hh>
-#include <n4-exceptions.hh>
-#include <n4-shape.hh>
-#include <n4-boolean-shape.hh>
-#include <n4-utils.hh>
-#include <n4-sequences.hh>
-#include <n4-volume.hh>
-#include <n4-geometry-iterators.hh>
-#include <n4-material.hh>
+#include <n4-all.hh>
 
 // Solids
 #include <CLHEP/Units/SystemOfUnits.h>
