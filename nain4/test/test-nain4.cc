@@ -2212,7 +2212,7 @@ TEST_CASE("stats mean", "[stats][mean]") {
   CHECK_THAT(mean(std::unordered_set<double> {9.0, 2.0}     ).value(), WithinULP(5.5f, 1));
 
   // TODO do we want to do some type traits gymnastics to avoid this loss of precision:
-  CHECK(mean(std::vector<int>{1,2}) == 1);
+  CHECK(mean(std::vector<int>{1,2}).value() == 1);
 }
 
 #pragma GCC diagnostic pop
