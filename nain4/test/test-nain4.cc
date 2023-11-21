@@ -2194,4 +2194,25 @@ TEST_CASE("stats sum", "[stats][sum]") {
   CHECK(     sum(std::unordered_set<long>  {7, 2, 9} )  ==        18       );
 }
 
+TEST_CASE("stats mean", "[stats][mean]") {
+  using n4::stats::mean;
+
+  // Means of empty containers
+  CHECK(! mean(std::vector    <double>{}).has_value());
+  CHECK(! mean(std::unordered_set<int>{}).has_value());
+
+  // Means of single-element containers
+  CHECK(mean(std::vector      <double>{2.3 }).value() == 2.3 );
+  CHECK(mean(std::unordered_set<float>{9.1f}).value() == 9.1f);
+  CHECK(mean(std::vector         <int>{42}  ).value() == 42  );
+
+  // Means of multiple-value containers
+  CHECK_THAT(mean(std::vector       <double> {1.0, 2.0}     ).value(), WithinULP(1.5 , 1));
+  CHECK_THAT(mean(std::vector       <float>  {3.1, 3.6, 5.9}).value(), WithinULP(4.2f, 1));
+  CHECK_THAT(mean(std::unordered_set<double> {9.0, 2.0}     ).value(), WithinULP(5.5f, 1));
+
+  // TODO do we want to do some type traits gymnastics to avoid this loss of precision:
+  CHECK(mean(std::vector<int>{1,2}) == 1);
+}
+
 #pragma GCC diagnostic pop
