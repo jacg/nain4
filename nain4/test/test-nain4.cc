@@ -2176,10 +2176,22 @@ TEST_CASE("random direction ranges", "[random][direction]") {
 }
 
 TEST_CASE("stats sum", "[stats][sum]") {
-  std::vector<int>        empty_int_vec;
-  std::unordered_set<int> empty_int_set;
-  CHECK(n4::stats::sum(empty_int_vec) == 0);
-  CHECK(n4::stats::sum(empty_int_set) == 0);
+  using n4::stats::sum;
+
+  // Sums of empty containers
+  CHECK(sum(std::vector       <int>   {}) == 0);
+  CHECK(sum(std::unordered_set<int>   {}) == 0);
+  CHECK(sum(std::vector       <float> {}) == 0);
+  CHECK(sum(std::unordered_set<double>{}) == 0);
+
+  // Sums of single-element containers
+  CHECK(sum(std::vector       <long> {3}) == 3);
+  CHECK(sum(std::unordered_set<float>{4}) == 4);
+
+  // Sums of multiple-element containers
+  CHECK_THAT(sum(std::vector       <float> {3.1, 7.2}), WithinULP(10.3f, 1));
+  CHECK_THAT(sum(std::vector       <double>{3.1, 7.2}), WithinULP(10.3 , 1));
+  CHECK(     sum(std::unordered_set<long>  {7, 2, 9} )  ==        18       );
 }
 
 #pragma GCC diagnostic pop
