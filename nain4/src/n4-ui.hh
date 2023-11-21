@@ -45,6 +45,7 @@ public:
 private: ui(const std::string& program_name, int argc, char** argv, unique_argparse, bool warn_empty_run);
 public : ui(const std::string& program_name, int argc, char** argv,                  bool warn_empty_run);
 
+  // UI for use in automated tests: provides dummy values of CLI arguments
   static ui fake_ui() {
     test::argcv args{"prog-name"};
     return ui("prog-name", args.argc, args.argv, false);
