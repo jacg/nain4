@@ -2209,7 +2209,7 @@ TEST_CASE("stats mean", "[stats][mean]") {
 }
 
 TEST_CASE("stats std_dev population", "[stats][std_dev][population]") {
-  using n4::stats::std_dev_population;
+  using n4::stats::std_dev_population; using n4::stats::variance_population;
 
   // Standard deviations of empty containers
   CHECK(! std_dev_population(std::vector       <int>   {}).has_value());
@@ -2222,16 +2222,17 @@ TEST_CASE("stats std_dev population", "[stats][std_dev][population]") {
   CHECK(std_dev_population(std::unordered_set<float>{6.3}).value() == 0);
 
   // Standard deviations of multi-element containers
-  auto check_case = [] (std::vector<double> data, double expected, uint64_t ulp=1) {
-    CHECK_THAT(std_dev_population(data).value(), WithinULP(expected, ulp));
+  auto check_std_and_var = [] (std::vector<double> data, double expected, uint64_t ulp=1) {
+    CHECK_THAT( std_dev_population(data).value(), WithinULP(std::sqrt(expected), ulp));
+    CHECK_THAT(variance_population(data).value(), WithinULP(          expected , ulp));
   };
-  check_case({5, 7}         , 1);
-  check_case({1, 2, 3, 4, 5}, std::sqrt(2));
-  check_case({2, 4, 4, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 12, 12, 14}, std::sqrt(10));
+  check_std_and_var({5, 7}                                                ,  1);
+  check_std_and_var({1, 2, 3, 4, 5}                                       ,  2);
+  check_std_and_var({2, 4, 4, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 12, 12, 14}, 10);
 }
 
 TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
-  using n4::stats::std_dev_sample;
+  using n4::stats::std_dev_sample; using n4::stats::variance_sample;
 
   // Standard deviations of empty containers
   CHECK(! std_dev_sample(std::vector       <int>   {}).has_value());
@@ -2244,12 +2245,13 @@ TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
   CHECK(! std_dev_sample(std::unordered_set<float>{7.9}).has_value());
 
   // Standard deviations of multi-element containers
-  auto check_case = [] (std::vector<double> data, double expected, uint64_t ulp=1) {
-    CHECK_THAT(std_dev_sample(data).value(), WithinULP(expected, ulp));
+  auto check_std_and_var = [] (std::vector<double> data, double expected, uint64_t ulp=1) {
+    CHECK_THAT( std_dev_sample(data).value(), WithinULP(std::sqrt(expected), ulp));
+    CHECK_THAT(variance_sample(data).value(), WithinULP(          expected , ulp));
   };
-  check_case({1, 5   }, std::sqrt( 8));
-  check_case({2, 4   }, std::sqrt( 2));
-  check_case({1, 2, 9}, std::sqrt(19));
+  check_std_and_var({1, 5   },  8);
+  check_std_and_var({2, 4   },  2);
+  check_std_and_var({1, 2, 9}, 19);
 }
 
 #pragma GCC diagnostic pop
