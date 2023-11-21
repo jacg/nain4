@@ -33,6 +33,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <cmath>
+#include <cstdint>
 #include <limits>
 #include <numeric>
 #include <stdexcept>
@@ -2205,6 +2206,28 @@ TEST_CASE("stats mean", "[stats][mean]") {
 
   // TODO do we want to do some type traits gymnastics to avoid this loss of precision:
   CHECK(mean(std::vector<int>{1,2}).value() == 1);
+}
+
+TEST_CASE("stats std_dev population", "[stats][std_dev][population]") {
+  using n4::stats::std_dev_population;
+
+  // Standard deviations of empty containers
+  CHECK(! std_dev_population(std::vector       <int>   {}).has_value());
+  CHECK(! std_dev_population(std::unordered_set<int>   {}).has_value());
+  CHECK(! std_dev_population(std::vector       <float> {}).has_value());
+  CHECK(! std_dev_population(std::unordered_set<double>{}).has_value());
+
+  // Standard deviations of single-element containers
+  CHECK(std_dev_population(std::vector      <double>{3.6}).value() == 0);
+  CHECK(std_dev_population(std::unordered_set<float>{6.3}).value() == 0);
+
+  // Standard deviations of multi-element containers
+  auto check_case = [] (std::vector<double> data, double expected, uint64_t ulp=1) {
+    CHECK_THAT(std_dev_population(data).value(), WithinULP(expected, ulp));
+  };
+  check_case({5, 7}         , 1);
+  check_case({1, 2, 3, 4, 5}, std::sqrt(2));
+  check_case({2, 4, 4, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 12, 12, 14}, std::sqrt(10));
 }
 
 #pragma GCC diagnostic pop
