@@ -45,6 +45,7 @@
 #include <numeric>
 #include <stdexcept>
 #include <type_traits>
+#include <unordered_set>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
@@ -2172,6 +2173,13 @@ TEST_CASE("random direction ranges", "[random][direction]") {
   //REQUIRE_NOTHROW(R.min_theta    (a).max_theta    (a)); // floating point mess
   REQUIRE_NOTHROW(R.min_phi      (a).max_phi      (a));
 #undef R
+}
+
+TEST_CASE("stats sum", "[stats][sum]") {
+  std::vector<int>        empty_int_vec;
+  std::unordered_set<int> empty_int_set;
+  CHECK(n4::stats::sum(empty_int_vec) == 0);
+  CHECK(n4::stats::sum(empty_int_set) == 0);
 }
 
 #pragma GCC diagnostic pop
