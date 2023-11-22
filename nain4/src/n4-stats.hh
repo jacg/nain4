@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <numeric>
 #include <optional>
+#include <type_traits>
 
 namespace nain4 {
 namespace stats {
@@ -20,8 +21,8 @@ sum(const CONTAINER& data) {
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-mean(const CONTAINER& data) {
+auto
+mean(const CONTAINER& data) -> std::optional<decltype(boost::math::statistics::mean(data))> {
   if (data.empty()) { return {}; }
   return boost::math::statistics::mean(data);
 }
