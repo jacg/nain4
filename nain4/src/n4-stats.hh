@@ -54,6 +54,14 @@ std_dev_sample(const CONTAINER& data) {
   if (var.has_value()) { return std::sqrt(var.value()); } else { return {}; }
 }
 
+template<class CONTAINER>
+std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
+correlation(const CONTAINER& a, const CONTAINER& b) {
+  if (a.size() != b.size()) { return {}; }
+  auto corr = boost::math::statistics::correlation_coefficient(a,b);
+  if (std::isnan(corr)) { return {}; } else { return corr; }
+}
+
 }
 } // namespace nain4
 
