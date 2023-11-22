@@ -2272,6 +2272,10 @@ TEST_CASE("stats correlation", "[stats][correlation]") {
   CHECK_THAT(corr({-1,-1,+1,+1},
                   {-8,+8,-8,+8}).value(), WithinULP(0.0,1));
 
+  // A non-trivial example
+  CHECK_THAT(corr({3,5,2,8,7},
+                  {1,9,2,6,3}).value(), WithinULP(0.4796356153459284, 1));
+
   // Different lengths: no result
   CHECK(! corr({1,2,3},
                {1,2  }).has_value());
