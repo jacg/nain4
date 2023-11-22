@@ -14,7 +14,7 @@ namespace stats {
 template<class CONTAINER>
 typename CONTAINER::value_type
 sum(const CONTAINER& data) {
-    return std::accumulate(begin(data), end(data),
+    return std::accumulate(cbegin(data), cend(data),
                            static_cast<typename CONTAINER::value_type>(0));
 }
 
