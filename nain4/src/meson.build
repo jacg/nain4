@@ -15,6 +15,9 @@ project( 'nain4'
 argparse = dependency( 'argparse'
                      , method : 'pkg-config')
 
+boost = dependency( 'boost'
+                  , method : 'pkg-config')
+
 geant4 = dependency( 'Geant4'
                    , method  : 'cmake'
                    , required: true

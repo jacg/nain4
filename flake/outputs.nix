@@ -223,7 +223,7 @@
       # ND CD
       prop-dev   = with pkgs; self.deps.prop-build ++ [ just clang-tools catch2_3 ];
       # NB CB
-      prop-build = with pkgs; [ meson ninja cmake pkg-config argparse ];
+      prop-build = with pkgs; [ meson ninja cmake pkg-config argparse boost182 ];
       # NB CB NR CR  +  ND CD, via addition to prop-dev
       prop-run   = with pkgs; [ just geant4-data my-geant4 qt5.wrapQtAppsHook ];
       # How about things needed at run but not build time?
