@@ -296,7 +296,7 @@ G4Box* box = n4::box("box").xz(10*cm).y(50*cm).solid();
 All these methods take full (as opposed to half-) lengths:
 + `x(lx)`, `y(ly)`, `z(ly)`: set one dimension.
 + `xy(l)`, `xz(l)`, `yz(l)`: set two dimensions to the same value.
-+ `xyz(lx, ly, lz)`: set three dimensions independently
++ `xyz(lx, ly, lz)`, `xyz(g4-three-vector)`: set three dimensions independently
 + `cube(l)`: set all dimensions to the same value.
 
 Note the, perhaps surprising, difference between `.xyz()` and the `.xy()`-`.xz()`-`.yz()` triumvirate: The latter assign a single value to multiple coordinates; the former accepts a separate value for each coordinate it sets.
