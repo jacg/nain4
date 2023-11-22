@@ -406,9 +406,6 @@ TEST_CASE("nain box", "[nain][box]") {
   auto box_half_xz = n4::box("box_xz").half_xz(lxz).y(ly).solid();
   auto box_half_yz = n4::box("box_yz").half_yz(lyz).x(lx).solid();
 
-  auto box_vec      = n4::box("box_vec").     xyz({lx, ly, lz});
-  auto box_vec_half = n4::box("box_vec").half_xyz({lx, ly, lz});
-
 #define CHECK_SQUARE_PROFILE(SOLID, SQR1, SQR2, DIFF)                                                \
     CHECK_THAT(SOLID -> Get ##SQR1## HalfLength(),   Within1ULP(SOLID-> Get ##SQR2## HalfLength())); \
     CHECK_THAT(SOLID -> Get ##SQR1## HalfLength(), ! Within1ULP(SOLID-> Get ##DIFF## HalfLength()));
