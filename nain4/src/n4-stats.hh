@@ -23,43 +23,37 @@ sum(const CONTAINER& data) {
 }
 
 template<class CONTAINER>
-auto
-mean(const CONTAINER& data) -> std::optional<decltype(BSTATS::mean(data))> {
+auto mean(const CONTAINER& data) -> std::optional<decltype(BSTATS::mean(data))> {
   if (data.empty()) { return {}; }
   return BSTATS::mean(data);
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-variance_population(const CONTAINER& data) {
+auto variance_population(const CONTAINER& data) -> std::optional<decltype(BSTATS::variance(data))> {
   if (data.empty()) { return {}; }
   return BSTATS::variance(data);
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-variance_sample(const CONTAINER& data) {
+auto variance_sample(const CONTAINER& data) -> std::optional<decltype(BSTATS::sample_variance(data))>  {
   if (data.size() < 2) { return {}; }
   return BSTATS::sample_variance(data);
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-std_dev_population(const CONTAINER& data) {
+auto std_dev_population(const CONTAINER& data) -> decltype(variance_population(data)) {
   auto var = variance_population(data);
   if (var.has_value()) { return std::sqrt(var.value()); } else { return {}; }
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-std_dev_sample(const CONTAINER& data) {
+auto std_dev_sample(const CONTAINER& data) -> decltype(variance_sample(data)) {
   auto var = variance_sample(data);
   if (var.has_value()) { return std::sqrt(var.value()); } else { return {}; }
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-correlation(const CONTAINER& a, const CONTAINER& b) {
+auto correlation(const CONTAINER& a, const CONTAINER& b) -> std::optional<decltype(BSTATS::correlation_coefficient(a,b))> {
   if (a.size() != b.size()) { return {}; }
   auto corr = BSTATS::correlation_coefficient(a,b);
   if (std::isnan(corr)) { return {}; } else { return corr; }

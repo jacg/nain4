@@ -2231,6 +2231,9 @@ TEST_CASE("stats std_dev population", "[stats][std_dev][population]") {
   check_std_and_var({1, 2, 3, 4, 5}                                       ,  2);
   check_std_and_var({2, 4, 4, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 12, 12, 14}, 10);
 
+  // Input integers give double results
+  CHECK_THAT( std_dev_population(vector<int>{1,2,3}).value(), WithinULP(std::sqrt(2.0/3), 1));
+  CHECK_THAT(variance_population(vector<int>{1,2,3}).value(), WithinULP(          2.0/3 , 1));
 }
 
 TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
@@ -2255,6 +2258,10 @@ TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
   check_std_and_var({1, 5   },  8);
   check_std_and_var({2, 4   },  2);
   check_std_and_var({1, 2, 9}, 19);
+
+  // Input integers give double results
+  CHECK_THAT( std_dev_sample(vector<int>{1,2,3,4}).value(), WithinULP(std::sqrt(5.0/3), 1));
+  CHECK_THAT(variance_sample(vector<int>{1,2,3,4}).value(), WithinULP(          5.0/3 , 1));
 }
 
 TEST_CASE("stats correlation", "[stats][correlation]") {
@@ -2290,6 +2297,11 @@ TEST_CASE("stats correlation", "[stats][correlation]") {
   // Too short: no result
   CHECK(! corr({1}, {1}).has_value());
 
+  // Input integers give double results
+  CHECK_THAT(n4::stats::correlation(
+               std::vector<int>{1,2,3},
+               std::vector<int>{1,2,2}).value(),
+             WithinULP(std::sqrt(3)/2, 1));
 }
 
 #pragma GCC diagnostic pop
