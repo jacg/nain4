@@ -2262,15 +2262,15 @@ TEST_CASE("stats correlation", "[stats][correlation]") {
 
   // Basic example of 100% correlation
   CHECK_THAT(corr({1,2},
-                  {1,2}).value(), WithinULP(1.0,1));
+                  {1,2}).value(), WithinULP(1.0, 1));
 
   // Basic example of 100% anti-correlation
   CHECK_THAT(corr({1,2},
-                  {2,1}).value(), WithinULP(-1.0,1));
+                  {2,1}).value(), WithinULP(-1.0, 1));
 
   // Basic example of ZERO correlation
   CHECK_THAT(corr({-1,-1,+1,+1},
-                  {-8,+8,-8,+8}).value(), WithinULP(0.0,1));
+                  {-8,+8,-8,+8}).value(), WithinULP(0.0, 1));
 
   // A non-trivial example
   CHECK_THAT(corr({3,5,2,8,7},
