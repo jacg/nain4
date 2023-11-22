@@ -2188,64 +2188,67 @@ TEST_CASE("stats sum", "[stats][sum]") {
 }
 
 TEST_CASE("stats mean", "[stats][mean]") {
-  using n4::stats::mean;
+  using n4::stats::mean; using std::vector; using std::unordered_set;
 
   // Means of empty containers
-  CHECK(! mean(std::vector    <double>{}).has_value());
-  CHECK(! mean(std::unordered_set<int>{}).has_value());
+  CHECK(! mean(vector    <double>{}).has_value());
+  CHECK(! mean(unordered_set<int>{}).has_value());
 
   // Means of single-element containers
-  CHECK(mean(std::vector      <double>{2.3 }).value() == 2.3 );
-  CHECK(mean(std::unordered_set<float>{9.1f}).value() == 9.1f);
-  CHECK(mean(std::vector         <int>{42}  ).value() == 42  );
+  CHECK(mean(vector      <double>{2.3 }).value() == 2.3 );
+  CHECK(mean(unordered_set<float>{9.1f}).value() == 9.1f);
+  CHECK(mean(vector         <int>{42}  ).value() == 42  );
 
   // Means of multiple-value containers
-  CHECK_THAT(mean(std::vector       <double> {1.0, 2.0}     ).value(), WithinULP(1.5 , 1));
-  CHECK_THAT(mean(std::vector       <float>  {3.1, 3.6, 5.9}).value(), WithinULP(4.2f, 1));
-  CHECK_THAT(mean(std::unordered_set<double> {9.0, 2.0}     ).value(), WithinULP(5.5f, 1));
+  CHECK_THAT(mean(vector       <double> {1.0, 2.0}     ).value(), WithinULP(1.5 , 1));
+  CHECK_THAT(mean(vector       <float>  {3.1, 3.6, 5.9}).value(), WithinULP(4.2f, 1));
+  CHECK_THAT(mean(unordered_set<double> {9.0, 2.0}     ).value(), WithinULP(5.5f, 1));
 
   // Input integers give double results
-  CHECK_THAT(mean(std::vector<int>{1,2}).value(), WithinULP(1.5, 1));
+  CHECK_THAT(mean(vector<int>{1,2}).value(), WithinULP(1.5, 1));
 }
 
 TEST_CASE("stats std_dev population", "[stats][std_dev][population]") {
   using n4::stats::std_dev_population; using n4::stats::variance_population;
+  using std::vector; using std::unordered_set;
 
   // Standard deviations of empty containers
-  CHECK(! std_dev_population(std::vector       <int>   {}).has_value());
-  CHECK(! std_dev_population(std::unordered_set<int>   {}).has_value());
-  CHECK(! std_dev_population(std::vector       <float> {}).has_value());
-  CHECK(! std_dev_population(std::unordered_set<double>{}).has_value());
+  CHECK(! std_dev_population(vector       <int>   {}).has_value());
+  CHECK(! std_dev_population(unordered_set<int>   {}).has_value());
+  CHECK(! std_dev_population(vector       <float> {}).has_value());
+  CHECK(! std_dev_population(unordered_set<double>{}).has_value());
 
   // Standard deviations of single-element containers
-  CHECK(std_dev_population(std::vector      <double>{3.6}).value() == 0);
-  CHECK(std_dev_population(std::unordered_set<float>{6.3}).value() == 0);
+  CHECK(std_dev_population(vector      <double>{3.6}).value() == 0);
+  CHECK(std_dev_population(unordered_set<float>{6.3}).value() == 0);
 
   // Standard deviations of multi-element containers
-  auto check_std_and_var = [] (std::vector<double> data, double expected, uint64_t ulp=1) {
+  auto check_std_and_var = [] (vector<double> data, double expected, uint64_t ulp=1) {
     CHECK_THAT( std_dev_population(data).value(), WithinULP(std::sqrt(expected), ulp));
     CHECK_THAT(variance_population(data).value(), WithinULP(          expected , ulp));
   };
   check_std_and_var({5, 7}                                                ,  1);
   check_std_and_var({1, 2, 3, 4, 5}                                       ,  2);
   check_std_and_var({2, 4, 4, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 12, 12, 14}, 10);
+
 }
 
 TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
   using n4::stats::std_dev_sample; using n4::stats::variance_sample;
+  using std::vector; using std::unordered_set;
 
   // Standard deviations of empty containers
-  CHECK(! std_dev_sample(std::vector       <int>   {}).has_value());
-  CHECK(! std_dev_sample(std::unordered_set<int>   {}).has_value());
-  CHECK(! std_dev_sample(std::vector       <float> {}).has_value());
-  CHECK(! std_dev_sample(std::unordered_set<double>{}).has_value());
+  CHECK(! std_dev_sample(vector       <int>   {}).has_value());
+  CHECK(! std_dev_sample(unordered_set<int>   {}).has_value());
+  CHECK(! std_dev_sample(vector       <float> {}).has_value());
+  CHECK(! std_dev_sample(unordered_set<double>{}).has_value());
 
   // Standard deviations of single-element containers
-  CHECK(! std_dev_sample(std::vector      <double>{4.2}).has_value());
-  CHECK(! std_dev_sample(std::unordered_set<float>{7.9}).has_value());
+  CHECK(! std_dev_sample(vector      <double>{4.2}).has_value());
+  CHECK(! std_dev_sample(unordered_set<float>{7.9}).has_value());
 
   // Standard deviations of multi-element containers
-  auto check_std_and_var = [] (std::vector<double> data, double expected, uint64_t ulp=1) {
+  auto check_std_and_var = [] (vector<double> data, double expected, uint64_t ulp=1) {
     CHECK_THAT( std_dev_sample(data).value(), WithinULP(std::sqrt(expected), ulp));
     CHECK_THAT(variance_sample(data).value(), WithinULP(          expected , ulp));
   };
