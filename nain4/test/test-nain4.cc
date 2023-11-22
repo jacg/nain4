@@ -2255,43 +2255,29 @@ TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
 }
 
 TEST_CASE("stats correlation", "[stats][correlation]") {
-  using n4::stats::correlation;
-  using std::vector;
+
+  auto corr = [] (const std::vector<double>& a, const std::vector<double>& b) {
+    return n4::stats::correlation(a, b);
+  };
 
   // Basic example of 100% correlation
-  CHECK_THAT(
-    correlation(
-      vector<double>{1,2},
-      vector<double>{1,2}
-    ).value(), WithinULP(1.0,1));
+  CHECK_THAT(corr({1,2},
+                  {1,2}).value(), WithinULP(1.0,1));
 
   // Basic example of 100% anti-correlation
-  CHECK_THAT(
-    correlation(
-      vector<double>{1,2},
-      vector<double>{2,1}
-    ).value(), WithinULP(-1.0,1));
+  CHECK_THAT(corr({1,2},
+                  {2,1}).value(), WithinULP(-1.0,1));
 
   // Different lengths: no result
-  CHECK(!
-    correlation(
-      vector<double>{1,2, 3},
-      vector<double>{1,2}
-    ).has_value());
+  CHECK(! corr({1,2,3},
+               {1,2  }).has_value());
 
-  // One sequence is constant: no value
-  CHECK(!
-    correlation(
-      vector<double>{1,2},
-      vector<double>{1,1}
-    ).has_value());
+  // One sequence is constant: no result
+  CHECK(! corr({1,2},
+               {1,1}).has_value());
 
-  // Too short: no value
-  CHECK(!
-    correlation(
-      vector<double>{1},
-      vector<double>{1}
-    ).has_value());
+  // Too short: no result
+  CHECK(! corr({1}, {1}).has_value());
 
 }
 
