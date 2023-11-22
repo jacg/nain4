@@ -2204,8 +2204,8 @@ TEST_CASE("stats mean", "[stats][mean]") {
   CHECK_THAT(mean(std::vector       <float>  {3.1, 3.6, 5.9}).value(), WithinULP(4.2f, 1));
   CHECK_THAT(mean(std::unordered_set<double> {9.0, 2.0}     ).value(), WithinULP(5.5f, 1));
 
-  // TODO do we want to do some type traits gymnastics to avoid this loss of precision:
-  CHECK(mean(std::vector<int>{1,2}).value() == 1);
+  // Input integers give double results
+  CHECK_THAT(mean(std::vector<int>{1,2}).value(), WithinULP(1.5, 1));
 }
 
 TEST_CASE("stats std_dev population", "[stats][std_dev][population]") {
