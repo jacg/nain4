@@ -2,9 +2,15 @@
 
 #include <n4-sequences.hh>
 
+#include <boost/math/statistics/univariate_statistics.hpp>
+#include <boost/math/statistics/bivariate_statistics.hpp>
+
 #include <algorithm>
 #include <numeric>
 #include <optional>
+#include <type_traits>
+
+#define BSTATS boost::math::statistics
 
 namespace nain4 {
 namespace stats {
@@ -12,62 +18,50 @@ namespace stats {
 template<class CONTAINER>
 typename CONTAINER::value_type
 sum(const CONTAINER& data) {
-    return std::accumulate(begin(data), end(data),
+    return std::accumulate(cbegin(data), cend(data),
                            static_cast<typename CONTAINER::value_type>(0));
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-mean(const CONTAINER& data) {
+auto mean(const CONTAINER& data) -> std::optional<decltype(BSTATS::mean(data))> {
   if (data.empty()) { return {}; }
-  return sum(data) / data.size();
+  return BSTATS::mean(data);
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-variance_population(const CONTAINER& data) {
-  auto average = stats::mean(data);
-  if (! average.has_value()) { return {}; }
-  auto mean = average.value();
-  auto squared_deltas = n4::map<typename CONTAINER::value_type>(
-      [mean](const auto x) { auto dx = x-mean; return dx*dx; },
-      data
-  );
-  return sum(squared_deltas) / data.size();
+auto variance_population(const CONTAINER& data) -> std::optional<decltype(BSTATS::variance(data))> {
+  if (data.empty()) { return {}; }
+  return BSTATS::variance(data);
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-variance_sample(const CONTAINER& data) {
+auto variance_sample(const CONTAINER& data) -> std::optional<decltype(BSTATS::sample_variance(data))>  {
   if (data.size() < 2) { return {}; }
-  auto average = stats::mean(data);
-  auto mean = average.value();
-  auto squared_deltas = n4::map<typename CONTAINER::value_type>(
-      [mean](const auto x) { auto dx = x-mean; return dx*dx; },
-      data
-  );
-  return sum(squared_deltas) / (data.size() - 1);
+  return BSTATS::sample_variance(data);
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-std_dev_population(const CONTAINER& data) {
+auto std_dev_population(const CONTAINER& data) -> decltype(variance_population(data)) {
   auto var = variance_population(data);
-  if (var.has_value()) { return std::sqrt(var.value()); }
-  else                 { return {}; }
+  if (var.has_value()) { return std::sqrt(var.value()); } else { return {}; }
 }
 
 template<class CONTAINER>
-std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
-std_dev_sample(const CONTAINER& data) {
+auto std_dev_sample(const CONTAINER& data) -> decltype(variance_sample(data)) {
   auto var = variance_sample(data);
-  if (var.has_value()) { return std::sqrt(var.value()); }
-  else                 { return {}; }
+  if (var.has_value()) { return std::sqrt(var.value()); } else { return {}; }
+}
+
+template<class CONTAINER>
+auto correlation(const CONTAINER& a, const CONTAINER& b) -> std::optional<decltype(BSTATS::correlation_coefficient(a,b))> {
+  if (a.size() != b.size()) { return {}; }
+  auto corr = BSTATS::correlation_coefficient(a,b);
+  if (std::isnan(corr)) { return {}; } else { return corr; }
 }
 
 }
 } // namespace nain4
 
-
+#undef BSTATS
 
 namespace n4 { using namespace nain4; }
