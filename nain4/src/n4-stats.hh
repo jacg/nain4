@@ -2,12 +2,12 @@
 
 #include <n4-sequences.hh>
 
+#include <boost/math/statistics/univariate_statistics.hpp>
+#include <boost/math/statistics/bivariate_statistics.hpp>
+
 #include <algorithm>
 #include <numeric>
 #include <optional>
-
-#include <boost/math/statistics/univariate_statistics.hpp>
-#include <boost/math/statistics/bivariate_statistics.hpp>
 
 namespace nain4 {
 namespace stats {
