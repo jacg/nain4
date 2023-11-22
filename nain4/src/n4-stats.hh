@@ -10,6 +10,8 @@
 #include <optional>
 #include <type_traits>
 
+#define BSTATS boost::math::statistics
+
 namespace nain4 {
 namespace stats {
 
@@ -22,23 +24,23 @@ sum(const CONTAINER& data) {
 
 template<class CONTAINER>
 auto
-mean(const CONTAINER& data) -> std::optional<decltype(boost::math::statistics::mean(data))> {
+mean(const CONTAINER& data) -> std::optional<decltype(BSTATS::mean(data))> {
   if (data.empty()) { return {}; }
-  return boost::math::statistics::mean(data);
+  return BSTATS::mean(data);
 }
 
 template<class CONTAINER>
 std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
 variance_population(const CONTAINER& data) {
   if (data.empty()) { return {}; }
-  return boost::math::statistics::variance(data);
+  return BSTATS::variance(data);
 }
 
 template<class CONTAINER>
 std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
 variance_sample(const CONTAINER& data) {
   if (data.size() < 2) { return {}; }
-  return boost::math::statistics::sample_variance(data);
+  return BSTATS::sample_variance(data);
 }
 
 template<class CONTAINER>
@@ -59,13 +61,13 @@ template<class CONTAINER>
 std::optional<typename CONTAINER::value_type> // TODO type trait gymnastics in case contained value is integral?
 correlation(const CONTAINER& a, const CONTAINER& b) {
   if (a.size() != b.size()) { return {}; }
-  auto corr = boost::math::statistics::correlation_coefficient(a,b);
+  auto corr = BSTATS::correlation_coefficient(a,b);
   if (std::isnan(corr)) { return {}; } else { return corr; }
 }
 
 }
 } // namespace nain4
 
-
+#undef BSTATS
 
 namespace n4 { using namespace nain4; }
