@@ -7,6 +7,7 @@
 #include <optional>
 
 #include <boost/math/statistics/univariate_statistics.hpp>
+#include <boost/math/statistics/bivariate_statistics.hpp>
 
 namespace nain4 {
 namespace stats {

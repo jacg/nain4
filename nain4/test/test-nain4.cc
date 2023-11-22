@@ -2254,4 +2254,46 @@ TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
   check_std_and_var({1, 2, 9}, 19);
 }
 
+TEST_CASE("stats correlation", "[stats][correlation]") {
+  //using n4::stats::correlation;
+  using boost::math::statistics::correlation_coefficient;
+  using std::vector;
+
+  // Basic example of 100% correlation
+  CHECK_THAT(
+    correlation_coefficient(
+      vector<double>{1,2},
+      vector<double>{1,2}
+    ), WithinULP(1.0,1));
+
+  // Basic example of 100% anti-correlation
+  CHECK_THAT(
+    correlation_coefficient(
+      vector<double>{1,2},
+      vector<double>{2,1}
+    ), WithinULP(-1.0,1));
+
+  // Different lengths: seems to succeed silently
+  CHECK_THAT(
+    correlation_coefficient(
+      vector<double>{1,2, 3},
+      vector<double>{1,2}
+    ), WithinULP(1.0,1));
+
+  // One sequence is constant, gives silent NaN
+  CHECK(std::isnan(
+    correlation_coefficient(
+      vector<double>{1,2},
+      vector<double>{1,1}
+    )));
+
+  // Too short
+  CHECK(std::isnan(
+    correlation_coefficient(
+      vector<double>{1},
+      vector<double>{1}
+    )));
+
+}
+
 #pragma GCC diagnostic pop
