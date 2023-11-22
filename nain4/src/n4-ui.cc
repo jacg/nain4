@@ -98,7 +98,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, unique_argparse c
   if (cli->is_used("--vis")) {
     auto& items = vis; // = args.get<std::vector<std::string>>("--vis");
 
-    bool macro_file_specified = std::find_if(begin(items), end(items), is_macro) != end(items);
+    bool macro_file_specified = std::find_if(cbegin(items), cend(items), is_macro) != end(items);
     if (! macro_file_specified) { items.insert(begin(items), default_vis_macro); }
   }
 
