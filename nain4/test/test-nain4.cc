@@ -1129,6 +1129,15 @@ TEST_CASE("nain const_over", "[nain][const_over]") {
   CHECK(nain4::const_over(   1., {10, 100})    == std::vector<G4double>{0.1, 0.01});
 }
 
+TEST_CASE("nain unpack", "[nain4][unpack]") {
+  auto xi = 666., yi = 3.14, zi = 42.;
+  auto v = G4ThreeVector{xi, yi, zi};
+  auto [xo, yo, zo] = n4::unpack(v);
+  CHECK_THAT(xo, WithinULP(xi, 1));
+  CHECK_THAT(yo, WithinULP(yi, 1));
+  CHECK_THAT(zo, WithinULP(zi, 1));
+}
+
 TEST_CASE("nain find geometry", "[nain][find][geometry]") {
   default_run_manager().run();
 

@@ -74,6 +74,8 @@ template<class F> auto interpolate(F f, size_t N, double min, double max) {
 std::vector<G4double> scale_by  (G4double factor, std::initializer_list<G4double> const& data);
 std::vector<G4double> const_over(G4double factor, std::initializer_list<G4double> const& data);
 
+inline std::tuple<G4double, G4double, G4double> unpack(const G4ThreeVector& v){ return {v.x(), v.y(), v.z()};};
+
 } // namespace nain4
 
 namespace n4 { using namespace nain4; }
