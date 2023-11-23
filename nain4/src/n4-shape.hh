@@ -1,6 +1,7 @@
 #pragma once
 
 #include <n4-place.hh>
+#include <n4-sensitive.hh>
 
 #include <G4Box.hh>
 #include <G4Cons.hh>
@@ -32,7 +33,9 @@ struct boolean_shape;
 struct shape {
   G4LogicalVolume*  volume(G4Material* material) const;
   n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
-  shape&         sensitive(G4SensDet*  s       ) { sd    = s   ; return *this; }
+  shape& sensitive(const G4String& name, sensitive_detector::process_hits_fn fn)
+                                 { sd = new sensitive_detector{name, fn}; return *this; }
+  shape& sensitive(G4SensDet* s) { sd = s;                                return *this; }
   virtual G4VSolid*  solid(                    ) const = 0;
   virtual ~shape() {}
 
