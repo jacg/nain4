@@ -24,8 +24,8 @@ inline void do_nothing(G4Event*) {}
 inline auto default_physics_lists() {
   auto verbosity = 0;
   auto physics_list = new FTFP_BERT{verbosity};
-  physics_list -> ReplacePhysics(new G4EmStandardPhysics_option4());
-  physics_list -> RegisterPhysics(new G4OpticalPhysics{});
+  physics_list -> ReplacePhysics(new G4EmStandardPhysics_option4{verbosity});
+  physics_list -> RegisterPhysics(new G4OpticalPhysics{verbosity});
   return physics_list;
 }
 
