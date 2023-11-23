@@ -1664,6 +1664,13 @@ TEST_CASE("nain linspace", "[nain][linspace]") {
 
   auto values = n4::linspace(start, stop, n_entries);
   CHECK( values == std::vector<double>{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5} );
+
+  auto one_item = n4::linspace(0.3, 0.4, 1);
+  CHECK( one_item == std::vector<double>{0.3} );
+
+  auto zero_items = n4::linspace(0.3, 0.4, 0);
+  CHECK( zero_items == std::vector<double>{} );
+
 }
 
 int ff(int x) {

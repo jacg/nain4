@@ -6,6 +6,8 @@
 namespace nain4 {
 
 std::vector<G4double> linspace(G4double start, G4double stop, size_t n_entries) {
+  if (n_entries == 0) { return {     }; }
+  if (n_entries == 1) { return {start}; }
   auto step = (stop - start) / (n_entries - 1);
   std::vector<G4double> output(n_entries);
 
