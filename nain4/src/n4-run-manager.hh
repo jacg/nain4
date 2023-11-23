@@ -69,6 +69,8 @@ public:
   run_manager(run_manager& ) = delete;
   run_manager(run_manager&&) = default;
 
+  static bool available() { return rm_instance != nullptr; }
+
 private:
   G4RM g4_manager;
   n4::ui ui;
