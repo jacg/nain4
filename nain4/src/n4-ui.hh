@@ -71,11 +71,13 @@ public : ui(const std::string& program_name, int argc, char** argv,             
 private:
   friend test::query;
 
-  std::optional<G4int>     n_events;
-  std::vector<std::string> early;
-  std::vector<std::string> late;
-  std::vector<std::string> vis;
-  bool                     use_graphics;
+  std::optional<G4int>       n_events;
+  std::vector<std::string>   early;
+  std::vector<std::string>   late;
+  std::vector<std::string>   vis;
+  bool                       use_graphics;
+  std::optional<std::string> rng_out;
+  std::optional<std::string> rng_in;
 
   int    argc;
   char** argv;

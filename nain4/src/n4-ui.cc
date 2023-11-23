@@ -41,6 +41,8 @@ nain4::internal::cli_and_err nain4::internal::define_args(const std::string& pro
   cli->add_argument("--vis"     , "-g").metavar("ITEMS").help("switch from batch mode to GUI, executing ITEMS").ANY
     .default_value(std::vector<std::string>{default_vis_macro});
   cli->add_argument("--macro-path", "-m").metavar("MACROPATHS").help("Add MACROPATHS to Geant4 macro search path").MULTIPLE;
+  cli->add_argument("--save-rng").metavar("DIR") .help("Save random number states for each event in DIR");
+  cli->add_argument("--with-rng").metavar("FILE").help("Run with random number generator state specified in FILE");
 
   try {
     cli->parse_args(argc, argv);
@@ -83,6 +85,8 @@ ui::ui(const std::string& program_name, int argc, char** argv, unique_argparse c
   , late {cli->get<std::vector<std::string>>("--late" )}
   , vis  {cli->get<std::vector<std::string>>("--vis"  )}
   , use_graphics{cli->is_used("--vis")}
+  , rng_out{cli->present("--save-rng")}
+  , rng_in {cli->present("--with-rng")}
   , argc{argc}
   , argv{argv}
   , g4_ui{*G4UImanager::GetUIpointer()}
@@ -110,6 +114,12 @@ ui::ui(const std::string& program_name, int argc, char** argv, unique_argparse c
 }
 
 void ui::run(std::optional<unsigned> n) {
+  if (rng_in .has_value()) { command("/random/resetEngineFrom "  + rng_in .value(), "RNG", kind::command); }
+  if (rng_out.has_value()) { command("/random/setDirectoryName " + rng_out.value(), "RNG", kind::command);
+                             command("/random/setSavingFlag true"                 , "RNG", kind::command);
+                             command("/random/saveEachEventFlag true"             , "RNG", kind::command);
+  }
+
   if (n.has_value()) { n_events = static_cast<int>(n.value()); }
 
   if (n_events.has_value() && !use_graphics) {
