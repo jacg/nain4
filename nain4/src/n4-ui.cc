@@ -107,7 +107,7 @@ ui::ui(const std::string& program_name, int argc, char** argv, unique_argparse c
   }
 
   if (warn_empty_run && ! (n_events.has_value() || use_graphics)) {
-    std::cerr << "'" + program_name + "' is not going to do anything interesting without some command-line arguments.\n\n";
+    std::cerr << "'" + program_name + "' is not going to do anything interesting without --beam-on or --vis.\n\n";
     std::cerr << *cli.get() << std::endl;
   }
 
