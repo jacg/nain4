@@ -11,9 +11,7 @@
 #include <G4VUserPhysicsList.hh>
 
 
-using test_result = std::vector<std::pair<double, double>>;
-
-test_result measure_abslength(test_config const& config) {
+std::vector<double> measure_abslength(test_config const& config) {
   auto air    = n4::material("G4_AIR");
   auto sphere = [material=config.material, air] (auto radius) {
     return [material, air, radius] () {
@@ -67,8 +65,8 @@ test_result measure_abslength(test_config const& config) {
       ;
 
     auto events = 10000;
-    auto radii  = n4::scale_by(cm, {1, 2, 3, 4, 5, 6, 7, 8});
-    test_result result;
+    auto radii  = config.distances;
+    std::vector<double> result;
     result.reserve(radii.size());
 
     // --- Infer attenuation length by gathering statistics for given radius -------------
@@ -80,7 +78,7 @@ test_result measure_abslength(test_config const& config) {
       auto ratio = unscathed / (1.0 * events);
       auto expected_attenuation_length = 3.74 * cm;
       auto attenuation_length = - radius / log(ratio);
-      result.push_back({radius, attenuation_length});
+      result.push_back(attenuation_length);
    };
 
     // --- Check attenuation length across range of radii --------------------------------

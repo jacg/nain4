@@ -9,7 +9,8 @@ struct test_config {
   G4Material*         material;
   std::string         particle_name;
   double              particle_energy;
+  std::vector<double> distances;
 };
 
 
-std::vector<std::pair<double, double>> measure_abslength(test_config const&);
+std::vector<double> measure_abslength(test_config const&);
