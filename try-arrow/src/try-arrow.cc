@@ -96,7 +96,8 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_csv(std::string filename) {
 }
 
 
-
+// Helper for easier specification of arrow schemas. To be used in conjunction
+// with helpers for creating fields. See field_helper_{1,2} below.
 template<typename... FIELDS>
 std::shared_ptr<arrow::Schema> make_schema(FIELDS&&... fields) {
   std::vector<std::shared_ptr<arrow::Field>> fields_vector;
@@ -104,36 +105,45 @@ std::shared_ptr<arrow::Schema> make_schema(FIELDS&&... fields) {
   return arrow::schema(fields_vector);
 }
 
+// Some typedefs to reduce noise
 using FLD = std::shared_ptr<arrow::Field>;
 using STR = std::string;
 using VFD = std::vector<std::shared_ptr<arrow::Field>>;
-namespace idea1 {
+
+namespace field_helper_1 {
+  // Need to write a function for creating a field of each and every Arrow type
   const FLD int8   (STR name)                    { return arrow::field(name, arrow::int8   (      )); }
   const FLD int16  (STR name)                    { return arrow::field(name, arrow::int16  (      )); }
   const FLD utf8   (STR name)                    { return arrow::field(name, arrow::utf8   (      )); }
   const FLD struct_(STR name, const VFD& fields) { return arrow::field(name, arrow::struct_(fields)); }
+  // ... and so on for every Arrow type
 };
 
-void show_usage1() {
-  using namespace idea1;
-  VFD some_fields;
-  auto schema1 = make_schema(int8("A"), utf8("B"));
-  auto schema2 = make_schema(int8("A"), utf8("B"), struct_("C", some_fields));
-}
-
-namespace idea2 {
+namespace field_helper_2 {
+  // Constructs a field by combining name, constructor function and any arguments the latter requires
   template<class FACTORY, class ...ARGS>
   const FLD field(STR name, FACTORY&& factory, ARGS&&... args) {
     return arrow::field(name, factory(std::forward<ARGS>(args)...));
   }
+  // Can reduce verbosity by ensuring that unqualified constructors are in scope
   using arrow::int8;
   using arrow::int16;
   using arrow::utf8;
   using arrow::struct_;
+  // ... and so on for every Arrow type
+}
+
+void show_usage1() {
+  using namespace field_helper_1;
+  VFD some_fields;
+  auto schema2 = make_schema(
+    int8("A"),
+    utf8("B"),
+    struct_("C", some_fields));
 }
 
 void show_usage2() {
-  using namespace idea2;
+  using namespace field_helper_2;
   VFD some_fields;
   auto schema2 = make_schema(
     field("A", int8),
@@ -159,16 +169,18 @@ arrow::Status generate_data_files() {
   std::shared_ptr<arrow::Array> years;
   ARROW_ASSIGN_OR_RAISE(years, int16builder.Finish());
 
+  // Using field_helper_1
   auto schema = [] {
-    using namespace idea1;
+    using namespace field_helper_1;
     return make_schema(
       int8 ("Day")  ,
       int8 ("Month"),
       int16("Year") );
   }();
 
+  // Using field_helper_2
  schema = [] {
-   using namespace idea2;
+   using namespace field_helper_2;
    return make_schema(
      field("Day"  , int8 ),
      field("Month", int8 ),
