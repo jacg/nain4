@@ -27,7 +27,8 @@ test_result measure_abslength(test_config const& config) {
   auto shoot_gamma = [&config](G4Event* event) {
      auto vertex = new G4PrimaryVertex{};
      auto p      = config.particle_energy * G4RandomDirection();
-     vertex -> SetPrimary(new G4PrimaryParticle(config.particle, p.x(), p.y(), p.z()));
+     auto particle = n4::find_particle(config.particle_name);
+     vertex -> SetPrimary(new G4PrimaryParticle(particle, p.x(), p.y(), p.z()));
      event -> AddPrimaryVertex(vertex);
   };
 

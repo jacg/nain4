@@ -5,10 +5,10 @@
 #include <G4VUserPhysicsList.hh>
 
 struct test_config {
-  G4VUserPhysicsList*   physics;
-  G4Material*           material;
-  G4ParticleDefinition* particle;
-  double                particle_energy;
+  G4VUserPhysicsList* physics;
+  G4Material*         material;
+  std::string         particle_name;
+  double              particle_energy;
 };
 
 
