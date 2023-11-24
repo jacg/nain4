@@ -107,18 +107,39 @@ std::shared_ptr<arrow::Schema> make_schema(FIELDS&&... fields) {
 using FLD = std::shared_ptr<arrow::Field>;
 using STR = std::string;
 using VFD = std::vector<std::shared_ptr<arrow::Field>>;
-namespace help {
+namespace idea1 {
   const FLD int8   (STR name)                    { return arrow::field(name, arrow::int8   (      )); }
   const FLD int16  (STR name)                    { return arrow::field(name, arrow::int16  (      )); }
   const FLD utf8   (STR name)                    { return arrow::field(name, arrow::utf8   (      )); }
   const FLD struct_(STR name, const VFD& fields) { return arrow::field(name, arrow::struct_(fields)); }
 };
 
-void show_usage() {
-  using namespace help;
+void show_usage1() {
+  using namespace idea1;
   VFD some_fields;
   auto schema1 = make_schema(int8("A"), utf8("B"));
   auto schema2 = make_schema(int8("A"), utf8("B"), struct_("C", some_fields));
+}
+
+namespace idea2 {
+  template<class FACTORY, class ...ARGS>
+  const FLD field(STR name, FACTORY factory, ARGS... args) {
+    return arrow::field(name, factory(args...));
+  }
+  using arrow::int8;
+  using arrow::int16;
+  using arrow::utf8;
+  using arrow::struct_;
+}
+
+void show_usage2() {
+  using namespace idea2;
+  VFD some_fields;
+  auto schema2 = make_schema(
+    field("A", int8),
+    field("B", utf8),
+    field("C", struct_, some_fields)
+  );
 }
 
 arrow::Status generate_data_files() {
@@ -139,8 +160,19 @@ arrow::Status generate_data_files() {
   ARROW_ASSIGN_OR_RAISE(years, int16builder.Finish());
 
   auto schema = [] {
-    using namespace help;
-    return make_schema(int8("Day"), int8("Month"), int16("Year"));
+    using namespace idea1;
+    return make_schema(
+      int8 ("Day")  ,
+      int8 ("Month"),
+      int16("Year") );
+  }();
+
+ schema = [] {
+   using namespace idea2;
+   return make_schema(
+     field("Day"  , int8 ),
+     field("Month", int8 ),
+     field("Year" , int16));
   }();
 
   auto rbatch = arrow::RecordBatch::Make(schema, days->length(), {days, months, years});
