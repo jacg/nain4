@@ -100,7 +100,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_csv(std::string filename) {
 template<typename... FIELDS>
 std::shared_ptr<arrow::Schema> make_schema(FIELDS&&... fields) {
   std::vector<std::shared_ptr<arrow::Field>> fields_vector;
-  (..., fields_vector.push_back(fields));
+  (..., fields_vector.push_back(std::forward<FIELDS>(fields)));
   return arrow::schema(fields_vector);
 }
 
