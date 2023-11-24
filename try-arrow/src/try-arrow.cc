@@ -123,8 +123,8 @@ void show_usage1() {
 
 namespace idea2 {
   template<class FACTORY, class ...ARGS>
-  const FLD field(STR name, FACTORY factory, ARGS... args) {
-    return arrow::field(name, factory(args...));
+  const FLD field(STR name, FACTORY&& factory, ARGS&&... args) {
+    return arrow::field(name, factory(std::forward<ARGS>(args)...));
   }
   using arrow::int8;
   using arrow::int16;
