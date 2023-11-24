@@ -95,6 +95,32 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_csv(std::string filename) {
   return arrow::Result<std::shared_ptr<arrow::Table>>(table);
 }
 
+
+
+template<typename... FIELDS>
+std::shared_ptr<arrow::Schema> make_schema(FIELDS&&... fields) {
+  std::vector<std::shared_ptr<arrow::Field>> fields_vector;
+  (..., fields_vector.push_back(fields));
+  return arrow::schema(fields_vector);
+}
+
+using FLD = std::shared_ptr<arrow::Field>;
+using STR = std::string;
+using VFD = std::vector<std::shared_ptr<arrow::Field>>;
+namespace help {
+  const FLD int8   (STR name)                    { return arrow::field(name, arrow::int8   (      )); }
+  const FLD int16  (STR name)                    { return arrow::field(name, arrow::int16  (      )); }
+  const FLD utf8   (STR name)                    { return arrow::field(name, arrow::utf8   (      )); }
+  const FLD struct_(STR name, const VFD& fields) { return arrow::field(name, arrow::struct_(fields)); }
+};
+
+void show_usage() {
+  using namespace help;
+  VFD some_fields;
+  auto schema1 = make_schema(int8("A"), utf8("B"));
+  auto schema2 = make_schema(int8("A"), utf8("B"), struct_("C", some_fields));
+}
+
 arrow::Status generate_data_files() {
   arrow::Int8Builder int8builder;
   int8_t days_raw[5] = {1, 12, 17, 23, 28};
@@ -112,10 +138,10 @@ arrow::Status generate_data_files() {
   std::shared_ptr<arrow::Array> years;
   ARROW_ASSIGN_OR_RAISE(years, int16builder.Finish());
 
-  auto field_day   = arrow::field("Day"  , arrow::int8 ());
-  auto field_month = arrow::field("Month", arrow::int8 ());
-  auto field_year  = arrow::field("Year" , arrow::int16());
-  auto schema      = arrow::schema({field_day, field_month, field_year});
+  auto schema = [] {
+    using namespace help;
+    return make_schema(int8("Day"), int8("Month"), int16("Year"));
+  }();
 
   auto rbatch = arrow::RecordBatch::Make(schema, days->length(), {days, months, years});
   //std::cout << rbatch -> ToString() << std::endl;
