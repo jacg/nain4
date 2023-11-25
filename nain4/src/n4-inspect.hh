@@ -4,9 +4,12 @@
 #include <n4-run-manager.hh>
 
 #include <G4LogicalVolumeStore.hh>
-#include <G4PhysicalVolumeStore.hh>
-#include <G4SolidStore.hh>
 #include <G4ParticleTable.hh>
+#include <G4PhysicalVolumeStore.hh>
+#include <G4SDManager.hh>
+#include <G4SolidStore.hh>
+
+#include <optional>
 #include <stdexcept>
 #include <typeinfo>
 
@@ -41,6 +44,13 @@ const DOWN* find_solid(const G4String& name) {
     throw n4::exceptions::bad_cast("find_solid", "solid " + name + " cannot be downcast to " + typeid(DOWN).name());
   }
   return down;
+}
+
+template<class SD>
+std::optional<SD*> find_sensitive(const G4String& name) {
+  auto sd = G4SDManager::GetSDMpointer() -> FindSensitiveDetector(name);
+  if (sd == nullptr ) { return {}; }
+  else                { return dynamic_cast<SD*>(sd); }
 }
 
 // Remove all, logical/physical volumes, solids and assemblies.
