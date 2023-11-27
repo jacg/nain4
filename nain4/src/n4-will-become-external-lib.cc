@@ -76,7 +76,6 @@ std::vector<double> measure_abslength(test_config const& config) {
       rm -> replace_geometry(sphere(radius)).run(events);
 
       auto ratio = unscathed / (1.0 * events);
-      auto expected_attenuation_length = 3.74 * cm;
       auto attenuation_length = - radius / log(ratio);
       result.push_back(attenuation_length);
    };
