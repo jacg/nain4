@@ -70,6 +70,19 @@ jobs:
         run: nix develop .#${{ matrix.devshell }}  -c just test-compile-time
         continue-on-error:  ${{ matrix.os == 'macos-12' }} # bizarre time-dependent encoding errors in python test generator
 
+      - name: Test variables set by nain4 setupHook
+        run: |
+          nix develop .# -c env > nain4-project-env
+          echo ====== grepping for G4_DIR ====================
+          grep G4_DIR nain4-project-env
+          echo ===============================================
+          echo ====== grepping for G4_EXAMPLES ===============
+          grep G4_EXAMPLES nain4-project-env
+          echo ===============================================
+          echo grepping for QT_QPA_PLATFORM_PLUGIN_PATH
+          grep QT_QPA_PLATFORM_PLUGIN_PATH nain4-project-env
+          echo ===============================================
+
       - name: Run N4 examples
         run: nix develop .#${{ matrix.devshell }}  -c just n4-examples/run-all
 
