@@ -7,28 +7,28 @@ default:
   just run --beam-on 10
 
 test *REST:
-  meson setup build/test test
-  meson compile -C build/test
-  meson install -C build/test
-  sh install/test/run-each-test-in-separate-process.sh "$@"
+  meson setup      build/CHANGEME-TESTS-PROJECT-NAME test
+  meson compile -C build/CHANGEME-TESTS-PROJECT-NAME
+  meson install -C build/CHANGEME-TESTS-PROJECT-NAME
+  sh install/CHANGEME-TESTS-PROJECT-NAME/run-each-test-in-separate-process.sh "$@"
 
 catch2-demo *REST:
   echo "$@"
-  meson setup build/test test
-  meson compile -C build/test
-  meson install -C build/test
-  install/test/bin/catch2-demo-test "$@"
+  meson setup      build/CHANGEME-TESTS-PROJECT-NAME test
+  meson compile -C build/CHANGEME-TESTS-PROJECT-NAME
+  meson install -C build/CHANGEME-TESTS-PROJECT-NAME
+  install/CHANGEME-TESTS-PROJECT-NAME/bin/catch2-demo-test "$@"
 
 build:
-  meson setup build/app src
-  meson compile -C build/app
+  meson setup build/CHANGEME-PROJECT-NAME src
+  meson compile -C build/CHANGEME-PROJECT-NAME
 
 install: build
-  meson install -C build/app
+  meson install -C build/CHANGEME-PROJECT-NAME
 
 run *ARGS: install
   #!/usr/bin/env sh
-  sh execute-with-nixgl-if-needed.sh ./install/app/bin/CHANGEME-EXE "$@"
+  sh execute-with-nixgl-if-needed.sh ./install/CHANGEME-PROJECT-NAME/bin/CHANGEME-EXE "$@"
   exit $?
 
 clean:

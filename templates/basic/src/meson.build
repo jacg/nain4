@@ -5,7 +5,7 @@ project( 'CHANGEME-PROJECT-NAME'
                            , 'debug=true'
                            , 'optimization=2'
                            , 'cpp_std=c++20'
-                           , 'prefix=@0@/../install/app/'.format(meson.source_root())
+                           , 'prefix=@0@/../install/CHANGEME-PROJECT-NAME/'.format(meson.source_root())
                            ]
        )
 
