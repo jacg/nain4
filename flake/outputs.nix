@@ -42,6 +42,38 @@
     G4NDL
   ];
 
+  # Exporter of G4 envvars
+  export-g4-env =
+    let
+      g4-data = self.deps.g4-data-package;
+    in
+      pkgs.writeShellScriptBin "export-g4-env" ''
+        # TODO replace manual envvar setting with with use of packages' setupHooks
+        export G4NEUTRONHPDATA="${g4-data.G4NDL}/share/Geant4-11.0.4/data/G4NDL4.6"
+        export G4LEDATA="${g4-data.G4EMLOW}/share/Geant4-11.0.4/data/G4EMLOW8.0"
+        export G4LEVELGAMMADATA="${g4-data.G4PhotonEvaporation}/share/Geant4-11.0.4/data/G4PhotonEvaporation5.7"
+        export G4RADIOACTIVEDATA="${g4-data.G4RadioactiveDecay}/share/Geant4-11.0.4/data/G4RadioactiveDecay5.6"
+        export G4PARTICLEXSDATA="${g4-data.G4PARTICLEXS}/share/Geant4-11.0.4/data/G4PARTICLEXS4.0"
+        export G4PIIDATA="${g4-data.G4PII}/share/Geant4-11.0.4/data/G4PII1.3"
+        export G4REALSURFACEDATA="${g4-data.G4RealSurface}/share/Geant4-11.0.4/data/G4RealSurface2.2"
+        export G4SAIDXSDATA="${g4-data.G4SAIDDATA}/share/Geant4-11.0.4/data/G4SAIDDATA2.0"
+        export G4ABLADATA="${g4-data.G4ABLA}/share/Geant4-11.0.4/data/G4ABLA3.1"
+        export G4INCLDATA="${g4-data.G4INCL}/share/Geant4-11.0.4/data/G4INCL1.0"
+        export G4ENSDFSTATEDATA="${g4-data.G4ENSDFSTATE}/share/Geant4-11.0.4/data/G4ENSDFSTATE2.3"
+      '';
+
+  # Utility for making Nix flake apps. A nix flake app allows "remote" execution of pre-packaged code.
+  make-app = args:
+    let
+      g4-data = self.deps.g4-data-package;
+      app-package = pkgs.writeShellScriptBin args.executable ''
+        export PATH=${pkgs.lib.makeBinPath [ args.package ]}:$PATH
+        # export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [ self.packages.geant4 ] }:$LD_LIBRARY_PATH
+        source "${export-g4-env}/bin/export-g4-env"
+        exec ${args.executable} ${args.args}
+      '';
+    in { type = "app"; program = "${app-package}/bin/${args.executable}"; };
+
   # Should be able to remove this, once https://github.com/NixOS/nixpkgs/issues/234710 is merged
   clang_16 = if pkgs.stdenv.isDarwin
              then pkgs.llvmPackages_16.clang.override rec {
@@ -86,6 +118,8 @@
     };
 
   in {
+
+    inherit export-g4-env;
 
     packages.default = self.packages.nain4;
 
@@ -207,6 +241,8 @@
     _contains-systems = { systems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ]; };
 
     deps = {
+      inherit make-app;
+      args-from-cli = ''"$@"'';
       dev-shell-packages = client-dev-shell-packages;
       g4-data-package = pkgs.geant4.data; # Needed for exporting G4*DATA envvars in client app
       # TODO: leave for now, in case client needs it, but make these purely
