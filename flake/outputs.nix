@@ -175,7 +175,6 @@
         REPLACE "CHANGEME-TESTS-PROJECT-NAME"            ''${BASE_NAME}-tests
         REPLACE "CHANGEME-PROJECT-TEST-EXE"              ''${BASE_NAME}-test
         REPLACE "CHANGEME-PACKAGE"                       ''${BASE_NAME}
-        REPLACE "CHANGEME-APP"                           ''${BASE_NAME}
         REPLACE "CHANGEME-ONE-LINE-PROJECT-DESCRIPTION" "''${DESCRIPTION}"
 
         git -c init.defaultBranch=master init -q

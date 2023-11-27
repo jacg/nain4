@@ -5,28 +5,12 @@
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
 
-  in {
-
-    packages.default = self.packages.CHANGEME-PACKAGE;
-
-    # Executed by `nix run <URL of this flake>#CHANGEME-PACKAGE -- <args?>`
-    # TODO: switch to clang environment
-    packages.CHANGEME-PACKAGE = pkgs.stdenv.mkDerivation {
-      pname = "CHANGEME-PACKAGE";
-      version = "0.0.0";
-      src = "${self}/src";
-      nativeBuildInputs = [];
-      buildInputs = [ nain4.packages.nain4 ];
-    };
-
-    # Executed by `nix run <URL of this flake> -- <args?>`
-    apps.default = self.apps.CHANGEME-APP;
-
-    # Executed by `nix run <URL of this flake>#CHANGEME-APP`
-    apps.CHANGEME-APP = let
+  # Utility for making Nix flake apps. A nix flake app allows "remote" execution of pre-packaged code.
+  make-app = executable: args:
+    let
       g4-data = nain4.deps.g4-data-package;
-      CHANGEME-APP-app-package = pkgs.writeShellScriptBin "CHANGEME-APP" ''
-        export PATH=${pkgs.lib.makeBinPath [ self.packages.CHANGEME-PACKAGE ]}:$PATH
+      crystal-app-package = pkgs.writeShellScriptBin executable ''
+        export PATH=${pkgs.lib.makeBinPath [ self.packages.crystal ]}:$PATH
         # export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [ nain4.packages.geant4 ] }:$LD_LIBRARY_PATH
 
         # TODO replace manual envvar setting with with use of packages' setupHooks
@@ -42,10 +26,31 @@
         export G4INCLDATA="${g4-data.G4INCL}/share/Geant4-11.0.4/data/G4INCL1.0"
         export G4ENSDFSTATEDATA="${g4-data.G4ENSDFSTATE}/share/Geant4-11.0.4/data/G4ENSDFSTATE2.3"
 
-        exec CHANGEME-EXE --macro-path ${self}/macs "$@"
+        exec ${executable} ${args}
       '';
-    in { type = "app"; program = "${CHANGEME-APP-app-package}/bin/CHANGEME-APP"; };
+    in { type = "app"; program = "${crystal-app-package}/bin/${executable}"; };
 
+  args-from-cli = ''"$@"'';
+
+  in {
+
+    packages.default = self.packages.CHANGEME-PACKAGE;
+
+    # Executed by `nix run <URL of this flake>#CHANGEME-PACKAGE -- <args?>`
+    # TODO: switch to clang environment
+    packages.CHANGEME-PACKAGE = pkgs.stdenv.mkDerivation {
+      pname = "CHANGEME-PACKAGE";
+      version = "0.0.0";
+      src = "${self}/src";
+      nativeBuildInputs = [];
+      buildInputs = [ nain4.packages.nain4 ];
+    };
+
+    # Executed by `nix run <URL of this flake> -- <args?>`
+    apps.default = self.apps.CHANGEME-EXE;
+
+    # Executed by `nix run <URL of this flake>#CHANGEME-EXE`
+    apps.CHANGEME-APP-NEW = make-app "CHANGEME-EXE";
 
     # Used by `direnv` when entering this directory (also by `nix develop <URL to this flake>`)
     devShell = self.devShells.clang;
@@ -67,8 +72,8 @@
     # 3. [on lxplus] `singularity run hello.img`
     packages.singularity = pkgs.singularity-tools.buildImage {
       name = "CHANGEME-PROJECT-NAME";
-      contents = [ self.apps.CHANGEME-APP.program ];
-      runScript = "${self.apps.CHANGEME-APP.program} $@";
+      contents = [ self.apps.CHANGEME-EXE.program ];
+      runScript = "${self.apps.CHANGEME-EXE.program} $@";
       diskSize = 10240;
       memSize = 5120;
     };
