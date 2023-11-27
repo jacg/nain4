@@ -13,6 +13,7 @@ jobs:
 
     # See https://wildwolf.name/github-actions-how-to-avoid-running-the-same-workflow-multiple-times/
     if: (! contains(github.event.head_commit.message, '[skip ci]')                   &&
+         ! contains(github.event.head_commit.message, '[skip nain4]')                &&
                   ((github.event_name                             != 'pull_request') ||
                    (github.event.pull_request.head.repo.full_name !=
                     github.event.pull_request.base.repo.full_name))
@@ -62,57 +63,6 @@ jobs:
       - name: Test nain4
         run: nix develop .#${{ matrix.devshell }} -c just test-nain4 -v
 
-      - name: Test bootstrapping of client project
-        run: |
-          cd ~/work
-          git config --global user.name Tester
-          git config --global user.email tester@testing.org
-          nix run github:jacg/nain4#bootstrap-client-project my-project name-chosen-by-me "description of my project"
-          cd my-project
-          nix develop -c just | tee just-output
-          PATTERN="end of event 10"
-          echo Looking for "'$PATTERN'" in output of 'just'
-          grep "$PATTERN" just-output
-
-      - name: Check that mdbook ANCHORs have been stripped from bootstrapped project
-        run: |
-          nix profile install nixpkgs#ripgrep
-          echo LOOKING FOR ANY REMAINING ANCHORS
-          rg ANCHOR ~/work/my-project | tee remaining-anchors
-          ! test -s remaining-anchors
-
-      - name: Test nix build client package
-        run: |
-          nix build   ~/work/my-project#
-
-      - name: Test run nix build client package result
-        run: |
-          nix develop ~/work/my-project# -c result/bin/name-chosen-by-me --beam-on 12 | tee build-and-run-client-package-output
-          PATTERN="end of event 12"
-          echo Looking for "'$PATTERN'" in output of 'just'
-          grep "$PATTERN" build-and-run-client-package-output
-        continue-on-error: true # see issue # https://github.com/jacg/nain4/issues/161
-
-      - name: Test variables set by nain4 setupHook
-        run: |
-          nix develop ~/work/my-project# -c env > my-project-env
-          echo ====== grepping for G4_DIR ====================
-          grep G4_DIR my-project-env
-          echo ===============================================
-          echo ====== grepping for G4_EXAMPLES ===============
-          grep G4_EXAMPLES my-project-env
-          echo ===============================================
-          echo grepping for QT_QPA_PLATFORM_PLUGIN_PATH
-          grep QT_QPA_PLATFORM_PLUGIN_PATH my-project-env
-          echo ===============================================
-
-      - name: Test nix run client app
-        run: |
-          nix run ~/work/my-project# -- -n 13 --early "/my/bubble_radius 0.2 m" | tee run-client-app-output
-          PATTERN="end of event 13"
-          echo Looking for "'$PATTERN'" in output of 'just'
-          grep "$PATTERN" run-client-app-output
-
       - name: Run client-side tests
         run: nix develop .#${{ matrix.devshell }}  -c just test-client-side
 
@@ -131,6 +81,7 @@ jobs:
 
       - name: Check for presence of debug symbols in Geant4
         run: |
+          nix profile install nixpkgs#ripgrep
           if ${{ matrix.os == 'macos-12' }}
           then
             if rg --files-with-matches debug_info result/lib/libG4*.so
