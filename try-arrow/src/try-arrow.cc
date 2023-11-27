@@ -152,6 +152,25 @@ void show_usage2() {
   );
 }
 
+void show_usage2b() {
+  using field_helper_2::field;
+  VFD some_fields;
+  auto schema2 = make_schema(
+    field("A", arrow::int8),
+    field("B", arrow::utf8),
+    field("C", arrow::struct_, some_fields)
+  );
+}
+
+void show_usage_without_field_helper() {
+  VFD some_fields;
+  make_schema(
+    arrow::field("A", arrow::int8()),
+    arrow::field("B", arrow::utf8()),
+    arrow::field("C", arrow::struct_(some_fields))
+ );
+}
+
 arrow::Status generate_data_files() {
   arrow::Int8Builder int8builder;
   int8_t days_raw[5] = {1, 12, 17, 23, 28};
