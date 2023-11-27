@@ -263,15 +263,14 @@ TEST_CASE("trivial app", "[app]") {
 
   auto hush = std::make_unique<n4::silence>(std::cout);
 
-  char *fake_argv[] = { (char*)"progname-bbb", NULL };
+  char *fake_argv[] = { (char*)"progname-bbb" };
   n4::run_manager::create()
     .ui("progname", 1, fake_argv, false)
     .physics(n4::test::default_physics_lists())
     .geometry<geometry>(y_min, y_max, z_min, z_max)
     .actions <actions >(n_gun, n_inside_generator)
-    .run();
+    .run(n_beam_on);
 
-  n4::run_manager::get().here_be_dragons() -> BeamOn(n_beam_on);
   hush = nullptr;
 
   // Verify that all the geantinos coming out from the source, hit the detector
