@@ -1190,6 +1190,21 @@ TEST_CASE("nain find solid downcast bad cast", "[nain][find][solid]") {
   REQUIRE_THROWS_AS(n4::find_solid<G4Tubs>("box"), n4::exceptions::bad_cast);
 }
 
+
+TEST_CASE("nain find sensitive", "[nain][find][sensitive]") {
+  auto dummy = [] (const G4Step*) {return true;};
+  auto material = n4::material("G4_AIR");
+
+  n4::box("box").cube(1).sensitive("my-sd", dummy).place(material).now();
+
+  auto found = n4::find_sensitive<n4::sensitive_detector>("my-sd");
+  CHECK(found.has_value());
+
+  auto should_not_exist = n4::find_sensitive<n4::sensitive_detector>("this name has not been used");
+  CHECK(! should_not_exist.has_value());
+}
+
+
 TEST_CASE("nain clear_geometry", "[nain][clear_geometry]") {
   default_run_manager().run();
 
