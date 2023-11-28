@@ -1,8 +1,10 @@
 #include <arrow/api.h>
 
+#include <arrow/array/builder_nested.h>
 #include <arrow/io/api.h>
 #include <arrow/ipc/api.h>
 #include <arrow/csv/api.h>
+#include <arrow/type.h>
 #include <parquet/arrow/reader.h>
 #include <parquet/arrow/writer.h>
 
@@ -15,7 +17,9 @@
 
 struct vec { double x, y, z; };
 
-enum class process { photoelectric, compton, rayleigh };
+//enum struct process { photoelectric, compton, rayleigh };
+
+using process = unsigned;
 
 // struct hit_sipm {
 //   size_t sipm_id;
@@ -44,7 +48,27 @@ struct event {
 };
 
 
-
+std::vector<event> sample_of_events() {
+  event e1 = {
+    vec{1,2,3},
+    vec{4,5,6},
+    {
+      hit_gamma{{1,1,1}, 1, {hit_e{vec{1.1, 1.1, 1.1}, 1.11, 11},
+                             hit_e{vec{1.2, 1.2, 1.2}, 1.22, 12}}},
+      hit_gamma{{2,2,2}, 2, {hit_e{vec{2.2, 2.2, 2.2}, 2.22, 22}}},
+    }
+  };
+  event e2 = {
+    vec{10,20,30},
+    vec{40,50,60},
+    {
+      hit_gamma{{10,10,10}, 10, {hit_e{vec{10.1, 10.1, 10.1}, 10.11, 110},
+                                 hit_e{vec{10.2, 10.2, 10.2}, 10.22, 12}}},
+      hit_gamma{{20,20,20}, 20, {hit_e{vec{20.2, 20.2, 20.2}, 20.22, 220}}},
+    }
+  };
+  return {e1, e2};
+}
 
 
 arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> ipc_writer, std::shared_ptr<arrow::Table> data) {
@@ -247,6 +271,9 @@ const FLD make_event_field(const STR& name) {
   return arrow::field(name, arrow::struct_(event_fields));
 }
 
+std::shared_ptr<arrow::Schema> make_crystal_output_schema() {
+  return make_schema(arrow::field("Events", arrow::list(make_event_field("event"))));
+}
 
 arrow::Status generate_data_files() {
   arrow::Int8Builder int8builder;
@@ -283,35 +310,47 @@ arrow::Status generate_data_files() {
      field("Year" , int16));
   }();
 
-  auto rbatch = arrow::RecordBatch::Make(schema, days->length(), {days, months, years});
-  //std::cout << rbatch -> ToString() << std::endl;
+  // Without field_helper
+ schema = [] {
+   return make_schema(
+     arrow::field("Day"  , arrow::int8 ()),
+     arrow::field("Month", arrow::int8 ()),
+     arrow::field("Year" , arrow::int16()));
+  }();
 
-  ARROW_RETURN_NOT_OK(int8builder.AppendValues({6, 12, 3, 30, 22}));
-  std::shared_ptr<arrow::Array> days2;
-  ARROW_ASSIGN_OR_RAISE(days2, int8builder.Finish());
+ auto event_schema = make_crystal_output_schema();
 
-  ARROW_RETURN_NOT_OK(int8builder.AppendValues({5, 4, 11, 3, 2}));
-  std::shared_ptr<arrow::Array> months2;
-  ARROW_ASSIGN_OR_RAISE(months2, int8builder.Finish());
+ arrow::ListBuilder listbuildr;
 
-  ARROW_RETURN_NOT_OK(int16builder.AppendValues({1980, 2001, 1915, 2020, 1996}));
-  std::shared_ptr<arrow::Array> years2;
-  ARROW_ASSIGN_OR_RAISE(years2, int16builder.Finish());
+ auto rbatch = arrow::RecordBatch::Make(schema, days->length(), {days, months, years});
+ //std::cout << rbatch -> ToString() << std::endl;
 
-  auto   day_chunks = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{days  , days2  });
-  auto month_chunks = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{months, months2});
-  auto  year_chunks = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{years , years2 });
+ ARROW_RETURN_NOT_OK(int8builder.AppendValues({6, 12, 3, 30, 22}));
+ std::shared_ptr<arrow::Array> days2;
+ ARROW_ASSIGN_OR_RAISE(days2, int8builder.Finish());
 
-  auto table = arrow::Table      ::Make(schema, {day_chunks, month_chunks, year_chunks}, 10);
-  //std::cout << table -> ToString() << std::endl;
+ ARROW_RETURN_NOT_OK(int8builder.AppendValues({5, 4, 11, 3, 2}));
+ std::shared_ptr<arrow::Array> months2;
+ ARROW_ASSIGN_OR_RAISE(months2, int8builder.Finish());
 
-  ARROW_RETURN_NOT_OK(write_arrow  ("test_in_table.arrow"  , table));
-  ARROW_RETURN_NOT_OK(write_csv    ("test_in_table.csv"    , table));
-  ARROW_RETURN_NOT_OK(write_parquet("test_in_table.parquet", table));
+ ARROW_RETURN_NOT_OK(int16builder.AppendValues({1980, 2001, 1915, 2020, 1996}));
+ std::shared_ptr<arrow::Array> years2;
+ ARROW_ASSIGN_OR_RAISE(years2, int16builder.Finish());
 
-  ARROW_RETURN_NOT_OK(write_arrow  ("test_in_rbatch.arrow"  , rbatch));
-  ARROW_RETURN_NOT_OK(write_csv    ("test_in_rbatch.csv"    , rbatch));
-  //ARROW_RETURN_NOT_OK(write_parquet("test_in_rbatch.parquet", rbatch)); // TODO WriteRecordBatch not available for parquet?
+ auto   day_chunks = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{days  , days2  });
+ auto month_chunks = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{months, months2});
+ auto  year_chunks = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{years , years2 });
+
+ auto table = arrow::Table      ::Make(schema, {day_chunks, month_chunks, year_chunks}, 10);
+ //std::cout << table -> ToString() << std::endl;
+
+ ARROW_RETURN_NOT_OK(write_arrow  ("test_in_table.arrow"  , table));
+ ARROW_RETURN_NOT_OK(write_csv    ("test_in_table.csv"    , table));
+ ARROW_RETURN_NOT_OK(write_parquet("test_in_table.parquet", table));
+
+ ARROW_RETURN_NOT_OK(write_arrow  ("test_in_rbatch.arrow"  , rbatch));
+ ARROW_RETURN_NOT_OK(write_csv    ("test_in_rbatch.csv"    , rbatch));
+ //ARROW_RETURN_NOT_OK(write_parquet("test_in_rbatch.parquet", rbatch)); // TODO WriteRecordBatch not available for parquet?
 
   return arrow::Status::OK();
 }
