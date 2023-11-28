@@ -11,6 +11,41 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <unordered_map>
+
+struct vec { double x, y, z; };
+
+enum class process { photoelectric, compton, rayleigh };
+
+// struct hit_sipm {
+//   size_t sipm_id;
+//   size_t photon_count;
+// };
+
+struct hit_e {
+  vec position;
+  double E;
+  size_t n_photons;
+};
+
+struct hit_gamma {
+  vec position;
+  process kind;
+  std::vector<hit_e> hits_e;
+};
+
+struct event {
+  // TODO metadata  material, config, sizes etc. git hash
+  // size_t event_id? // Is this necessary at all?
+  vec                    primary_position;
+  vec                    primary_momentum;
+  std::vector<hit_gamma> hits_gamma;
+//std::vector<hit_sipm>  hits_sipm;
+};
+
+
+
+
 
 arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> ipc_writer, std::shared_ptr<arrow::Table> data) {
   ARROW_RETURN_NOT_OK(ipc_writer -> WriteTable(*data));
@@ -106,6 +141,7 @@ std::shared_ptr<arrow::Schema> make_schema(FIELDS&&... fields) {
 }
 
 // Some typedefs to reduce noise
+using DTT = std::shared_ptr<arrow::DataType>;
 using FLD = std::shared_ptr<arrow::Field>;
 using STR = std::string;
 using VFD = std::vector<std::shared_ptr<arrow::Field>>;
@@ -128,8 +164,14 @@ namespace field_helper_2 {
   // Can reduce verbosity by ensuring that unqualified constructors are in scope
   using arrow::int8;
   using arrow::int16;
+  using arrow::uint8;
+  using arrow::uint32;
+  using arrow::uint64;
   using arrow::utf8;
+  using arrow::float16;
   using arrow::struct_;
+  using arrow::list;
+  using arrow::large_list;
   // ... and so on for every Arrow type
 }
 
@@ -170,6 +212,41 @@ void show_usage_without_field_helper() {
     arrow::field("C", arrow::struct_(some_fields))
  );
 }
+
+const FLD make_vec_field(const STR& name) {
+  using namespace field_helper_2;
+  static auto x = field("x", float16);
+  static auto y = field("y", float16);
+  static auto z = field("z", float16);
+  static VFD vec_fields{x,y,z};
+  return field(name, struct_, vec_fields);
+}
+
+const FLD make_hit_e_field(const STR& name) {
+  using namespace field_helper_2;
+  static auto position  = make_vec_field("position");
+  static auto E         = field("E", float16);
+  static auto n_photons = field("n_photons", uint64);
+  static VFD hit_e_fields{position, E, n_photons};
+  return field(name, struct_, hit_e_fields);
+}
+
+const FLD make_hit_gamma_field(const STR& name) {
+  static auto position  = make_vec_field("position");
+  static auto kind      = field("kind", arrow::uint8());
+  static auto hits_e = arrow::field("hits_e", arrow::list(make_hit_e_field("e_field")));
+  static VFD hit_e_fields{position, kind, hits_e};
+  return arrow::field(name, arrow::struct_(hit_e_fields));
+}
+
+const FLD make_event_field(const STR& name) {
+  static auto primary_position = make_vec_field("primary_position");
+  static auto primary_momentum = make_vec_field("primary_momentum");
+  static auto hits_gamma = arrow::field("hits_gamma", arrow::list(make_hit_gamma_field("hits_gamma")));
+  static VFD event_fields{primary_position, primary_momentum, hits_gamma};
+  return arrow::field(name, arrow::struct_(event_fields));
+}
+
 
 arrow::Status generate_data_files() {
   arrow::Int8Builder int8builder;
@@ -256,6 +333,7 @@ arrow::Status read_data_files() {
 arrow::Status arrow_main() {
   ARROW_RETURN_NOT_OK(generate_data_files());
   ARROW_RETURN_NOT_OK(    read_data_files());
+  return arrow::Status::OK();
 }
 
 int main() {
