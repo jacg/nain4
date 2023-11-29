@@ -276,6 +276,8 @@ const FLD make_event_field(const STR& name) {
   return arrow::field(name, arrow::struct_(event_fields));
 }
 
+template<class T> void print(T data, std::ostream& out=std::cout) { out << data -> ToString() << std::endl; }
+
 std::shared_ptr<arrow::Schema> make_crystal_output_schema() {
   return make_schema(arrow::field("Events", arrow::list(make_event_field("event"))));
 }
@@ -324,7 +326,7 @@ arrow::Status generate_data_files() {
   }();
 
  auto rbatch = arrow::RecordBatch::Make(schema, days->length(), {days, months, years});
- //std::cout << rbatch -> ToString() << std::endl;
+ //print(rbatch);
 
  ARROW_RETURN_NOT_OK(int8builder.AppendValues({6, 12, 3, 30, 22}));
  std::shared_ptr<arrow::Array> days2;
@@ -343,7 +345,7 @@ arrow::Status generate_data_files() {
  auto  year_chunks = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{years , years2 });
 
  auto table = arrow::Table      ::Make(schema, {day_chunks, month_chunks, year_chunks}, 10);
- //std::cout << table -> ToString() << std::endl;
+ //print(table);
 
  ARROW_RETURN_NOT_OK(write_arrow  ("test_in_table.arrow"  , table));
  ARROW_RETURN_NOT_OK(write_csv    ("test_in_table.csv"    , table));
@@ -358,11 +360,11 @@ arrow::Status generate_data_files() {
 
 arrow::Status read_data_files() {
 
-  ARROW_ASSIGN_OR_RAISE(auto  table, read_csv    ("test_in_table.csv"    ));  //std::cout << table  -> ToString() << std::endl;
-  ARROW_ASSIGN_OR_RAISE(      table, read_parquet("test_in_table.parquet"));    std::cout << table  -> ToString() << std::endl;
+  ARROW_ASSIGN_OR_RAISE(auto  table, read_csv    ("test_in_table.csv"    ));  // print(table);
+  ARROW_ASSIGN_OR_RAISE(      table, read_parquet("test_in_table.parquet"));     print(table);
 
-  ARROW_ASSIGN_OR_RAISE(auto rbatch, read_arrow  ("test_in_rbatch.arrow" ));  //std::cout << rbatch -> ToString() << std::endl;
-  ARROW_ASSIGN_OR_RAISE(      table, read_csv    ("test_in_rbatch.csv"   ));  //std::cout << table  -> ToString() << std::endl;
+  ARROW_ASSIGN_OR_RAISE(auto rbatch, read_arrow  ("test_in_rbatch.arrow" ));  // print(rbatch);
+  ARROW_ASSIGN_OR_RAISE(      table, read_csv    ("test_in_rbatch.csv"   ));  // print(table);
 
   return arrow::Status::OK();
 
@@ -422,29 +424,28 @@ arrow::Status list_example() {
   ARROW_RETURN_NOT_OK(build_1.Finish(&a1)); // ARROW_ASSIGN_OR_RAISE(a1, build_1.Finish());
   ARROW_RETURN_NOT_OK(build_2.Finish(&a2));
   auto rbatch = arrow::RecordBatch::Make(schema, a0->length(), {a0, a1, a2});
-  //std::cout << rbatch -> ToString() << std::endl;
+  //print(rbatch);
 
   // ARROW_RETURN_NOT_OK(write_csv("with-lists.csv", rbatch)); // Lists not supported by CSV, no surprise there
   ARROW_RETURN_NOT_OK(            write_arrow("with-lists.arrow", rbatch));
   ARROW_ASSIGN_OR_RAISE(auto data, read_arrow("with-lists.arrow"));
-  //std::cout << data -> ToString() << std::endl;
+  //print(data);
 
- auto chunks_0 = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{a0, a0});
- auto chunks_1 = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{a1, a1});
- auto chunks_2 = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{a2, a2});
+  auto chunks_0 = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{a0, a0});
+  auto chunks_1 = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{a1, a1});
+  auto chunks_2 = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{a2, a2});
 
- auto table = arrow::Table      ::Make(schema, {chunks_0, chunks_1, chunks_2});
- std::cout << table -> ToString() << std::endl;
+  auto table = arrow::Table      ::Make(schema, {chunks_0, chunks_1, chunks_2});
+  print(table);
 
- ARROW_RETURN_NOT_OK(               write_parquet("with-lists.parquet", table));
- ARROW_ASSIGN_OR_RAISE(auto table2, read_parquet("with-lists.parquet"));
- std::cout << table2 -> ToString() << std::endl;
- std::cout << table  -> ToString() << std::endl;
+  ARROW_RETURN_NOT_OK(               write_parquet("with-lists.parquet", table));
+  ARROW_ASSIGN_OR_RAISE(auto table2, read_parquet("with-lists.parquet"));
+  print(table2);
 
   return arrow::Status::OK();
 }
 
-arrow::Status crystal_io() {
+arrow::Status crystal_io_proof_of_concept() {
   auto pool = arrow::default_memory_pool();
   auto event_schema = make_crystal_output_schema();
 
