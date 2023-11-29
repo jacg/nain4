@@ -561,6 +561,16 @@ arrow::Status serialize_me_proof_of_concept() {
   ARROW_ASSIGN_OR_RAISE(auto table2, read_parquet("structs.parquet"));
   print(table2);
 
+  DBG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+  print(table2 -> field(0));
+  DBG("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+  print(table2 -> column(0));
+  DBG("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+  print(table2 -> Slice(2,2));
+  DBG("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+  ARROW_ASSIGN_OR_RAISE(auto grr, table2 -> column(0) -> GetScalar(3));
+
+
   return arrow::Status::OK();
 }
 
