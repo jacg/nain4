@@ -19,6 +19,8 @@
 
 #define DBG(stuff) std::cout << stuff << std::endl;
 
+// ===== Event model expressed in plain C++ ==================================================
+
 struct vec { double x, y, z; };
 
 //enum struct process { photoelectric, compton, rayleigh };
@@ -73,6 +75,31 @@ std::vector<event> sample_of_events() {
   };
   return {e1, e2};
 }
+
+// ===== Columnar version of event model ============================================================
+
+// + run
+//   x   : float
+//   y   : float
+//   z   : float
+//   px  : float
+//   py  : float
+//   pz  : float
+//   hits: list[gamma_hit]
+
+// + gamma_hit
+//   x      : float
+//   y      : float
+//   z      : float
+//   process: kind (probably uint8)
+//   hits   : list[electron_hit]
+
+// + electron_hit
+//   x        : float
+//   y        : float
+//   z        : float
+//   E        : float
+//   n_photons: uint32
 
 // =================================== Functions for writing data ==================================================
 // 2 varieties of  input: 1. table  2. record batch
