@@ -8,12 +8,13 @@
 #include <parquet/arrow/reader.h>
 #include <parquet/arrow/writer.h>
 
-
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <unordered_map>
+
+#define DBG(stuff) std::cout << stuff << std::endl;
 
 struct vec { double x, y, z; };
 
@@ -171,11 +172,14 @@ using STR = std::string;
 using VFD = std::vector<std::shared_ptr<arrow::Field>>;
 
 namespace field_helper_1 {
+  using arrow::field;
   // Need to write a function for creating a field of each and every Arrow type
-  const FLD int8   (STR name)                    { return arrow::field(name, arrow::int8   (      )); }
-  const FLD int16  (STR name)                    { return arrow::field(name, arrow::int16  (      )); }
-  const FLD utf8   (STR name)                    { return arrow::field(name, arrow::utf8   (      )); }
-  const FLD struct_(STR name, const VFD& fields) { return arrow::field(name, arrow::struct_(fields)); }
+  const FLD int8   (STR name)                    { return field(name, arrow::int8   (      )); }
+  const FLD int16  (STR name)                    { return field(name, arrow::int16  (      )); }
+  const FLD int32  (STR name)                    { return field(name, arrow::int32  (      )); }
+  const FLD utf8   (STR name)                    { return field(name, arrow::utf8   (      )); }
+  const FLD struct_(STR name, const VFD& fields) { return field(name, arrow::struct_(fields)); }
+  const FLD list   (STR name, const DTT& dtype ) { return field(name, arrow::list   (dtype )); }
   // ... and so on for every Arrow type
 };
 
@@ -188,6 +192,7 @@ namespace field_helper_2 {
   // Can reduce verbosity by ensuring that unqualified constructors are in scope
   using arrow::int8;
   using arrow::int16;
+  using arrow::int32;
   using arrow::uint8;
   using arrow::uint32;
   using arrow::uint64;
@@ -318,10 +323,6 @@ arrow::Status generate_data_files() {
      arrow::field("Year" , arrow::int16()));
   }();
 
- auto event_schema = make_crystal_output_schema();
-
- arrow::ListBuilder listbuildr;
-
  auto rbatch = arrow::RecordBatch::Make(schema, days->length(), {days, months, years});
  //std::cout << rbatch -> ToString() << std::endl;
 
@@ -355,8 +356,6 @@ arrow::Status generate_data_files() {
   return arrow::Status::OK();
 }
 
-
-
 arrow::Status read_data_files() {
 
   ARROW_ASSIGN_OR_RAISE(auto  table, read_csv    ("test_in_table.csv"    ));  //std::cout << table  -> ToString() << std::endl;
@@ -369,9 +368,93 @@ arrow::Status read_data_files() {
 
 }
 
+template <class BuilderType, class T>
+arrow::Status append_values(BuilderType* builder, const std::vector<T>& values) {
+  ARROW_RETURN_NOT_OK(builder -> AppendValues(values));
+  return arrow::Status::OK();
+}
+
+template <class ValueType, class T>
+arrow::Status append_list(arrow::ListBuilder* builder, const std::vector<std::vector<T>>& values) {
+  auto values_builder = dynamic_cast<ValueType*>(builder -> value_builder());
+  if (! values_builder) { throw "up"; }
+  for (auto& list: values) {
+    ARROW_RETURN_NOT_OK(builder -> Append());
+    ARROW_RETURN_NOT_OK(append_values(values_builder, list));
+  }
+  return arrow::Status::OK();
+}
+
+std::shared_ptr<arrow::Schema> list_example_schema() {
+  using namespace field_helper_1;
+  return make_schema(
+    int32("f0"),
+    utf8 ("f1"),
+    list ("f2", arrow::int8()));
+}
+
+arrow::Status list_example() {
+  auto pool = arrow::default_memory_pool();
+  auto schema = list_example_schema();
+
+  std::vector<int32_t>             f0{0,1,2,3};
+  std::vector<std::string>         f1{"zero", "one", "two", "three"};
+  std::vector<std::vector<int8_t>> f2{{}, {0,1}, {}, {2}};
+
+  std::shared_ptr<arrow::Array> a0, a1, a2;
+  auto append_data = [&] (
+    arrow::Int32Builder * b0,
+    arrow::StringBuilder* b1,
+    arrow::ListBuilder  * b2)
+  {
+    ARROW_RETURN_NOT_OK(append_values                   (b0, f0));
+    ARROW_RETURN_NOT_OK(append_values                   (b1, f1));
+    ARROW_RETURN_NOT_OK(append_list<arrow::Int8Builder> (b2, f2));
+    return arrow::Status::OK();
+  };
+
+  arrow::Int32Builder  build_0;
+  arrow::StringBuilder build_1;
+  arrow::ListBuilder   build_2{pool, std::make_unique<arrow::Int8Builder>(pool)};
+
+  ARROW_RETURN_NOT_OK(append_data(&build_0, &build_1, &build_2));
+  ARROW_RETURN_NOT_OK(build_0.Finish(&a0));
+  ARROW_RETURN_NOT_OK(build_1.Finish(&a1)); // ARROW_ASSIGN_OR_RAISE(a1, build_1.Finish());
+  ARROW_RETURN_NOT_OK(build_2.Finish(&a2));
+  auto rbatch = arrow::RecordBatch::Make(schema, a0->length(), {a0, a1, a2});
+  //std::cout << rbatch -> ToString() << std::endl;
+
+  // ARROW_RETURN_NOT_OK(write_csv("with-lists.csv", rbatch)); // Lists not supported by CSV, no surprise there
+  ARROW_RETURN_NOT_OK(            write_arrow("with-lists.arrow", rbatch));
+  ARROW_ASSIGN_OR_RAISE(auto data, read_arrow("with-lists.arrow"));
+  //std::cout << data -> ToString() << std::endl;
+
+ auto chunks_0 = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{a0, a0});
+ auto chunks_1 = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{a1, a1});
+ auto chunks_2 = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{a2, a2});
+
+ auto table = arrow::Table      ::Make(schema, {chunks_0, chunks_1, chunks_2});
+ std::cout << table -> ToString() << std::endl;
+
+ ARROW_RETURN_NOT_OK(               write_parquet("with-lists.parquet", table));
+ ARROW_ASSIGN_OR_RAISE(auto table2, read_parquet("with-lists.parquet"));
+ std::cout << table2 -> ToString() << std::endl;
+ std::cout << table  -> ToString() << std::endl;
+
+  return arrow::Status::OK();
+}
+
+arrow::Status crystal_io() {
+  auto pool = arrow::default_memory_pool();
+  auto event_schema = make_crystal_output_schema();
+
+}
+
+
 arrow::Status arrow_main() {
-  ARROW_RETURN_NOT_OK(generate_data_files());
-  ARROW_RETURN_NOT_OK(    read_data_files());
+  ARROW_RETURN_NOT_OK(list_example());
+  // ARROW_RETURN_NOT_OK(generate_data_files());
+  // ARROW_RETURN_NOT_OK(    read_data_files());
   return arrow::Status::OK();
 }
 
