@@ -207,6 +207,7 @@ namespace field_helper_1 {
   const FLD int8   (STR name)                    { return field(name, arrow::int8   (      )); }
   const FLD int16  (STR name)                    { return field(name, arrow::int16  (      )); }
   const FLD int32  (STR name)                    { return field(name, arrow::int32  (      )); }
+  const FLD float32(STR name)                    { return field(name, arrow::float32(      )); }
   const FLD utf8   (STR name)                    { return field(name, arrow::utf8   (      )); }
   const FLD struct_(STR name, const VFD& fields) { return field(name, arrow::struct_(fields)); }
   const FLD list   (STR name, const DTT& dtype ) { return field(name, arrow::list   (dtype )); }
@@ -312,6 +313,18 @@ std::shared_ptr<arrow::Schema> make_crystal_output_schema() {
   return make_schema(make_event_field("event"));
 }
 
+std::shared_ptr<arrow::Schema> make_columnar_crystal_output_schema() {
+  using namespace field_helper_1;
+  return make_schema( float32( "x")
+                    , float32( "y")
+                    , float32( "z")
+                    , float32("px")
+                    , float32("py")
+                    , float32("pz")
+                    // TODO: list of gamma-hits
+  );
+}
+
 arrow::Status generate_data_files() {
   arrow::Int8Builder int8builder;
   int8_t days_raw[5] = {1, 12, 17, 23, 28};
@@ -406,6 +419,33 @@ arrow::Status append_values(BuilderType* builder, const std::vector<T>& values) 
   return arrow::Status::OK();
 }
 
+// template <class T>
+// arrow::Status append_structs(arrow::StructBuilder* builder, const std::vector<T>& values) {
+//   std::vector<std::shared_ptr<arrow::Scalar>> scalars;
+//   scalars.reserve(values.size());
+//   for (const auto& value : values) {
+//     ARROW_ASSIGN_OR_RAISE(auto one_scalar, arrow::MakeScalar(builder->type(), value));
+//     scalars.push_back(one_scalar);
+//   }
+//   ARROW_RETURN_NOT_OK(builder->AppendScalars(scalars));
+//   return arrow::Status::OK();
+// }
+
+template <class ValueType_A, class ValueType_B, class T>
+arrow::Status append_structs(arrow::StructBuilder* builder, const std::vector<T>& values) {
+  auto as_builder = dynamic_cast<ValueType_A*>(builder -> field_builder(0));
+  auto bs_builder = dynamic_cast<ValueType_B*>(builder -> field_builder(1));
+  DBG("builder pointers in append_structs  " << as_builder << "    -----    " << bs_builder);
+  if (! (as_builder && bs_builder)) { throw "up"; }
+
+  for (auto& v: values) {
+    ARROW_RETURN_NOT_OK(builder -> Append());
+    ARROW_RETURN_NOT_OK(as_builder -> Append(v.a));
+    ARROW_RETURN_NOT_OK(bs_builder -> Append(v.b));
+  }
+  return arrow::Status::OK();
+}
+
 template <class ValueType, class T>
 arrow::Status append_list(arrow::ListBuilder* builder, const std::vector<std::vector<T>>& values) {
   auto values_builder = dynamic_cast<ValueType*>(builder -> value_builder());
@@ -469,37 +509,90 @@ arrow::Status list_example() {
   auto table = arrow::Table      ::Make(schema, {chunks_0, chunks_1, chunks_2});
   print(table);
 
-  ARROW_RETURN_NOT_OK(               write_parquet("with-lists.parquet", table));
+  ARROW_RETURN_NOT_OK(              write_parquet("with-lists.parquet", table));
   ARROW_ASSIGN_OR_RAISE(auto table2, read_parquet("with-lists.parquet"));
   print(table2);
 
   return arrow::Status::OK();
 }
 
-arrow::Status crystal_io_proof_of_concept() {
-  auto pool = arrow::default_memory_pool();
-  auto event_schema = make_crystal_output_schema();
+// ----- Struct proof of concept ------------------------------------------------------------
 
-  auto events_std_vector = sample_of_events();
-  std::shared_ptr<arrow::Array> events_array;
+// A struct to be serialized
+struct serialize_me { int16_t a; float b; };
 
-  // auto append_data = [&] (arrow::StructBuilder* struct_builder) {
-  //   ARROW_RETURN_NOT_OK(append_values(struct_builder, events_std_vector));
-  //   return arrow::Status::OK();
-  // };
-  // FLD event_field     = make_event_field("Event");
-  // DTT event_data_type = event_field->type();
-
-  // std::unique_ptr<arrow::ArrayBuilder> fuck;
-  // ARROW_RETURN_NOT_OK(arrow::MakeBuilder(pool, event_data_type, &fuck));
-  // auto clusterfuck = std::make_shared<arrow::StructBuilder>(dynamic_cast<arrow::StructBuilder*>(fuck.release()));
-
-
+// The schema describing the fields of the struct
+std::tuple<
+  FLD,
+  std::shared_ptr<arrow::Schema>
+>
+make_serialize_me_schema() {
+  using namespace field_helper_1;
+  auto field = struct_("whatever", {int16("A"), float32("B")});
+  return {field, make_schema(field)};
 }
+
+arrow::Status serialize_me_proof_of_concept() {
+  auto pool = arrow::default_memory_pool();
+
+  auto append_data = [] (arrow::StructBuilder& struct_builder, const std::vector<serialize_me>& data) {
+    auto fuck_C_macros = append_structs<arrow::Int16Builder, arrow::FloatBuilder>(&struct_builder, data);
+    ARROW_RETURN_NOT_OK(fuck_C_macros);
+    return arrow::Status::OK();
+  };
+
+  auto build_int8  = std::make_shared<arrow::Int16Builder>() ;
+  auto build_float = std::make_shared<arrow::FloatBuilder>() ;
+
+  auto [field, schema] = make_serialize_me_schema();
+  arrow::StructBuilder struct_builder{field -> type(), pool, {build_int8, build_float}};
+
+  std::vector<serialize_me> std_vector_of_data {{1,1.1}, {2,2.2}, {2,3.4}};
+  ARROW_RETURN_NOT_OK(append_data(struct_builder, std_vector_of_data));
+
+  std::shared_ptr<arrow::Array> the_array;
+  ARROW_RETURN_NOT_OK(struct_builder.Finish(&the_array));
+
+  auto the_chunks = std::make_shared<arrow::ChunkedArray>(arrow::ArrayVector{the_array, the_array});
+  auto table = arrow::Table::Make(schema, {the_chunks});
+  print(table);
+
+  ARROW_RETURN_NOT_OK(              write_parquet("structs.parquet", table));
+  ARROW_ASSIGN_OR_RAISE(auto table2, read_parquet("structs.parquet"));
+  print(table2);
+
+  return arrow::Status::OK();
+}
+
+// arrow::Status crystal_io_proof_of_concept() {
+//   auto pool = arrow::default_memory_pool();
+//   auto event_schema = make_crystal_output_schema();
+
+//   std::vector<event> events_std_vector = sample_of_events();
+//   std::shared_ptr<arrow::Array> events_array;
+
+//   auto append_data = [&] (arrow::StructBuilder* struct_builder) {
+//     ARROW_RETURN_NOT_OK(append_structs(struct_builder, events_std_vector));
+//     return arrow::Status::OK();
+//   };
+
+//   // ARROW_RETURN_NOT_OK(append_data(arrow::StructBuilder *struct_builder));
+
+//   arrow::struct_(const std::vector<std::shared_ptr<Field>> &fields)
+
+//   FLD event_field     = make_event_field("Event");
+//   DTT event_data_type = event_field->type();
+
+//   std::unique_ptr<arrow::ArrayBuilder> array_builder;
+//   ARROW_RETURN_NOT_OK(arrow::MakeBuilder(pool, event_data_type, &array_builder));
+//   auto clusterfuck = std::make_shared<arrow::StructBuilder>(dynamic_cast<arrow::StructBuilder*>(array_builder.release()));
+
+// }
 
 
 arrow::Status arrow_main() {
-  ARROW_RETURN_NOT_OK(list_example());
+  ARROW_RETURN_NOT_OK(serialize_me_proof_of_concept());
+  // ARROW_RETURN_NOT_OK(list_example());
   // ARROW_RETURN_NOT_OK(generate_data_files());
   // ARROW_RETURN_NOT_OK(    read_data_files());
   return arrow::Status::OK();
