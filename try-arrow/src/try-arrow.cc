@@ -1,9 +1,12 @@
 #include <arrow/api.h>
 
+#include <arrow/array/array_base.h>
+#include <arrow/array/builder_base.h>
 #include <arrow/array/builder_nested.h>
 #include <arrow/io/api.h>
 #include <arrow/ipc/api.h>
 #include <arrow/csv/api.h>
+#include <arrow/status.h>
 #include <arrow/type.h>
 #include <parquet/arrow/reader.h>
 #include <parquet/arrow/writer.h>
@@ -399,21 +402,22 @@ arrow::Status list_example() {
   auto pool = arrow::default_memory_pool();
   auto schema = list_example_schema();
 
-  std::vector<int32_t>             f0{0,1,2,3};
-  std::vector<std::string>         f1{"zero", "one", "two", "three"};
-  std::vector<std::vector<int8_t>> f2{{}, {0,1}, {}, {2}};
+  std::vector<int32_t>             vec_0{0,1,2,3};
+  std::vector<std::string>         vec_1{"zero", "one", "two", "three"};
+  std::vector<std::vector<int8_t>> vec_2{{}, {0,1}, {}, {2}};
 
-  std::shared_ptr<arrow::Array> a0, a1, a2;
   auto append_data = [&] (
     arrow::Int32Builder * b0,
     arrow::StringBuilder* b1,
     arrow::ListBuilder  * b2)
   {
-    ARROW_RETURN_NOT_OK(append_values                   (b0, f0));
-    ARROW_RETURN_NOT_OK(append_values                   (b1, f1));
-    ARROW_RETURN_NOT_OK(append_list<arrow::Int8Builder> (b2, f2));
+    ARROW_RETURN_NOT_OK(append_values                   (b0, vec_0));
+    ARROW_RETURN_NOT_OK(append_values                   (b1, vec_1));
+    ARROW_RETURN_NOT_OK(append_list<arrow::Int8Builder> (b2, vec_2));
     return arrow::Status::OK();
   };
+
+  std::shared_ptr<arrow::Array> a0, a1, a2;
 
   arrow::Int32Builder  build_0;
   arrow::StringBuilder build_1;
@@ -448,6 +452,21 @@ arrow::Status list_example() {
 arrow::Status crystal_io_proof_of_concept() {
   auto pool = arrow::default_memory_pool();
   auto event_schema = make_crystal_output_schema();
+
+  auto events_std_vector = sample_of_events();
+  std::shared_ptr<arrow::Array> events_array;
+
+  auto append_data = [&] (arrow::StructBuilder* struct_builder) {
+    ARROW_RETURN_NOT_OK(append_values(struct_builder, events_std_vector));
+    return arrow::Status::OK();
+  };
+  FLD event_field     = make_event_field("Event");
+  DTT event_data_type = event_field->type();
+
+  std::unique_ptr<arrow::ArrayBuilder> fuck;
+  ARROW_RETURN_NOT_OK(arrow::MakeBuilder(pool, event_data_type, &fuck));
+  auto clusterfuck = std::make_shared<arrow::StructBuilder>(dynamic_cast<arrow::StructBuilder*>(fuck.release()));
+
 
 }
 
