@@ -279,7 +279,7 @@ const FLD make_event_field(const STR& name) {
 template<class T> void print(T data, std::ostream& out=std::cout) { out << data -> ToString() << std::endl; }
 
 std::shared_ptr<arrow::Schema> make_crystal_output_schema() {
-  return make_schema(arrow::field("Events", arrow::list(make_event_field("event"))));
+  return make_schema(make_event_field("event"));
 }
 
 arrow::Status generate_data_files() {
