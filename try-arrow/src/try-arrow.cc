@@ -70,17 +70,22 @@ std::vector<event> sample_of_events() {
   return {e1, e2};
 }
 
+// =================================== Functions for writing data ==================================================
+// 2 varieties of  input: 1. table  2. record batch
+// 3 varieties of output: 1. Arrow  2. CSV  3. Parquet
+// The following functions
 
-arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> ipc_writer, std::shared_ptr<arrow::Table> data) {
-  ARROW_RETURN_NOT_OK(ipc_writer -> WriteTable(*data));
-  return arrow::Status::OK();
+#define DEFINE_WRITE_DATA_FUNCTION(THING)                                                                                 \
+arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> ipc_writer, std::shared_ptr<arrow::THING> data) { \
+  ARROW_RETURN_NOT_OK(ipc_writer -> Write##THING(*data));                                                                 \
+  return arrow::Status::OK();                                                                                             \
 }
 
-arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> ipc_writer, std::shared_ptr<arrow::RecordBatch> data) {
-  ARROW_RETURN_NOT_OK(ipc_writer -> WriteRecordBatch(*data));
-  return arrow::Status::OK();
-}
+DEFINE_WRITE_DATA_FUNCTION(Table)
+DEFINE_WRITE_DATA_FUNCTION(RecordBatch)
 
+#undef DEFINE_WRITE_DATA_FUNCTION
+// ----- Three functions
 template<class T>
 arrow::Status write_arrow(
   std::string filename,
