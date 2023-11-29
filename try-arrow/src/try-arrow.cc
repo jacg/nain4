@@ -75,43 +75,31 @@ std::vector<event> sample_of_events() {
 // 3 varieties of output: 1. Arrow  2. CSV  3. Parquet
 // The following functions
 
-#define DEFINE_WRITE_DATA_FUNCTION(THING)                                                                             \
-arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> writer, std::shared_ptr<arrow::THING> data) { \
-  ARROW_RETURN_NOT_OK(writer -> Write##THING(*data));                                                                 \
-  return arrow::Status::OK();                                                                                         \
+#define DEFINE_WRITE_DATA_FUNCTION(INPUT_FORMAT)                                                                             \
+arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> writer, std::shared_ptr<arrow::INPUT_FORMAT> data) { \
+  ARROW_RETURN_NOT_OK(writer -> Write##INPUT_FORMAT(*data));                                                                 \
+  return arrow::Status::OK();                                                                                                \
 }
 
 DEFINE_WRITE_DATA_FUNCTION(Table)
 DEFINE_WRITE_DATA_FUNCTION(RecordBatch)
 
 #undef DEFINE_WRITE_DATA_FUNCTION
-// ----- Three functions
-template<class T>
-arrow::Status write_arrow(
-  std::string filename,
-  std::shared_ptr<T> data
-) {
-  std::shared_ptr<arrow::io::FileOutputStream> outfile;
-  ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open(filename));
-  ARROW_ASSIGN_OR_RAISE(auto writer, arrow::ipc::MakeFileWriter(outfile, data -> schema()));
-  ARROW_RETURN_NOT_OK(write_data(writer, data));
-  ARROW_RETURN_NOT_OK(writer -> Close());
-  return arrow::Status::OK();
-}
 
-template<class T>
-arrow::Status write_csv(
-  std::string filename,
-  std::shared_ptr<T> data
-) {
-  std::shared_ptr<arrow::io::FileOutputStream> outfile;
-  ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open(filename));
-  ARROW_ASSIGN_OR_RAISE(auto writer, arrow::csv::MakeCSVWriter(outfile, data -> schema()));
-  ARROW_RETURN_NOT_OK(write_data(writer, data));
-  ARROW_RETURN_NOT_OK(writer -> Close());
-  return arrow::Status::OK();
+// Writing to CSV and Arrow is very similar
+#define DEFINE_WRITE_FORMAT_FUNCTION(OUTPUT_FORMAT, WRITER, INPUT_FORMAT)       \
+arrow::Status write_##OUTPUT_FORMAT(                                            \
+  std::string filename,                                                         \
+  std::shared_ptr<arrow::INPUT_FORMAT> data                                     \
+) {                                                                             \
+  std::shared_ptr<arrow::io::FileOutputStream> outfile;                         \
+  ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open(filename));  \
+  ARROW_ASSIGN_OR_RAISE(auto writer, arrow::WRITER(outfile, data -> schema())); \
+  ARROW_RETURN_NOT_OK(write_data(writer, data));                                \
+  ARROW_RETURN_NOT_OK(writer -> Close());                                       \
+  return arrow::Status::OK();                                                   \
 }
-
+// But writing to parquet looks a bit different. Seems to need the memory pool.
 arrow::Status write_parquet(
   std::string filename,
   std::shared_ptr<arrow::Table> data,
@@ -122,6 +110,13 @@ arrow::Status write_parquet(
   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(*data, arrow::default_memory_pool(), outfile, chunk_size));
   return arrow::Status::OK();
 }
+
+DEFINE_WRITE_FORMAT_FUNCTION(arrow, ipc::MakeFileWriter, Table)
+DEFINE_WRITE_FORMAT_FUNCTION(arrow, ipc::MakeFileWriter, RecordBatch)
+DEFINE_WRITE_FORMAT_FUNCTION(csv  , csv::MakeCSVWriter , Table)
+DEFINE_WRITE_FORMAT_FUNCTION(csv  , csv::MakeCSVWriter , RecordBatch)
+
+#undef DEFINE_WRITE_FORMAT_FUNCTION
 
 arrow::Result<std::shared_ptr<arrow::Table>> read_parquet(std::string filename) {
   std::shared_ptr<arrow::io::ReadableFile> infile;
