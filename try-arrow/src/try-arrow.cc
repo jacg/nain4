@@ -456,16 +456,16 @@ arrow::Status crystal_io_proof_of_concept() {
   auto events_std_vector = sample_of_events();
   std::shared_ptr<arrow::Array> events_array;
 
-  auto append_data = [&] (arrow::StructBuilder* struct_builder) {
-    ARROW_RETURN_NOT_OK(append_values(struct_builder, events_std_vector));
-    return arrow::Status::OK();
-  };
-  FLD event_field     = make_event_field("Event");
-  DTT event_data_type = event_field->type();
+  // auto append_data = [&] (arrow::StructBuilder* struct_builder) {
+  //   ARROW_RETURN_NOT_OK(append_values(struct_builder, events_std_vector));
+  //   return arrow::Status::OK();
+  // };
+  // FLD event_field     = make_event_field("Event");
+  // DTT event_data_type = event_field->type();
 
-  std::unique_ptr<arrow::ArrayBuilder> fuck;
-  ARROW_RETURN_NOT_OK(arrow::MakeBuilder(pool, event_data_type, &fuck));
-  auto clusterfuck = std::make_shared<arrow::StructBuilder>(dynamic_cast<arrow::StructBuilder*>(fuck.release()));
+  // std::unique_ptr<arrow::ArrayBuilder> fuck;
+  // ARROW_RETURN_NOT_OK(arrow::MakeBuilder(pool, event_data_type, &fuck));
+  // auto clusterfuck = std::make_shared<arrow::StructBuilder>(dynamic_cast<arrow::StructBuilder*>(fuck.release()));
 
 
 }
