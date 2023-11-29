@@ -75,10 +75,10 @@ std::vector<event> sample_of_events() {
 // 3 varieties of output: 1. Arrow  2. CSV  3. Parquet
 // The following functions
 
-#define DEFINE_WRITE_DATA_FUNCTION(THING)                                                                                 \
-arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> ipc_writer, std::shared_ptr<arrow::THING> data) { \
-  ARROW_RETURN_NOT_OK(ipc_writer -> Write##THING(*data));                                                                 \
-  return arrow::Status::OK();                                                                                             \
+#define DEFINE_WRITE_DATA_FUNCTION(THING)                                                                             \
+arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> writer, std::shared_ptr<arrow::THING> data) { \
+  ARROW_RETURN_NOT_OK(writer -> Write##THING(*data));                                                                 \
+  return arrow::Status::OK();                                                                                         \
 }
 
 DEFINE_WRITE_DATA_FUNCTION(Table)
@@ -93,9 +93,9 @@ arrow::Status write_arrow(
 ) {
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
   ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open(filename));
-  ARROW_ASSIGN_OR_RAISE(auto ipc_writer, arrow::ipc::MakeFileWriter(outfile, data -> schema()));
-  ARROW_RETURN_NOT_OK(write_data(ipc_writer, data));
-  ARROW_RETURN_NOT_OK(ipc_writer -> Close());
+  ARROW_ASSIGN_OR_RAISE(auto writer, arrow::ipc::MakeFileWriter(outfile, data -> schema()));
+  ARROW_RETURN_NOT_OK(write_data(writer, data));
+  ARROW_RETURN_NOT_OK(writer -> Close());
   return arrow::Status::OK();
 }
 
@@ -106,9 +106,9 @@ arrow::Status write_csv(
 ) {
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
   ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open(filename));
-  ARROW_ASSIGN_OR_RAISE(auto csv_writer, arrow::csv::MakeCSVWriter(outfile, data -> schema()));
-  ARROW_RETURN_NOT_OK(write_data(csv_writer, data));
-  ARROW_RETURN_NOT_OK(csv_writer -> Close());
+  ARROW_ASSIGN_OR_RAISE(auto writer, arrow::csv::MakeCSVWriter(outfile, data -> schema()));
+  ARROW_RETURN_NOT_OK(write_data(writer, data));
+  ARROW_RETURN_NOT_OK(writer -> Close());
   return arrow::Status::OK();
 }
 
