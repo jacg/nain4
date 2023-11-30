@@ -17,14 +17,11 @@ arrow::MemoryPool* pool = arrow::default_memory_pool();
 // we want give a brief introduction into the classes provided by Apache Arrow by
 // showing how to transform row-wise data into a columnar table.
 //
-// The table contains an id for a product, the number of components in the product
-// and the cost of each component.
-//
 // The data in this example is stored in the following struct:
 struct data_row {
-  int64_t id;
-  int64_t components;
-  std::vector<double> component_cost;
+  int64_t a;
+  int64_t b;
+  std::vector<double> cs;
 };
 
 // Transforming a vector of structs into a columnar Table.
@@ -37,49 +34,47 @@ struct data_row {
 // construction of the final `arrow::Array` instances.
 //
 // For each type, Arrow has a specially typed builder class. For the primitive
-// values `id` and `components` we can use the `arrow::Int64Builder`. For the
-// `component_cost` vector, we need to have two builders, a top-level
-// `arrow::ListBuilder` that builds the array of offsets and a nested
-// `arrow::DoubleBuilder` that constructs the underlying values array that
-// is referenced by the offsets in the former array.
+// values `a` and `b` we can use the `arrow::Int64Builder`. For the `cs` vector,
+// we need to have two builders, a top-level `arrow::ListBuilder` that builds
+// the array of offsets and a nested `arrow::DoubleBuilder` that constructs the
+// underlying values array that is referenced by the offsets in the former
+// array.
 arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(const std::vector<struct data_row>& rows) {
 
-  Int64Builder id_builder            (pool);
-  Int64Builder components_builder    (pool);
-  ListBuilder  component_cost_builder(pool, std::make_shared<DoubleBuilder>(pool));
+  Int64Builder  a_builder(pool);
+  Int64Builder  b_builder(pool);
+  ListBuilder  cs_builder(pool, std::make_shared<DoubleBuilder>(pool));
   // The following builder is owned by component_cost_builder.
-  DoubleBuilder* component_item_cost_builder =
-      (static_cast<DoubleBuilder*>(component_cost_builder.value_builder()));
+  DoubleBuilder* c_builder = (static_cast<DoubleBuilder*>(cs_builder.value_builder()));
 
   // Now we can loop over our existing data and insert it into the builders. The
   // `Append` calls here may fail (e.g. we cannot allocate enough additional memory).
   // Thus we need to check their return values. For more information on these values,
   // check the documentation about `arrow::Status`.
   for (const data_row& row : rows) {
-    ARROW_RETURN_NOT_OK(id_builder.Append(row.id));
-    ARROW_RETURN_NOT_OK(components_builder.Append(row.components));
+    ARROW_RETURN_NOT_OK(a_builder.Append(row.a));
+    ARROW_RETURN_NOT_OK(b_builder.Append(row.b));
 
     // Indicate the start of a new list row. This will memorise the current
     // offset in the values builder.
-    ARROW_RETURN_NOT_OK(component_cost_builder.Append());
+    ARROW_RETURN_NOT_OK(cs_builder.Append());
     // Store the actual values. The same memory layout is
     // used for the component cost data, in this case a vector of
     // type double, as for the memory that Arrow uses to hold this
     // data and will be created.
-    ARROW_RETURN_NOT_OK(component_item_cost_builder->AppendValues(
-        row.component_cost.data(), row.component_cost.size()));
+    ARROW_RETURN_NOT_OK(c_builder -> AppendValues(row.cs.data(), row.cs.size()));
   }
 
   // At the end, we finalise the arrays, declare the (type) schema and combine them
   // into a single `arrow::Table`:
-  std::shared_ptr<arrow::Array> id_array;         ARROW_RETURN_NOT_OK(id_builder        .Finish(&        id_array));
-  std::shared_ptr<arrow::Array> components_array; ARROW_RETURN_NOT_OK(components_builder.Finish(&components_array));
-  // No need to invoke component_item_cost_builder.Finish because it is implied by
-  // the parent builder's Finish invocation.
-  std::shared_ptr<arrow::Array> component_cost_array; ARROW_RETURN_NOT_OK(component_cost_builder.Finish(&component_cost_array));
+  std::shared_ptr<arrow::Array>  a_array; ARROW_RETURN_NOT_OK( a_builder.Finish(& a_array));
+  std::shared_ptr<arrow::Array>  b_array; ARROW_RETURN_NOT_OK( b_builder.Finish(& b_array));
+  std::shared_ptr<arrow::Array> cs_array; ARROW_RETURN_NOT_OK(cs_builder.Finish(&cs_array));
+  // No need to invoke c_builder.Finish because it is implied by the parent builder's Finish invocation.
 
   std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
-      arrow::field("id", arrow::int64()), arrow::field("components", arrow::int64()),
+      arrow::field("id", arrow::int64()),
+      arrow::field("components", arrow::int64()),
       arrow::field("component_cost", arrow::list(arrow::float64()))};
 
   auto schema = std::make_shared<arrow::Schema>(schema_vector);
@@ -89,7 +84,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(const std::ve
   // all referenced data, thus we don't have to care about undefined references once
   // we leave the scope of the function building the table and its underlying arrays.
   std::shared_ptr<arrow::Table> table =
-      arrow::Table::Make(schema, {id_array, components_array, component_cost_array});
+      arrow::Table::Make(schema, {a_array, b_array, cs_array});
 
   return table;
 }
@@ -102,13 +97,12 @@ arrow::Result<std::vector<data_row>> ColumnarTableToVector(
   //
   // For the check if the table is as expected, we can utilise solely its schema.
   std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
-      arrow::field("id", arrow::int64()), arrow::field("components", arrow::int64()),
+      arrow::field("id", arrow::int64()),
+      arrow::field("components", arrow::int64()),
       arrow::field("component_cost", arrow::list(arrow::float64()))};
   auto expected_schema = std::make_shared<arrow::Schema>(schema_vector);
 
-  if (!expected_schema->Equals(*table->schema())) {
-    return arrow::Status::Invalid("Schemas do not match");
-  }
+  if (!expected_schema->Equals(*table->schema())) { return arrow::Status::Invalid("Schemas do not match"); }
 
   // As we have ensured that the table has the expected structure, we can unpack the
   // underlying arrays. For the primitive columns `id` and `components` we can use the
@@ -120,8 +114,8 @@ arrow::Result<std::vector<data_row>> ColumnarTableToVector(
   // arrays, this cannot be done for the accompanying bitmap as often the slicing
   // border would be inside a byte.
 
-  auto ids                   = std::static_pointer_cast<arrow::Int64Array >(table->column(0)->chunk(0));
-  auto components            = std::static_pointer_cast<arrow::Int64Array >(table->column(1)->chunk(0));
+  auto as                    = std::static_pointer_cast<arrow::Int64Array >(table->column(0)->chunk(0));
+  auto bs                    = std::static_pointer_cast<arrow::Int64Array >(table->column(1)->chunk(0));
   auto component_cost        = std::static_pointer_cast<arrow::ListArray  >(table->column(2)->chunk(0));
   auto component_cost_values = std::static_pointer_cast<arrow::DoubleArray>(component_cost->values());
   // To enable zero-copy slices, the native values pointer might need to account
@@ -132,12 +126,12 @@ arrow::Result<std::vector<data_row>> ColumnarTableToVector(
   for (int64_t i = 0; i < table->num_rows(); i++) {
     // Another simplification in this example is that we assume that there are
     // no null entries, e.g. each row is fill with valid values.
-    int64_t id = ids->Value(i);
-    int64_t component = components->Value(i);
+    int64_t a = as -> Value(i);
+    int64_t b = bs -> Value(i);
     const double* first = ccv_ptr + component_cost->value_offset(i);
-    const double* last = ccv_ptr + component_cost->value_offset(i + 1);
+    const double* last  = ccv_ptr + component_cost->value_offset(i + 1);
     std::vector<double> components_vec(first, last);
-    rows.push_back({id, component, components_vec});
+    rows.push_back({a, b, components_vec});
   }
 
   return rows;
@@ -154,19 +148,20 @@ arrow::Status RunRowConversion() {
   assert(original_rows.size() == converted_rows.size());
 
   // Print out contents of table, should get
-  // ID Components Component prices
-  // 1  1          10
-  // 2  3          11  12  13
-  // 3  2          15  25
-  std::cout << std::left << std::setw(3) << "ID " << std::left << std::setw(11)
-            << "Components " << std::left << std::setw(15) << "Component prices "
-            << std::endl;
+  // A  B  Cs
+  // 1  1  10
+  // 2  3  11  12  13
+  // 3  2  15  25
+  std::cout
+      << std::left << "A  "
+      << std::left << "B  "
+      << std::left << "Cs "
+      << std::endl;
   for (const auto& row : converted_rows) {
-    std::cout << std::left << std::setw(3) << row.id << std::left << std::setw(11)
-              << row.components;
-    for (const auto& cost : row.component_cost) {
-      std::cout << std::left << std::setw(4) << cost;
-    }
+    std::cout
+        << std::left << std::setw(3) << row.a
+        << std::left << std::setw(3) << row.b;
+    for (const auto& cost : row.cs) { std::cout << std::left << std::setw(4) << cost; }
     std::cout << std::endl;
   }
   return arrow::Status::OK();
