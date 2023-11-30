@@ -3,6 +3,9 @@
 run: install
     build/try-arrow
 
+example: install
+    build/arrow-example
+
 install:
     meson setup build src
     meson compile -C build

@@ -25,3 +25,11 @@ try_arrow_exe = executable( 'try-arrow'
                            , dependencies       : [ try_arrow_deps ]
                            , install            : true
                            )
+
+arrow_eg_sources = [ 'arrow-example.cc' ]
+arrow_eg_exe = executable( 'arrow-example'
+                         , arrow_eg_sources
+                         , include_directories: [ try_arrow_include ]
+                         , dependencies       : [ try_arrow_deps ]
+                         , install            : true
+                         )
