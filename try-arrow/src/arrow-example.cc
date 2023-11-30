@@ -122,7 +122,7 @@ arrow::Result<std::vector<data_row>> columnar_table_to_vector(
   std::vector<data_row> rows;
   for (int64_t i = 0; i < table->num_rows(); i++) {
     // Another simplification in this example is that we assume that there are
-    // no null entries, e.g. each row is fill with valid values.
+    // no null entries, i.e. each row is filled with valid values.
     int64_t a = as -> Value(i);
     int64_t b = bs -> Value(i);
     const double* first = ccv_ptr + cs_list -> value_offset(i);
