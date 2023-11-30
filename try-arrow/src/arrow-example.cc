@@ -77,9 +77,10 @@ arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(const std::ve
 
   // At the end, we finalise the arrays, declare the (type) schema and combine them
   // into a single `arrow::Table`:
-  std::shared_ptr<arrow::Array>  a_array; ARROW_RETURN_NOT_OK( a_builder.Finish(& a_array));
-  std::shared_ptr<arrow::Array>  b_array; ARROW_RETURN_NOT_OK( b_builder.Finish(& b_array));
-  std::shared_ptr<arrow::Array> cs_array; ARROW_RETURN_NOT_OK(cs_builder.Finish(&cs_array));
+
+  ARROW_ASSIGN_OR_RAISE(auto  a_array,  a_builder.Finish());
+  ARROW_ASSIGN_OR_RAISE(auto  b_array,  b_builder.Finish());
+  ARROW_ASSIGN_OR_RAISE(auto cs_array, cs_builder.Finish());
   // No need to invoke c_builder.Finish because it is implied by the parent builder's Finish invocation.
 
   // The final `table` variable is the one we can then pass on to other functions
