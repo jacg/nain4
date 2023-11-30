@@ -36,6 +36,7 @@ struct data_row {
   int64_t             b;
   std::vector<double> cs;
   pair                d;
+  std::vector<pair>   es;
 };
 
 std::shared_ptr<arrow::Schema> the_schema() {
@@ -46,7 +47,11 @@ std::shared_ptr<arrow::Schema> the_schema() {
     arrow::field("d" , arrow::struct_({
             arrow::field("one", arrow::float64()),
             arrow::field("two", arrow::float64())}
-   ))
+    )),
+    arrow::field("es", arrow::list(arrow::struct_({
+                arrow::field("one", arrow::float64()),
+                arrow::field("two", arrow::float64())
+    })))
   };
   return std::make_shared<arrow::Schema>(schema_vector);
 }
@@ -97,14 +102,24 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
   Int64Builder                a_builder{pool};
   Int64Builder                b_builder{pool};
   list_builder<DoubleBuilder> c_builder{pool};
+  // --- d ---------------
   auto field = arrow::struct_({
       arrow::field("one", arrow::float64()),
       arrow::field("two", arrow::float64())
   });
+
   StructBuilder               d_builder{field, pool, {std::make_shared<DoubleBuilder>(pool), std::make_shared<DoubleBuilder>(pool)}};
 
-  auto one_builder = static_cast<DoubleBuilder*>(d_builder.field_builder(0));
-  auto two_builder = static_cast<DoubleBuilder*>(d_builder.field_builder(1));
+  auto d_one_builder = static_cast<DoubleBuilder*>(d_builder.field_builder(0));
+  auto d_two_builder = static_cast<DoubleBuilder*>(d_builder.field_builder(1));
+  // --- e ---------------
+  std::vector<std::shared_ptr<arrow::ArrayBuilder>> vec_of_builders {std::make_shared<DoubleBuilder>(pool), std::make_shared<DoubleBuilder>(pool)};
+  ListBuilder e_builder{pool, std::make_shared<StructBuilder>(field, pool, vec_of_builders)};
+
+  StructBuilder* e_inner = static_cast<StructBuilder*>(e_builder.value_builder());
+
+  auto e_one_builder = static_cast<DoubleBuilder*>(e_inner -> field_builder(0));
+  auto e_two_builder = static_cast<DoubleBuilder*>(e_inner -> field_builder(1));
 
   // Now we can loop over our existing data and insert it into the builders. The
   // `Append` calls here may fail (e.g. we cannot allocate enough additional memory).
@@ -114,25 +129,34 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
     ARROW_RETURN_NOT_OK(a_builder.Append(row.a ));
     ARROW_RETURN_NOT_OK(b_builder.Append(row.b ));
     ARROW_RETURN_NOT_OK(c_builder.Append(row.cs));
+
     ARROW_RETURN_NOT_OK(d_builder.Append());
-    ARROW_RETURN_NOT_OK(one_builder->Append(row.d.one));
-    ARROW_RETURN_NOT_OK(two_builder->Append(row.d.two));
+    ARROW_RETURN_NOT_OK(d_one_builder->Append(row.d.one));
+    ARROW_RETURN_NOT_OK(d_two_builder->Append(row.d.two));
+
+    for (auto e_pair: row.es) {
+      ARROW_RETURN_NOT_OK(e_builder.Append());
+      ARROW_RETURN_NOT_OK(e_inner -> Append());
+      ARROW_RETURN_NOT_OK(e_one_builder->Append(e_pair.one));
+      ARROW_RETURN_NOT_OK(e_two_builder->Append(e_pair.two));
+    }
   }
 
   // At the end, we finalise the arrays, declare the (type) schema and combine them
   // into a single `arrow::Table`:
   ARROW_ASSIGN_OR_RAISE(auto  a_array, a_builder.Finish());
   ARROW_ASSIGN_OR_RAISE(auto  b_array, b_builder.Finish());
-  ARROW_ASSIGN_OR_RAISE(auto cs_array, c_builder.Finish());
+  ARROW_ASSIGN_OR_RAISE(auto cs_array, c_builder.Finish()); // No need to invoke c_builder.Finish because it is implied by the parent builder's Finish invocation.
   ARROW_ASSIGN_OR_RAISE(auto  d_array, d_builder.Finish());
-  // No need to invoke c_builder.Finish because it is implied by the parent builder's Finish invocation.
+  ARROW_ASSIGN_OR_RAISE(auto es_array, e_builder.Finish());
+
 
   // The final `table` is the one we can then pass on to other functions that
   // can consume Apache Arrow memory structures. This object has ownership of
   // all referenced data, thus we don't have to care about undefined references
   // once we leave the scope of the function building the table and its
   // underlying arrays.
-  return arrow::Table::Make(the_schema(), {a_array, b_array, cs_array, d_array});
+  return arrow::Table::Make(the_schema(), {a_array, b_array, cs_array, d_array, es_array});
 }
 
 template<class ListContentArray>
@@ -208,23 +232,33 @@ void print_rows(const std::vector<data_row>& rows) {
       << std::left << "B  "
       << std::left << "Cs "
       << std::left << "D  "
+      << std::left << "Es "
       << std::endl;
   for (const auto& row : rows) {
     std::cout
         << std::left << std::setw(3) << row.a
         << std::left << std::setw(3) << row.b;
+
+    std::cout << " < ";
     for (const auto& cost : row.cs) { std::cout << std::left << std::setw(4) << cost; }
+    std::cout << ">  ";
+
     std::cout
         << std::left << std::setw(3) << row.d;
+
+    std::cout << " { ";
+    for (const auto& cost : row.es) { std::cout << std::left << std::setw(20) << cost; }
+    std::cout << "}";
+
     std::cout << std::endl;
   }
 }
 
 arrow::Status RunRowConversion() {
   std::vector<data_row> original_rows = {
-    {1, 1, {10.0}            , { 1.23,  9.87}},
-    {2, 3, {11.0, 12.0, 13.0}, {22   , 23}},
-    {3, 2, {15.0, 25.0}      , {99   , 88}}
+    {1, 1, {10.0}            , { 1.23,  9.87}, {{1.11,1.12},{1.21,1.22}}},
+    {2, 3, {11.0, 12.0, 13.0}, {22   , 23}   , {{2.11,2.12},{2.21,2.22},{2.31,2.32}}},
+    {3, 2, {15.0, 25.0}      , {99   , 88}   , {{3.11,3.12}}}
   };
   std::shared_ptr<arrow::Table> table;
   std::vector<data_row> converted_rows;
