@@ -80,13 +80,12 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
   ARROW_ASSIGN_OR_RAISE(auto cs_array, cs_builder.Finish());
   // No need to invoke c_builder.Finish because it is implied by the parent builder's Finish invocation.
 
-  // The final `table` variable is the one we can then pass on to other functions
-  // that can consume Apache Arrow memory structures. This object has ownership of
-  // all referenced data, thus we don't have to care about undefined references once
-  // we leave the scope of the function building the table and its underlying arrays.
-  std::shared_ptr<arrow::Table> table = arrow::Table::Make(the_schema(), {a_array, b_array, cs_array});
-
-  return table;
+  // The final `table` is the one we can then pass on to other functions that
+  // can consume Apache Arrow memory structures. This object has ownership of
+  // all referenced data, thus we don't have to care about undefined references
+  // once we leave the scope of the function building the table and its
+  // underlying arrays.
+  return arrow::Table::Make(the_schema(), {a_array, b_array, cs_array});
 }
 
 arrow::Result<std::vector<data_row>> columnar_table_to_vector(
