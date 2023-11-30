@@ -20,8 +20,8 @@ arrow::MemoryPool* pool = arrow::default_memory_pool();
 //
 // The data in this example is stored in the following struct:
 struct data_row {
-  int64_t a;
-  int64_t b;
+  int64_t             a;
+  int64_t             b;
   std::vector<double> cs;
 };
 
@@ -92,35 +92,35 @@ arrow::Result<std::vector<data_row>> columnar_table_to_vector(const std::shared_
   // Check that the table's schema matches the expected schema
   if (!the_schema() -> Equals(*table->schema())) { return arrow::Status::Invalid("Schemas do not match"); }
 
-  // As we have ensured that the table has the expected structure, we can unpack the
-  // underlying arrays. For the primitive columns `a` and `b` we can use the
-  // high level functions to get the values whereas for the nested column
-  // `component_costs` we need to access the C-pointer to the data to copy its
-  // contents into the resulting `std::vector<double>`. Here we need to be careful to
-  // also add the offset to the pointer. This offset is needed to enable zero-copy
-  // slicing operations. While this could be adjusted automatically for double
-  // arrays, this cannot be done for the accompanying bitmap as often the slicing
-  // border would be inside a byte.
+  // Unpack the underlying arrays.
+  //
+  // For the primitive columns `a` and `b` we can use the high level functions
+  // to get the values.
+  //
+  // For the nested column `cs` we need to access the C-pointer to the data to
+  // copy its contents into the resulting `std::vector<double>`. Here we need to
+  // be careful to also add the offset to the pointer. This offset is needed to
+  // enable zero-copy slicing operations. While this could be adjusted
+  // automatically for double arrays, this cannot be done for the accompanying
+  // bitmap as often the slicing border would be inside a byte.
 
   auto as      = std::static_pointer_cast<arrow::Int64Array >(table   -> column(0) -> chunk(0));
   auto bs      = std::static_pointer_cast<arrow::Int64Array >(table   -> column(1) -> chunk(0));
   auto cs_list = std::static_pointer_cast<arrow::ListArray  >(table   -> column(2) -> chunk(0));
-  auto cs      = std::static_pointer_cast<arrow::DoubleArray>(cs_list -> values()             );
+  auto cs_raw  = std::static_pointer_cast<arrow::DoubleArray>(cs_list -> values()) -> raw_values();
   // To enable zero-copy slices, the native values pointer might need to account
   // for this slicing offset. This is not needed for the higher level functions
   // like Value(…) that already account for this offset internally.
-  const double* ccv_ptr = cs -> raw_values();
   std::vector<data_row> rows;
 
   for (int64_t i = 0; i < table->num_rows(); i++) {
     // Another simplification in this example is that we assume that there are
     // no null entries, i.e. each row is filled with valid values.
-    int64_t a = as -> Value(i);
-    int64_t b = bs -> Value(i);
-    const double* first = ccv_ptr + cs_list -> value_offset(i);
-    const double* last  = ccv_ptr + cs_list -> value_offset(i + 1);
-    std::vector<double> c_vec(first, last);
-    rows.push_back({a, b, c_vec});
+    int64_t             a = as               -> Value       (i);
+    int64_t             b = bs               -> Value       (i);
+    std::vector<double> cs( cs_raw + cs_list -> value_offset(i    )
+                          , cs_raw + cs_list -> value_offset(i + 1));
+    rows.push_back({a, b, cs});
   }
 
   return rows;
