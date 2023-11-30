@@ -49,35 +49,53 @@ std::shared_ptr<arrow::Schema> the_schema() {
 // underlying values array that is referenced by the offsets in the former
 // array.
 
+template<class ListContentBuilder>
+class list_builder {
+  using InnerType = decltype(std::declval<ListContentBuilder>().GetValue(0));
+public:
+
+  list_builder(arrow::MemoryPool* pool = arrow::default_memory_pool())
+  : build_outer{pool, std::make_shared<ListContentBuilder>(pool)}
+  , build_inner{static_cast<ListContentBuilder*>(build_outer.value_builder())}
+  {}
+
+  arrow::Status Append(const std::vector<InnerType>& stuff) {
+    ARROW_RETURN_NOT_OK(build_outer .  Append      (     ));
+    ARROW_RETURN_NOT_OK(build_inner -> AppendValues(stuff));
+    return arrow::Status::OK();
+  }
+
+  arrow::Result<std::shared_ptr<arrow::Array>> Finish() {
+    return build_outer.Finish();;
+  }
+
+private:
+  ListBuilder         build_outer;
+  ListContentBuilder* build_inner;
+};
+
+
 arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std::vector<struct data_row>& rows) {
 
-  Int64Builder  a_builder{pool};
-  Int64Builder  b_builder{pool};
-  ListBuilder  cs_builder{pool, std::make_shared<DoubleBuilder>(pool)};
-  // The following builder is owned by cs_builder.
-  DoubleBuilder* c_builder = (static_cast<DoubleBuilder*>(cs_builder.value_builder()));
+  Int64Builder                a_builder{pool};
+  Int64Builder                b_builder{pool};
+  list_builder<DoubleBuilder> c_builder{pool};
 
   // Now we can loop over our existing data and insert it into the builders. The
   // `Append` calls here may fail (e.g. we cannot allocate enough additional memory).
   // Thus we need to check their return values. For more information on these values,
   // check the documentation about `arrow::Status`.
   for (const data_row& row : rows) {
-    ARROW_RETURN_NOT_OK( a_builder.Append(row.a));
-    ARROW_RETURN_NOT_OK( b_builder.Append(row.b));
-
-    ARROW_RETURN_NOT_OK(cs_builder.Append(     )); // Indicate the start of a new list row. This will memorise the current offset in the values builder.
-    // Store the actual values. The same memory layout is
-    // used for the component cost data, in this case a vector of
-    // type double, as for the memory that Arrow uses to hold this
-    // data and will be created.
-    ARROW_RETURN_NOT_OK(c_builder -> AppendValues(row.cs));
+    ARROW_RETURN_NOT_OK(a_builder.Append(row.a ));
+    ARROW_RETURN_NOT_OK(b_builder.Append(row.b ));
+    ARROW_RETURN_NOT_OK(c_builder.Append(row.cs));
   }
 
   // At the end, we finalise the arrays, declare the (type) schema and combine them
   // into a single `arrow::Table`:
-  ARROW_ASSIGN_OR_RAISE(auto  a_array,  a_builder.Finish());
-  ARROW_ASSIGN_OR_RAISE(auto  b_array,  b_builder.Finish());
-  ARROW_ASSIGN_OR_RAISE(auto cs_array, cs_builder.Finish());
+  ARROW_ASSIGN_OR_RAISE(auto  a_array, a_builder.Finish());
+  ARROW_ASSIGN_OR_RAISE(auto  b_array, b_builder.Finish());
+  ARROW_ASSIGN_OR_RAISE(auto cs_array, c_builder.Finish());
   // No need to invoke c_builder.Finish because it is implied by the parent builder's Finish invocation.
 
   // The final `table` is the one we can then pass on to other functions that
