@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 using arrow::DoubleBuilder;
@@ -23,6 +24,15 @@ struct data_row {
   int64_t b;
   std::vector<double> cs;
 };
+
+std::shared_ptr<arrow::Schema> the_schema() {
+  std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
+    arrow::field("a" , arrow::int64()),
+    arrow::field("b" , arrow::int64()),
+    arrow::field("cs", arrow::list(arrow::float64()))
+  };
+  return std::make_shared<arrow::Schema>(schema_vector);
+}
 
 // Transforming a vector of structs into a columnar Table.
 //
@@ -72,19 +82,12 @@ arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(const std::ve
   std::shared_ptr<arrow::Array> cs_array; ARROW_RETURN_NOT_OK(cs_builder.Finish(&cs_array));
   // No need to invoke c_builder.Finish because it is implied by the parent builder's Finish invocation.
 
-  std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
-      arrow::field("a" , arrow::int64()),
-      arrow::field("b" , arrow::int64()),
-      arrow::field("cs", arrow::list(arrow::float64()))};
-
-  auto schema = std::make_shared<arrow::Schema>(schema_vector);
-
   // The final `table` variable is the one we can then pass on to other functions
   // that can consume Apache Arrow memory structures. This object has ownership of
   // all referenced data, thus we don't have to care about undefined references once
   // we leave the scope of the function building the table and its underlying arrays.
   std::shared_ptr<arrow::Table> table =
-      arrow::Table::Make(schema, {a_array, b_array, cs_array});
+      arrow::Table::Make(the_schema(), {a_array, b_array, cs_array});
 
   return table;
 }
@@ -96,13 +99,7 @@ arrow::Result<std::vector<data_row>> ColumnarTableToVector(
   // schema and then will build up the vector of rows incrementally.
   //
   // For the check if the table is as expected, we can utilise solely its schema.
-  std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
-      arrow::field("a" , arrow::int64()),
-      arrow::field("b" , arrow::int64()),
-      arrow::field("cs", arrow::list(arrow::float64()))};
-  auto expected_schema = std::make_shared<arrow::Schema>(schema_vector);
-
-  if (!expected_schema->Equals(*table->schema())) { return arrow::Status::Invalid("Schemas do not match"); }
+  if (!the_schema() -> Equals(*table->schema())) { return arrow::Status::Invalid("Schemas do not match"); }
 
   // As we have ensured that the table has the expected structure, we can unpack the
   // underlying arrays. For the primitive columns `a` and `b` we can use the
