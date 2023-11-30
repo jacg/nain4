@@ -10,6 +10,8 @@ using arrow::DoubleBuilder;
 using arrow::Int64Builder;
 using arrow::ListBuilder;
 
+arrow::MemoryPool* pool = arrow::default_memory_pool();
+
 // While we want to use columnar data structures to build efficient operations, we
 // often receive data in a row-wise fashion from other systems. In the following,
 // we want give a brief introduction into the classes provided by Apache Arrow by
@@ -40,17 +42,11 @@ struct data_row {
 // `arrow::ListBuilder` that builds the array of offsets and a nested
 // `arrow::DoubleBuilder` that constructs the underlying values array that
 // is referenced by the offsets in the former array.
-arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(
-    const std::vector<struct data_row>& rows) {
-  // The builders are more efficient using
-  // arrow::jemalloc::MemoryPool::default_pool() as this can increase the size of
-  // the underlying memory regions in-place. At the moment, arrow::jemalloc is only
-  // supported on Unix systems, not Windows.
-  arrow::MemoryPool* pool = arrow::default_memory_pool();
+arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(const std::vector<struct data_row>& rows) {
 
-  Int64Builder id_builder(pool);
-  Int64Builder components_builder(pool);
-  ListBuilder component_cost_builder(pool, std::make_shared<DoubleBuilder>(pool));
+  Int64Builder id_builder            (pool);
+  Int64Builder components_builder    (pool);
+  ListBuilder  component_cost_builder(pool, std::make_shared<DoubleBuilder>(pool));
   // The following builder is owned by component_cost_builder.
   DoubleBuilder* component_item_cost_builder =
       (static_cast<DoubleBuilder*>(component_cost_builder.value_builder()));
@@ -76,14 +72,11 @@ arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(
 
   // At the end, we finalise the arrays, declare the (type) schema and combine them
   // into a single `arrow::Table`:
-  std::shared_ptr<arrow::Array> id_array;
-  ARROW_RETURN_NOT_OK(id_builder.Finish(&id_array));
-  std::shared_ptr<arrow::Array> components_array;
-  ARROW_RETURN_NOT_OK(components_builder.Finish(&components_array));
+  std::shared_ptr<arrow::Array> id_array;         ARROW_RETURN_NOT_OK(id_builder        .Finish(&        id_array));
+  std::shared_ptr<arrow::Array> components_array; ARROW_RETURN_NOT_OK(components_builder.Finish(&components_array));
   // No need to invoke component_item_cost_builder.Finish because it is implied by
   // the parent builder's Finish invocation.
-  std::shared_ptr<arrow::Array> component_cost_array;
-  ARROW_RETURN_NOT_OK(component_cost_builder.Finish(&component_cost_array));
+  std::shared_ptr<arrow::Array> component_cost_array; ARROW_RETURN_NOT_OK(component_cost_builder.Finish(&component_cost_array));
 
   std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
       arrow::field("id", arrow::int64()), arrow::field("components", arrow::int64()),
@@ -114,9 +107,7 @@ arrow::Result<std::vector<data_row>> ColumnarTableToVector(
   auto expected_schema = std::make_shared<arrow::Schema>(schema_vector);
 
   if (!expected_schema->Equals(*table->schema())) {
-    // The table doesn't have the expected schema thus we cannot directly
-    // convert it to our target representation.
-    return arrow::Status::Invalid("Schemas are not matching!");
+    return arrow::Status::Invalid("Schemas do not match");
   }
 
   // As we have ensured that the table has the expected structure, we can unpack the
@@ -129,13 +120,10 @@ arrow::Result<std::vector<data_row>> ColumnarTableToVector(
   // arrays, this cannot be done for the accompanying bitmap as often the slicing
   // border would be inside a byte.
 
-  auto ids = std::static_pointer_cast<arrow::Int64Array>(table->column(0)->chunk(0));
-  auto components =
-      std::static_pointer_cast<arrow::Int64Array>(table->column(1)->chunk(0));
-  auto component_cost =
-      std::static_pointer_cast<arrow::ListArray>(table->column(2)->chunk(0));
-  auto component_cost_values =
-      std::static_pointer_cast<arrow::DoubleArray>(component_cost->values());
+  auto ids                   = std::static_pointer_cast<arrow::Int64Array >(table->column(0)->chunk(0));
+  auto components            = std::static_pointer_cast<arrow::Int64Array >(table->column(1)->chunk(0));
+  auto component_cost        = std::static_pointer_cast<arrow::ListArray  >(table->column(2)->chunk(0));
+  auto component_cost_values = std::static_pointer_cast<arrow::DoubleArray>(component_cost->values());
   // To enable zero-copy slices, the native values pointer might need to account
   // for this slicing offset. This is not needed for the higher level functions
   // like Value(…) that already account for this offset internally.
@@ -156,13 +144,11 @@ arrow::Result<std::vector<data_row>> ColumnarTableToVector(
 }
 
 arrow::Status RunRowConversion() {
-  std::vector<data_row> original_rows = {
-      {1, 1, {10.0}}, {2, 3, {11.0, 12.0, 13.0}}, {3, 2, {15.0, 25.0}}};
+  std::vector<data_row> original_rows = {{1, 1, {10.0}}, {2, 3, {11.0, 12.0, 13.0}}, {3, 2, {15.0, 25.0}}};
   std::shared_ptr<arrow::Table> table;
   std::vector<data_row> converted_rows;
 
   ARROW_ASSIGN_OR_RAISE(table, VectorToColumnarTable(original_rows));
-
   ARROW_ASSIGN_OR_RAISE(converted_rows, ColumnarTableToVector(table));
 
   assert(original_rows.size() == converted_rows.size());
