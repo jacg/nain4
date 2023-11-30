@@ -49,12 +49,14 @@ std::shared_ptr<arrow::Schema> the_schema() {
 // the array of offsets and a nested `arrow::DoubleBuilder` that constructs the
 // underlying values array that is referenced by the offsets in the former
 // array.
-arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(const std::vector<struct data_row>& rows) {
 
-  Int64Builder  a_builder(pool);
-  Int64Builder  b_builder(pool);
-  ListBuilder  cs_builder(pool, std::make_shared<DoubleBuilder>(pool));
-  // The following builder is owned by component_cost_builder.
+
+arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std::vector<struct data_row>& rows) {
+
+  Int64Builder  a_builder{pool};
+  Int64Builder  b_builder{pool};
+  ListBuilder  cs_builder{pool, std::make_shared<DoubleBuilder>(pool)};
+  // The following builder is owned by cs_builder.
   DoubleBuilder* c_builder = (static_cast<DoubleBuilder*>(cs_builder.value_builder()));
 
   // Now we can loop over our existing data and insert it into the builders. The
@@ -62,12 +64,10 @@ arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(const std::ve
   // Thus we need to check their return values. For more information on these values,
   // check the documentation about `arrow::Status`.
   for (const data_row& row : rows) {
-    ARROW_RETURN_NOT_OK(a_builder.Append(row.a));
-    ARROW_RETURN_NOT_OK(b_builder.Append(row.b));
+    ARROW_RETURN_NOT_OK( a_builder.Append(row.a));
+    ARROW_RETURN_NOT_OK( b_builder.Append(row.b));
 
-    // Indicate the start of a new list row. This will memorise the current
-    // offset in the values builder.
-    ARROW_RETURN_NOT_OK(cs_builder.Append());
+    ARROW_RETURN_NOT_OK(cs_builder.Append(     )); // Indicate the start of a new list row. This will memorise the current offset in the values builder.
     // Store the actual values. The same memory layout is
     // used for the component cost data, in this case a vector of
     // type double, as for the memory that Arrow uses to hold this
@@ -87,13 +87,12 @@ arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(const std::ve
   // that can consume Apache Arrow memory structures. This object has ownership of
   // all referenced data, thus we don't have to care about undefined references once
   // we leave the scope of the function building the table and its underlying arrays.
-  std::shared_ptr<arrow::Table> table =
-      arrow::Table::Make(the_schema(), {a_array, b_array, cs_array});
+  std::shared_ptr<arrow::Table> table = arrow::Table::Make(the_schema(), {a_array, b_array, cs_array});
 
   return table;
 }
 
-arrow::Result<std::vector<data_row>> ColumnarTableToVector(
+arrow::Result<std::vector<data_row>> columnar_table_to_vector(
     const std::shared_ptr<arrow::Table>& table) {
   // To convert an Arrow table back into the same row-wise representation as in the
   // above section, we first will check that the table conforms to our expected
@@ -140,8 +139,8 @@ arrow::Status RunRowConversion() {
   std::shared_ptr<arrow::Table> table;
   std::vector<data_row> converted_rows;
 
-  ARROW_ASSIGN_OR_RAISE(table, VectorToColumnarTable(original_rows));
-  ARROW_ASSIGN_OR_RAISE(converted_rows, ColumnarTableToVector(table));
+  ARROW_ASSIGN_OR_RAISE(table, vector_to_columnar_table(original_rows));
+  ARROW_ASSIGN_OR_RAISE(converted_rows, columnar_table_to_vector(table));
 
   assert(original_rows.size() == converted_rows.size());
 
