@@ -36,12 +36,11 @@ std::shared_ptr<arrow::Schema> the_schema() {
 
 // Transforming a vector of structs into a columnar Table.
 //
-// The final representation should be an `arrow::Table` which in turn
-// is made up of an `arrow::Schema` and a list of
-// `arrow::ChunkedArray` instances. As the first step, we will iterate
-// over the data and build up the arrays incrementally.  For this
-// task, we provide `arrow::ArrayBuilder` classes that help in the
-// construction of the final `arrow::Array` instances.
+// The final representation should be an `arrow::Table` which in turn is made up
+// of an `arrow::Schema` and a list of `arrow::ChunkedArray` instances. As the
+// first step, we will iterate over the data and build up the arrays
+// incrementally. For this task, we provide `arrow::ArrayBuilder` classes that
+// help in the construction of the final `arrow::Array` instances.
 //
 // For each type, Arrow has a specially typed builder class. For the primitive
 // values `a` and `b` we can use the `arrow::Int64Builder`. For the `cs` vector,
@@ -49,7 +48,6 @@ std::shared_ptr<arrow::Schema> the_schema() {
 // the array of offsets and a nested `arrow::DoubleBuilder` that constructs the
 // underlying values array that is referenced by the offsets in the former
 // array.
-
 
 arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std::vector<struct data_row>& rows) {
 
@@ -77,7 +75,6 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
 
   // At the end, we finalise the arrays, declare the (type) schema and combine them
   // into a single `arrow::Table`:
-
   ARROW_ASSIGN_OR_RAISE(auto  a_array,  a_builder.Finish());
   ARROW_ASSIGN_OR_RAISE(auto  b_array,  b_builder.Finish());
   ARROW_ASSIGN_OR_RAISE(auto cs_array, cs_builder.Finish());
@@ -120,6 +117,7 @@ arrow::Result<std::vector<data_row>> columnar_table_to_vector(
   // like Value(…) that already account for this offset internally.
   const double* ccv_ptr = cs -> raw_values();
   std::vector<data_row> rows;
+
   for (int64_t i = 0; i < table->num_rows(); i++) {
     // Another simplification in this example is that we assume that there are
     // no null entries, i.e. each row is filled with valid values.
