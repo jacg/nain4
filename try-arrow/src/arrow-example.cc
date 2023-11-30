@@ -70,7 +70,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
     // used for the component cost data, in this case a vector of
     // type double, as for the memory that Arrow uses to hold this
     // data and will be created.
-    ARROW_RETURN_NOT_OK(c_builder -> AppendValues(row.cs.data(), row.cs.size()));
+    ARROW_RETURN_NOT_OK(c_builder -> AppendValues(row.cs));
   }
 
   // At the end, we finalise the arrays, declare the (type) schema and combine them
