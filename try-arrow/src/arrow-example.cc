@@ -88,8 +88,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
   return arrow::Table::Make(the_schema(), {a_array, b_array, cs_array});
 }
 
-arrow::Result<std::vector<data_row>> columnar_table_to_vector(
-    const std::shared_ptr<arrow::Table>& table) {
+arrow::Result<std::vector<data_row>> columnar_table_to_vector(const std::shared_ptr<arrow::Table>& table) {
   // To convert an Arrow table back into the same row-wise representation as in the
   // above section, we first will check that the table conforms to our expected
   // schema and then will build up the vector of rows incrementally.
