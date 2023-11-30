@@ -88,6 +88,30 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
   return arrow::Table::Make(the_schema(), {a_array, b_array, cs_array});
 }
 
+template<class ListContentArray>
+class vector_from_list {
+public:
+
+  vector_from_list(std::shared_ptr<arrow::Array> chunk)
+      : list{std::static_pointer_cast<arrow::ListArray>(chunk)}
+      , raw {std::static_pointer_cast<ListContentArray>(list -> values()) -> raw_values()}
+    {}
+
+  using RawListContentType =
+      std::remove_const_t<
+        std::remove_pointer_t<
+          decltype(std::static_pointer_cast<ListContentArray>(std::make_shared<arrow::ListArray>() -> values()) -> raw_values())
+        >
+      >;
+  std::vector<RawListContentType> Value(size_t i) {
+    return std::vector<double> ( raw + list -> value_offset(i    )
+                               , raw + list -> value_offset(i + 1));
+  }
+private:
+  std::shared_ptr<arrow::ListArray> list;
+  const RawListContentType* raw;
+};
+
 arrow::Result<std::vector<data_row>> columnar_table_to_vector(const std::shared_ptr<arrow::Table>& table) {
   // Check that the table's schema matches the expected schema
   if (!the_schema() -> Equals(*table->schema())) { return arrow::Status::Invalid("Schemas do not match"); }
@@ -106,8 +130,8 @@ arrow::Result<std::vector<data_row>> columnar_table_to_vector(const std::shared_
 
   auto as      = std::static_pointer_cast<arrow::Int64Array >(table   -> column(0) -> chunk(0));
   auto bs      = std::static_pointer_cast<arrow::Int64Array >(table   -> column(1) -> chunk(0));
-  auto cs_list = std::static_pointer_cast<arrow::ListArray  >(table   -> column(2) -> chunk(0));
-  auto cs_raw  = std::static_pointer_cast<arrow::DoubleArray>(cs_list -> values()) -> raw_values();
+  vector_from_list<arrow::DoubleArray> cs                    {table   -> column(2) -> chunk(0)};
+
   // To enable zero-copy slices, the native values pointer might need to account
   // for this slicing offset. This is not needed for the higher level functions
   // like Value(…) that already account for this offset internally.
@@ -116,11 +140,11 @@ arrow::Result<std::vector<data_row>> columnar_table_to_vector(const std::shared_
   for (int64_t i = 0; i < table->num_rows(); i++) {
     // Another simplification in this example is that we assume that there are
     // no null entries, i.e. each row is filled with valid values.
-    int64_t             a = as               -> Value       (i);
-    int64_t             b = bs               -> Value       (i);
-    std::vector<double> cs( cs_raw + cs_list -> value_offset(i    )
-                          , cs_raw + cs_list -> value_offset(i + 1));
-    rows.push_back({a, b, cs});
+    rows.push_back({
+        as -> Value(i),
+        bs -> Value(i),
+        cs  . Value(i)
+    });
   }
 
   return rows;
