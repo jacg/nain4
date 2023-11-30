@@ -73,9 +73,9 @@ arrow::Result<std::shared_ptr<arrow::Table>> VectorToColumnarTable(const std::ve
   // No need to invoke c_builder.Finish because it is implied by the parent builder's Finish invocation.
 
   std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
-      arrow::field("id", arrow::int64()),
-      arrow::field("components", arrow::int64()),
-      arrow::field("component_cost", arrow::list(arrow::float64()))};
+      arrow::field("a" , arrow::int64()),
+      arrow::field("b" , arrow::int64()),
+      arrow::field("cs", arrow::list(arrow::float64()))};
 
   auto schema = std::make_shared<arrow::Schema>(schema_vector);
 
@@ -97,15 +97,15 @@ arrow::Result<std::vector<data_row>> ColumnarTableToVector(
   //
   // For the check if the table is as expected, we can utilise solely its schema.
   std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
-      arrow::field("id", arrow::int64()),
-      arrow::field("components", arrow::int64()),
-      arrow::field("component_cost", arrow::list(arrow::float64()))};
+      arrow::field("a" , arrow::int64()),
+      arrow::field("b" , arrow::int64()),
+      arrow::field("cs", arrow::list(arrow::float64()))};
   auto expected_schema = std::make_shared<arrow::Schema>(schema_vector);
 
   if (!expected_schema->Equals(*table->schema())) { return arrow::Status::Invalid("Schemas do not match"); }
 
   // As we have ensured that the table has the expected structure, we can unpack the
-  // underlying arrays. For the primitive columns `id` and `components` we can use the
+  // underlying arrays. For the primitive columns `a` and `b` we can use the
   // high level functions to get the values whereas for the nested column
   // `component_costs` we need to access the C-pointer to the data to copy its
   // contents into the resulting `std::vector<double>`. Here we need to be careful to
@@ -114,24 +114,24 @@ arrow::Result<std::vector<data_row>> ColumnarTableToVector(
   // arrays, this cannot be done for the accompanying bitmap as often the slicing
   // border would be inside a byte.
 
-  auto as                    = std::static_pointer_cast<arrow::Int64Array >(table->column(0)->chunk(0));
-  auto bs                    = std::static_pointer_cast<arrow::Int64Array >(table->column(1)->chunk(0));
-  auto component_cost        = std::static_pointer_cast<arrow::ListArray  >(table->column(2)->chunk(0));
-  auto component_cost_values = std::static_pointer_cast<arrow::DoubleArray>(component_cost->values());
+  auto as      = std::static_pointer_cast<arrow::Int64Array >(table   -> column(0) -> chunk(0));
+  auto bs      = std::static_pointer_cast<arrow::Int64Array >(table   -> column(1) -> chunk(0));
+  auto cs_list = std::static_pointer_cast<arrow::ListArray  >(table   -> column(2) -> chunk(0));
+  auto cs      = std::static_pointer_cast<arrow::DoubleArray>(cs_list -> values()             );
   // To enable zero-copy slices, the native values pointer might need to account
   // for this slicing offset. This is not needed for the higher level functions
   // like Value(…) that already account for this offset internally.
-  const double* ccv_ptr = component_cost_values->raw_values();
+  const double* ccv_ptr = cs -> raw_values();
   std::vector<data_row> rows;
   for (int64_t i = 0; i < table->num_rows(); i++) {
     // Another simplification in this example is that we assume that there are
     // no null entries, e.g. each row is fill with valid values.
     int64_t a = as -> Value(i);
     int64_t b = bs -> Value(i);
-    const double* first = ccv_ptr + component_cost->value_offset(i);
-    const double* last  = ccv_ptr + component_cost->value_offset(i + 1);
-    std::vector<double> components_vec(first, last);
-    rows.push_back({a, b, components_vec});
+    const double* first = ccv_ptr + cs_list -> value_offset(i);
+    const double* last  = ccv_ptr + cs_list -> value_offset(i + 1);
+    std::vector<double> c_vec(first, last);
+    rows.push_back({a, b, c_vec});
   }
 
   return rows;
