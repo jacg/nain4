@@ -19,6 +19,8 @@
 
 #define DBG(stuff) std::cout << stuff << std::endl;
 
+arrow::MemoryPool* MEMORY_POOL = arrow::default_memory_pool();
+
 // ===== Event model expressed in plain C++ ==================================================
 
 struct vec { double x, y, z; };
@@ -138,7 +140,7 @@ arrow::Status write_parquet(
 ) {
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
   ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open(filename));
-  PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(*data, arrow::default_memory_pool(), outfile, chunk_size));
+  PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(*data, MEMORY_POOL, outfile, chunk_size));
   return arrow::Status::OK();
 }
 
@@ -153,7 +155,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_parquet(std::string filename) 
   std::shared_ptr<arrow::io::ReadableFile> infile;
   ARROW_ASSIGN_OR_RAISE(infile, arrow::io::ReadableFile::Open(filename));
   std::unique_ptr<parquet::arrow::FileReader> reader;
-  PARQUET_THROW_NOT_OK(parquet::arrow::OpenFile(infile, arrow::default_memory_pool(), &reader));
+  PARQUET_THROW_NOT_OK(parquet::arrow::OpenFile(infile, MEMORY_POOL, &reader));
   std::shared_ptr<arrow::Table> table;
   PARQUET_THROW_NOT_OK(reader->ReadTable(&table));
   return arrow::Result<std::shared_ptr<arrow::Table>>(table);
@@ -161,7 +163,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_parquet(std::string filename) 
 
 arrow::Result<std::shared_ptr<arrow::RecordBatch>> read_arrow(std::string filename) {
   std::shared_ptr<arrow::io::ReadableFile> infile;
-  ARROW_ASSIGN_OR_RAISE(infile, arrow::io::ReadableFile::Open(filename, arrow::default_memory_pool()));
+  ARROW_ASSIGN_OR_RAISE(infile, arrow::io::ReadableFile::Open(filename, MEMORY_POOL));
   ARROW_ASSIGN_OR_RAISE(auto ipc_reader, arrow::ipc::RecordBatchFileReader::Open(infile));
   // Using the reader, we can read Record Batches. Note that this is specific to IPC;
   // for other formats, we focus on Tables, but here, RecordBatches are used.
@@ -466,7 +468,6 @@ std::shared_ptr<arrow::Schema> list_example_schema() {
 }
 
 arrow::Status list_example() {
-  auto pool = arrow::default_memory_pool();
   auto schema = list_example_schema();
 
   std::vector<int32_t>             vec_0{0,1,2,3};
@@ -488,8 +489,7 @@ arrow::Status list_example() {
 
   arrow::Int32Builder  build_0;
   arrow::StringBuilder build_1;
-  arrow::ListBuilder   build_2{pool, std::make_unique<arrow::Int8Builder>(pool)};
-
+  arrow::ListBuilder   build_2{MEMORY_POOL, std::make_unique<arrow::Int8Builder>(MEMORY_POOL)};
   ARROW_RETURN_NOT_OK(append_data(&build_0, &build_1, &build_2));
   ARROW_RETURN_NOT_OK(build_0.Finish(&a0));
   ARROW_RETURN_NOT_OK(build_1.Finish(&a1)); // ARROW_ASSIGN_OR_RAISE(a1, build_1.Finish());
@@ -533,7 +533,6 @@ make_serialize_me_schema() {
 }
 
 arrow::Status serialize_me_proof_of_concept() {
-  auto pool = arrow::default_memory_pool();
 
   auto append_data = [] (arrow::StructBuilder& struct_builder, const std::vector<serialize_me>& data) {
     auto fuck_C_macros = append_structs<arrow::Int16Builder, arrow::FloatBuilder>(&struct_builder, data);
@@ -545,7 +544,7 @@ arrow::Status serialize_me_proof_of_concept() {
   auto build_float = std::make_shared<arrow::FloatBuilder>() ;
 
   auto [field, schema] = make_serialize_me_schema();
-  arrow::StructBuilder struct_builder{field -> type(), pool, {build_int8, build_float}};
+  arrow::StructBuilder struct_builder{field -> type(), MEMORY_POOL, {build_int8, build_float}};
 
   std::vector<serialize_me> std_vector_of_data {{1,1.1}, {2,2.2}, {2,3.4}};
   ARROW_RETURN_NOT_OK(append_data(struct_builder, std_vector_of_data));
@@ -570,12 +569,10 @@ arrow::Status serialize_me_proof_of_concept() {
   DBG("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
   ARROW_ASSIGN_OR_RAISE(auto grr, table2 -> column(0) -> GetScalar(3));
 
-
   return arrow::Status::OK();
 }
 
 // arrow::Status crystal_io_proof_of_concept() {
-//   auto pool = arrow::default_memory_pool();
 //   auto event_schema = make_crystal_output_schema();
 
 //   std::vector<event> events_std_vector = sample_of_events();
@@ -594,15 +591,15 @@ arrow::Status serialize_me_proof_of_concept() {
 //   DTT event_data_type = event_field->type();
 
 //   std::unique_ptr<arrow::ArrayBuilder> array_builder;
-//   ARROW_RETURN_NOT_OK(arrow::MakeBuilder(pool, event_data_type, &array_builder));
+//   ARROW_RETURN_NOT_OK(arrow::MakeBuilder(MEMORY_POOL, event_data_type, &array_builder));
 //   auto clusterfuck = std::make_shared<arrow::StructBuilder>(dynamic_cast<arrow::StructBuilder*>(array_builder.release()));
 
 // }
 
 
 arrow::Status arrow_main() {
-  ARROW_RETURN_NOT_OK(serialize_me_proof_of_concept());
-  // ARROW_RETURN_NOT_OK(list_example());
+  //ARROW_RETURN_NOT_OK(serialize_me_proof_of_concept());
+   ARROW_RETURN_NOT_OK(list_example());
   // ARROW_RETURN_NOT_OK(generate_data_files());
   // ARROW_RETURN_NOT_OK(    read_data_files());
   return arrow::Status::OK();
