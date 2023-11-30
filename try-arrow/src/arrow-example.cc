@@ -10,8 +10,20 @@
 using arrow::DoubleBuilder;
 using arrow::Int64Builder;
 using arrow::ListBuilder;
+using arrow::StructBuilder;
 
 arrow::MemoryPool* pool = arrow::default_memory_pool();
+
+
+#define DBG(stuff) std::cout << stuff << std::endl;
+template<class T> void print(T data, std::ostream& out=std::cout) { out << data -> ToString() << std::endl; }
+
+
+struct pair { double one, two; };
+
+std::ostream& operator << (std::ostream& out, const pair& p) {
+  return out << std::setw(0) << '[' << p.one << ", " << p.two << ']';
+}
 
 // While we want to use columnar data structures to build efficient operations, we
 // often receive data in a row-wise fashion from other systems. In the following,
@@ -23,13 +35,18 @@ struct data_row {
   int64_t             a;
   int64_t             b;
   std::vector<double> cs;
+  pair                d;
 };
 
 std::shared_ptr<arrow::Schema> the_schema() {
   std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
     arrow::field("a" , arrow::int64()),
     arrow::field("b" , arrow::int64()),
-    arrow::field("cs", arrow::list(arrow::float64()))
+    arrow::field("cs", arrow::list(arrow::float64())),
+    arrow::field("d" , arrow::struct_({
+            arrow::field("one", arrow::float64()),
+            arrow::field("two", arrow::float64())}
+   ))
   };
   return std::make_shared<arrow::Schema>(schema_vector);
 }
@@ -80,6 +97,14 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
   Int64Builder                a_builder{pool};
   Int64Builder                b_builder{pool};
   list_builder<DoubleBuilder> c_builder{pool};
+  auto field = arrow::struct_({
+      arrow::field("one", arrow::float64()),
+      arrow::field("two", arrow::float64())
+  });
+  StructBuilder               d_builder{field, pool, {std::make_shared<DoubleBuilder>(pool), std::make_shared<DoubleBuilder>(pool)}};
+
+  auto one_builder = static_cast<DoubleBuilder*>(d_builder.field_builder(0));
+  auto two_builder = static_cast<DoubleBuilder*>(d_builder.field_builder(1));
 
   // Now we can loop over our existing data and insert it into the builders. The
   // `Append` calls here may fail (e.g. we cannot allocate enough additional memory).
@@ -89,6 +114,9 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
     ARROW_RETURN_NOT_OK(a_builder.Append(row.a ));
     ARROW_RETURN_NOT_OK(b_builder.Append(row.b ));
     ARROW_RETURN_NOT_OK(c_builder.Append(row.cs));
+    ARROW_RETURN_NOT_OK(d_builder.Append());
+    ARROW_RETURN_NOT_OK(one_builder->Append(row.d.one));
+    ARROW_RETURN_NOT_OK(two_builder->Append(row.d.two));
   }
 
   // At the end, we finalise the arrays, declare the (type) schema and combine them
@@ -96,6 +124,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
   ARROW_ASSIGN_OR_RAISE(auto  a_array, a_builder.Finish());
   ARROW_ASSIGN_OR_RAISE(auto  b_array, b_builder.Finish());
   ARROW_ASSIGN_OR_RAISE(auto cs_array, c_builder.Finish());
+  ARROW_ASSIGN_OR_RAISE(auto  d_array, d_builder.Finish());
   // No need to invoke c_builder.Finish because it is implied by the parent builder's Finish invocation.
 
   // The final `table` is the one we can then pass on to other functions that
@@ -103,7 +132,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
   // all referenced data, thus we don't have to care about undefined references
   // once we leave the scope of the function building the table and its
   // underlying arrays.
-  return arrow::Table::Make(the_schema(), {a_array, b_array, cs_array});
+  return arrow::Table::Make(the_schema(), {a_array, b_array, cs_array, d_array});
 }
 
 template<class ListContentArray>
@@ -133,7 +162,6 @@ private:
 arrow::Result<std::vector<data_row>> columnar_table_to_vector(const std::shared_ptr<arrow::Table>& table) {
   // Check that the table's schema matches the expected schema
   if (!the_schema() -> Equals(*table->schema())) { return arrow::Status::Invalid("Schemas do not match"); }
-
   // Unpack the underlying arrays.
   //
   // For the primitive columns `a` and `b` we can use the high level functions
@@ -150,6 +178,10 @@ arrow::Result<std::vector<data_row>> columnar_table_to_vector(const std::shared_
   auto bs      = std::static_pointer_cast<arrow::Int64Array >(table   -> column(1) -> chunk(0));
   vector_from_list<arrow::DoubleArray> cs                    {table   -> column(2) -> chunk(0)};
 
+  auto ds      = std::static_pointer_cast<arrow::StructArray>(table   -> column(3) -> chunk(0));
+  auto ds_1 = std::static_pointer_cast<arrow::DoubleArray>(ds -> field(0));
+  auto ds_2 = std::static_pointer_cast<arrow::DoubleArray>(ds -> field(1));
+
   // To enable zero-copy slices, the native values pointer might need to account
   // for this slicing offset. This is not needed for the higher level functions
   // like Value(…) that already account for this offset internally.
@@ -161,44 +193,57 @@ arrow::Result<std::vector<data_row>> columnar_table_to_vector(const std::shared_
     rows.push_back({
         as -> Value(i),
         bs -> Value(i),
-        cs  . Value(i)
+        cs  . Value(i),
+        { ds_1 -> Value(i), ds_2 -> Value(i)}
+
     });
   }
 
   return rows;
 }
 
-arrow::Status RunRowConversion() {
-  std::vector<data_row> original_rows = {{1, 1, {10.0}}, {2, 3, {11.0, 12.0, 13.0}}, {3, 2, {15.0, 25.0}}};
-  std::shared_ptr<arrow::Table> table;
-  std::vector<data_row> converted_rows;
-
-  ARROW_ASSIGN_OR_RAISE(table, vector_to_columnar_table(original_rows));
-  ARROW_ASSIGN_OR_RAISE(converted_rows, columnar_table_to_vector(table));
-
-  assert(original_rows.size() == converted_rows.size());
-
-  // Print out contents of table, should get
-  // A  B  Cs
-  // 1  1  10
-  // 2  3  11  12  13
-  // 3  2  15  25
+void print_rows(const std::vector<data_row>& rows) {
   std::cout
       << std::left << "A  "
       << std::left << "B  "
       << std::left << "Cs "
+      << std::left << "D  "
       << std::endl;
-  for (const auto& row : converted_rows) {
+  for (const auto& row : rows) {
     std::cout
         << std::left << std::setw(3) << row.a
         << std::left << std::setw(3) << row.b;
     for (const auto& cost : row.cs) { std::cout << std::left << std::setw(4) << cost; }
+    std::cout
+        << std::left << std::setw(3) << row.d;
     std::cout << std::endl;
   }
+}
+
+arrow::Status RunRowConversion() {
+  std::vector<data_row> original_rows = {
+    {1, 1, {10.0}            , { 1.23,  9.87}},
+    {2, 3, {11.0, 12.0, 13.0}, {22   , 23}},
+    {3, 2, {15.0, 25.0}      , {99   , 88}}
+  };
+  std::shared_ptr<arrow::Table> table;
+  std::vector<data_row> converted_rows;
+
+  ARROW_ASSIGN_OR_RAISE(table, vector_to_columnar_table(original_rows));
+  DBG("Table returned by vector_to_columnar_table");
+  print(table);
+  ARROW_ASSIGN_OR_RAISE(converted_rows, columnar_table_to_vector(table));
+
+  assert(original_rows.size() == converted_rows.size());
+
+  DBG("original ...") ; print_rows(original_rows);
+  DBG("converted ..."); print_rows(converted_rows);
+
   return arrow::Status::OK();
 }
 
 int main(int argc, char** argv) {
+  DBG("MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN ");
   auto status = RunRowConversion();
   if (!status.ok()) {
     std::cerr << status.ToString() << std::endl;
