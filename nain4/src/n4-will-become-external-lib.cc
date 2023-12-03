@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <n4-will-become-external-lib.hh>
 #include <n4-inspect.hh>
 #include <n4-material.hh>
@@ -12,81 +13,75 @@
 #include <G4VUserPhysicsList.hh>
 
 
-  auto air    = n4::material("G4_AIR");
-  auto sphere = [material=config.material, air] (auto radius) {
-    return [material, air, radius] () {
-      auto lab = n4::box   ("LAB"   ).half_cube(1.1*radius).place(air     )        .now();
-                 n4::sphere("Sphere").r        (    radius).place(material).in(lab).now();
-      return lab;
-    };
 std::vector<double> measure_abslength(abslength_config const& config) {
+  std::vector<double> interaction_distances;
+  interaction_distances.reserve(config.n_events);
+
+  auto isotropic = n4::random::direction{};
+
+  auto enormous_sphere = [config] () {
+    return n4::sphere("huge").r(1*km).place(config.material).now();
   };
 
-  // --- Generator -----
-  auto shoot_gamma = [&config](G4Event* event) {
-     auto vertex = new G4PrimaryVertex{};
-     auto p      = config.particle_energy * G4RandomDirection();
-     auto particle = n4::find_particle(config.particle_name);
-     vertex -> SetPrimary(new G4PrimaryParticle(particle, p.x(), p.y(), p.z()));
-     event -> AddPrimaryVertex(vertex);
+  auto gamma_511keV = [config, isotropic] (G4Event* event) {
+    static auto gamma = n4::find_particle(config.particle_name);
+    auto p            = config.particle_energy * isotropic.get();
+    auto particle     = n4::find_particle(config.particle_name);
+    auto vertex       = new G4PrimaryVertex({}, 0);
+    vertex -> SetPrimary(new G4PrimaryParticle(particle, p.x(), p.y(), p.z()));
+    event  -> AddPrimaryVertex(vertex);
   };
 
-  // --- Count unscathed gammas (in stepping action) -----
-  size_t unscathed = 0;
-  auto count_unscathed = [&unscathed, initial_energy=config.particle_energy](auto step) {
-    auto energy = step -> GetTrack() -> GetTotalEnergy();
-    if (energy > 0.999999 * initial_energy) {
-      auto name = step -> GetPreStepPoint() -> GetTouchable() -> GetVolume() -> GetName();
-      if (name == "LAB") { unscathed++; }
+  auto record_distance_and_kill = [&interaction_distances] (const G4Step* step) {
+    auto post    = step -> GetPostStepPoint();
+    auto process = post -> GetProcessDefinedStep() -> GetProcessName();
+    if (process != "Transportation") {
+      interaction_distances.push_back(post -> GetPosition().z());
+      step -> GetTrack() -> SetTrackStatus(fStopAndKill);
     }
   };
 
-  // --- Eliminate secondaries (in stacking action)  -----
-  auto kill_secondaries = [](auto track) {
-    auto kill = track -> GetParentID() > 0;
-    return kill > 0 ? G4ClassificationOfNewTrack::fKill : G4ClassificationOfNewTrack::fUrgent;
+  auto kill_secondaries = [] (const G4Track* track) {
+    return track -> GetTrackID() == 1 ? G4ClassificationOfNewTrack::fUrgent : G4ClassificationOfNewTrack::fKill;
   };
 
-  auto create_actions = [&] {
-    return (new n4::actions{shoot_gamma})
-         -> set((new n4::stacking_action) -> classify(kill_secondaries))
-         -> set (new n4::stepping_action{count_unscathed});
+  auto actions = [&] () {
+    return   (new n4::actions{gamma_511keV})
+      -> set((new n4::stacking_action{}) -> classify(kill_secondaries))
+      -> set( new n4::stepping_action{record_distance_and_kill})
+      ;
   };
 
   // ----- Initialize and run Geant4 -------------------------------------------
   {
     n4::silence _{G4cout};
-
-    auto rm = n4::run_manager::create()
-      .fake_ui ()
-      .physics (config.physics)
-      .geometry(sphere(1))
-      .actions(create_actions)
-      .run()
-      ;
-
-    auto events = 10000;
-    auto radii  = config.distances;
-    std::vector<double> result;
-    result.reserve(radii.size());
-
-    // --- Infer attenuation length by gathering statistics for given radius -------------
-    auto estimate_att_length = [&unscathed, rm, &sphere, events, &result] (auto radius) {
-      unscathed = 0;
-
-      rm -> replace_geometry(sphere(radius)).run(events);
-
-      auto ratio = unscathed / (1.0 * events);
-      auto attenuation_length = - radius / log(ratio);
-      result.push_back(attenuation_length);
-   };
-
-    // --- Check attenuation length across range of radii --------------------------------
-    for (auto radius : radii) {
-      estimate_att_length(radius);
-    }
-    return result;
+    n4::run_manager::create()
+      .fake_ui()
+      .physics(config.physics)
+      .geometry(enormous_sphere)
+      .actions(actions())
+      .run(config.n_events);
   }
+
+  std::vector<double> measured_abslengths;
+  measured_abslengths.reserve(config.distances.size());
+
+  auto estimate_abslength = [&] (auto distance) {
+    auto interacted_within_distance = std::count_if( cbegin(interaction_distances)
+                                                   ,   cend(interaction_distances)
+                                                   , [=] (auto d) {return d<distance;});
+    auto ratio     = 1 - interacted_within_distance / static_cast<float>(config.n_events);
+    auto abslength = - distance / log(ratio);
+    measured_abslengths.push_back(abslength);
+  };
+
+
+  std::for_each( cbegin(config.distances)
+               ,   cend(config.distances)
+               , estimate_abslength
+               );
+
+  return measured_abslengths;
 }
 
 // ----- Calculate 511 keV gamma interaction process fractions for given material ------------------------------
