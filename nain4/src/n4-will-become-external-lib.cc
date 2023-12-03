@@ -12,7 +12,6 @@
 #include <G4VUserPhysicsList.hh>
 
 
-std::vector<double> measure_abslength(test_config const& config) {
   auto air    = n4::material("G4_AIR");
   auto sphere = [material=config.material, air] (auto radius) {
     return [material, air, radius] () {
@@ -20,6 +19,7 @@ std::vector<double> measure_abslength(test_config const& config) {
                  n4::sphere("Sphere").r        (    radius).place(material).in(lab).now();
       return lab;
     };
+std::vector<double> measure_abslength(abslength_config const& config) {
   };
 
   // --- Generator -----

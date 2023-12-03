@@ -4,16 +4,17 @@
 #include <G4ParticleDefinition.hh>
 #include <G4VUserPhysicsList.hh>
 
-struct test_config {
+struct abslength_config {
   G4VUserPhysicsList* physics;
   G4Material*         material;
   std::string         particle_name;
   double              particle_energy;
   std::vector<double> distances;
+  unsigned            n_events;
 };
 
 
-std::vector<double> measure_abslength(test_config const&);
+std::vector<double> measure_abslength(abslength_config const&);
 
 
 // ----- Calculate 511 keV gamma interaction process fractions for given material ------------------------------
