@@ -1,4 +1,3 @@
-
 #include <n4-will-become-external-lib.hh>
 #include <n4-inspect.hh>
 #include <n4-material.hh>
@@ -11,82 +10,91 @@
 #include <G4RandomDirection.hh>
 #include <G4VUserPhysicsList.hh>
 
+#include <cstddef>
+#include <algorithm>
 
-std::vector<double> measure_abslength(test_config const& config) {
-  auto air    = n4::material("G4_AIR");
-  auto sphere = [material=config.material, air] (auto radius) {
-    return [material, air, radius] () {
-      auto lab = n4::box   ("LAB"   ).half_cube(1.1*radius).place(air     )        .now();
-                 n4::sphere("Sphere").r        (    radius).place(material).in(lab).now();
-      return lab;
-    };
+
+// Estimate interaction_lengths based on given configuration
+std::vector<double> measure_interaction_length(interaction_length_config const& config) {
+  // 1. Shoot particles isotropically from origin
+  // 2. Record distance travelled until first interaction
+  // 3. For each distance specified in config, calculate proportion of events in
+  //    which the particle interacts before travelling that distance
+  // 4. Use this fraction to estimate the interaction length: distance / log(fraction)
+  // 5. Return vector of interaction lengths estimated from each distance in config.distances
+
+  // Storage space for data to be collected
+  auto observed_interaction_distances = n4::vec_with_capacity<double>(config.n_events);
+
+  auto enormous_sphere = [config] () {
+    return n4::sphere("huge").r(1*km).place(config.material).now();
   };
 
-  // --- Generator -----
-  auto shoot_gamma = [&config](G4Event* event) {
-     auto vertex = new G4PrimaryVertex{};
-     auto p      = config.particle_energy * G4RandomDirection();
-     auto particle = n4::find_particle(config.particle_name);
-     vertex -> SetPrimary(new G4PrimaryParticle(particle, p.x(), p.y(), p.z()));
-     event -> AddPrimaryVertex(vertex);
+  auto isotropic = n4::random::direction{};
+
+  // Generate particles isotropically from centre of sphere
+  auto shoot_particle = [config, isotropic] (G4Event* event) {
+    static auto particle = n4::find_particle(config.particle_name);
+    auto p               = config.particle_energy * isotropic.get();
+    auto vertex          = new G4PrimaryVertex({}, 0);
+    vertex -> SetPrimary(new G4PrimaryParticle(particle, p.x(), p.y(), p.z()));
+    event  -> AddPrimaryVertex(vertex);
   };
 
-  // --- Count unscathed gammas (in stepping action) -----
-  size_t unscathed = 0;
-  auto count_unscathed = [&unscathed, initial_energy=config.particle_energy](auto step) {
-    auto energy = step -> GetTrack() -> GetTotalEnergy();
-    if (energy > 0.999999 * initial_energy) {
-      auto name = step -> GetPreStepPoint() -> GetTouchable() -> GetVolume() -> GetName();
-      if (name == "LAB") { unscathed++; }
+  // Kill the particle as soon as it interacts and record the distance travelled
+  auto record_distance_and_kill = [&observed_interaction_distances] (const G4Step* step) {
+    auto post    = step -> GetPostStepPoint();
+    auto process = post -> GetProcessDefinedStep() -> GetProcessName();
+    if (process != "Transportation") { // Transportation step length might be limited
+      observed_interaction_distances.push_back(post -> GetPosition().mag());
+      step -> GetTrack() -> SetTrackStatus(fStopAndKill);
     }
   };
 
-  // --- Eliminate secondaries (in stacking action)  -----
-  auto kill_secondaries = [](auto track) {
-    auto kill = track -> GetParentID() > 0;
-    return kill > 0 ? G4ClassificationOfNewTrack::fKill : G4ClassificationOfNewTrack::fUrgent;
+  auto kill_secondaries = [] (const G4Track* track) {
+    return track -> GetTrackID() == 1 ? G4ClassificationOfNewTrack::fUrgent : G4ClassificationOfNewTrack::fKill;
   };
 
-  auto create_actions = [&] {
-    return (new n4::actions{shoot_gamma})
-         -> set((new n4::stacking_action) -> classify(kill_secondaries))
-         -> set (new n4::stepping_action{count_unscathed});
+  auto actions = [&] () {
+    return   (new n4::actions{shoot_particle})
+      -> set((new n4::stacking_action{}) -> classify(kill_secondaries))
+      -> set( new n4::stepping_action{record_distance_and_kill})
+      ;
   };
 
   // ----- Initialize and run Geant4 -------------------------------------------
   {
     n4::silence _{G4cout};
-
-    auto rm = n4::run_manager::create()
-      .fake_ui ()
-      .physics (config.physics)
-      .geometry(sphere(1))
-      .actions(create_actions)
-      .run()
-      ;
-
-    auto events = 10000;
-    auto radii  = config.distances;
-    std::vector<double> result;
-    result.reserve(radii.size());
-
-    // --- Infer attenuation length by gathering statistics for given radius -------------
-    auto estimate_att_length = [&unscathed, rm, &sphere, events, &result] (auto radius) {
-      unscathed = 0;
-
-      rm -> replace_geometry(sphere(radius)).run(events);
-
-      auto ratio = unscathed / (1.0 * events);
-      auto attenuation_length = - radius / log(ratio);
-      result.push_back(attenuation_length);
-   };
-
-    // --- Check attenuation length across range of radii --------------------------------
-    for (auto radius : radii) {
-      estimate_att_length(radius);
-    }
-    return result;
+    n4::run_manager::create()
+      .fake_ui()
+      .physics(config.physics)
+      .geometry(enormous_sphere)
+      .actions(actions())
+      .run(config.n_events);
   }
+
+
+  // Space for the results that will be returned
+  auto measured_interaction_lengths = n4::vec_with_capacity<double>(config.distances.size());
+
+  // Find fraction of events in which particle interacted before travelling the
+  // given distance. Use that fraction to estimate the interaction length.
+  auto estimate_interaction_length = [&] (auto distance) {
+    auto interacted_within_distance = std::count_if( cbegin(observed_interaction_distances)
+                                                   ,   cend(observed_interaction_distances)
+                                                   , [=] (auto d) {return d<distance;});
+    auto ratio     = 1 - interacted_within_distance / static_cast<float>(config.n_events);
+    auto interaction_length = - distance / log(ratio);
+    measured_interaction_lengths.push_back(interaction_length);
+  };
+
+  // Estimate interaction length based on each distance specfied in config.distances
+  std::for_each( cbegin(config.distances)
+               ,   cend(config.distances)
+               , estimate_interaction_length
+               );
+
+  return measured_interaction_lengths;
 }
 
 // ----- Calculate 511 keV gamma interaction process fractions for given material ------------------------------
@@ -138,7 +146,7 @@ interaction_process_fractions calculate_interaction_process_fractions(G4Material
     .physics(physics)
     .geometry(enormous_sphere)
     .actions(test_action)
-    .run(100000);
+    .run(100'000);
 
   auto total = static_cast<float>(phot + compt + rayl);
   return { phot/total, compt/total, rayl/total };

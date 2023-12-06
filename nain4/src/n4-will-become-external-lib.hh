@@ -4,17 +4,18 @@
 #include <G4ParticleDefinition.hh>
 #include <G4VUserPhysicsList.hh>
 
-struct test_config {
+// Configuration of abslength estimation: use with `measure_abslength`
+struct interaction_length_config {
   G4VUserPhysicsList* physics;
   G4Material*         material;
   std::string         particle_name;
   double              particle_energy;
   std::vector<double> distances;
+  unsigned            n_events;
 };
 
-
-std::vector<double> measure_abslength(test_config const&);
-
+// Estimate interaction_lengths based on given configuration
+std::vector<double> measure_interaction_length(interaction_length_config const&);
 
 // ----- Calculate 511 keV gamma interaction process fractions for given material ------------------------------
 struct interaction_process_fractions { double photoelectric, compton, rayleigh; };

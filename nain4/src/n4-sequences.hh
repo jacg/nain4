@@ -66,6 +66,13 @@ template<class F> auto interpolate(F f, size_t N, double min, double max) {
   return make_tuple(xs, ys);
 }
 
+template<class T>
+std::vector<T> vec_with_capacity(size_t N) {
+  std::vector<T> vec;
+  vec.reserve(N);
+  return std::move(vec);
+}
+
 // --------------------------------------------------------------------------------
 // Utility for creating a vector of physical quantity data, without having to
 // repeat the physical unit in each element.
