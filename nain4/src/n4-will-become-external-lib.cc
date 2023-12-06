@@ -13,9 +13,10 @@
 #include <G4VUserPhysicsList.hh>
 
 
-std::vector<double> measure_abslength(abslength_config const& config) {
-  std::vector<double> interaction_distances;
-  interaction_distances.reserve(config.n_events);
+// Calculate interaction_lengths for given
+std::vector<double> measure_interaction_length(interaction_length_config const& config) {
+  std::vector<double> observed_interaction_distances;
+  observed_interaction_distances.reserve(config.n_events);
 
   auto isotropic = n4::random::direction{};
 
@@ -23,20 +24,21 @@ std::vector<double> measure_abslength(abslength_config const& config) {
     return n4::sphere("huge").r(1*km).place(config.material).now();
   };
 
-  auto gamma_511keV = [config, isotropic] (G4Event* event) {
-    static auto gamma = n4::find_particle(config.particle_name);
-    auto p            = config.particle_energy * isotropic.get();
-    auto particle     = n4::find_particle(config.particle_name);
-    auto vertex       = new G4PrimaryVertex({}, 0);
+  // Generate particles isotropically from centre of sphere
+  auto shoot_particle = [config, isotropic] (G4Event* event) {
+    static auto particle = n4::find_particle(config.particle_name);
+    auto p               = config.particle_energy * isotropic.get();
+    auto vertex          = new G4PrimaryVertex({}, 0);
     vertex -> SetPrimary(new G4PrimaryParticle(particle, p.x(), p.y(), p.z()));
     event  -> AddPrimaryVertex(vertex);
   };
 
-  auto record_distance_and_kill = [&interaction_distances] (const G4Step* step) {
+  // Kill the particle as soon as it interacts and record the distance travelled
+  auto record_distance_and_kill = [&observed_interaction_distances] (const G4Step* step) {
     auto post    = step -> GetPostStepPoint();
     auto process = post -> GetProcessDefinedStep() -> GetProcessName();
-    if (process != "Transportation") {
-      interaction_distances.push_back(post -> GetPosition().mag());
+    if (process != "Transportation") { // Transportation step length might be limited
+      observed_interaction_distances.push_back(post -> GetPosition().mag());
       step -> GetTrack() -> SetTrackStatus(fStopAndKill);
     }
   };
@@ -46,7 +48,7 @@ std::vector<double> measure_abslength(abslength_config const& config) {
   };
 
   auto actions = [&] () {
-    return   (new n4::actions{gamma_511keV})
+    return   (new n4::actions{shoot_particle})
       -> set((new n4::stacking_action{}) -> classify(kill_secondaries))
       -> set( new n4::stepping_action{record_distance_and_kill})
       ;
@@ -63,25 +65,25 @@ std::vector<double> measure_abslength(abslength_config const& config) {
       .run(config.n_events);
   }
 
-  std::vector<double> measured_abslengths;
-  measured_abslengths.reserve(config.distances.size());
+  std::vector<double> measured_interaction_lengths;
+  measured_interaction_lengths.reserve(config.distances.size());
 
-  auto estimate_abslength = [&] (auto distance) {
-    auto interacted_within_distance = std::count_if( cbegin(interaction_distances)
-                                                   ,   cend(interaction_distances)
+  auto estimate_interaction_length = [&] (auto distance) {
+    auto interacted_within_distance = std::count_if( cbegin(observed_interaction_distances)
+                                                   ,   cend(observed_interaction_distances)
                                                    , [=] (auto d) {return d<distance;});
     auto ratio     = 1 - interacted_within_distance / static_cast<float>(config.n_events);
-    auto abslength = - distance / log(ratio);
-    measured_abslengths.push_back(abslength);
+    auto interaction_length = - distance / log(ratio);
+    measured_interaction_lengths.push_back(interaction_length);
   };
 
 
   std::for_each( cbegin(config.distances)
                ,   cend(config.distances)
-               , estimate_abslength
+               , estimate_interaction_length
                );
 
-  return measured_abslengths;
+  return measured_interaction_lengths;
 }
 
 // ----- Calculate 511 keV gamma interaction process fractions for given material ------------------------------
