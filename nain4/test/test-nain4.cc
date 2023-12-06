@@ -1,5 +1,7 @@
 #include <n4-all.hh>
 
+#include <n4-will-become-external-lib.hh>
+
 // Solids
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Box.hh>
@@ -2323,6 +2325,22 @@ TEST_CASE("stats correlation", "[stats][correlation]") {
                std::vector<int>{1,2,3},
                std::vector<int>{1,2,2}).value(),
              WithinULP(std::sqrt(3)/2, 1));
+}
+
+TEST_CASE("interaction length") {
+  interaction_length_config config {
+    .physics         = default_physics_lists(),
+    .material        = n4::material("G4_Pb"),
+    .particle_name   = "gamma",
+    .particle_energy = 1 * MeV,
+    .distances       = n4::scale_by(1*mm, {1, 2, 3, 4, 5, 6}),
+    .n_events        = 100'000
+  };
+
+  for (auto l: measure_interaction_length(config)) {
+    CHECK_THAT(l, WithinRel(12.5*mm, 0.02));
+  }
+
 }
 
 #pragma GCC diagnostic pop
