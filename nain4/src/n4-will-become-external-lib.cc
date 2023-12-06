@@ -36,7 +36,7 @@ std::vector<double> measure_abslength(abslength_config const& config) {
     auto post    = step -> GetPostStepPoint();
     auto process = post -> GetProcessDefinedStep() -> GetProcessName();
     if (process != "Transportation") {
-      interaction_distances.push_back(post -> GetPosition().z());
+      interaction_distances.push_back(post -> GetPosition().mag());
       step -> GetTrack() -> SetTrackStatus(fStopAndKill);
     }
   };
