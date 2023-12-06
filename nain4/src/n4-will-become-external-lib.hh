@@ -10,15 +10,12 @@ struct interaction_length_config {
   G4Material*         material;
   std::string         particle_name;
   double              particle_energy;
-  // fulanito
   std::vector<double> distances;
-  // bla bla bla
   unsigned            n_events;
 };
 
-// Comment in header
-std::vector<double> measure_abslength(interaction_length_config const&);
-
+// Estimate interaction_lengths based on given configuration
+std::vector<double> measure_interaction_length(interaction_length_config const&);
 
 // ----- Calculate 511 keV gamma interaction process fractions for given material ------------------------------
 struct interaction_process_fractions { double photoelectric, compton, rayleigh; };

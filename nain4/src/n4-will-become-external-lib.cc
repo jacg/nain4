@@ -1,5 +1,3 @@
-
-#include <algorithm>
 #include <n4-will-become-external-lib.hh>
 #include <n4-inspect.hh>
 #include <n4-material.hh>
@@ -12,17 +10,27 @@
 #include <G4RandomDirection.hh>
 #include <G4VUserPhysicsList.hh>
 
+#include <cstddef>
+#include <algorithm>
 
-// Calculate interaction_lengths for given
+
+// Estimate interaction_lengths based on given configuration
 std::vector<double> measure_interaction_length(interaction_length_config const& config) {
-  std::vector<double> observed_interaction_distances;
-  observed_interaction_distances.reserve(config.n_events);
+  // 1. Shoot particles isotropically from origin
+  // 2. Record distance travelled until first interaction
+  // 3. For each distance specified in config, calculate proportion of events in
+  //    which the particle interacts before travelling that distance
+  // 4. Use this fraction to estimate the interaction length: distance / log(fraction)
+  // 5. Return vector of interaction lengths estimated from each distance in config.distances
 
-  auto isotropic = n4::random::direction{};
+  // Storage space for data to be collected
+  auto observed_interaction_distances = n4::vec_with_capacity<double>(config.n_events);
 
   auto enormous_sphere = [config] () {
     return n4::sphere("huge").r(1*km).place(config.material).now();
   };
+
+  auto isotropic = n4::random::direction{};
 
   // Generate particles isotropically from centre of sphere
   auto shoot_particle = [config, isotropic] (G4Event* event) {
@@ -65,9 +73,12 @@ std::vector<double> measure_interaction_length(interaction_length_config const& 
       .run(config.n_events);
   }
 
-  std::vector<double> measured_interaction_lengths;
-  measured_interaction_lengths.reserve(config.distances.size());
 
+  // Space for the results that will be returned
+  auto measured_interaction_lengths = n4::vec_with_capacity<double>(config.distances.size());
+
+  // Find fraction of events in which particle interacted before travelling the
+  // given distance. Use that fraction to estimate the interaction length.
   auto estimate_interaction_length = [&] (auto distance) {
     auto interacted_within_distance = std::count_if( cbegin(observed_interaction_distances)
                                                    ,   cend(observed_interaction_distances)
@@ -77,7 +88,7 @@ std::vector<double> measure_interaction_length(interaction_length_config const& 
     measured_interaction_lengths.push_back(interaction_length);
   };
 
-
+  // Estimate interaction length based on each distance specfied in config.distances
   std::for_each( cbegin(config.distances)
                ,   cend(config.distances)
                , estimate_interaction_length
@@ -135,7 +146,7 @@ interaction_process_fractions calculate_interaction_process_fractions(G4Material
     .physics(physics)
     .geometry(enormous_sphere)
     .actions(test_action)
-    .run(100000);
+    .run(100'000);
 
   auto total = static_cast<float>(phot + compt + rayl);
   return { phot/total, compt/total, rayl/total };
