@@ -215,11 +215,11 @@ arrow::Result<std::vector<data_row>> columnar_table_to_vector(const std::shared_
   // automatically for double arrays, this cannot be done for the accompanying
   // bitmap as often the slicing border would be inside a byte.
 
-  auto as      = std::static_pointer_cast<arrow::Int64Array >(table   -> column(0) -> chunk(0));
-  auto bs      = std::static_pointer_cast<arrow::Int64Array >(table   -> column(1) -> chunk(0));
-  vector_from_list<arrow::DoubleArray> cs                    {table   -> column(2) -> chunk(0)};
+  auto as      = std::static_pointer_cast<arrow::Int64Array >(table -> column(0) -> chunk(0));
+  auto bs      = std::static_pointer_cast<arrow::Int64Array >(table -> column(1) -> chunk(0));
+  vector_from_list<arrow::DoubleArray> cs                    {table -> column(2) -> chunk(0)};
 
-  auto ds      = std::static_pointer_cast<arrow::StructArray>(table   -> column(3) -> chunk(0));
+  auto ds   = std::static_pointer_cast<arrow::StructArray>(table -> column(3) -> chunk(0));
   auto ds_1 = std::static_pointer_cast<arrow::DoubleArray>(ds -> field(0));
   auto ds_2 = std::static_pointer_cast<arrow::DoubleArray>(ds -> field(1));
 
