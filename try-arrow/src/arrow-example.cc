@@ -1,5 +1,11 @@
 #include <arrow/api.h>
+#include <arrow/array/builder_nested.h>
+#include <arrow/io/api.h>
+#include <arrow/ipc/api.h>
 #include <arrow/result.h>
+
+#include <arrow/type_fwd.h>
+#include <parquet/arrow/writer.h>
 
 #include <cstdint>
 #include <iomanip>
@@ -41,17 +47,26 @@ struct data_row {
 
 std::shared_ptr<arrow::Schema> the_schema() {
   std::vector<std::shared_ptr<arrow::Field>> schema_vector = {
-    arrow::field("a" , arrow::int64()),
-    arrow::field("b" , arrow::int64()),
-    arrow::field("cs", arrow::list(arrow::float64())),
-    arrow::field("d" , arrow::struct_({
-            arrow::field("one", arrow::float64()),
-            arrow::field("two", arrow::float64())}
-    )),
-    arrow::field("es", arrow::list(arrow::struct_({
-                arrow::field("one", arrow::float64()),
-                arrow::field("two", arrow::float64())
-    })))
+    arrow::field("a", arrow::int64(), false),
+    arrow::field("b", arrow::int64(), false),
+
+    arrow::field( "cs"
+                , arrow::list(arrow::field( "c"
+                                          , arrow::float64()
+                                          , true))
+                , false),
+
+    arrow::field("d"
+                , arrow::struct_({ arrow::field("one", arrow::float64(), false),
+                                   arrow::field("two", arrow::float64(), false)})
+                , false),
+
+    arrow::field( "es"
+                , arrow::list( arrow::field( "e"
+                                           , arrow::struct_({ arrow::field("one", arrow::float64(), false)
+                                                            , arrow::field("two", arrow::float64(), false)})
+                                           , true))
+                , false)
   };
   return std::make_shared<arrow::Schema>(schema_vector);
 }
@@ -79,7 +94,8 @@ public:
   list_builder(arrow::MemoryPool* pool = arrow::default_memory_pool())
   : build_outer{pool, std::make_shared<ListContentBuilder>(pool)}
   , build_inner{static_cast<ListContentBuilder*>(build_outer.value_builder())}
-  {}
+  {
+  }
 
   arrow::Status Append(const std::vector<InnerType>& stuff) {
     ARROW_RETURN_NOT_OK(build_outer .  Append      (     ));
@@ -102,19 +118,20 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
   Int64Builder                a_builder{pool};
   Int64Builder                b_builder{pool};
   list_builder<DoubleBuilder> c_builder{pool};
+
   // --- d ---------------
-  auto field = arrow::struct_({
-      arrow::field("one", arrow::float64()),
-      arrow::field("two", arrow::float64())
+  auto struct_type = arrow::struct_({
+      arrow::field("one", arrow::float64(), false),
+      arrow::field("two", arrow::float64(), false)
   });
 
-  StructBuilder               d_builder{field, pool, {std::make_shared<DoubleBuilder>(pool), std::make_shared<DoubleBuilder>(pool)}};
+  StructBuilder               d_builder{struct_type, pool, {std::make_shared<DoubleBuilder>(pool), std::make_shared<DoubleBuilder>(pool)}};
 
   auto d_one_builder = static_cast<DoubleBuilder*>(d_builder.field_builder(0));
   auto d_two_builder = static_cast<DoubleBuilder*>(d_builder.field_builder(1));
   // --- e ---------------
   std::vector<std::shared_ptr<arrow::ArrayBuilder>> vec_of_builders {std::make_shared<DoubleBuilder>(pool), std::make_shared<DoubleBuilder>(pool)};
-  ListBuilder e_builder{pool, std::make_shared<StructBuilder>(field, pool, vec_of_builders)};
+  ListBuilder e_builder{pool, std::make_shared<StructBuilder>(struct_type, pool, vec_of_builders)};
 
   StructBuilder* e_inner = static_cast<StructBuilder*>(e_builder.value_builder());
 
@@ -134,8 +151,8 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
     ARROW_RETURN_NOT_OK(d_one_builder->Append(row.d.one));
     ARROW_RETURN_NOT_OK(d_two_builder->Append(row.d.two));
 
+    ARROW_RETURN_NOT_OK(e_builder.Append());
     for (auto e_pair: row.es) {
-      ARROW_RETURN_NOT_OK(e_builder.Append());
       ARROW_RETURN_NOT_OK(e_inner -> Append());
       ARROW_RETURN_NOT_OK(e_one_builder->Append(e_pair.one));
       ARROW_RETURN_NOT_OK(e_two_builder->Append(e_pair.two));
@@ -254,10 +271,58 @@ void print_rows(const std::vector<data_row>& rows) {
   }
 }
 
+
+arrow::Status write_parquet(
+  std::string filename,
+  std::shared_ptr<arrow::Table> data,
+  int64_t chunk_size = parquet::DEFAULT_MAX_ROW_GROUP_LENGTH
+) {
+  std::shared_ptr<arrow::io::FileOutputStream> outfile;
+  ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open(filename));
+  PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(*data, pool, outfile, chunk_size));
+  return arrow::Status::OK();
+}
+
+
+#define DEFINE_WRITE_DATA_FUNCTION(INPUT_FORMAT)                                                                             \
+arrow::Status write_data(std::shared_ptr<arrow::ipc::RecordBatchWriter> writer, std::shared_ptr<arrow::INPUT_FORMAT> data) { \
+  ARROW_RETURN_NOT_OK(writer -> Write##INPUT_FORMAT(*data));                                                                 \
+  return arrow::Status::OK();                                                                                                \
+}
+
+DEFINE_WRITE_DATA_FUNCTION(Table)
+DEFINE_WRITE_DATA_FUNCTION(RecordBatch)
+
+#undef DEFINE_WRITE_DATA_FUNCTION
+
+#define DEFINE_WRITE_FORMAT_FUNCTION(OUTPUT_FORMAT, WRITER, INPUT_FORMAT) \
+arrow::Status write_##OUTPUT_FORMAT(                                            \
+  std::string filename,                                                         \
+  std::shared_ptr<arrow::INPUT_FORMAT> data                                     \
+) {                                                                             \
+  std::shared_ptr<arrow::io::FileOutputStream> outfile;                         \
+  ARROW_ASSIGN_OR_RAISE(outfile, arrow::io::FileOutputStream::Open(filename));  \
+  ARROW_ASSIGN_OR_RAISE(auto writer, arrow::WRITER(outfile, data -> schema())); \
+  ARROW_RETURN_NOT_OK(write_data(writer, data));                                \
+  ARROW_RETURN_NOT_OK(writer -> Close());                                       \
+  return arrow::Status::OK();                                                   \
+}
+DEFINE_WRITE_FORMAT_FUNCTION(arrow, ipc::MakeFileWriter, Table)
+
+#undef DEFINE_WRITE_FORMAT_FUNCTION
+
+
+
 arrow::Status RunRowConversion() {
   std::vector<data_row> original_rows = {
-    {1, 1, {10.0}            , { 1.23,  9.87}, {{1.11,1.12},{1.21,1.22}}},
-    {2, 3, {11.0, 12.0, 13.0}, {22   , 23}   , {{2.11,2.12},{2.21,2.22},{2.31,2.32}}},
+ //  a  b  c                   d               e
+    {1, 1, {10.0}            , { 1.23,  9.87}, {{1.11,1.12}
+                                               ,{1.21,1.22}}},
+
+    {2, 3, {11.0, 12.0, 13.0}, {22   , 23}   , {{2.11,2.12}
+                                               ,{2.21,2.22}
+                                               ,{2.31,2.32}}},
+
     {3, 2, {15.0, 25.0}      , {99   , 88}   , {{3.11,3.12}}}
   };
   std::shared_ptr<arrow::Table> table;
@@ -266,6 +331,12 @@ arrow::Status RunRowConversion() {
   ARROW_ASSIGN_OR_RAISE(table, vector_to_columnar_table(original_rows));
   DBG("Table returned by vector_to_columnar_table");
   print(table);
+
+
+  ARROW_RETURN_NOT_OK(write_parquet("complex-structure.parquet", table));
+  ARROW_RETURN_NOT_OK(write_arrow  ("complex-structure.arrow"  , table));
+
+
   ARROW_ASSIGN_OR_RAISE(converted_rows, columnar_table_to_vector(table));
 
   assert(original_rows.size() == converted_rows.size());
