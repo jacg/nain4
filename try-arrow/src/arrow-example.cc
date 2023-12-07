@@ -4,7 +4,6 @@
 #include <arrow/ipc/api.h>
 #include <arrow/result.h>
 
-#include <arrow/type.h>
 #include <arrow/type_fwd.h>
 #include <parquet/arrow/writer.h>
 
@@ -89,36 +88,16 @@ std::shared_ptr<arrow::Schema> the_schema() {
 // underlying values array that is referenced by the offsets in the former
 // array.
 
-template<class LCB>
-std::shared_ptr<arrow::DataType> type_with_given_nullability(std::shared_ptr<LCB> lcb, bool nullable) {
-  auto type = lcb -> type();
-  DBG("type: " << type);
-
-  auto fields = type -> fields();
-  DBG("no fields: " << fields.size());
-
-  auto field = type -> field(0);
-  DBG("field: " << field);
-
-  auto modified_nullability_field = field -> WithNullable(nullable);
-  DBG("modified_nullability_field: " << modified_nullability_field);
-
-  type = modified_nullability_field -> type();
-  DBG("type again: " << type);
-
-  return type;
-  //return lcb -> type() -> field(0) -> WithNullable(nullable) -> type();
-}
-
 template<class ListContentBuilder>
 class list_builder {
   using InnerType = decltype(std::declval<ListContentBuilder>().GetValue(0));
 public:
 
   list_builder(arrow::MemoryPool* pool = arrow::default_memory_pool())
-  : build_inner{std::make_shared<ListContentBuilder>(pool)}
-  , build_outer{pool, build_inner, type_with_given_nullability(build_inner, false)}
-  {}
+  : build_outer{pool, std::make_shared<ListContentBuilder>(pool)}
+  , build_inner{static_cast<ListContentBuilder*>(build_outer.value_builder())}
+  {
+  }
 
   arrow::Status Append(const std::vector<InnerType>& stuff) {
     ARROW_RETURN_NOT_OK(build_outer .  Append      (     ));
@@ -131,8 +110,8 @@ public:
   }
 
 private:
-  std::shared_ptr<ListContentBuilder> build_inner;
-  ListBuilder                         build_outer;
+  ListBuilder         build_outer;
+  ListContentBuilder* build_inner;
 };
 
 
@@ -348,13 +327,11 @@ arrow::Status RunRowConversion() {
   DBG("Table returned by vector_to_columnar_table");
   print(table);
 
-  DBG("ARROW_RETURN_NOT_OK(write_parquet(\"complex-structure.parquet\", table));");
+
   ARROW_RETURN_NOT_OK(write_parquet("complex-structure.parquet", table));
-  DBG("ARROW_RETURN_NOT_OK(write_arrow  (\"complex-structure.arrow\"  , table));")
   ARROW_RETURN_NOT_OK(write_arrow  ("complex-structure.arrow"  , table));
 
 
-  DBG("ARROW_ASSIGN_OR_RAISE(converted_rows, columnar_table_to_vector(table));")
   ARROW_ASSIGN_OR_RAISE(converted_rows, columnar_table_to_vector(table));
 
   assert(original_rows.size() == converted_rows.size());
