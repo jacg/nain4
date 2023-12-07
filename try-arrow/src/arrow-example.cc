@@ -31,6 +31,12 @@ std::ostream& operator << (std::ostream& out, const pair& p) {
   return out << std::setw(0) << '[' << p.one << ", " << p.two << ']';
 }
 
+// --- d ---------------
+auto struct_type = arrow::struct_({
+  arrow::field("one", arrow::float64(), false),
+  arrow::field("two", arrow::float64(), false)
+});
+
 // While we want to use columnar data structures to build efficient operations, we
 // often receive data in a row-wise fashion from other systems. In the following,
 // we want give a brief introduction into the classes provided by Apache Arrow by
@@ -56,15 +62,11 @@ std::shared_ptr<arrow::Schema> the_schema() {
                                           , true))
                 , false),
 
-    arrow::field("d"
-                , arrow::struct_({ arrow::field("one", arrow::float64(), false),
-                                   arrow::field("two", arrow::float64(), false)})
-                , false),
+    arrow::field("d", struct_type, false),
 
     arrow::field( "es"
                 , arrow::list( arrow::field( "e"
-                                           , arrow::struct_({ arrow::field("one", arrow::float64(), false)
-                                                            , arrow::field("two", arrow::float64(), false)})
+                                           , struct_type
                                            , true))
                 , false)
   };
@@ -118,13 +120,6 @@ arrow::Result<std::shared_ptr<arrow::Table>> vector_to_columnar_table(const std:
   Int64Builder                a_builder{pool};
   Int64Builder                b_builder{pool};
   list_builder<DoubleBuilder> c_builder{pool};
-
-  // --- d ---------------
-  auto struct_type = arrow::struct_({
-      arrow::field("one", arrow::float64(), false),
-      arrow::field("two", arrow::float64(), false)
-  });
-
   StructBuilder               d_builder{struct_type, pool, {std::make_shared<DoubleBuilder>(pool), std::make_shared<DoubleBuilder>(pool)}};
 
   auto d_one_builder = static_cast<DoubleBuilder*>(d_builder.field_builder(0));
