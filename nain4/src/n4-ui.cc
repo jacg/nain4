@@ -182,6 +182,28 @@ internal::may_err ui::command (const G4String& command, const G4String& prefix, 
   return {};
 }
 
+
+std::unordered_map<std::string, std::string> ui::arg_map() {
+  std::unordered_map<std::string, std::string> args;
+  args.reserve(5);
+
+  auto concatenate = [] (auto ss) {
+    auto join2 = [] (const auto& acc, const auto& s) { return acc.empty() ? s : acc + "; " + s; };
+    return std::accumulate(cbegin(ss), cend(ss), std::string(""), join2);
+  };
+
+  auto macro_path = g4_ui.GetMacroSearchPath();
+
+  args["-n"] =   n_events.has_value() ? std::to_string(n_events.value()) : "NOT SET";
+  args["-e"] =      early.size() > 0  ? concatenate(early)               : "NOT SET";
+  args["-l"] =       late.size() > 0  ? concatenate(late)                : "NOT SET";
+  args["-g"] =        vis.size() > 0  ? concatenate(vis)                 : "NOT SET";
+  args["-m"] = macro_path.size() > 0  ? macro_path                       : "NOT SET";
+
+  return args;
+}
+
+
 test::argcv::argcv(std::initializer_list<std::string> args): argc{static_cast<int>(args.size())} {
   argv = new char*[argc+1];
   int i = 0;
