@@ -33,3 +33,11 @@ arrow_eg_exe = executable( 'arrow-example'
                          , dependencies       : [ try_arrow_deps ]
                          , install            : true
                          )
+
+simple_list_sources = [ 'simple-list.cc' ]
+simple_list_exe = executable( 'simple-list'
+                            , simple_list_sources
+                            , include_directories: []
+                            , dependencies       : [ try_arrow_deps ]
+                            , install            : true
+                            )

@@ -6,6 +6,9 @@ run: install
 example: install
     build/arrow-example
 
+simple-list: install
+    build/simple-list
+
 install:
     meson setup build src
     meson compile -C build
