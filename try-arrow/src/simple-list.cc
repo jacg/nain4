@@ -8,9 +8,11 @@
 
 using namespace arrow;
 
+#define DBG(stuff) std::cout << stuff << std::endl;
+
 std::shared_ptr<Schema> the_schema() {
   auto nullable_list_element = false;
-  auto nullable_list         = false;
+  auto nullable_list         = true;
 
   auto element_field = field( "item", int32()            , nullable_list_element);
   auto    list_field = field("items", list(element_field), nullable_list);
@@ -35,7 +37,9 @@ Status do_it() {
 
   auto filename = "outputfile.parquet";
   ARROW_ASSIGN_OR_RAISE(auto outfile, io::FileOutputStream::Open(filename));
+  DBG("ABOUT TO CRASH, MAYBE ....");
   PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(*table, pool, outfile));
+  DBG("HOORAY, WE DIDN'T CRASH!");
 
   return Status::OK();
 }
@@ -46,5 +50,6 @@ int main() {
     std::cerr << status.ToString() << std::endl;
     return EXIT_FAILURE;
   }
+  DBG("WE SURVIVED ALL THE WAY TO THE END");
   return EXIT_SUCCESS;
 }
