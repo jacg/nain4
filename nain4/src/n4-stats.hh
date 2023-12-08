@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <n4-sequences.hh>
 
 #include <boost/math/statistics/univariate_statistics.hpp>
@@ -57,6 +58,17 @@ auto correlation(const CONTAINER& a, const CONTAINER& b) -> std::optional<declty
   if (a.size() != b.size()) { return {}; }
   auto corr = BSTATS::correlation_coefficient(a,b);
   if (std::isnan(corr)) { return {}; } else { return corr; }
+}
+
+template<class CONTAINER>
+auto min_max(const CONTAINER& data) -> std::tuple<typename CONTAINER::value_type, typename CONTAINER::value_type> {
+  auto min = std::numeric_limits<typename CONTAINER::value_type>::max();
+  auto max = std::numeric_limits<typename CONTAINER::value_type>::min();
+  for (const auto& x: data) {
+    min = std::min(x, min);
+    max = std::max(x, max);
+  }
+  return {min, max};
 }
 
 }
