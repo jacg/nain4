@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <n4-all.hh>
 
 #include <n4-will-become-external-lib.hh>
@@ -1725,21 +1726,21 @@ TEST_CASE("nain interpolate", "[nain][interpolate]") {
     double last;
 
     last = xs.front();
-    for (auto i=1; i<xs.size(); i++) {
+    for (size_t i=1; i<xs.size(); i++) {
       CHECK(last < xs[i]);
       last = xs[i];
     }
 
     last = ys.front();
-    for (auto i=1; i<ys.size(); i++) {
+    for (size_t i=1; i<ys.size(); i++) {
       CHECK(last > ys[i]);
       last = ys[i];
     }
   }
 
   SECTION("distance between elements") {
-    for (auto i=1; i<xs.size()-1; i++) { CHECK_THAT(xs[i+1] - xs[i], WithinULP( delta, 3)); }
-    for (auto i=1; i<ys.size()-1; i++) { CHECK_THAT(ys[i+1] - ys[i], WithinULP(-delta, 3)); }
+    for (size_t i=1; i<xs.size()-1; i++) { CHECK_THAT(xs[i+1] - xs[i], WithinULP( delta, 3)); }
+    for (size_t i=1; i<ys.size()-1; i++) { CHECK_THAT(ys[i+1] - ys[i], WithinULP(-delta, 3)); }
   }
 
 }
@@ -1755,7 +1756,7 @@ TEST_CASE("nain interpolate values", "[nain][interpolate]") {
 
   auto [xs, ys]   = n4::interpolate(f, n_points, lower, upper);
 
-  for (auto i=0; i<ys.size(); i++) {
+  for (size_t i=0; i<ys.size(); i++) {
     auto xi = lower + i * delta;
     auto yi = f(xi);
 

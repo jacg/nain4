@@ -70,7 +70,7 @@ template<class T>
 std::vector<T> vec_with_capacity(size_t N) {
   std::vector<T> vec;
   vec.reserve(N);
-  return std::move(vec);
+  return vec;
 }
 
 // --------------------------------------------------------------------------------
