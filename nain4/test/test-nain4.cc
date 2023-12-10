@@ -1,4 +1,3 @@
-#include <cstddef>
 #include <n4-all.hh>
 
 #include <n4-will-become-external-lib.hh>
@@ -36,6 +35,7 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <numeric>
@@ -2326,6 +2326,23 @@ TEST_CASE("stats correlation", "[stats][correlation]") {
                std::vector<int>{1,2,3},
                std::vector<int>{1,2,2}).value(),
              WithinULP(std::sqrt(3)/2, 1));
+}
+
+TEST_CASE("stats min_max", "[stats][min_max]") {
+  std::vector<double> empty{};
+  CHECK(! n4::stats::min_max(empty).has_value());
+
+  auto check_min_max = [] (const auto& data, const auto expected_min, const auto expected_max) {
+    auto [min, max] = n4::stats::min_max(data).value();
+    CHECK(min == expected_min);
+    CHECK(max == expected_max);
+  };
+
+  std::vector<double> a {1.23, -9.62, 12.3, 4.56};
+  check_min_max(a,             -9.62, 12.3);
+
+  std::unordered_set<int> b {6,5,4,3};
+  check_min_max(b, 3, 6);
 }
 
 TEST_CASE("interaction length") {
