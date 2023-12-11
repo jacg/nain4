@@ -11,6 +11,7 @@
 #include <G4VUserActionInitialization.hh>
 #include <G4VUserPhysicsList.hh>
 
+#include <G4GeometryManager.hh>
 #include <G4RunManager.hh>
 #include <G4RunManagerFactory.hh>
 #include <G4VUserPrimaryGeneratorAction.hh>
@@ -60,6 +61,7 @@ class run_manager {
   run_manager(G4RM g4_manager, n4::ui ui) : g4_manager{std::move(g4_manager)}, ui{std::move(ui)} {
     rm_instance = this;
   }
+
 
   struct ready;
 public:
@@ -133,6 +135,8 @@ private:
       run_manager::rm_instance = new run_manager{std::move(g4_manager), std::move(ui)};
 
       run_manager::rm_instance -> ui.run(n_events);
+      G4GeometryManager::GetInstance() -> OpenGeometry();
+
       return run_manager::rm_instance;
     }
     ui::kind command = ui::kind::command;
