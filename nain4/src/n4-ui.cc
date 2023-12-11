@@ -10,6 +10,8 @@
 
 #include <argparse/argparse.hpp>
 
+#include <boost/algorithm/string.hpp>
+
 #include <algorithm>
 #include <cstdlib>
 #include <initializer_list>
@@ -187,10 +189,7 @@ std::unordered_map<std::string, std::string> ui::arg_map() {
   std::unordered_map<std::string, std::string> args;
   args.reserve(5);
 
-  auto concatenate = [] (auto ss) {
-    auto join2 = [] (const auto& acc, const auto& s) { return acc.empty() ? s : acc + "; " + s; };
-    return std::accumulate(cbegin(ss), cend(ss), std::string(""), join2);
-  };
+  auto concatenate = [] (const auto& strings) { return boost::algorithm::join(strings, "; "); };
 
   auto macro_path = g4_ui.GetMacroSearchPath();
 
