@@ -1203,7 +1203,7 @@ TEST_CASE("nain find sensitive", "[nain][find][sensitive]") {
   REQUIRE(found.has_value());
   CHECK  (found.value() == sd1);
 
-  auto should_not_exist = n4::find_sensitive<n4::sensitive_detector>("this name has not been used");
+  auto should_not_exist = n4::find_sensitive<n4::sensitive_detector>("MISSING-NAME-92zidf");
   CHECK(! should_not_exist.has_value());
 }
 
