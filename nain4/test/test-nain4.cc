@@ -1195,10 +1195,13 @@ TEST_CASE("nain find sensitive", "[nain][find][sensitive]") {
   auto dummy = [] (const G4Step*) {return true;};
   auto material = n4::material("G4_AIR");
 
-  n4::box("box").cube(1).sensitive("my-sd", dummy).place(material).now();
+  auto sd1 = new n4::sensitive_detector{"my-sd", dummy};
+
+  n4::box("box").cube(1).sensitive(sd1).place(material).now();
 
   auto found = n4::find_sensitive<n4::sensitive_detector>("my-sd");
-  CHECK(found.has_value());
+  REQUIRE(found.has_value());
+  CHECK  (found.value() == sd1);
 
   auto should_not_exist = n4::find_sensitive<n4::sensitive_detector>("this name has not been used");
   CHECK(! should_not_exist.has_value());
