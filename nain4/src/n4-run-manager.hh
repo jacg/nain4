@@ -225,6 +225,11 @@ public:
     return *rm_instance;
   }
 
+  static n4::ui& get_ui() {
+    exit_if_too_early("run_manager::get_ui");
+    return get().ui;
+  }
+
   static const G4VUserDetectorConstruction& get_geometry();
   static const G4UserRunAction            & get_run_action();
   static const G4UserEventAction          & get_event_action();

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <memory>
 #include <optional>
+#include <unordered_map>
 
 
 namespace nain4 {
@@ -68,6 +69,7 @@ public : ui(const std::string& program_name, int argc, char** argv,             
   void     set_path(G4String const& path) {                       g4_ui.SetMacroSearchPath(path) ; g4_ui.ParseMacroSearchPath();}
   void prepend_path(G4String const& path) { set_path(path + ":" + g4_ui.GetMacroSearchPath(    ));}
 
+  std::unordered_map<std::string, std::string> arg_map();
 private:
   friend test::query;
 

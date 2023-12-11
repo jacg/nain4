@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <n4-ui.hh>
 #include <n4-run-manager.hh>
 
@@ -11,6 +10,9 @@
 
 #include <argparse/argparse.hpp>
 
+#include <boost/algorithm/string.hpp>
+
+#include <algorithm>
 #include <cstdlib>
 #include <initializer_list>
 #include <memory>
@@ -181,6 +183,25 @@ internal::may_err ui::command (const G4String& command, const G4String& prefix, 
             << " accepted: (" << command  << ')' << std::endl;
   return {};
 }
+
+
+std::unordered_map<std::string, std::string> ui::arg_map() {
+  std::unordered_map<std::string, std::string> args;
+  args.reserve(5);
+
+  auto concatenate = [] (const auto& strings) { return boost::algorithm::join(strings, "; "); };
+
+  auto macro_path = g4_ui.GetMacroSearchPath();
+
+  args["-n"] =   n_events.has_value() ? std::to_string(n_events.value()) : "NOT SET";
+  args["-e"] =      early.size() > 0  ? concatenate(early)               : "NOT SET";
+  args["-l"] =       late.size() > 0  ? concatenate(late)                : "NOT SET";
+  args["-g"] =        vis.size() > 0  ? concatenate(vis)                 : "NOT SET";
+  args["-m"] = macro_path.size() > 0  ? macro_path                       : "NOT SET";
+
+  return args;
+}
+
 
 test::argcv::argcv(std::initializer_list<std::string> args): argc{static_cast<int>(args.size())} {
   argv = new char*[argc+1];
