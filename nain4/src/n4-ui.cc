@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <n4-ui.hh>
 #include <n4-run-manager.hh>
 
@@ -11,6 +10,7 @@
 
 #include <argparse/argparse.hpp>
 
+#include <algorithm>
 #include <cstdlib>
 #include <initializer_list>
 #include <memory>
