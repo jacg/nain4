@@ -263,7 +263,7 @@
     };
 
     #
-    nixConfig = {
+    _nixConfig = {
       extra-substituters = [
         "https://nain4.cachix.org"
       ];
