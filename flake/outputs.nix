@@ -262,4 +262,14 @@
       # How about things needed at run but not build time?
     };
 
+    #
+    nixConfig = {
+      extra-substituters = [
+        "https://nain4.cachix.org"
+      ];
+      extra-trusted-public-keys = [
+        "nain4.cachix.org-1:YBX1IitiHnP2JkR8q7bM+wj3gZPRlDVFyOk1BhYP/6s="
+      ];
+    };
+
   }
