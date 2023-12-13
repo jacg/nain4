@@ -19,7 +19,7 @@ Status arrow_main() {
 
   // Build an array with the data to be placed in the table
   auto  int_builder = std::make_shared<Int32Builder>(pool);
-  auto list_builder = ListBuilder{pool, int_builder};
+  auto list_builder = ListBuilder{pool, int_builder, list_type};
 
   std::vector<std::vector<int>> all_values{{0, 1}, {2}, {3,4,5}, {6,7,8,9}};
   for (const auto& values : all_values) {
