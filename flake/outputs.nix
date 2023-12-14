@@ -1,8 +1,10 @@
 { self
 , nixpkgs # <---- This `nixpkgs` has systems removed e.g. legacyPackages.zlib
+, oldpkgs
 , ...
 }: let
 
+  pkgs-old = oldpkgs.legacyPackages.pkgs;
   pkgs = (nixpkgs.legacyPackages
     .extend (import ./overlays/argparse.nix))
     .extend add-debug-symbols-to-geant4;
@@ -20,7 +22,7 @@
   };
 
   g4 = { thread ? false , inventor ? false , qt ? false, xm ? false, ogl ? false, python ? false, raytrace ? false }:
-    (pkgs.geant4.override {
+    (pkgs-old.geant4.override {
       enableMultiThreading = thread;
       enableInventor       = inventor;
       enableQt             = qt;
@@ -32,7 +34,7 @@
 
   my-geant4 = g4 { qt = true; };
 
-  geant4-data = with pkgs.geant4.data; [
+  geant4-data = with pkgs-old.geant4.data; [
     G4PhotonEvaporation
     G4RealSurface
     G4EMLOW
@@ -109,7 +111,7 @@
   shell-shared = {
     G4_DIR = "${pkgs.geant4}";
       G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
-      QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
+      QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs-old.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs-old.libsForQt5.qt5.qtbase.version}/plugins";
 
       shellHook = ''
           export NAIN4_LIB=$PWD/install/nain4/lib
@@ -137,9 +139,9 @@
                       buildInputs = self.deps.run;        # local            build and runtime environment
       propagatedBuildInputs       = self.deps.prop-run;   # local and client build and runtime environment
 
-      hook_g4_dir = "${pkgs.geant4}";
-      hook_g4_examples = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
-      hook_qt_stuff = "${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
+      hook_g4_dir = "${pkgs-old.geant4}";
+      hook_g4_examples = "${pkgs-old.geant4}/share/Geant4-11.0.4/examples/";
+      hook_qt_stuff = "${pkgs-old.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs-old.libsForQt5.qt5.qtbase.version}/plugins";
       setupHook = ./nain4-hook.sh;
 
     };
@@ -243,7 +245,7 @@
       inherit make-app;
       args-from-cli = ''"$@"'';
       dev-shell-packages = client-dev-shell-packages;
-      g4-data-package = pkgs.geant4.data; # Needed for exporting G4*DATA envvars in client app
+      g4-data-package = pkgs-old.geant4.data; # Needed for exporting G4*DATA envvars in client app
       # TODO: leave for now, in case client needs it, but make these purely
       # internal once we're happy that everything works
       # The prop-* variants are to be propagated to downstream packages (either by Nix (build, run) or by us (dev, test))
@@ -259,7 +261,7 @@
       # NB CB
       prop-build = with pkgs; [ meson ninja cmake pkg-config argparse boost182 ];
       # NB CB NR CR  +  ND CD, via addition to prop-dev
-      prop-run   = with pkgs; [ just geant4-data my-geant4 qt5.wrapQtAppsHook ];
+      prop-run   = with pkgs; [ just geant4-data my-geant4 pkgs-old.qt5.wrapQtAppsHook ];
       # How about things needed at run but not build time?
     };
 
