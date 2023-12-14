@@ -30,7 +30,7 @@
       enableRaytracerX11   = raytrace;
     });
 
-  my-geant4 = g4 { qt = true; ogl = true ; };
+  my-geant4 = g4 { qt = true; };
 
   geant4-data = with pkgs.geant4.data; [
     G4PhotonEvaporation
