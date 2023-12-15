@@ -62,6 +62,7 @@ nain4_includes = [ 'n4-all.hh'
                  , 'n4-testing.hh'
                  , 'n4-ui.hh'
                  , 'n4-utils.hh'
+                 , 'n4-vis-attributes.hh'
                  , 'n4-volume.hh'
                  ]
 

@@ -3,6 +3,9 @@
 #include <n4-place.hh>
 #include <n4-sensitive.hh>
 
+// Export to clients, but not used here
+#include <n4-vis-attributes.hh>
+
 #include <G4Box.hh>
 #include <G4Cons.hh>
 #include <G4Orb.hh>
@@ -11,6 +14,7 @@
 #include <G4Tubs.hh>
 
 #include <G4LogicalVolume.hh>
+#include <G4VisAttributes.hh>
 
 #include <G4String.hh>
 #include <G4SystemOfUnits.hh>
