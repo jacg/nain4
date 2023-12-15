@@ -3,6 +3,9 @@
 #include <n4-place.hh>
 #include <n4-sensitive.hh>
 
+// Export to clients, but not used here
+#include <n4-vis-attributes.hh>
+
 #include <G4Box.hh>
 #include <G4Cons.hh>
 #include <G4Orb.hh>
@@ -11,6 +14,7 @@
 #include <G4Tubs.hh>
 
 #include <G4LogicalVolume.hh>
+#include <G4VisAttributes.hh>
 
 #include <G4String.hh>
 #include <G4SystemOfUnits.hh>
@@ -31,12 +35,14 @@ struct boolean_shape;
 
 // ---- Base class for interfaces to G4VSolids --------------------------------------------------------
 struct shape {
+  virtual G4VSolid*  solid(                    ) const = 0;
   G4LogicalVolume*  volume(G4Material* material) const;
   n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
   shape& sensitive(const G4String& name, sensitive_detector::process_hits_fn fn)
                                  { sd = new sensitive_detector{name, fn}; return *this; }
   shape& sensitive(G4SensDet* s) { sd = s;                                return *this; }
-  virtual G4VSolid*  solid(                    ) const = 0;
+  shape& vis(G4VisAttributes  v) { va = v;                                return *this; }
+  shape& vis(G4VisAttributes* v) { return vis(*v); }
   virtual ~shape() {}
 
   // Boolean operations
@@ -62,6 +68,7 @@ public:
 protected:
   shape(G4String name) : name_{name} {}
   std::optional<G4VSensitiveDetector*> sd;
+  std::optional<G4VisAttributes>       va;
   G4String                             name_;
 };
 

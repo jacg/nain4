@@ -122,6 +122,7 @@ G4Trd* trd::solid() const {
 G4LogicalVolume* shape::volume(G4Material* material) const {
   auto vol = n4::volume(solid(), material);
   if (sd.has_value()) { vol -> SetSensitiveDetector(sd.value()); }
+  if (va.has_value()) { vol -> SetVisAttributes    (va.value()); }
   return vol;
 }
 
