@@ -41,6 +41,8 @@ struct shape {
                                  { sd = new sensitive_detector{name, fn}; return *this; }
   shape& sensitive(G4SensDet* s) { sd = s;                                return *this; }
   virtual G4VSolid*  solid(                    ) const = 0;
+  shape& vis(G4VisAttributes  v) { va = v;                                return *this; }
+  shape& vis(G4VisAttributes* v) { return vis(*v); }
   virtual ~shape() {}
 
   // Boolean operations
@@ -66,6 +68,7 @@ public:
 protected:
   shape(G4String name) : name_{name} {}
   std::optional<G4VSensitiveDetector*> sd;
+  std::optional<G4VisAttributes>       va;
   G4String                             name_;
 };
 
