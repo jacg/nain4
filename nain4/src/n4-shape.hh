@@ -35,12 +35,12 @@ struct boolean_shape;
 
 // ---- Base class for interfaces to G4VSolids --------------------------------------------------------
 struct shape {
+  virtual G4VSolid*  solid(                    ) const = 0;
   G4LogicalVolume*  volume(G4Material* material) const;
   n4::place          place(G4Material* material) const { return n4::place(volume(material)); }
   shape& sensitive(const G4String& name, sensitive_detector::process_hits_fn fn)
                                  { sd = new sensitive_detector{name, fn}; return *this; }
   shape& sensitive(G4SensDet* s) { sd = s;                                return *this; }
-  virtual G4VSolid*  solid(                    ) const = 0;
   shape& vis(G4VisAttributes  v) { va = v;                                return *this; }
   shape& vis(G4VisAttributes* v) { return vis(*v); }
   virtual ~shape() {}
