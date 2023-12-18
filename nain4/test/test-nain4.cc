@@ -1783,6 +1783,31 @@ TEST_CASE("nain interpolate values", "[nain][interpolate]") {
   }
 }
 
+TEST_CASE("nain interpolator", "[nain][interpolator]") {
+  std::vector<double> x{0, 1, 3.5, 6.6666, 10};
+  std::vector<double> y; y.reserve(x.size());
+  auto factor = -3.1416;
+  for (const auto& xi:x) { y.push_back(factor*xi); }
+
+  auto interpolator = n4::interpolator(x, y);
+
+  std::vector<double> x_test{0.1, 0.5555, 2.00001, 10/3., 5.6789, 9.99999};
+  for (const auto& xt : x_test) {
+    auto yt = interpolator(xt);
+    REQUIRE   (yt.has_value());
+    CHECK_THAT(yt.    value(), WithinULP(factor * xt, 1));
+  }
+}
+
+TEST_CASE("nain interpolator out of range", "[nain][interpolator]") {
+  std::vector<double> x{0, 10};
+  std::vector<double> y{x};
+  auto interpolator = n4::interpolator(x, y);
+
+  CHECK(! interpolator(- 1).has_value());
+  CHECK(! interpolator( 11).has_value());
+}
+
 
 // TODO can the overlap check tests be automated? G4 raises an exception when an
 // overlap is detected, and we do not know how to observe that in Catch2
