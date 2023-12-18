@@ -8,6 +8,10 @@
 #include <G4ThreeVector.hh>
 #include <G4Types.hh>
 #include <Randomize.hh>
+
+#include <boost/random/piecewise_linear_distribution.hpp>
+#include  <boost/random/mersenne_twister.hpp>
+
 #include <optional>
 #include <stdexcept>
 
@@ -99,6 +103,20 @@ private:
 
 G4ThreeVector random_in_sphere(G4double radius);
 std::tuple<G4double, G4double> random_on_disc(G4double radius);
+
+struct piecewise_linear_distribution {
+public:
+  piecewise_linear_distribution(const std::vector<double>& x, const std::vector<double>& y)
+    : x{x}, y{y}, rng{}, sampler{&x[0], &x[0] + x.size(), &y[0]} {}
+
+  double sample() { return sampler(rng); }
+
+private:
+  const std::vector<double> x;
+  const std::vector<double> y;
+  boost::random::mt19937 rng;
+  boost::random::piecewise_linear_distribution<> sampler;
+};
 
 } // namespace random
 } // namespace nain4
