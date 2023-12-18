@@ -30,6 +30,23 @@ std::vector<G4double> const_over(G4double factor, std::initializer_list<G4double
   return out;
 }
 
+
+std::function<std::optional<double>(double)> interpolator(const std::vector<double> x, const std::vector<double> y) {
+  return [x=std::move(x), y=std::move(y)] (double xk) -> std::optional<double> {
+    for (const auto& [i, x1] : enumerate(x) ) {
+      if (xk < x1) {
+        if (i==0) { return {}; }
+
+        auto x0 = x[i-1];
+        auto y0 = y[i-1];
+        auto y1 = y[i  ];
+        return y0 + (xk - x0) * (y1 - y0)/(x1 - x0);
+      }
+    }
+    return {};
+  };
+}
+
 } // namespace nain4
 
 #pragma GCC diagnostic pop

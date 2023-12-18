@@ -7,6 +7,8 @@
 #include <Randomize.hh>
 #include <G4Types.hh>
 
+#include <functional>
+#include <optional>
 #include <algorithm>
 
 namespace nain4 {
@@ -65,6 +67,8 @@ template<class F> auto interpolate(F f, size_t N, double min, double max) {
   transform(cbegin(xs), cend(xs), begin(ys), f);
   return make_tuple(xs, ys);
 }
+
+std::function<std::optional<double>(double)> interpolator(const std::vector<double> x, const std::vector<double> y);
 
 template<class T>
 std::vector<T> vec_with_capacity(size_t N) {
