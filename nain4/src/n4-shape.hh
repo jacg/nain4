@@ -41,8 +41,12 @@ struct shape {
   shape& sensitive(const G4String& name, sensitive_detector::process_hits_fn fn)
                                  { sd = new sensitive_detector{name, fn}; return *this; }
   shape& sensitive(G4SensDet* s) { sd = s;                                return *this; }
-  shape& vis(G4VisAttributes  v) { va = v;                                return *this; }
-  shape& vis(G4VisAttributes* v) { return vis(*v); }
+  shape& vis(G4VisAttributes     v) { va = v;                             return *this; }
+  shape& vis(n4::vis_attributes  v) { va = v;                             return *this; }
+  shape& vis(G4VisAttributes*    v) { return vis(*v); }
+  shape& vis(n4::vis_attributes* v) { return vis(*v); }
+  template<class...Args>
+  shape& vis(Args&&... args    ) { return vis(n4::vis_attributes{std::forward<Args>(args)...}); }
   virtual ~shape() {}
 
   // Boolean operations

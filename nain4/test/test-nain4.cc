@@ -2444,5 +2444,22 @@ TEST_CASE("nain vis_attributes", "[nain][vis_attributes]") {
         vis_attributes{}.visible(false).colour({1,1,0}));
 }
 
+TEST_CASE("nain vis_attributes shape", "[nain][vis_attributes]") {
+  auto attrs = n4::vis_attributes{}.visible(true).colour(G4Colour::Red());
+  auto check_props = [] (auto vol) {
+    auto vis = vol -> GetVisAttributes();
+    CHECK(vis -> IsVisible());
+    CHECK(vis -> GetColour()    == G4Colour::Red());
+  };
+  auto air   = n4::material("G4_AIR");
+  auto box1 = n4::box("box1").cube(1).vis( attrs               ).volume(air);
+  auto box2 = n4::box("box2").cube(1).vis(&attrs               ).volume(air);
+  auto box3 = n4::box("box3").cube(1).vis(true, G4Colour::Red()).volume(air);
+
+  check_props(box1);
+  check_props(box2);
+  check_props(box3);
+}
+
 
 #pragma GCC diagnostic pop
