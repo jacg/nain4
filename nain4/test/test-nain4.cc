@@ -2235,6 +2235,28 @@ TEST_CASE("random direction ranges", "[random][direction]") {
 #undef R
 }
 
+TEST_CASE("random piecewise_linear_distribution", "[nain][random][piecewise_linear_distribution]") {
+  // simple test of a triangular distribution.
+  std::vector<double> x{-10, 3, 10};
+  std::vector<double> y{  0, 1,  0};
+
+  auto N = 1'000'000;
+  n4::random::piecewise_linear_distribution sampler{x, y};
+
+  // threevec_stats would help here, but it would be a bit silly to
+  // store 3 numbers to test just 1
+  std::vector<double> data; data.reserve(N);
+  for (auto i=0; i<N; i++) { data.push_back(sampler.sample()); }
+  auto data_min  = *std::min_element(cbegin(data), cend(data));
+  auto data_max  = *std::max_element(cbegin(data), cend(data));
+  auto data_mean =  std::accumulate (cbegin(data), cend(data), 0.) / N;
+
+  auto expected_mean = (-10 + 3 + 10) / 3.;
+  CHECK_THAT(data_min , WithinRel(           -10, 1e-1));
+  CHECK_THAT(data_max , WithinRel(            10, 1e-1));
+  CHECK_THAT(data_mean, WithinRel( expected_mean, 1e-2));
+}
+
 TEST_CASE("stats sum", "[stats][sum]") {
   using n4::stats::sum;
 
