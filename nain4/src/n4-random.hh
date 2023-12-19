@@ -107,7 +107,7 @@ std::tuple<G4double, G4double> random_on_disc(G4double radius);
 struct piecewise_linear_distribution {
 public:
   piecewise_linear_distribution(const std::vector<double>& x, const std::vector<double>& y)
-    : x{x}, y{y}, rng{}, sampler{&x[0], &x[0] + x.size(), &y[0]} {}
+    : x{x}, y{y}, rng{}, sampler{cbegin(x), cend(x), cbegin(y)} {}
 
   double sample() { return sampler(rng); }
 

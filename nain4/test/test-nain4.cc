@@ -1784,19 +1784,25 @@ TEST_CASE("nain interpolate values", "[nain][interpolate]") {
 }
 
 TEST_CASE("nain interpolator", "[nain][interpolator]") {
-  std::vector<double> x{0, 1, 3.5, 6.6666, 10};
+  std::vector<double> x{-2, -0.3, 0, 1, 3.5, 6.2, 10};
   std::vector<double> y; y.reserve(x.size());
-  auto factor = -3.1416;
-  for (const auto& xi:x) { y.push_back(factor*xi); }
+  for (const auto& xi:x) { y.push_back(3*xi*xi); }
 
   auto interpolator = n4::interpolator(x, y);
 
-  std::vector<double> x_test{0.1, 0.5555, 2.00001, 10/3., 5.6789, 9.99999};
-  for (const auto& xt : x_test) {
-    auto yt = interpolator(xt);
-    REQUIRE   (yt.has_value());
-    CHECK_THAT(yt.    value(), WithinULP(factor * xt, 1));
-  }
+  auto check = [&interpolator] (double x, double expected_y, int ulp=1) {
+    auto y = interpolator(x);
+    REQUIRE(y.has_value());
+    CHECK_THAT(y.value(), WithinULP(expected_y, ulp));
+  };
+
+  check(-1  ,   5.1 );
+  check(-0.1,   0.09);
+  check( 0  ,   0   );
+  check( 0.5,   1.5 );
+  check( 3.1,  31.35);
+  check( 3.6,  39.66);
+  check( 8.8, 241.68, 2);
 }
 
 TEST_CASE("nain interpolator out of range", "[nain][interpolator]") {
@@ -2251,9 +2257,9 @@ TEST_CASE("random piecewise_linear_distribution", "[nain][random][piecewise_line
   auto data_max  = *std::max_element(cbegin(data), cend(data));
   auto data_mean =  std::accumulate (cbegin(data), cend(data), 0.) / N;
 
-  auto expected_mean = (-10 + 3 + 10) / 3.;
-  CHECK_THAT(data_min , WithinRel(           -10, 1e-1));
-  CHECK_THAT(data_max , WithinRel(            10, 1e-1));
+  auto expected_mean = (x[0] + x[1] + x[2]) / 3;
+  CHECK_THAT(data_min , WithinRel(     x.front(), 1e-1));
+  CHECK_THAT(data_max , WithinRel(     x.back (), 1e-1));
   CHECK_THAT(data_mean, WithinRel( expected_mean, 1e-2));
 }
 
