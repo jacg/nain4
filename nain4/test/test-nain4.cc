@@ -2251,9 +2251,9 @@ TEST_CASE("random piecewise_linear_distribution", "[nain][random][piecewise_line
   auto data_max  = *std::max_element(cbegin(data), cend(data));
   auto data_mean =  std::accumulate (cbegin(data), cend(data), 0.) / N;
 
-  auto expected_mean = (-10 + 3 + 10) / 3.;
-  CHECK_THAT(data_min , WithinRel(           -10, 1e-1));
-  CHECK_THAT(data_max , WithinRel(            10, 1e-1));
+  auto expected_mean = (x[0] + x[1] + x[2]) / 3;
+  CHECK_THAT(data_min , WithinRel(     x.front(), 1e-1));
+  CHECK_THAT(data_max , WithinRel(     x.back (), 1e-1));
   CHECK_THAT(data_mean, WithinRel( expected_mean, 1e-2));
 }
 
