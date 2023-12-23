@@ -34,6 +34,7 @@
 
   geant4-data = with pkgs.geant4.data; [
     G4PhotonEvaporation
+    G4RealSurface
     G4EMLOW
     G4RadioactiveDecay
     G4ENSDFSTATE
