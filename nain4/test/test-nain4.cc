@@ -1314,9 +1314,9 @@ auto check_properties (n4::boolean_shape& shape, G4Material* mat, G4String name,
   CHECK_THAT(solid  -> GetCubicVolume() / m3, WithinRel(vol           / m3, 1e-3));
   CHECK_THAT(volume -> GetMass() / kg       , WithinRel(vol * density / kg, 1e-3));
 
-  CHECK(solid  -> GetName()             == name);
-  CHECK(volume -> GetName()             == name);
-  CHECK(placed -> GetName()             == name);
+  CHECK(solid  -> GetName() == name);
+  CHECK(volume -> GetName() == name);
+  CHECK(placed -> GetName() == name);
 };
 
 
@@ -1724,8 +1724,8 @@ TEST_CASE("nain map", "[nain][map]") {
   auto mapped_lambda    = n4::map<int>( f, input_x);
   auto mapped_fn        = n4::map<int>(ff, input_x);
 
-  CHECK( mapped_lambda    == std::vector<int>{ f(a),  f(b),  f(c),  f(d)} );
-  CHECK( mapped_fn        == std::vector<int>{ff(a), ff(b), ff(c), ff(d)} );
+  CHECK( mapped_lambda == std::vector<int>{ f(a),  f(b),  f(c),  f(d)} );
+  CHECK( mapped_fn     == std::vector<int>{ff(a), ff(b), ff(c), ff(d)} );
 
 }
 
@@ -1761,18 +1761,8 @@ TEST_CASE("nain interpolate", "[nain][interpolate]") {
 
   SECTION("element order") {
     double last;
-
-    last = xs.front();
-    for (size_t i=1; i<xs.size(); i++) {
-      CHECK(last < xs[i]);
-      last = xs[i];
-    }
-
-    last = ys.front();
-    for (size_t i=1; i<ys.size(); i++) {
-      CHECK(last > ys[i]);
-      last = ys[i];
-    }
+    last = xs.front(); for (auto i=1; i<xs.size(); i++) { CHECK(last < xs[i]); last = xs[i]; }
+    last = ys.front(); for (auto i=1; i<ys.size(); i++) { CHECK(last > ys[i]); last = ys[i]; }
   }
 
   SECTION("distance between elements") {
