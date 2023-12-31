@@ -27,12 +27,9 @@
 #include <G4Material.hh>
 #include <G4Gamma.hh>
 
-#include <catch2/catch_approx.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <cmath>
 #include <cstddef>
@@ -52,10 +49,24 @@
 // this gives rise to the apparently superfluous division by the same unit on
 // both sides of an equation, in the source code.
 
-using Catch::Approx; // TODO replace Approx with Matchers
 using Catch::Matchers::WithinAbs; using Catch::Matchers::WithinRel; using Catch::Matchers::WithinULP;
 using CLHEP::pi; using CLHEP::halfpi; using CLHEP::twopi;
 using namespace n4::test;
+
+inline Catch::Matchers::WithinUlpsMatcher Within1ULP(double x) { return WithinULP(x, 1); }
+
+inline void check_all_within1ULP(std::vector<double> x, double ref) {
+  for (auto& xi: x) {
+    CHECK_THAT(xi, Within1ULP(ref));
+  }
+}
+
+inline void check_all_within1ULP(std::vector<double> x, std::vector<double> ref) {
+  REQUIRE(x.size() == ref.size());
+  for (auto i = 0; i<x.size(); i++) {
+    CHECK_THAT(x[i], Within1ULP(ref[i]));
+  }
+}
 
 TEST_CASE("nain material", "[nain][material]") {
 
@@ -72,12 +83,12 @@ TEST_CASE("nain material", "[nain][material]") {
   SECTION("material properties") {
     SECTION("water") {
       auto water = nain4::material("G4_WATER");
-      CHECK(water->GetName()                  == "G4_WATER");
-      CHECK(water->GetChemicalFormula()       == "H_2O");
-      CHECK(water->GetTemperature() /  kelvin == Approx(293.15));
-      CHECK(water->GetPressure() / atmosphere == Approx(1));
-      CHECK(water->GetDensity() /     (kg/m3) == Approx(1000));
-      CHECK(water->GetState()                 == G4State::kStateSolid); // WTF!?
+      CHECK     (water->GetName()                  == "G4_WATER");
+      CHECK     (water->GetChemicalFormula()       == "H_2O");
+      CHECK     (water->GetState()                 == G4State::kStateSolid); // WTF!?
+      CHECK_THAT(water->GetTemperature() /  kelvin, Within1ULP( 293.15));
+      CHECK_THAT(water->GetPressure() / atmosphere, Within1ULP(   1.  ));
+      CHECK_THAT(water->GetDensity() /     (kg/m3), Within1ULP(1000.  ));
     }
   }
 
@@ -117,18 +128,18 @@ TEST_CASE("nain material", "[nain][material]") {
     CHECK(atoms[2] == nO);
 
     // Basic properties set corretly?
-    CHECK(fr4 -> GetNumberOfElements() == 3);
-    CHECK(fr4 -> GetDensity() == density);
-    CHECK(fr4 -> GetState() == state);
+    CHECK     (fr4 -> GetNumberOfElements() == 3);
+    CHECK     (fr4 -> GetState()            == state);
+    CHECK_THAT(fr4 -> GetDensity()          ,  Within1ULP(density));
 
     // Fractional composition correct?
     auto fracs = fr4 -> GetFractionVector();
-    CHECK(fracs[0] == Approx(nH*mH / total_mass));
-    CHECK(fracs[1] == Approx(nC*mC / total_mass));
-    CHECK(fracs[2] == Approx(nO*mO / total_mass));
+    CHECK_THAT(fracs[0], Within1ULP(nH*mH / total_mass));
+    CHECK_THAT(fracs[1], Within1ULP(nC*mC / total_mass));
+    CHECK_THAT(fracs[2], Within1ULP(nO*mO / total_mass));
 
     // Does fractional composition sum to 1?
-    CHECK(std::accumulate(fracs, fracs + fr4->GetNumberOfElements(), 0.0) == Approx(1));
+    CHECK_THAT(std::accumulate(fracs, fracs + fr4->GetNumberOfElements(), 0.0), Within1ULP(1));
   }
 
   // Making and retrieving materials with nain4
@@ -170,9 +181,9 @@ TEST_CASE("nain material", "[nain][material]") {
     CHECK(atoms[3] == 2);
 
     // Basic properties set corretly?
-    CHECK(lyso -> GetNumberOfElements() == 4);
-    CHECK(lyso -> GetDensity() == density);
-    CHECK(lyso -> GetState() == state);
+    CHECK     (lyso -> GetNumberOfElements() == 4);
+    CHECK     (lyso -> GetState()            == state);
+    CHECK_THAT(lyso -> GetDensity()          ,  Within1ULP(density));
 
     // Fractional composition correct?
     auto fracs = lyso -> GetFractionVector();
@@ -182,7 +193,7 @@ TEST_CASE("nain material", "[nain][material]") {
     CHECK(fracs[3] == fO );
 
     // Does fractional composition sum to 1?
-    CHECK(std::accumulate(fracs, fracs + lyso->GetNumberOfElements(), 0.0) == Approx(1));
+    CHECK_THAT(std::accumulate(fracs, fracs + lyso->GetNumberOfElements(), 0.0), Within1ULP(1));
 
   }
 }
@@ -209,19 +220,19 @@ TEST_CASE("nain material_properties", "[nain][material_properties]") {
     auto property_1 = mp -> GetProperty(key_1);
     for (auto i=0; i<3; i++) {
       auto e1 = energies_1[i];
-      CHECK( property_1 -> Energy(i)  == e1);
-      CHECK( property_1 -> Value (e1) == values_1[i]);
+      CHECK_THAT(property_1 -> Energy(i) , Within1ULP(         e1));
+      CHECK_THAT(property_1 -> Value (e1), Within1ULP(values_1[i]));
     }
 
     auto property_2 = mp -> GetProperty(key_2);
     for (auto i=0; i<2; i++){
       auto e2 = energies_2[i];
-      CHECK( property_2 -> Energy(i)  == e2);
-      CHECK( property_2 -> Value (e2) == const_value_2);
+      CHECK_THAT(property_2 -> Energy(i) , Within1ULP(           e2));
+      CHECK_THAT(property_2 -> Value (e2), Within1ULP(const_value_2));
     }
 
-    CHECK( mp ->    ConstPropertyExists(key_3)                );
-    CHECK( mp -> GetConstProperty      (key_3) == const_value_3 );
+    CHECK     (mp ->    ConstPropertyExists(key_3));
+    CHECK_THAT(mp -> GetConstProperty      (key_3), Within1ULP(const_value_3));
   }
 
   SECTION("initializer lists") {
@@ -233,8 +244,8 @@ TEST_CASE("nain material_properties", "[nain][material_properties]") {
     auto property = mp -> GetProperty("RINDEX");
     for (auto i=0; i<3; i++) {
       auto e = 3 + i;
-      CHECK( property -> Energy(i) == 3 + i );
-      CHECK( property -> Value (e) == 6 + i );
+      CHECK_THAT(property -> Energy(i), Within1ULP(3 + i));
+      CHECK_THAT(property -> Value (e), Within1ULP(6 + i));
     }
   }
 
@@ -259,19 +270,19 @@ TEST_CASE("nain material_properties", "[nain][material_properties]") {
     auto property_1 = mp -> GetProperty(key_1);
     for (auto i=0; i<3; i++){
       auto e1 = energies_1[i];
-      CHECK( property_1 -> Energy(i)  == e1);
-      CHECK( property_1 -> Value (e1) == values_1[i]);
+      CHECK_THAT(property_1 -> Energy(i) , Within1ULP(         e1));
+      CHECK_THAT(property_1 -> Value (e1), Within1ULP(values_1[i]));
     }
 
     auto property_2 = mp -> GetProperty(key_2);
     for (auto i=0; i<2; i++){
       auto e2 = energies_2[i];
-      CHECK( property_2 -> Energy(i)  == e2);
-      CHECK( property_2 -> Value (e2) == const_value_2);
+      CHECK_THAT(property_2 -> Energy(i) , Within1ULP(           e2));
+      CHECK_THAT(property_2 -> Value (e2), Within1ULP(const_value_2));
     }
 
-    CHECK( mp ->    ConstPropertyExists(key_3)                  );
-    CHECK( mp -> GetConstProperty      (key_3) == const_value_3 );
+    CHECK     (mp ->    ConstPropertyExists(key_3));
+    CHECK_THAT(mp -> GetConstProperty      (key_3), Within1ULP(const_value_3));
   }
 
 
@@ -392,55 +403,52 @@ TEST_CASE("nain box", "[nain][box]") {
   auto box_half_xz = n4::box("box_xz").half_xz(lxz).y(ly).solid();
   auto box_half_yz = n4::box("box_yz").half_yz(lyz).x(lx).solid();
 
-  auto box_vec      = n4::box("box_vec").     xyz({lx, ly, lz});
-  auto box_vec_half = n4::box("box_vec").half_xyz({lx, ly, lz});
+#define CHECK_SQUARE_PROFILE(SOLID, SQR1, SQR2, DIFF)                                                \
+    CHECK_THAT(SOLID -> Get ##SQR1## HalfLength(),   Within1ULP(SOLID-> Get ##SQR2## HalfLength())); \
+    CHECK_THAT(SOLID -> Get ##SQR1## HalfLength(), ! Within1ULP(SOLID-> Get ##DIFF## HalfLength()));
 
-  CHECK(box_xy      -> GetXHalfLength()   ==   box_xy      -> GetYHalfLength());
-  CHECK(box_xy      -> GetXHalfLength()   !=   box_xy      -> GetZHalfLength());
-  CHECK(box_xz      -> GetXHalfLength()   ==   box_xz      -> GetZHalfLength());
-  CHECK(box_xz      -> GetXHalfLength()   !=   box_xz      -> GetYHalfLength());
-  CHECK(box_yz      -> GetYHalfLength()   ==   box_yz      -> GetZHalfLength());
-  CHECK(box_yz      -> GetYHalfLength()   !=   box_yz      -> GetXHalfLength());
+  CHECK_SQUARE_PROFILE(box_xy, X, Y, Z);
+  CHECK_SQUARE_PROFILE(box_xz, X, Z, Y);
+  CHECK_SQUARE_PROFILE(box_yz, Y, Z, X);
 
-  CHECK(box_half_xy -> GetXHalfLength()   ==   box_half_xy -> GetYHalfLength());
-  CHECK(box_half_xy -> GetXHalfLength()   !=   box_half_xy -> GetZHalfLength());
-  CHECK(box_half_xz -> GetXHalfLength()   ==   box_half_xz -> GetZHalfLength());
-  CHECK(box_half_xz -> GetXHalfLength()   !=   box_half_xz -> GetYHalfLength());
-  CHECK(box_half_yz -> GetYHalfLength()   ==   box_half_yz -> GetZHalfLength());
-  CHECK(box_half_yz -> GetYHalfLength()   !=   box_half_yz -> GetXHalfLength());
+  CHECK_SQUARE_PROFILE(box_half_xy, X, Y, Z);
+  CHECK_SQUARE_PROFILE(box_half_xz, X, Z, Y);
+  CHECK_SQUARE_PROFILE(box_half_yz, Y, Z, X);
 
-  CHECK(box_h -> GetCubicVolume() / m3 == box_s -> GetCubicVolume() / m3);
-  CHECK(box_h -> GetSurfaceArea() / m2 == box_s -> GetSurfaceArea() / m2);
+#undef CHECK_SQUARE_PROFILE
 
-  CHECK(box_l -> TotalVolumeEntities() == 1);
-  CHECK(box_l -> GetMass() / kg        == Approx(lx * ly * lz * density / kg));
-  CHECK(box_l -> GetMaterial()         == water);
-  CHECK(box_l -> GetName()             == "box_l");
+  CHECK_THAT(box_h -> GetCubicVolume() / m3, Within1ULP(box_s -> GetCubicVolume() / m3));
+  CHECK_THAT(box_h -> GetSurfaceArea() / m2, Within1ULP(box_s -> GetSurfaceArea() / m2));
+
+  CHECK     (box_l -> TotalVolumeEntities() == 1);
+  CHECK     (box_l -> GetMaterial()         == water);
+  CHECK     (box_l -> GetName()             == "box_l");
+  CHECK_THAT(box_l -> GetMass() / kg        , Within1ULP(lx * ly * lz * density / kg));
 
   auto solid = box_l -> GetSolid();
-  CHECK(solid -> GetCubicVolume() / m3 == Approx(     lx    * ly    * lz     / m3));
-  CHECK(solid -> GetSurfaceArea() / m2 == Approx(2 * (lx*ly + ly*lz + lz*lx) / m2));
-  CHECK(solid -> GetName()             == "box_l");
+  CHECK     (solid -> GetName()             == "box_l");
+  CHECK_THAT(solid -> GetCubicVolume() / m3, Within1ULP(     lx    * ly    * lz     / m3));
+  CHECK_THAT(solid -> GetSurfaceArea() / m2, Within1ULP(2 * (lx*ly + ly*lz + lz*lx) / m2));
 
-  CHECK(box_s -> GetCubicVolume() / m3 == solid -> GetCubicVolume() / m3);
-  CHECK(box_s -> GetSurfaceArea() / m2 == solid -> GetSurfaceArea() / m2);
-  CHECK(box_s -> GetName()             == "box_s");
+  CHECK     (box_s -> GetName()             == "box_s");
+  CHECK_THAT(box_s -> GetCubicVolume() / m3, Within1ULP(solid -> GetCubicVolume() / m3));
+  CHECK_THAT(box_s -> GetSurfaceArea() / m2, Within1ULP(solid -> GetSurfaceArea() / m2));
 
-  CHECK(box_p -> GetTranslation() . x() / m == xc / m);
-  CHECK(box_p -> GetTranslation() . y() / m == yc / m);
-  CHECK(box_p -> GetTranslation() . z() / m == zc / m);
+  CHECK_THAT(box_p -> GetTranslation() . x() / m, Within1ULP(xc / m));
+  CHECK_THAT(box_p -> GetTranslation() . y() / m, Within1ULP(yc / m));
+  CHECK_THAT(box_p -> GetTranslation() . z() / m, Within1ULP(zc / m));
 
   auto small_cube = n4::box("small_cube").cube     (lz).solid();
   auto   big_cube = n4::box(  "big_cube").half_cube(lz).solid();
-  CHECK(big_cube -> GetCubicVolume() / m3 == 8 * small_cube -> GetCubicVolume() / m3);
-  CHECK(big_cube -> GetSurfaceArea() / m2 == 4 * small_cube -> GetSurfaceArea() / m2);
-  CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetYHalfLength() / m );
-  CHECK(big_cube -> GetXHalfLength() / m  == 2 * small_cube -> GetZHalfLength() / m );
+  CHECK_THAT(big_cube -> GetCubicVolume() / m3, Within1ULP(8 * small_cube -> GetCubicVolume() / m3));
+  CHECK_THAT(big_cube -> GetSurfaceArea() / m2, Within1ULP(4 * small_cube -> GetSurfaceArea() / m2));
+  CHECK_THAT(big_cube -> GetXHalfLength() / m , Within1ULP(2 * small_cube -> GetYHalfLength() / m ));
+  CHECK_THAT(big_cube -> GetXHalfLength() / m , Within1ULP(2 * small_cube -> GetZHalfLength() / m ));
 
   auto check_dimensions = [lx, ly, lz] (auto box) {
-    CHECK(box -> GetXHalfLength() / m  == lx / 2 / m);
-    CHECK(box -> GetYHalfLength() / m  == ly / 2 / m);
-    CHECK(box -> GetZHalfLength() / m  == lz / 2 / m);
+    CHECK_THAT(box -> GetXHalfLength() / m, Within1ULP(lx / 2 / m));
+    CHECK_THAT(box -> GetYHalfLength() / m, Within1ULP(ly / 2 / m));
+    CHECK_THAT(box -> GetZHalfLength() / m, Within1ULP(lz / 2 / m));
   };
 
   check_dimensions(n4::box("box_xyz")     .     xyz( lx  , ly  , lz   ).solid());
@@ -461,17 +469,17 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto sphere_l = n4::sphere("sphere_l").r(r).volume(water);
   auto sphere_p = n4::sphere("sphere_p").r(r).place  (water).at(xc, yc, zc).now();
 
-  CHECK(sphere_l -> TotalVolumeEntities() == 1);
-  CHECK(sphere_l -> GetMass() / kg        == Approx(4 * pi / 3 * r * r * r * density / kg));
-  CHECK(sphere_l -> GetMaterial()         == water);
-  CHECK(sphere_l -> GetName()             == "sphere_l");
+  CHECK     (sphere_l -> TotalVolumeEntities() == 1);
+  CHECK     (sphere_l -> GetMaterial()         == water);
+  CHECK     (sphere_l -> GetName()             == "sphere_l");
+  CHECK_THAT(sphere_l -> GetMass() / kg        , Within1ULP(4 * pi / 3 * r * r * r * density / kg));
 
-  CHECK(sphere_s -> GetCubicVolume() / m3 == Approx(4 * pi / 3 * r * r * r / m3));
-  CHECK(sphere_s -> GetSurfaceArea() / m2 == Approx(4 * pi     * r * r     / m2));
+  CHECK_THAT(sphere_s -> GetCubicVolume() / m3, Within1ULP(4 * pi / 3 * r * r * r / m3));
+  CHECK_THAT(sphere_s -> GetSurfaceArea() / m2, Within1ULP(4 * pi     * r * r     / m2));
 
-  CHECK(sphere_p -> GetTranslation() . x() / m == xc / m);
-  CHECK(sphere_p -> GetTranslation() . y() / m == yc / m);
-  CHECK(sphere_p -> GetTranslation() . z() / m == zc / m);
+  CHECK_THAT(sphere_p -> GetTranslation() . x() / m, Within1ULP(xc / m));
+  CHECK_THAT(sphere_p -> GetTranslation() . y() / m, Within1ULP(yc / m));
+  CHECK_THAT(sphere_p -> GetTranslation() . z() / m, Within1ULP(zc / m));
 
   auto start   = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto spherer = [&] (auto name) { return n4::sphere(name).r(1); };
@@ -488,8 +496,8 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto down = [] (auto g4vsolid) { return dynamic_cast<G4Sphere*>(g4vsolid); };
 
   auto check_phi = [&down] (auto solid, auto start, auto delta) {
-      CHECK( down(solid) -> GetStartPhiAngle() == start);
-      CHECK( down(solid) -> GetDeltaPhiAngle() == delta);
+    CHECK_THAT(down(solid) -> GetStartPhiAngle(), Within1ULP(start));
+    CHECK_THAT(down(solid) -> GetDeltaPhiAngle(), Within1ULP(delta));
   };
   check_phi(phi_s , start      , twopi - start );
   check_phi(phi_se, start      ,   end - start );
@@ -498,8 +506,8 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   check_phi(phi_es, start      ,   end - start );
   check_phi(phi_ds, start      , delta         );
   check_phi(phi_ed, end - delta, delta         );
-  check_phi(phi_e ,           0,   end         );
-  check_phi(phi_d ,           0, delta         );
+  check_phi(phi_e ,          0.,   end         );
+  check_phi(phi_d ,          0., delta         );
 
   start = pi/8; end = pi/2; delta = pi/4;
   auto theta_s  = spherer("theta_s" ).theta_start(start) /*.end(180)*/     .solid();
@@ -513,8 +521,8 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto theta_d  = spherer("theta_d" ).theta_delta(delta) /* .start(0) */   .solid();
 
   auto check_theta = [&down] (auto solid, auto start, auto delta) {
-      CHECK( down(solid) -> GetStartThetaAngle() == start);
-      CHECK( down(solid) -> GetDeltaThetaAngle() == delta);
+    CHECK_THAT(down(solid) -> GetStartThetaAngle(), Within1ULP(start));
+    CHECK_THAT(down(solid) -> GetDeltaThetaAngle(), Within1ULP(delta));
   };
 
   check_theta(theta_s , start      ,    pi - start );
@@ -524,8 +532,8 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   check_theta(theta_es, start      ,   end - start );
   check_theta(theta_ds, start      , delta         );
   check_theta(theta_ed, end - delta, delta         );
-  check_theta(theta_e ,           0,   end         );
-  check_theta(theta_d ,           0, delta         );
+  check_theta(theta_e ,          0.,   end         );
+  check_theta(theta_d ,          0., delta         );
 
   start = m/8; end = m/2; delta = m/4;
   //  auto r_s  = n4::sphere("r_s" ).r_inner(start) /*.end(180)*/     .solid(); // 1/8 - 8/8    7/8
@@ -539,8 +547,8 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   auto r_d  = n4::sphere("r_d" ).r_delta(delta)/*.r_inner(0)*/.phi_delta(1).solid();
 
   auto check_r = [&down] (auto solid, auto inner, auto outer) {
-      CHECK( down(solid) -> GetInnerRadius() == inner);
-      CHECK( down(solid) -> GetOuterRadius() == outer);
+    CHECK_THAT(down(solid) -> GetInnerRadius(), Within1ULP(inner));
+    CHECK_THAT(down(solid) -> GetOuterRadius(), Within1ULP(outer));
   };
 
   // check_r(r_s , start,    pi - start); // Shouldn't work
@@ -553,9 +561,9 @@ TEST_CASE("nain sphere", "[nain][sphere]") {
   check_r(r_ed, end - delta,   end         );
   check_r(r_de, end - delta,   end         );
 
-  check_r(r_e ,           0,   end         );
+  check_r(r_e ,          0.,   end         );
 
-  check_r(r_d ,           0, delta         );
+  check_r(r_d ,          0., delta         );
 }
 
 TEST_CASE("nain sphere orb", "[nain][sphere][orb]") {
@@ -613,17 +621,17 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   auto tubs_l = n4::tubs("tubs_l").r(r).z(z).volume(water);
   auto tubs_p = n4::tubs("tubs_p").r(r).z(z).place (water).at(xc, yc, zc).now();
 
-  CHECK(tubs_l -> TotalVolumeEntities() == 1);
-  CHECK(tubs_l -> GetMass() / kg        == Approx(pi * r * r * z * density / kg));
-  CHECK(tubs_l -> GetMaterial()         == water);
-  CHECK(tubs_l -> GetName()             == "tubs_l");
+  CHECK     (tubs_l -> TotalVolumeEntities() == 1);
+  CHECK     (tubs_l -> GetMaterial()         == water);
+  CHECK     (tubs_l -> GetName()             == "tubs_l");
+  CHECK_THAT(tubs_l -> GetMass() / kg        , Within1ULP(pi * r * r * z * density / kg));
 
-  CHECK(tubs_s -> GetCubicVolume() / m3 == Approx(     pi * r * r * z               / m3));
-  CHECK(tubs_s -> GetSurfaceArea() / m2 == Approx((2 * pi * r * z + 2 * pi * r * r) / m2));
+  CHECK_THAT(tubs_s -> GetCubicVolume() / m3, Within1ULP(     pi * r * r * z               / m3));
+  CHECK_THAT(tubs_s -> GetSurfaceArea() / m2, Within1ULP((2 * pi * r * z + 2 * pi * r * r) / m2));
 
-  CHECK(tubs_p -> GetTranslation() . x() / m == xc / m);
-  CHECK(tubs_p -> GetTranslation() . y() / m == yc / m);
-  CHECK(tubs_p -> GetTranslation() . z() / m == zc / m);
+  CHECK_THAT(tubs_p -> GetTranslation().x() / m, Within1ULP(xc / m));
+  CHECK_THAT(tubs_p -> GetTranslation().y() / m, Within1ULP(yc / m));
+  CHECK_THAT(tubs_p -> GetTranslation().z() / m, Within1ULP(zc / m));
 
   auto start  = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto tubsrz = [&] (auto name) { return n4::tubs(name).r(1).z(1); };
@@ -638,8 +646,8 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   auto phi_d  = tubsrz("phi_d" ).phi_delta(delta) /* .start(0) */ .solid();
 
   auto check_phi = [] (auto solid, auto start, auto delta) {
-      CHECK( solid -> GetStartPhiAngle() == start);
-      CHECK( solid -> GetDeltaPhiAngle() == delta);
+    CHECK_THAT(solid -> GetStartPhiAngle(), Within1ULP(start));
+    CHECK_THAT(solid -> GetDeltaPhiAngle(), Within1ULP(delta));
   };
   check_phi(phi_s , start      , twopi - start );
   check_phi(phi_se, start      ,   end - start );
@@ -648,14 +656,14 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   check_phi(phi_es, start      ,   end - start );
   check_phi(phi_ds, start      , delta         );
   check_phi(phi_ed, end - delta, delta         );
-  check_phi(phi_e ,           0,   end         );
-  check_phi(phi_d ,           0, delta         );
+  check_phi(phi_e ,          0.,   end         );
+  check_phi(phi_d ,          0., delta         );
 
   auto z_full = n4::tubs("z_full").r(1).     z(z  ).solid();
   auto z_half = n4::tubs("z_half").r(1).half_z(z/2).solid();
 
-  CHECK(z_full -> GetZHalfLength() == z_half -> GetZHalfLength());
-  CHECK(z_full -> GetZHalfLength() == z/2);
+  CHECK_THAT(z_full -> GetZHalfLength(), Within1ULP(z_half -> GetZHalfLength()));
+  CHECK_THAT(z_full -> GetZHalfLength(), Within1ULP(z/2                       ));
 
   start = m/8; end = m/2; delta = m/4;
   //  Meaningless case: auto r_s  = n4::tubs("r_s" ).r_inner(start) /*.end(180)*/ .solid();
@@ -670,8 +678,8 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   auto r_d   = tubsz("r_d" ).r_delta(delta)/*.r_inner(0)*/.solid();
 
   auto check_r = [] (auto solid, auto inner, auto outer) {
-      CHECK( solid -> GetInnerRadius() == inner);
-      CHECK( solid -> GetOuterRadius() == outer);
+    CHECK_THAT(solid -> GetInnerRadius(), Within1ULP(inner));
+    CHECK_THAT(solid -> GetOuterRadius(), Within1ULP(outer));
   };
 
   // check_r(r_s , start,    pi - start); // Shouldn't work
@@ -684,9 +692,9 @@ TEST_CASE("nain tubs", "[nain][tubs]") {
   check_r(r_ed, end - delta,   end         );
   check_r(r_de, end - delta,   end         );
 
-  check_r(r_e ,           0,   end         );
+  check_r(r_e ,          0.,   end         );
 
-  check_r(r_d ,           0, delta         );
+  check_r(r_d ,          0., delta         );
 }
 
 TEST_CASE("nain cons", "[nain][cons]") {
@@ -709,17 +717,17 @@ TEST_CASE("nain cons", "[nain][cons]") {
   auto area         = pi * (r1+r2) * slant_height
                     + pi * (r1*r1 + r2*r2);
 
-  CHECK(cons_l -> TotalVolumeEntities() == 1);
-  CHECK(cons_l -> GetMass() / kg        == Approx(volume * density / kg));
-  CHECK(cons_l -> GetMaterial()         == water);
-  CHECK(cons_l -> GetName()             == "cons_l");
+  CHECK     (cons_l -> TotalVolumeEntities() == 1);
+  CHECK     (cons_l -> GetMaterial()         == water);
+  CHECK     (cons_l -> GetName()             == "cons_l");
+  CHECK_THAT(cons_l -> GetMass() / kg        , Within1ULP(volume * density / kg));
 
-  CHECK(cons_s -> GetCubicVolume() / m3 == Approx(volume / m3));
-  CHECK(cons_s -> GetSurfaceArea() / m2 == Approx(area   / m2));
+  CHECK_THAT(cons_s -> GetCubicVolume() / m3, Within1ULP(volume / m3));
+  CHECK_THAT(cons_s -> GetSurfaceArea() / m2, Within1ULP(area   / m2));
 
-  CHECK(cons_p -> GetTranslation() . x() / m == xc / m);
-  CHECK(cons_p -> GetTranslation() . y() / m == yc / m);
-  CHECK(cons_p -> GetTranslation() . z() / m == zc / m);
+  CHECK_THAT(cons_p -> GetTranslation() . x() / m, Within1ULP(xc / m));
+  CHECK_THAT(cons_p -> GetTranslation() . y() / m, Within1ULP(yc / m));
+  CHECK_THAT(cons_p -> GetTranslation() . z() / m, Within1ULP(zc / m));
 
   auto start  = twopi/8; auto end = twopi/2; auto delta = twopi/4;
   auto consrz = [&] (auto name) { return n4::cons(name).r1(1).r2(2).z(1); };
@@ -734,8 +742,8 @@ TEST_CASE("nain cons", "[nain][cons]") {
   auto phi_d  = consrz("phi_d" ).phi_delta(delta) /* .start(0) */ .solid();
 
   auto check_phi = [] (auto solid, auto start, auto delta) {
-      CHECK( solid -> GetStartPhiAngle() == start);
-      CHECK( solid -> GetDeltaPhiAngle() == delta);
+    CHECK_THAT(solid -> GetStartPhiAngle(), Within1ULP(start));
+    CHECK_THAT(solid -> GetDeltaPhiAngle(), Within1ULP(delta));
   };
   check_phi(phi_s , start      , twopi - start );
   check_phi(phi_se, start      ,   end - start );
@@ -744,14 +752,14 @@ TEST_CASE("nain cons", "[nain][cons]") {
   check_phi(phi_es, start      ,   end - start );
   check_phi(phi_ds, start      , delta         );
   check_phi(phi_ed, end - delta, delta         );
-  check_phi(phi_e ,           0,   end         );
-  check_phi(phi_d ,           0, delta         );
+  check_phi(phi_e ,          0.,   end         );
+  check_phi(phi_d ,          0., delta         );
 
   auto z_full = n4::cons("z_full").r1(1).r2(1).     z(z  ).solid();
   auto z_half = n4::cons("z_half").r1(1).r2(1).half_z(z/2).solid();
 
-  CHECK(z_full -> GetZHalfLength() == z_half -> GetZHalfLength());
-  CHECK(z_full -> GetZHalfLength() == z/2);
+  CHECK_THAT(z_full -> GetZHalfLength(), Within1ULP(z_half -> GetZHalfLength()));
+  CHECK_THAT(z_full -> GetZHalfLength(), Within1ULP(z/2                       ));
 
   start = m/8; end = m/2; delta = m/4;
   // r1 = 0 would be meaningless
@@ -783,12 +791,12 @@ TEST_CASE("nain cons", "[nain][cons]") {
   auto r12_sd = n4::cons("r12_sd").z(1*m).r1_inner(start).r2_inner(start_2).r_delta(delta).solid();
 
   auto check_r2 = [] (auto solid, auto inner, auto outer) {
-      CHECK( solid -> GetInnerRadiusPlusZ() == inner);
-      CHECK( solid -> GetOuterRadiusPlusZ() == outer);
+    CHECK_THAT(solid -> GetInnerRadiusPlusZ(), Within1ULP(inner));
+    CHECK_THAT(solid -> GetOuterRadiusPlusZ(), Within1ULP(outer));
   };
   auto check_r1 = [] (auto solid, auto inner, auto outer) {
-      CHECK( solid -> GetInnerRadiusMinusZ() == inner);
-      CHECK( solid -> GetOuterRadiusMinusZ() == outer);
+    CHECK_THAT(solid -> GetInnerRadiusMinusZ(), Within1ULP(inner));
+    CHECK_THAT(solid -> GetOuterRadiusMinusZ(), Within1ULP(outer));
   };
 
   auto eps = n4::cons::eps;
@@ -838,13 +846,13 @@ TEST_CASE("nain trd", "[nain][trd]") {
   auto trd_xy      = n4::trd("trd_xy").     xy1(lxy1  ).     xy2(lxy2).z(lz).solid();
   auto trd_half_xy = n4::trd("trd_xy").half_xy1(lxy1/2).half_xy2(lxy2).z(lz).solid();
 
-  CHECK(trd_xy      -> GetXHalfLength1()   ==   trd_xy      -> GetYHalfLength1());
-  CHECK(trd_xy      -> GetXHalfLength2()   ==   trd_xy      -> GetYHalfLength2());
-  CHECK(trd_xy      -> GetXHalfLength1()   !=   trd_xy      -> GetZHalfLength ());
-  CHECK(trd_xy      -> GetXHalfLength2()   !=   trd_xy      -> GetZHalfLength ());
-  CHECK(trd_half_xy -> GetXHalfLength1()   ==   trd_half_xy -> GetYHalfLength1());
-  CHECK(trd_half_xy -> GetXHalfLength2()   ==   trd_half_xy -> GetYHalfLength2());
-  CHECK(trd_half_xy -> GetXHalfLength1()   !=   trd_half_xy -> GetZHalfLength ());
+  CHECK_THAT(trd_xy      -> GetXHalfLength1(),   Within1ULP(trd_xy      -> GetYHalfLength1()));
+  CHECK_THAT(trd_xy      -> GetXHalfLength2(),   Within1ULP(trd_xy      -> GetYHalfLength2()));
+  CHECK_THAT(trd_xy      -> GetXHalfLength1(), ! Within1ULP(trd_xy      -> GetZHalfLength ()));
+  CHECK_THAT(trd_xy      -> GetXHalfLength2(), ! Within1ULP(trd_xy      -> GetZHalfLength ()));
+  CHECK_THAT(trd_half_xy -> GetXHalfLength1(),   Within1ULP(trd_half_xy -> GetYHalfLength1()));
+  CHECK_THAT(trd_half_xy -> GetXHalfLength2(),   Within1ULP(trd_half_xy -> GetYHalfLength2()));
+  CHECK_THAT(trd_half_xy -> GetXHalfLength1(), ! Within1ULP(trd_half_xy -> GetZHalfLength ()));
 
   auto dlx     = lx2 - lx1;
   auto dly     = ly2 - ly1;
@@ -856,33 +864,33 @@ TEST_CASE("nain trd", "[nain][trd]") {
                + sly * std::sqrt(lz*lz + dlx * dlx / 4)
                + slx * std::sqrt(lz*lz + dly * dly / 4);
 
-  CHECK(trd_h -> GetCubicVolume() / m3 == trd_s -> GetCubicVolume() / m3);
-  CHECK(trd_h -> GetSurfaceArea() / m2 == trd_s -> GetSurfaceArea() / m2);
+  CHECK_THAT(trd_h -> GetCubicVolume() / m3, Within1ULP(trd_s -> GetCubicVolume() / m3));
+  CHECK_THAT(trd_h -> GetSurfaceArea() / m2, Within1ULP(trd_s -> GetSurfaceArea() / m2));
 
-  CHECK(trd_l -> TotalVolumeEntities() == 1);
-  CHECK(trd_l -> GetMass() / kg        == Approx(volume * density / kg));
-  CHECK(trd_l -> GetMaterial()         == water);
-  CHECK(trd_l -> GetName()             == "trd_l");
+  CHECK     (trd_l -> TotalVolumeEntities() == 1);
+  CHECK     (trd_l -> GetMaterial()         == water);
+  CHECK     (trd_l -> GetName()             == "trd_l");
+  CHECK_THAT(trd_l -> GetMass() / kg        , Within1ULP(volume * density / kg));
 
   auto solid = trd_l -> GetSolid();
-  CHECK(solid -> GetCubicVolume() / m3 == Approx(volume  / m3));
-  CHECK(solid -> GetSurfaceArea() / m2 == Approx(surface / m2));
-  CHECK(solid -> GetName()             == "trd_l");
+  CHECK     (solid -> GetName()             == "trd_l");
+  CHECK_THAT(solid -> GetCubicVolume() / m3, Within1ULP(volume  / m3));
+  CHECK_THAT(solid -> GetSurfaceArea() / m2, Within1ULP(surface / m2));
 
-  CHECK(trd_s -> GetCubicVolume() / m3 == solid -> GetCubicVolume() / m3);
-  CHECK(trd_s -> GetSurfaceArea() / m2 == solid -> GetSurfaceArea() / m2);
-  CHECK(trd_s -> GetName()             == "trd_s");
+  CHECK     (trd_s -> GetName()             == "trd_s");
+  CHECK_THAT(trd_s -> GetCubicVolume() / m3, Within1ULP(solid -> GetCubicVolume() / m3));
+  CHECK_THAT(trd_s -> GetSurfaceArea() / m2, Within1ULP(solid -> GetSurfaceArea() / m2));
 
-  CHECK(trd_p -> GetTranslation() . x() / m == xc / m);
-  CHECK(trd_p -> GetTranslation() . y() / m == yc / m);
-  CHECK(trd_p -> GetTranslation() . z() / m == zc / m);
+  CHECK_THAT(trd_p -> GetTranslation() . x() / m, Within1ULP(xc / m));
+  CHECK_THAT(trd_p -> GetTranslation() . y() / m, Within1ULP(yc / m));
+  CHECK_THAT(trd_p -> GetTranslation() . z() / m, Within1ULP(zc / m));
 
   auto check_dimensions = [&] (auto trd) {
-    CHECK(trd -> GetXHalfLength1() / m  == lxy1 / 2 / m);
-    CHECK(trd -> GetYHalfLength1() / m  == lxy1 / 2 / m);
-    CHECK(trd -> GetXHalfLength2() / m  == lxy2 / 2 / m);
-    CHECK(trd -> GetYHalfLength2() / m  == lxy2 / 2 / m);
-    CHECK(trd -> GetZHalfLength () / m  == lz   / 2 / m);
+    CHECK_THAT(trd -> GetXHalfLength1() / m , Within1ULP(lxy1 / 2 / m));
+    CHECK_THAT(trd -> GetYHalfLength1() / m , Within1ULP(lxy1 / 2 / m));
+    CHECK_THAT(trd -> GetXHalfLength2() / m , Within1ULP(lxy2 / 2 / m));
+    CHECK_THAT(trd -> GetYHalfLength2() / m , Within1ULP(lxy2 / 2 / m));
+    CHECK_THAT(trd -> GetZHalfLength () / m , Within1ULP(lz   / 2 / m));
   };
 
   check_dimensions(n4::trd("trd_xyz")     .     xy1(lxy1  ).     xy2(lxy2  ).z(lz).solid());
@@ -898,15 +906,15 @@ TEST_CASE("nain volume", "[nain][volume]") {
   auto ly = 2 * m;
   auto lz = 3 * m;
   auto box = nain4::volume<G4Box>("test_box", water, lx, ly, lz);
-  CHECK(box->TotalVolumeEntities() == 1);
-  CHECK(box->GetMass() / kg        == Approx(8 * lx * ly * lz * density / kg));
-  CHECK(box->GetMaterial()         == water);
-  CHECK(box->GetName()             == "test_box");
+  CHECK     (box->TotalVolumeEntities() == 1);
+  CHECK     (box->GetMaterial()         == water);
+  CHECK     (box->GetName()             == "test_box");
+  CHECK_THAT(box->GetMass() / kg        , Within1ULP(8 * lx * ly * lz * density / kg));
 
   auto solid = box->GetSolid();
-  CHECK(solid->GetCubicVolume() / m3 == Approx(8 *  lx    * ly    * lz     / m3));
-  CHECK(solid->GetSurfaceArea() / m2 == Approx(8 * (lx*ly + ly*lz + lz*lx) / m2));
-  CHECK(solid->GetName()             == "test_box");
+  CHECK     (solid->GetName()             == "test_box");
+  CHECK_THAT(solid->GetCubicVolume() / m3 , Within1ULP(8 *  lx    * ly    * lz     / m3));
+  CHECK_THAT(solid->GetSurfaceArea() / m2 , Within1ULP(8 * (lx*ly + ly*lz + lz*lx) / m2));
 }
 
 TEST_CASE("nain place", "[nain][place]") {
@@ -1109,8 +1117,8 @@ TEST_CASE("nain place", "[nain][place]") {
   SECTION("clone") {
     auto place_box = n4::box("box").cube(1*mm).place(water).in(outer).at_x(2*mm);
 
-    auto check = [] (auto x, auto expected) {
-      CHECK(x -> GetTranslation().x() / mm == expected);
+    auto check = [] (auto x, double expected) {
+      CHECK_THAT(x -> GetTranslation().x() / mm, Within1ULP(expected));
     };
 
     auto a = place_box.clone().at_x(10*mm).now(); check(a, 2 + 10          );
@@ -1123,22 +1131,22 @@ TEST_CASE("nain place", "[nain][place]") {
 }
 
 TEST_CASE("nain scale_by", "[nain][scale_by]") {
-  CHECK(nain4::scale_by(eV, {1, 2.3, 4.5}) == std::vector<G4double>{1*eV, 2.3*eV, 4.5*eV});
-  CHECK(nain4::scale_by(cm, {6, 7})        == std::vector<G4double>{6*cm, 7*cm});
+  check_all_within1ULP(n4::scale_by(eV, {1, 2.3, 4.5}), {1*eV, 2.3*eV, 4.5*eV});
+  check_all_within1ULP(n4::scale_by(cm, {6, 7       }), {6*cm, 7*cm          });
 }
 
 TEST_CASE("nain const_over", "[nain][const_over]") {
-  CHECK(nain4::const_over(2*3*4, {2., 3., 4.}) == std::vector<G4double>{3*4, 2*4, 2*3});
-  CHECK(nain4::const_over(   1., {10, 100})    == std::vector<G4double>{0.1, 0.01});
+  check_all_within1ULP(n4::const_over(2*3*4, {2., 3., 4.}), {3*4, 2*4, 2*3});
+  check_all_within1ULP(n4::const_over(   1., {10, 100   }), {0.1, 0.01    });
 }
 
 TEST_CASE("nain unpack", "[nain4][unpack]") {
   auto xi = 666., yi = 3.14, zi = 42.;
   auto v = G4ThreeVector{xi, yi, zi};
   auto [xo, yo, zo] = n4::unpack(v);
-  CHECK_THAT(xo, WithinULP(xi, 1));
-  CHECK_THAT(yo, WithinULP(yi, 1));
-  CHECK_THAT(zo, WithinULP(zi, 1));
+  CHECK_THAT(xo, Within1ULP(xi));
+  CHECK_THAT(yo, Within1ULP(yi));
+  CHECK_THAT(zo, Within1ULP(zi));
 }
 
 TEST_CASE("nain find geometry", "[nain][find][geometry]") {
@@ -1283,9 +1291,9 @@ void error_if_do_not_like_type(T) {
 //TEST_CASE("static assert string", "[static][string]") {  error_if_do_not_like_type(std::string{"bla"}); }
 //TEST_CASE("static assert double", "[static][double]") {  error_if_do_not_like_type(3.2); }
 
-void check_solid_volume_placed_equivalence(G4VSolid* solid, G4LogicalVolume* volume, G4PVPlacement* placed, double tol=0) {
-  CHECK(volume -> GetMass()        / kg ==  Approx(placed -> GetLogicalVolume() -> GetMass()        / kg).margin(tol));
-  CHECK(solid  -> GetCubicVolume() / m3 ==  Approx(volume -> GetSolid        () -> GetCubicVolume() / m3).margin(tol));
+void check_solid_volume_placed_equivalence(G4VSolid* solid, G4LogicalVolume* volume, G4PVPlacement* placed, double tol) {
+  CHECK_THAT(volume -> GetMass()        / kg, WithinRel(placed -> GetLogicalVolume() -> GetMass()        / kg, tol));
+  CHECK_THAT(solid  -> GetCubicVolume() / m3, WithinRel(volume -> GetSolid        () -> GetCubicVolume() / m3, tol));
 }
 
 auto check_properties (n4::boolean_shape& shape, G4Material* mat, G4String name, double vol, double density) {
@@ -1295,14 +1303,14 @@ auto check_properties (n4::boolean_shape& shape, G4Material* mat, G4String name,
 
   check_solid_volume_placed_equivalence(solid, volume, placed, 1e-4);
 
-  CHECK(solid  -> GetCubicVolume() / m3 == Approx(vol           / m3));
-  CHECK(volume -> GetMass() / kg        == Approx(vol * density / kg));
-  CHECK(volume -> TotalVolumeEntities() == 1);
-  CHECK(volume -> GetMaterial()         == mat);
+  CHECK     (volume -> TotalVolumeEntities() == 1);
+  CHECK     (volume -> GetMaterial()         == mat);
+  CHECK_THAT(solid  -> GetCubicVolume() / m3, WithinRel(vol           / m3, 1e-3));
+  CHECK_THAT(volume -> GetMass() / kg       , WithinRel(vol * density / kg, 1e-3));
 
-  CHECK(solid  -> GetName()             == name);
-  CHECK(volume -> GetName()             == name);
-  CHECK(placed -> GetName()             == name);
+  CHECK(solid  -> GetName() == name);
+  CHECK(volume -> GetName() == name);
+  CHECK(placed -> GetName() == name);
 };
 
 
@@ -1529,19 +1537,21 @@ TEST_CASE("nain boolean at", "[nain][geometry][boolean][at]") {
   auto at_xz   = box.intersect(box).at_x(lx)         .at_z(lz).solid();
   auto at_yz   = box.intersect(box)         .at_y(ly).at_z(lz).solid();
   auto at_xyz  = box.intersect(box).at_x(lx).at_y(ly).at_z(lz).solid();
-  auto n   = 10000;
-  auto eps = 1e-3;
 
   // When displaced, the volumes do not overlap at all, resulting in a null volume
   // Cannot use GetCubicVolume because gives nonsense
-  CHECK(at_full -> EstimateCubicVolume(n, eps) == Approx(0));
-  CHECK(at_x    -> EstimateCubicVolume(n, eps) == Approx(0));
-  CHECK(at_y    -> EstimateCubicVolume(n, eps) == Approx(0));
-  CHECK(at_z    -> EstimateCubicVolume(n, eps) == Approx(0));
-  CHECK(at_xy   -> EstimateCubicVolume(n, eps) == Approx(0));
-  CHECK(at_xz   -> EstimateCubicVolume(n, eps) == Approx(0));
-  CHECK(at_yz   -> EstimateCubicVolume(n, eps) == Approx(0));
-  CHECK(at_xyz  -> EstimateCubicVolume(n, eps) == Approx(0));
+  auto n   = 10000;
+  auto eps = 1e-3;
+  auto check_zero_volume = [=] (auto solid) { CHECK_THAT(solid -> EstimateCubicVolume(n, eps) / m3, WithinAbs(0, eps)); };
+
+  check_zero_volume(at_full);
+  check_zero_volume(at_x   );
+  check_zero_volume(at_y   );
+  check_zero_volume(at_z   );
+  check_zero_volume(at_xy  );
+  check_zero_volume(at_xz  );
+  check_zero_volume(at_yz  );
+  check_zero_volume(at_xyz );
 }
 
 TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
@@ -1570,17 +1580,20 @@ TEST_CASE("nain boolean rotation", "[nain][geometry][boolean][rotation]") {
   // Cannot use GetCubicVolume because gives nonsense
   auto n   = 100000;
   auto eps = 1e-3;
-  CHECK(without_rot_xy -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK(without_rot_zx -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK(without_rot_yz -> EstimateCubicVolume(n, eps) >  0 );
-  CHECK(with_rotate_x  -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rotate_y  -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rotate_z  -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rotate    -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rot_x     -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rot_y     -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rot_z     -> EstimateCubicVolume(n, eps) == 0 );
-  CHECK(with_rot       -> EstimateCubicVolume(n, eps) == 0 );
+  auto nonzero_volume = [=] (auto solid) { CHECK_THAT(solid -> EstimateCubicVolume(n, eps), ! WithinAbs(0, eps)); };
+  auto    zero_volume = [=] (auto solid) { CHECK_THAT(solid -> EstimateCubicVolume(n, eps),   WithinAbs(0, eps)); };
+
+  nonzero_volume(without_rot_xy);
+  nonzero_volume(without_rot_zx);
+  nonzero_volume(without_rot_yz);
+     zero_volume(with_rotate_x );
+     zero_volume(with_rotate_y );
+     zero_volume(with_rotate_z );
+     zero_volume(with_rotate   );
+     zero_volume(with_rot_x    );
+     zero_volume(with_rot_y    );
+     zero_volume(with_rot_z    );
+     zero_volume(with_rot      );
 }
 
 TEST_CASE("boolean transform", "[boolean][transform]") {
@@ -1606,10 +1619,10 @@ TEST_CASE("boolean transform", "[boolean][transform]") {
   // The small box is 1/4 of the big box, so the result is two
   // disconnected boxes: one with 1/2 volume and another one with 1/4
   // volume
-  CHECK( usolid1 -> EstimateCubicVolume(n, eps) / m3 == Approx(3*vbox/4 / m3).margin(3e-3));
-  CHECK( usolid1 -> EstimateCubicVolume(n, eps) / m3 == Approx(3*vbox/4 / m3).margin(3e-3));
-  CHECK( usolid2 -> EstimateCubicVolume(n, eps) / m3 == Approx(3*vbox/4 / m3).margin(3e-3));
-  CHECK( usolid2 -> EstimateCubicVolume(n, eps) / m3 == Approx(3*vbox/4 / m3).margin(3e-3));
+  CHECK_THAT( usolid1 -> EstimateCubicVolume(n, eps) / m3, WithinRel(3*vbox/4 / m3, 3e-3));
+  CHECK_THAT( usolid1 -> EstimateCubicVolume(n, eps) / m3, WithinRel(3*vbox/4 / m3, 3e-3));
+  CHECK_THAT( usolid2 -> EstimateCubicVolume(n, eps) / m3, WithinRel(3*vbox/4 / m3, 3e-3));
+  CHECK_THAT( usolid2 -> EstimateCubicVolume(n, eps) / m3, WithinRel(3*vbox/4 / m3, 3e-3));
 }
 
 
@@ -1684,14 +1697,14 @@ TEST_CASE("nain linspace", "[nain][linspace]") {
   auto n_entries = 11 ;
 
   auto values = n4::linspace(start, stop, n_entries);
-  CHECK( values == std::vector<double>{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5} );
+  check_all_within1ULP(values, {0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5});
 
   auto one_item = n4::linspace(0.3, 0.4, 1);
-  CHECK( one_item == std::vector<double>{0.3} );
+  REQUIRE   (one_item.size() == 1);
+  CHECK_THAT(one_item.front(), Within1ULP(0.3));
 
   auto zero_items = n4::linspace(0.3, 0.4, 0);
-  CHECK( zero_items == std::vector<double>{} );
-
+  CHECK(zero_items.size() == 0);
 }
 
 int ff(int x) {
@@ -1705,8 +1718,8 @@ TEST_CASE("nain map", "[nain][map]") {
   auto mapped_lambda    = n4::map<int>( f, input_x);
   auto mapped_fn        = n4::map<int>(ff, input_x);
 
-  CHECK( mapped_lambda    == std::vector<int>{ f(a),  f(b),  f(c),  f(d)} );
-  CHECK( mapped_fn        == std::vector<int>{ff(a), ff(b), ff(c), ff(d)} );
+  CHECK( mapped_lambda == std::vector<int>{ f(a),  f(b),  f(c),  f(d)} );
+  CHECK( mapped_fn     == std::vector<int>{ff(a), ff(b), ff(c), ff(d)} );
 
 }
 
@@ -1729,31 +1742,21 @@ TEST_CASE("nain interpolate", "[nain][interpolate]") {
     auto [x_min, x_max] = std::minmax_element(begin(xs), end(xs));
     auto [y_min, y_max] = std::minmax_element(begin(ys), end(ys));
 
-    CHECK_THAT(*x_min, WithinULP(    lower,  1));
-    CHECK_THAT(*x_max, WithinULP(    upper,  1));
-    CHECK_THAT(*x_min, WithinULP(xs.front(), 1));
-    CHECK_THAT(*x_max, WithinULP(xs. back(), 1));
+    CHECK_THAT(*x_min, Within1ULP(    lower ));
+    CHECK_THAT(*x_max, Within1ULP(    upper ));
+    CHECK_THAT(*x_min, Within1ULP(xs.front()));
+    CHECK_THAT(*x_max, Within1ULP(xs. back()));
 
-    CHECK_THAT(*y_min, WithinULP(   -upper,  1));
-    CHECK_THAT(*y_max, WithinULP(   -lower,  1));
-    CHECK_THAT(*y_min, WithinULP(ys. back(), 1));
-    CHECK_THAT(*y_max, WithinULP(ys.front(), 1));
+    CHECK_THAT(*y_min, Within1ULP(   -upper ));
+    CHECK_THAT(*y_max, Within1ULP(   -lower ));
+    CHECK_THAT(*y_min, Within1ULP(ys. back()));
+    CHECK_THAT(*y_max, Within1ULP(ys.front()));
   }
 
   SECTION("element order") {
     double last;
-
-    last = xs.front();
-    for (size_t i=1; i<xs.size(); i++) {
-      CHECK(last < xs[i]);
-      last = xs[i];
-    }
-
-    last = ys.front();
-    for (size_t i=1; i<ys.size(); i++) {
-      CHECK(last > ys[i]);
-      last = ys[i];
-    }
+    last = xs.front(); for (auto i=1; i<xs.size(); i++) { CHECK(last < xs[i]); last = xs[i]; }
+    last = ys.front(); for (auto i=1; i<ys.size(); i++) { CHECK(last > ys[i]); last = ys[i]; }
   }
 
   SECTION("distance between elements") {
@@ -1868,8 +1871,8 @@ TEST_CASE("biased choice", "[random][biased][choice]") {
 
   // Verify that ratio of weights matches ratio of generated choices
   auto check = [&](auto l, auto r) {
-    CHECK(static_cast<G4double>(hits[l]) /    hits[r] ==
-                      Approx(weights[l]  / weights[r]).epsilon(0.01));
+    CHECK_THAT( static_cast<G4double>(   hits[l]) /    hits[r]
+              ,             WithinRel(weights[l]  / weights[r], 0.01));
   };
 
   for (size_t i=1; i<weights.size(); ++i) { check(0, i); }
@@ -1919,13 +1922,13 @@ TEST_CASE("random point in sphere", "[random][sphere]") {
 
   // ----- Check distribution in concentric shells ----------------------
   for (size_t n=1; n<N_bins; ++n) {
-    CHECK(r_hits[n] / r_hits[n-1] == Approx(shell_ratio(n+1)).epsilon(0.02));
+    CHECK_THAT(r_hits[n] / r_hits[n-1], WithinRel(shell_ratio(n+1), 0.02));
   }
 
   // ----- Check angular distribution around each axis ------------------
   auto check_around_axis = [=](auto const& bin) {
     for (size_t n = 0; n < N_bins; ++n) {
-      CHECK(bin[n] == Approx(N_per_bin).epsilon(0.01));
+      CHECK_THAT(bin[n], WithinRel(N_per_bin, 0.01));
     }
   };
 
@@ -2267,19 +2270,19 @@ TEST_CASE("stats sum", "[stats][sum]") {
   using n4::stats::sum;
 
   // Sums of empty containers
-  CHECK(sum(std::vector       <int>   {}) == 0);
-  CHECK(sum(std::unordered_set<int>   {}) == 0);
-  CHECK(sum(std::vector       <float> {}) == 0);
-  CHECK(sum(std::unordered_set<double>{}) == 0);
+  CHECK     (sum(std::vector       <int>   {}) == 0);
+  CHECK     (sum(std::unordered_set<int>   {}) == 0);
+  CHECK_THAT(sum(std::vector       <float> {}), Within1ULP(0.f));
+  CHECK_THAT(sum(std::unordered_set<double>{}), Within1ULP(0. ));
 
   // Sums of single-element containers
-  CHECK(sum(std::vector       <long> {3}) == 3);
-  CHECK(sum(std::unordered_set<float>{4}) == 4);
+  CHECK     (sum(std::vector       <long> {3}) == 3);
+  CHECK_THAT(sum(std::unordered_set<float>{4}), Within1ULP(4.f));
 
   // Sums of multiple-element containers
-  CHECK_THAT(sum(std::vector       <float> {3.1, 7.2}), WithinULP(10.3f, 1));
-  CHECK_THAT(sum(std::vector       <double>{3.1, 7.2}), WithinULP(10.3 , 1));
-  CHECK(     sum(std::unordered_set<long>  {7, 2, 9} )  ==        18       );
+  CHECK_THAT(sum(std::vector       <float> {3.1, 7.2}), WithinULP (10.3f, 1)); // Avoid casting float to double
+  CHECK_THAT(sum(std::vector       <double>{3.1, 7.2}), Within1ULP(10.3 ));
+  CHECK(     sum(std::unordered_set<long>  {7, 2, 9} )  ==         18    );
 }
 
 TEST_CASE("stats mean", "[stats][mean]") {
@@ -2290,17 +2293,17 @@ TEST_CASE("stats mean", "[stats][mean]") {
   CHECK(! mean(unordered_set<int>{}).has_value());
 
   // Means of single-element containers
-  CHECK(mean(vector      <double>{2.3 }).value() == 2.3 );
-  CHECK(mean(unordered_set<float>{9.1f}).value() == 9.1f);
-  CHECK(mean(vector         <int>{42}  ).value() == 42  );
+  CHECK_THAT(mean(vector      <double>{2.3 }).value(), Within1ULP( 2.3 ));
+  CHECK_THAT(mean(unordered_set<float>{9.1f}).value(), Within1ULP( 9.1f));
+  CHECK_THAT(mean(vector         <int>{42}  ).value(), Within1ULP(42.  ));
 
   // Means of multiple-value containers
-  CHECK_THAT(mean(vector       <double> {1.0, 2.0}     ).value(), WithinULP(1.5 , 1));
-  CHECK_THAT(mean(vector       <float>  {3.1, 3.6, 5.9}).value(), WithinULP(4.2f, 1));
-  CHECK_THAT(mean(unordered_set<double> {9.0, 2.0}     ).value(), WithinULP(5.5f, 1));
+  CHECK_THAT(mean(vector       <double>{1.0, 2.0}     ).value(), Within1ULP(1.5 ));
+  CHECK_THAT(mean(vector       <float> {3.1, 3.6, 5.9}).value(), Within1ULP(4.2f));
+  CHECK_THAT(mean(unordered_set<double>{9.0, 2.0}     ).value(), Within1ULP(5.5f));
 
   // Input integers give double results
-  CHECK_THAT(mean(vector<int>{1,2}).value(), WithinULP(1.5, 1));
+  CHECK_THAT(mean(vector<int>{1,2}).value(), Within1ULP(1.5));
 }
 
 TEST_CASE("stats std_dev population", "[stats][std_dev][population]") {
@@ -2314,21 +2317,21 @@ TEST_CASE("stats std_dev population", "[stats][std_dev][population]") {
   CHECK(! std_dev_population(unordered_set<double>{}).has_value());
 
   // Standard deviations of single-element containers
-  CHECK(std_dev_population(vector      <double>{3.6}).value() == 0);
-  CHECK(std_dev_population(unordered_set<float>{6.3}).value() == 0);
+  CHECK_THAT(std_dev_population(vector      <double>{3.6}).value(), Within1ULP(0. ));
+  CHECK_THAT(std_dev_population(unordered_set<float>{6.3}).value(), Within1ULP(0.f));
 
   // Standard deviations of multi-element containers
-  auto check_std_and_var = [] (vector<double> data, double expected, uint64_t ulp=1) {
-    CHECK_THAT( std_dev_population(data).value(), WithinULP(std::sqrt(expected), ulp));
-    CHECK_THAT(variance_population(data).value(), WithinULP(          expected , ulp));
+  auto check_std_and_var = [] (vector<double> data, double expected) {
+    CHECK_THAT( std_dev_population(data).value(), Within1ULP(std::sqrt(expected)));
+    CHECK_THAT(variance_population(data).value(), Within1ULP(          expected ));
   };
   check_std_and_var({5, 7}                                                ,  1);
   check_std_and_var({1, 2, 3, 4, 5}                                       ,  2);
   check_std_and_var({2, 4, 4, 6, 6, 6, 8, 8, 8, 8, 10, 10, 10, 12, 12, 14}, 10);
 
   // Input integers give double results
-  CHECK_THAT( std_dev_population(vector<int>{1,2,3}).value(), WithinULP(std::sqrt(2.0/3), 1));
-  CHECK_THAT(variance_population(vector<int>{1,2,3}).value(), WithinULP(          2.0/3 , 1));
+  CHECK_THAT( std_dev_population(vector<int>{1,2,3}).value(), Within1ULP(std::sqrt(2.0/3)));
+  CHECK_THAT(variance_population(vector<int>{1,2,3}).value(), Within1ULP(          2.0/3 ));
 }
 
 TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
@@ -2346,17 +2349,17 @@ TEST_CASE("stats std_dev sample", "[stats][std_dev][sample]") {
   CHECK(! std_dev_sample(unordered_set<float>{7.9}).has_value());
 
   // Standard deviations of multi-element containers
-  auto check_std_and_var = [] (vector<double> data, double expected, uint64_t ulp=1) {
-    CHECK_THAT( std_dev_sample(data).value(), WithinULP(std::sqrt(expected), ulp));
-    CHECK_THAT(variance_sample(data).value(), WithinULP(          expected , ulp));
+  auto check_std_and_var = [] (vector<double> data, double expected) {
+    CHECK_THAT( std_dev_sample(data).value(), Within1ULP(std::sqrt(expected)));
+    CHECK_THAT(variance_sample(data).value(), Within1ULP(          expected ));
   };
   check_std_and_var({1, 5   },  8);
   check_std_and_var({2, 4   },  2);
   check_std_and_var({1, 2, 9}, 19);
 
   // Input integers give double results
-  CHECK_THAT( std_dev_sample(vector<int>{1,2,3,4}).value(), WithinULP(std::sqrt(5.0/3), 1));
-  CHECK_THAT(variance_sample(vector<int>{1,2,3,4}).value(), WithinULP(          5.0/3 , 1));
+  CHECK_THAT( std_dev_sample(vector<int>{1,2,3,4}).value(), Within1ULP(std::sqrt(5.0/3)));
+  CHECK_THAT(variance_sample(vector<int>{1,2,3,4}).value(), Within1ULP(          5.0/3 ));
 }
 
 TEST_CASE("stats correlation", "[stats][correlation]") {
@@ -2367,19 +2370,19 @@ TEST_CASE("stats correlation", "[stats][correlation]") {
 
   // Basic example of 100% correlation
   CHECK_THAT(corr({1,2},
-                  {1,2}).value(), WithinULP(1.0, 1));
+                  {1,2}).value(), Within1ULP(1.0));
 
   // Basic example of 100% anti-correlation
   CHECK_THAT(corr({1,2},
-                  {2,1}).value(), WithinULP(-1.0, 1));
+                  {2,1}).value(), Within1ULP(-1.0));
 
   // Basic example of ZERO correlation
   CHECK_THAT(corr({-1,-1,+1,+1},
-                  {-8,+8,-8,+8}).value(), WithinULP(0.0, 1));
+                  {-8,+8,-8,+8}).value(), Within1ULP(0.0));
 
   // A non-trivial example
   CHECK_THAT(corr({3,5,2,8,7},
-                  {1,9,2,6,3}).value(), WithinULP(0.4796356153459284, 1));
+                  {1,9,2,6,3}).value(), Within1ULP(0.4796356153459284));
 
   // Different lengths: no result
   CHECK(! corr({1,2,3},
@@ -2396,7 +2399,7 @@ TEST_CASE("stats correlation", "[stats][correlation]") {
   CHECK_THAT(n4::stats::correlation(
                std::vector<int>{1,2,3},
                std::vector<int>{1,2,2}).value(),
-             WithinULP(std::sqrt(3)/2, 1));
+             Within1ULP(std::sqrt(3)/2));
 }
 
 TEST_CASE("stats min_max", "[stats][min_max]") {

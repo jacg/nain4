@@ -30,8 +30,6 @@
 
 #include <stdexcept>
 
-using Catch::Approx;
-
 // Many of the tests below check physical quantities. Dividing physical
 // quantities by their units gives raw numbers which are easily understandable
 // by a human reader, which is important test failures are reported. Sometimes
