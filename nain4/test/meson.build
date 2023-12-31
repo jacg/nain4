@@ -44,6 +44,7 @@ nain4_test_deps    = [nain4, geant4, catch2]
 nain4_test_include = include_directories('.')
 nain4_test_sources = [ 'test-nain4.cc'
                      , 'test-external.cc'
+                     , 'test-sensitive.cc'
                      , 'test-vis-attributes.cc'
                      , 'test-run-manager.cc'
                      , 'trivial-full-app-test.cc'
