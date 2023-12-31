@@ -27,12 +27,9 @@
 #include <G4Material.hh>
 #include <G4Gamma.hh>
 
-#include <catch2/catch_approx.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <cmath>
 #include <cstddef>
