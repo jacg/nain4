@@ -42,27 +42,6 @@
 
 using namespace n4::test;
 
-template<class T>
-void error_if_do_not_like_type(T) {
-  static_assert(
-    std::negation_v<std::is_same<T, int>>,
-    "\n\n\n\nWe do not like `int`s\n\n\n\n\n"
-  );
-  static_assert(
-    std::negation_v<std::is_same<T, std::string>>,
-    "\n\n\n\n\n`std::string`s NOT welcome\n\n\n\n"
-  );
-}
-
-
-//TEST_CASE("static assert int", "[static][int]") {  error_if_do_not_like_type(2); }
-//TEST_CASE("static assert string", "[static][string]") {  error_if_do_not_like_type(std::string{"bla"}); }
-//TEST_CASE("static assert double", "[static][double]") {  error_if_do_not_like_type(3.2); }
-
-// TODO can the overlap check tests be automated? G4 raises an exception when an
-// overlap is detected, and we do not know how to observe that in Catch2
-
-// }
 
 
 #pragma GCC diagnostic pop
