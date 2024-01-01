@@ -45,6 +45,7 @@ nain4_test_include = include_directories('.')
 nain4_test_sources = [ 'test-nain4.cc'
                      , 'test-external.cc'
                      , 'test-inspect.cc'
+                     , 'test-geometry-iterator.cc'
                      , 'test-material.cc'
                      , 'test-place.cc'
                      , 'test-random.cc'
