@@ -42,22 +42,22 @@ geant4 = dependency( 'Geant4'
 
 nain4_test_deps    = [nain4, geant4, catch2]
 nain4_test_include = include_directories('.')
-nain4_test_sources = [ 'test-boolean.cc'
+nain4_test_sources = [ 'catch2-main-test.cc'
+                     , 'test-boolean.cc'
                      , 'test-external.cc'
                      , 'test-inspect.cc'
                      , 'test-geometry-iterator.cc'
                      , 'test-material.cc'
                      , 'test-place.cc'
                      , 'test-random.cc'
+                     , 'test-run-manager.cc'
                      , 'test-sensitive.cc'
                      , 'test-sequences.cc'
                      , 'test-shape.cc'
                      , 'test-stats.cc'
                      , 'test-vis-attributes.cc'
                      , 'test-volume.cc'
-                     , 'test-run-manager.cc'
                      , 'trivial-full-app-test.cc'
-                     , 'catch2-main-test.cc'
                      ]
 
 geant4_include = geant4.get_variable(cmake    : 'Geant4_INCLUDE_DIRS')
