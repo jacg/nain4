@@ -62,6 +62,13 @@ jobs:
       - name: Run test suite
         run: nix develop .#${{ matrix.devshell }} -c just test
 
+      - name: Test run in dev environment
+        run: |
+          nix develop .# -c just run --beam-on 12 | tee build-and-run-in-devenv-output
+          PATTERN="end of event 12"
+          echo Looking for "'$PATTERN'" in output of 'just'
+          grep "$PATTERN" build-and-run-in-devenv-output
+
       - name: Test nix build default package
         run: |
           nix build ./#

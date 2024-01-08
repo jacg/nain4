@@ -69,6 +69,14 @@ jobs:
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" run-client-app-output
 
+      - name: Test run dev environment
+        run: |
+          cd ~/work/my-project
+          nix develop .# -c just run --beam-on 12 | tee build-and-run-in-devenv-output
+          PATTERN="end of event 12"
+          echo Looking for "'$PATTERN'" in output of 'just'
+          grep "$PATTERN" build-and-run-in-devenv-output
+
       - name: Test nix build client package
         run: |
           nix build   ~/work/my-project#
