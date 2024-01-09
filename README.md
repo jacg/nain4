@@ -28,8 +28,10 @@ compatible versions and works together in harmony[^1].
     then we will aim to fix it; if something is broken when using `nain4`
     without Nix, then we won't be able to help.
 
-For HPC systems on which installing Nix might be problematic, we provide the
-means to generate Singularity/[Apptainer](https://apptainer.org/) containers.
+For HPC systems on which installing Nix might be problematic:
+
++ [nix-portable](https://github.com/DavHau/nix-portable) works well in many situations
++ we provide the means to generate Singularity/[Apptainer](https://apptainer.org/) containers.
 
 # `nain4`
 
