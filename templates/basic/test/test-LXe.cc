@@ -46,9 +46,9 @@ TEST_CASE("liquid xenon properties", "[.xfail][xenon][properties]") {
       .physics         = our_optical_physics()
     , .material        = LXe
     , .particle_name   = "gamma"
-    , .particle_energy = 511 * keV}
-    , .distances       = n4::scale_by(cm , {1, 2, 3, 4, 5, 6, 7, 8}
-  );
+    , .particle_energy = 511 * keV
+    , .distances       = n4::scale_by(cm , {1, 2, 3, 4, 5, 6, 7, 8})
+  });
 
   auto expected_abs_length = 3.74 * cm;
   for (auto abs_length : abs_lengths) {
