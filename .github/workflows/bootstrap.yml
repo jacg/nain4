@@ -77,6 +77,11 @@ jobs:
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" build-and-run-in-devenv-output
 
+      - name: Run project tests in dev environment
+        run: |
+          cd ~/work/my-project
+          nix develop .# -c just test -v
+
       - name: Test nix build client package
         run: |
           nix build   ~/work/my-project#
