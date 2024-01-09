@@ -98,12 +98,13 @@ lines spread over 13 files in the original Geant4 rendition.
 
 2. Bootstrap a new `nain4` project:
    ```sh
-   nix run github:jacg/nain4#bootstrap-client-project path/to/your-new-project
+   nix run github:jacg/nain4#bootstrap-client-project path/to/your-new-project your-project-name "Your project description"
    ```
-   This will create a new directory in `path/to/your-new-project`. Adapt this
-   path to your needs before executing the command.
+   This will create a new directory in `path/to/your-new-project`. Adapt this path to your needs *before* executing the command.
 
-3. `cd` into it
+   Also adapt `your-project-name` (used in various identifiers and path components inside your project) and `"Your project description"` before executing the command.
+
+3. `cd` into `path/to/your-new-project`
 
 4. Type `nix develop` [^3]
 
