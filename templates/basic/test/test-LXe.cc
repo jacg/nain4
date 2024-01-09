@@ -42,7 +42,7 @@ TEST_CASE("liquid xenon properties", "[.xfail][xenon][properties]") {
   };
 
 
-  auto abs_lengths = measure_abslength(abslength_config{
+  auto abs_lengths = measure_interaction_length(interaction_length_config{
       .physics         = our_optical_physics()
     , .material        = LXe
     , .particle_name   = "gamma"
