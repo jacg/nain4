@@ -195,6 +195,7 @@
         ${pkgs.coreutils}/bin/cp -Tr ${self}/templates/basic                                    $FQ_DIRECTORY
         ${pkgs.coreutils}/bin/cp     ${self}/nain4/test/run-each-test-in-separate-process.sh.in $FQ_DIRECTORY
         ${pkgs.coreutils}/bin/cp     ${self}/scripts/count-warnings.sh                          $FQ_DIRECTORY/scripts
+        ${pkgs.coreutils}/bin/touch  $FQ_DIRECTORY/scripts/tolerated-warnings
         chmod -R u+w $FQ_DIRECTORY
         nix develop  $FQ_DIRECTORY -c true # create flake.lock
         cd           $FQ_DIRECTORY

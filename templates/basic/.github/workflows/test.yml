@@ -57,7 +57,7 @@ jobs:
         run: nix develop .#${{ matrix.devshell }} -c just build | tee compilation-log
 
       - name: Count warnings
-        run: bash scripts/count-warnings.sh compilation-log 0 do-not-fail-here
+        run: nix develop .# -c bash scripts/count-warnings.sh compilation-log scripts/tolerated-warnings do-not-fail-here
 
       - name: Run test suite
         run: nix develop .#${{ matrix.devshell }} -c just test
@@ -92,4 +92,4 @@ jobs:
           echo ===============================================
 
       - name: Fail if too many warnings
-        run: bash scripts/count-warnings.sh compilation-log 0 fail
+        run: nix develop .# -c bash scripts/count-warnings.sh compilation-log scripts/tolerated-warnings fail

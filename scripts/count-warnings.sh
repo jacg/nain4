@@ -1,17 +1,28 @@
 COMPILATION_LOG=$1
-ACCEPTABLE_NUMBER_OF_WARNINGS=$2
+TOLERATED_WARNINGS_FILE=$2
 FAIL=$3
 
-WARNING_COUNT=$(grep -io warning $COMPILATION_LOG | wc -l)
-if (( $WARNING_COUNT > $ACCEPTABLE_NUMBER_OF_WARNINGS ))
+readarray -t TOLERATED_WARNINGS < $TOLERATED_WARNINGS_FILE
+
+echo 'Tolerated warnings (one per line)':
+for w in "${TOLERATED_WARNINGS[@]}";do echo $w; done
+
+WARNINGS=$(grep -i warning $COMPILATION_LOG)
+
+for TOLERATED_WARNING in "${TOLERATED_WARNINGS[@]}"; do
+    WARNINGS=$(echo $WARNINGS | grep -v "$TOLERATED_WARNING")
+done
+
+WARNING_COUNT=$(echo $WARNINGS | grep -ve '^[[:space:]]*$' | wc -l)
+
+if (( $WARNING_COUNT > 0 ))
 then
-    echo too many warnings: $WARNING_COUNT
+    echo too many unexpected warnings: $WARNING_COUNT
     echo
     echo
     grep -iC2 warning compilation-log
     false || [ "$FAIL" != "fail" ]
 else
-    echo Warnings detected: $WARNING_COUNT
-    echo We tolerate up to $ACCEPTABLE_NUMBER_OF_WARNINGS warnings
+    echo No untolerated warnings detected
     true
 fi
