@@ -52,7 +52,7 @@ protrude beyond the bounds of the world volume.
 <!-- TODO replace with an mdbook-admonish thing, or some other higher-level
 feature --> <font color="red">NOTE: the volume is not placed until the `.now()`
 method is called.</font> See [Placement: Laziness and
-Accumulation](./placement-laziness-and-accumulation.md) for more details.
+Accumulation](../explanation/placement-laziness-and-accumulation.md) for more details.
 
 ### Daughter volumes
 
@@ -117,7 +117,7 @@ n4::place(box).in(world).at_y(3*cm).rot_z(30*deg).now();
   .at_x(101*m)
   .at_x(1*m).at_x(100*m)
   ```
-  NOTE: [Displacements and rotations are not commutative](#displacements-and-rotations-are-not-commutative).
+  NOTE: [Displacements and rotations are not commutative](../explanation/displacements-and-rotations-are-not-commutative.md).
 
 
 + Rotations
@@ -143,7 +143,7 @@ n4::place(box).in(world).at_y(3*cm).rot_z(30*deg).now();
   .rot_y(90*deg).rot_x(90*deg)
   ```
 
-  NOTE: [Displacements and rotations are not commutative](./displacements-and-rotations-are-not-commutative.md).
+  NOTE: [Displacements and rotations are not commutative](../explanation/displacements-and-rotations-are-not-commutative.md).
 
 + Transformations
   - `transform(G4Transform3D*)`, `trans(G4Transform3D*)` (identical meanings)
@@ -194,4 +194,4 @@ n4::place(box).in(world).at_y(3*cm).rot_z(30*deg).now();
   // Place boxes at 1, 3 and 6 metres
   for (auto k : {1,2,3}) { place_box        .at_x(k*m).now(); }
   ```
-  See [Placement: Laziness and Accumulation](./placement-laziness-and-accumulation.md).
+  See [Placement: Laziness and Accumulation](../explanation/placement-laziness-and-accumulation.md).

@@ -1,7 +1,7 @@
 # Input types for boolean solids' methods
 
 `nain4` provides a collection of methods to create boolean solids
-described in [n4 boolean solids](./n4-boolean-solids.md). These
+described in [n4 boolean solids](../reference/n4-boolean-solids.md). These
 functions accept either a `n4::shape` or `G4VSolid*`. However, when
 building a geometry, it's fairly easy to get confused with the
 different stages of the creation of components (`solid`,
