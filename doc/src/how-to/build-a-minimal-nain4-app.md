@@ -2,7 +2,7 @@
 
 ## Building the app
 
-One of the most basic examples of a nain4 app can be found in [templates/basic/src/n4app.cc](../../../templates/basic/src/n4app.cc). Here is the full file:
+One of the most basic examples of a nain4 app can be found in `templates/basic/src/n4app.cc`. Here is the full file:
 
 ```c++
 {{#include ../../../templates/basic/src/n4app.cc:full_file}}
