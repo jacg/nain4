@@ -1,7 +1,7 @@
 # How to install `nix`
 
 `nain4` is distributed and its dependencies are managed using
-`nix`. The reasons for this are explained in [why nix?](../why-nix.md).
+`nix`. The reasons for this are explained in [why nix?](../explanation/why-nix.md).
 
 ## On your personal computer
 
@@ -23,7 +23,7 @@ The situation on HPC clusters is different, as we usually we don't
 have super-user permissions. At the moment the installation of nix in
 this kind of environments is not fully supported. In the meantime, you
 may want to check [How to make nain4 available in a Geant4/cmake
-project](./how-to/enable-nain4-in-cmake.md)
+project](./enable-nain4-in-cmake.md)
 
 
 ## `direnv`

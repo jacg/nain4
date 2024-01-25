@@ -2,7 +2,7 @@
 
 ## Building the app
 
-One of the most basic examples of a nain4 app can be found in [templates/basic/src/n4app.cc](../../../templates/basic/src/n4app.cc). Here is the full file:
+One of the most basic examples of a nain4 app can be found in `templates/basic/src/n4app.cc`. Here is the full file:
 
 ```c++
 {{#include ../../../templates/basic/src/n4app.cc:full_file}}
@@ -77,7 +77,7 @@ Next, we include `nain4` and `Geant4` in our project:
 {{#include ../../../examples/00-basic/CMakeLists.txt:include_nain4_geant4}}
 ```
 
-Note that we have chosen to use an existing installation of `nain4` so this example runs out of the box when run within `nain4`. If you were to copy this example and run it elsewhere, make sure to check [How to make nain4 available in a Geant4/cmake project](@book/how-to/enable-nain4-in-cmake).
+Note that we have chosen to use an existing installation of `nain4` so this example runs out of the box when run within `nain4`. If you were to copy this example and run it elsewhere, make sure to check [How to make nain4 available in a Geant4/cmake project](./enable-nain4-in-cmake.md).
 
 Finally, we create an executable file and link it to the relevant libraries.
 
