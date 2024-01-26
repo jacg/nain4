@@ -6,6 +6,7 @@ project( 'CHANGEME-PROJECT-NAME'
                            , 'optimization=2'
                            , 'cpp_std=c++20'
                            , 'prefix=@0@/../install/CHANGEME-PROJECT-NAME/'.format(meson.source_root())
+                           , 'libdir=lib'
                            ]
        )
 
@@ -32,16 +33,35 @@ geant4 = dependency( 'Geant4'
                                , 'Geant4::G4UIVisDefinitions'
                                ])
 
-my_app_deps    = [nain4, geant4]
-my_app_include = include_directories('.')
-my_app_sources = ['n4app.cc', 'LXe.cc']
+CHANGEME_SNAKE_LIB_deps     = [nain4, geant4]
+CHANGEME_SNAKE_LIB_include  = include_directories('.')
+CHANGEME_SNAKE_LIB_includes = ['LXe.hh']
+CHANGEME_SNAKE_LIB_sources  = ['LXe.cc']
 
 geant4_include = geant4.get_variable(cmake    : 'Geant4_INCLUDE_DIRS')
 nain4_include  =  nain4.get_variable(pkgconfig: 'includedir'         )
 
-my_app_exe = executable( 'CHANGEME-EXE'
-                       , my_app_sources
-                       , include_directories: [my_app_include, nain4_include, geant4_include]
-                       , dependencies       : my_app_deps
-                       , install            : true
-                       )
+
+CHANGEME_SNAKE_LIB = shared_library( 'CHANGEME_LIB'
+                                   , CHANGEME_SNAKE_LIB_sources
+                                   , include_directories: [CHANGEME_SNAKE_LIB_include, geant4_include]
+                                   , dependencies       : CHANGEME_SNAKE_LIB_deps
+                                   , install            : true
+                                   )
+
+CHANGEME_SNAKE_EXE = executable( 'CHANGEME-EXE'
+                               , ['CHANGEME-PROJECT-NAME.cc']
+                               , include_directories: [CHANGEME_SNAKE_LIB_include, nain4_include, geant4_include]
+                               , dependencies       : CHANGEME_SNAKE_LIB_deps
+                               , link_with          : CHANGEME_SNAKE_LIB
+                               , install            : true
+                               )
+
+install_headers(CHANGEME_SNAKE_LIB_includes)
+
+pkg = import('pkgconfig')
+pkg.generate( CHANGEME_SNAKE_LIB
+            , description: 'CHANGEME-ONE-LINE-PROJECT-DESCRIPTION'
+            , name       : 'CHANGEME-PROJECT-NAME'
+            , filebase   : 'CHANGEME-PROJECT-NAME'
+            )
