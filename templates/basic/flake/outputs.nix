@@ -15,6 +15,7 @@
       pname = "CHANGEME-PACKAGE";
       version = "0.0.0";
       src = "${self}/src";
+      postInstall = "${pkgs.coreutils}/bin/cp -r ${self}/macs $out";
       nativeBuildInputs = [];
       buildInputs = [ nain4.packages.nain4 ];
     };
