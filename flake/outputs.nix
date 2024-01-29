@@ -196,7 +196,10 @@
         ${pkgs.coreutils}/bin/cp     ${self}/nain4/test/run-each-test-in-separate-process.sh.in $FQ_DIRECTORY
         ${pkgs.coreutils}/bin/cp     ${self}/scripts/count-warnings.sh                          $FQ_DIRECTORY/scripts
         ${pkgs.coreutils}/bin/touch  $FQ_DIRECTORY/scripts/tolerated-warnings
+
         chmod -R u+w $FQ_DIRECTORY
+
+        ${pkgs.coreutils}/bin/mv     $FQ_DIRECTORY/src/n4app.cc                                 $FQ_DIRECTORY/src/''${BASE_NAME}.cc
         nix develop  $FQ_DIRECTORY -c true # create flake.lock
         cd           $FQ_DIRECTORY
         ${pkgs.ripgrep}/bin/rg "ANCHOR" --files-with-matches . | ${pkgs.findutils}/bin/xargs ${pkgs.gnused}/bin/sed -i '/ANCHOR/d'
@@ -209,9 +212,15 @@
         REPLACE "CHANGEME-EXE"                           ''${BASE_NAME}
         REPLACE "CHANGEME-PROJECT-NAME"                  ''${BASE_NAME}
         REPLACE "CHANGEME-TESTS-PROJECT-NAME"            ''${BASE_NAME}-tests
-        REPLACE "CHANGEME-PROJECT-TEST-EXE"              ''${BASE_NAME}-test
+        REPLACE "CHANGEME-TEST-EXE"                      ''${BASE_NAME}-test
         REPLACE "CHANGEME-PACKAGE"                       ''${BASE_NAME}
+        REPLACE "CHANGEME_LIB"                           ''${BASE_NAME}
+
+        REPLACE "CHANGEME_SNAKE_LIB"                     ''${BASE_NAME//-/_}_lib # replace ALL dashes by underscores
+        REPLACE "CHANGEME_SNAKE_EXE"                     ''${BASE_NAME//-/_}_exe # replace ALL dashes by underscores
+
         REPLACE "CHANGEME-ONE-LINE-PROJECT-DESCRIPTION" "''${DESCRIPTION}"
+
 
         git -c init.defaultBranch=master init -q
         # TODO: protect against user not having set git user.{name,email}
