@@ -4,6 +4,7 @@
 , ...
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
+  inherit (import ./helpers.nix {inherit pkgs;}) shell-shared;
   inherit (nain4.deps) args-from-cli make-app;
   in {
 
@@ -34,16 +35,16 @@
     devShell = self.devShells.clang;
 
     # Activated by `nix develop <URL to this flake>#clang`
-    devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } {
+    devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } (shell-shared // {
       name = "CHANGEME-PROJECT-NAME-clang-devenv";
       packages = nain4.deps.dev-shell-packages ++ [ nain4.packages.clang_16 ];
-    };
+    });
 
     # Activated by `nix develop <URL to this flake>#gcc`
-    devShells.gcc = pkgs.mkShell {
+    devShells.gcc = pkgs.mkShell (shell-shared // {
       name = "CHANGEME-PROJECT-NAME-gcc-devenv";
       packages = nain4.deps.dev-shell-packages;
-    };
+    });
 
     # 1. `nix build` .#singularity
     # 2. `scp result <me>@lxplus7.cern.ch:hello.img`
