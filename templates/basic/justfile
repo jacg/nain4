@@ -6,10 +6,19 @@ set positional-arguments := true
 default:
   just run --beam-on 10
 
-test *REST:
-  meson setup      build/CHANGEME-TESTS-PROJECT-NAME test
+setup BUILD SRC:
+  #!/usr/bin/env sh
+  if [[ ! -d {{BUILD}} ]]; then
+    meson setup {{BUILD}} {{SRC}}
+  fi
+
+install-tests:
+  just install-lib-quiet
+  just setup build/CHANGEME-TESTS-PROJECT-NAME test
   meson compile -C build/CHANGEME-TESTS-PROJECT-NAME
   meson install -C build/CHANGEME-TESTS-PROJECT-NAME
+
+test *REST: install-tests
   sh install/CHANGEME-TESTS-PROJECT-NAME/run-each-test-in-separate-process.sh "$@"
 
 catch2-demo *REST:
@@ -20,11 +29,26 @@ catch2-demo *REST:
   install/CHANGEME-TESTS-PROJECT-NAME/bin/catch2-demo-test "$@"
 
 build:
-  meson setup build/CHANGEME-PROJECT-NAME src
+  just setup build/CHANGEME-PROJECT-NAME src
   meson compile -C build/CHANGEME-PROJECT-NAME
 
 install: build
   meson install -C build/CHANGEME-PROJECT-NAME
+
+
+install-lib-quiet:
+  #!/usr/bin/env sh
+  if [[ -f install/CHANGEME-PROJECT-NAME/lib/libCHANGEME_LIB.so    ||
+        -f install/CHANGEME-PROJECT-NAME/lib/libCHANGEME_LIB.dylib ]]; then
+    install_output=$(just install)
+    install_ok=$?
+    if ! test install_ok; then
+      echo $install_output
+      exit $install_ok
+    fi
+  else
+    just install
+  fi
 
 run *ARGS: install
   #!/usr/bin/env sh
