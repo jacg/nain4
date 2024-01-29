@@ -1,0 +1,9 @@
+###################################################################
+# Any line in which the first non-whitespace characters is a `#` is
+# considered a comment.
+# Any non-comment line is a regexp specifying a tolerated warning,
+###################################################################
+
+# This is a warning caused by macOS providing an 'nm' version not
+# expected by meson.
+\['nm'\] does not work

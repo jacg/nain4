@@ -194,8 +194,7 @@
         FQ_DIRECTORY=$(${pkgs.coreutils}/bin/readlink -f $DIRECTORY)
         ${pkgs.coreutils}/bin/cp -Tr ${self}/templates/basic                                    $FQ_DIRECTORY
         ${pkgs.coreutils}/bin/cp     ${self}/nain4/test/run-each-test-in-separate-process.sh.in $FQ_DIRECTORY
-        ${pkgs.coreutils}/bin/cp     ${self}/scripts/count-warnings.sh                          $FQ_DIRECTORY/scripts
-        ${pkgs.coreutils}/bin/touch  $FQ_DIRECTORY/scripts/tolerated-warnings
+        ${pkgs.coreutils}/bin/cp -r  ${self}/scripts                                            $FQ_DIRECTORY
 
         chmod -R u+w $FQ_DIRECTORY
 

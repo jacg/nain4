@@ -2,7 +2,7 @@ COMPILATION_LOG=$1
 TOLERATED_WARNINGS_FILE=$2
 FAIL=$3
 
-readarray -t TOLERATED_WARNINGS < $TOLERATED_WARNINGS_FILE
+readarray -t TOLERATED_WARNINGS < $(rg --no-line-number -v '^\s*(#|$)' $TOLERATED_WARNINGS_FILE)
 
 echo 'Tolerated warnings (one per line)':
 for w in "${TOLERATED_WARNINGS[@]}";do echo $w; done
