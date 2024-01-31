@@ -363,5 +363,24 @@ TEST_CASE("run manager get run action", "[run_manager][get_run_action]") {
      .geometry(water_box)
      .actions(actions)
      .run();
+}
 
+TEST_CASE("run manager execute", "[run_manager][execute]") {
+  unsigned a = 0, b = 0, c = 0, d = 0;
+
+  n4::run_manager::create()
+     .ui("progname", fake_argv.argc, fake_argv.argv, false)
+     .execute([&a]{ a++; })
+     .physics<FTFP_BERT>(0)
+     .execute([&b]{ b++; })
+     .geometry(water_box)
+     .execute([&c]{ c++; })
+     .actions(do_nothing)
+     .execute([&d]{ d++; })
+     .run(0);
+
+  CHECK(a==1);
+  CHECK(b==1);
+  CHECK(c==1);
+  CHECK(d==1);
 }
