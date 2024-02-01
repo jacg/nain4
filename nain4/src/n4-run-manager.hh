@@ -53,10 +53,12 @@ namespace nain4 {
 // geometry to commute with actions and physics. However our
 // constraint imposes no loss of generality.
 
+
 void check_world_volume();
 
 class run_manager {
   using G4RM = std::unique_ptr<G4RunManager>;
+  using side_effect_fn = std::function<void(void)>;
 
   run_manager(G4RM g4_manager, n4::ui ui) : g4_manager{std::move(g4_manager)}, ui{std::move(ui)} {
     rm_instance = this;
@@ -84,16 +86,17 @@ private:
 // that clients cannot create their own; by making run_manager a
 // friend, each state can build the next because the states are
 // members of run_manager as is the create method.
-#define CORE(THIS_STATE)                                         \
-    friend run_manager;                                          \
-    G4RunManager* here_be_dragons() { return g4_manager.get(); } \
-  private:                                                       \
-    G4RM g4_manager;                                             \
-    n4::ui ui;                                                   \
-    THIS_STATE(G4RM g4_manager, n4::ui ui) :                     \
-      g4_manager{std::move(g4_manager)},                         \
-      ui        {std::move(ui        )}                          \
-      { }                                                        \
+#define CORE(THIS_STATE)                                                        \
+    friend run_manager;                                                         \
+    G4RunManager* here_be_dragons() { return g4_manager.get(); }                \
+    THIS_STATE    execute(side_effect_fn fn) { fn(); return std::move(*this); } \
+  private:                                                                      \
+    G4RM g4_manager;                                                            \
+    n4::ui ui;                                                                  \
+    THIS_STATE(G4RM g4_manager, n4::ui ui) :                                    \
+      g4_manager{std::move(g4_manager)},                                        \
+      ui        {std::move(ui        )}                                         \
+      { }                                                                       \
   public:
 
 
