@@ -23,7 +23,7 @@ function cli_requires_nixgl() {
 if system_requires_nixgl && cli_requires_nixgl $@
 then
     echo Running with nixGL
-    nix --extra-experimental-features "nix-command flakes" run --impure github:guibou/nixGL -- "$@"
+    nix --extra-experimental-features "nix-command flakes" run --impure --inputs-from .# github:guibou/nixGL -- "$@"
 else
     echo Running without nixGL
     "$@"
