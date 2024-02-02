@@ -18,23 +18,25 @@ argparse = dependency( 'argparse'
 boost = dependency( 'boost'
                   , method : 'pkg-config')
 
+geant4_modules = [ 'Geant4::G4ptl'              , 'Geant4::G4analysis'    , 'Geant4::G4digits_hits'
+                 , 'Geant4::G4error_propagation', 'Geant4::G4event'       , 'Geant4::G4tools'
+                 , 'Geant4::G3toG4'             , 'Geant4::G4geometry'    , 'Geant4::G4global'
+                 , 'Geant4::G4graphics_reps'    , 'Geant4::G4intercoms'   , 'Geant4::G4interfaces'
+                 , 'Geant4::G4materials'        , 'Geant4::G4parmodels'   , 'Geant4::G4particles'
+                 , 'Geant4::G4persistency'      , 'Geant4::G4physicslists', 'Geant4::G4processes'
+                 , 'Geant4::G4readout'          , 'Geant4::G4run'         , 'Geant4::G4tasking'
+                 , 'Geant4::G4track'            , 'Geant4::G4tracking'    , 'Geant4::G4FR'
+                 , 'Geant4::G4visHepRep'        , 'Geant4::G4RayTracer'   , 'Geant4::G4Tree'
+                 , 'Geant4::G4VRML'             , 'Geant4::G4gl2ps'       , 'Geant4::G4GMocren'
+                 , 'Geant4::G4vis_management'   , 'Geant4::G4modeling'    , 'Geant4::G4OpenGL'
+                 , 'Geant4::G4UIVisDefinitions'
+                 ]
+
 geant4 = dependency( 'Geant4'
-                   , method  : 'cmake'
-                   , required: true
-                   , components: ['ui_all', 'vis_all']
-                   , modules : [ 'Geant4::G4ptl'              , 'Geant4::G4analysis'    , 'Geant4::G4digits_hits'
-                               , 'Geant4::G4error_propagation', 'Geant4::G4event'       , 'Geant4::G4tools'
-                               , 'Geant4::G3toG4'             , 'Geant4::G4geometry'    , 'Geant4::G4global'
-                               , 'Geant4::G4graphics_reps'    , 'Geant4::G4intercoms'   , 'Geant4::G4interfaces'
-                               , 'Geant4::G4materials'        , 'Geant4::G4parmodels'   , 'Geant4::G4particles'
-                               , 'Geant4::G4persistency'      , 'Geant4::G4physicslists', 'Geant4::G4processes'
-                               , 'Geant4::G4readout'          , 'Geant4::G4run'         , 'Geant4::G4tasking'
-                               , 'Geant4::G4track'            , 'Geant4::G4tracking'    , 'Geant4::G4FR'
-                               , 'Geant4::G4visHepRep'        , 'Geant4::G4RayTracer'   , 'Geant4::G4Tree'
-                               , 'Geant4::G4VRML'             , 'Geant4::G4gl2ps'       , 'Geant4::G4GMocren'
-                               , 'Geant4::G4vis_management'   , 'Geant4::G4modeling'    , 'Geant4::G4OpenGL'
-                               , 'Geant4::G4UIVisDefinitions'
-                               ])
+                   , method     : 'cmake'
+                   , required   : true
+                   , components : ['ui_all', 'vis_all']
+                   , modules    : geant4_modules)
 
 nain4_deps    = [argparse, geant4]
 nain4_include = include_directories('.')
@@ -104,6 +106,7 @@ pkg.generate( nain4_lib
             , description: 'nain4'
             , name       : 'nain4'
             , filebase   : 'nain4'
+            , variables  : 'geant4_modules=' + ','.join(geant4_modules)
             )
 
 
@@ -112,7 +115,7 @@ cmake = import('cmake')
 install_prefix = get_option('prefix')
 
 conf_data = configuration_data({
-'install_prefix'  : install_prefix,
+  'install_prefix' : install_prefix,
 })
 
 cmake.configure_package_config_file(
