@@ -57,3 +57,6 @@ run *ARGS: install
 
 clean:
   rm build install -rf
+
+host *ARGS: install
+  nixglhost install/CHANGEME-PROJECT-NAME/bin/CHANGEME-EXE -- -g "$@"

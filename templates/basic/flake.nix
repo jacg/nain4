@@ -2,9 +2,10 @@
   description = "CHANGEME-ONE-LINE-PROJECT-DESCRIPTION";
 
   inputs = {
-    nain4  .url     = "github:jacg/nain4";
-    nosys  .follows = "nain4/nosys";
-    nixpkgs.follows = "nain4/nixpkgs";
+    nain4      .url     = "github:jacg/nain4";
+    nix-gl-host.url     = "github:numtide/nix-gl-host";
+    nosys      .follows = "nain4/nosys";
+    nixpkgs    .follows = "nain4/nixpkgs";
   };
 
   outputs = inputs @ {
