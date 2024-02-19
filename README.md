@@ -100,7 +100,9 @@ lines spread over 13 files in the original Geant4 rendition.
    ```sh
    nix run github:jacg/nain4#bootstrap-client-project path/to/your-new-project your-project-name "Your project description"
    ```
-   This will create a new directory in `path/to/your-new-project`. Adapt this path to your needs *before* executing the command.
+   This step will take a while as it downloads and compiles Geant4.
+
+   A new directory `path/to/your-new-project` will be created. Adapt this path to your needs *before* executing the command.
 
    Also adapt `your-project-name` (used in various identifiers and path components inside your project) and `"Your project description"` before executing the command.
 
@@ -108,9 +110,10 @@ lines spread over 13 files in the original Geant4 rendition.
 
 4. Type `nix develop` [^3]
 
-   This step will take a while, the very first time you do it: it will download
-   and compile Geant4. Thereafter, the build result is cached, and subsequent
-   invocations should take under a second.
+   Start a new `bash` shell in which all the required dependencies are
+   available. Exiting this shell makes these dependencies invisible once more.
+   Thus, the installation of these dependencies does not interfere with anything
+   else you may have on your system.
 
 5. Type `just run -g -n 10`.
 
