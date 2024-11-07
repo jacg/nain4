@@ -32,7 +32,7 @@
 
   my-geant4 = g4 { qt = true; };
 
-  geant4-data = with pkgs.geant4.data; [
+  geant4-data = with my-geant4.data; [
     G4PhotonEvaporation
     G4RealSurface
     G4EMLOW
@@ -242,7 +242,7 @@
       inherit make-app;
       args-from-cli = ''"$@"'';
       dev-shell-packages = client-dev-shell-packages;
-      g4-data-package = pkgs.geant4.data; # Needed for exporting G4*DATA envvars in client app
+      g4-data-package = my-geant4.data; # Needed for exporting G4*DATA envvars in client app
       # TODO: leave for now, in case client needs it, but make these purely
       # internal once we're happy that everything works
       # The prop-* variants are to be propagated to downstream packages (either by Nix (build, run) or by us (dev, test))
