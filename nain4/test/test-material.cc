@@ -19,7 +19,7 @@ TEST_CASE("nain material", "[nain][material]") {
       auto water = nain4::material("G4_WATER");
       CHECK     (water->GetName()                  == "G4_WATER");
       CHECK     (water->GetChemicalFormula()       == "H_2O");
-      CHECK     (water->GetState()                 == G4State::kStateSolid); // WTF!?
+      CHECK     (water->GetState()                 == G4State::kStateLiquid);
       CHECK_THAT(water->GetTemperature() /  kelvin, Within1ULP( 293.15));
       CHECK_THAT(water->GetPressure() / atmosphere, Within1ULP(   1.  ));
       CHECK_THAT(water->GetDensity() /     (kg/m3), Within1ULP(1000.  ));
