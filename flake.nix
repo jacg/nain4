@@ -2,7 +2,7 @@
   description = "An abstraction layer on top of Geant4";
 
   inputs = {
-    nixpkgs         .url = "github:NixOS/nixpkgs/nixos-23.05";
+    nixpkgs         .url = "github:NixOS/nixpkgs/nixos-24.05";
     flake-compat = { url = "github:edolstra/flake-compat"; flake = false; };
     nosys           .url = "github:divnix/nosys";
   };
