@@ -127,8 +127,8 @@
                       buildInputs = self.deps.run;        # local            build and runtime environment
       propagatedBuildInputs       = self.deps.prop-run;   # local and client build and runtime environment
 
-      hook_g4_dir = "${pkgs.geant4}";
-      hook_g4_examples = "${pkgs.geant4}/share/Geant4/examples/";
+      hook_g4_dir = "${my-geant4}";
+      hook_g4_examples = "${my-geant4}/share/Geant4/examples/";
       hook_qt_stuff = "${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
       setupHook = ./nain4-hook.sh;
 
