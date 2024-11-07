@@ -97,8 +97,8 @@
   ;
 
   shell-shared = {
-      G4_DIR = "${pkgs.geant4}";
-      G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4/examples/";
+      G4_DIR = "${my-geant4}";
+      G4_EXAMPLES_DIR = "${my-geant4}/share/Geant4/examples/";
       QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
       shellHook = ''
