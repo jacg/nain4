@@ -106,6 +106,20 @@ jobs:
           grep QT_QPA_PLATFORM_PLUGIN_PATH my-project-env
           echo ===============================================
 
+      - name: Test variables set by bootstrap project
+        run: |
+          nix develop ~/work/my-project# -c env > my-project-env
+          var="name_chosen_by_me_lib_PATH"
+          echo ====== checking that $var exits =========================
+          grep "name_chosen_by_me" my-project-env
+          echo =========================================================
+          echo ====== grepping LD_LIBRARY_PATH for $libpath ============
+          grep "LD_LIBRARY_PATH=" my-project-env | grep "name-chosen-by-me"
+          echo =========================================================
+          echo ====== grepping PKG_CONFIG_PATH for $libpath ============
+          grep "PKG_CONFIG_PATH=" my-project-env | grep "name-chosen-by-me"
+          echo =========================================================
+
       - name: Check that mdbook ANCHORs have been stripped from bootstrapped project
         run: |
           nix profile install nixpkgs#ripgrep
