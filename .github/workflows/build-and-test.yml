@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build and test nain4 package
 on:
   pull_request:
   push:
@@ -9,7 +9,7 @@ on:
       - docs
 
 jobs:
-  build-and-test:
+  build-and-test-nain4-package:
 
     # See https://wildwolf.name/github-actions-how-to-avoid-running-the-same-workflow-multiple-times/
     if: (! contains(github.event.head_commit.message, '[skip ci]')                   &&
