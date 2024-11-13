@@ -1,11 +1,13 @@
 { self
 , nixpkgs # <---- This `nixpkgs` has systems removed e.g. legacyPackages.zlib
 , nain4
+, nix-gl-host
 , ...
 }: let
   inherit (nixpkgs.legacyPackages) pkgs;
   inherit (import ./helpers.nix {inherit pkgs;}) shell-shared;
   inherit (nain4.deps) args-from-cli make-app;
+  nixglhost = nix-gl-host.defaultPackage;
   in {
 
     packages.default = self.packages.CHANGEME-PACKAGE;
@@ -37,13 +39,13 @@
     # Activated by `nix develop <URL to this flake>#clang`
     devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } (shell-shared // {
       name = "CHANGEME-PROJECT-NAME-clang-devenv";
-      packages = nain4.deps.dev-shell-packages ++ [ nain4.packages.clang_16 ];
+      packages = nain4.deps.dev-shell-packages ++ [ nixglhost nain4.packages.clang_16 ];
     });
 
     # Activated by `nix develop <URL to this flake>#gcc`
     devShells.gcc = pkgs.mkShell (shell-shared // {
       name = "CHANGEME-PROJECT-NAME-gcc-devenv";
-      packages = nain4.deps.dev-shell-packages;
+      packages = nain4.deps.dev-shell-packages ++ [ nixglhost ];
     });
 
     # 1. `nix build` .#singularity
