@@ -24,13 +24,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12 ]
+        os: [ubuntu-22.04, macos-15 ]
         py: [311]
         devshell: [ clang, gcc ]
         #allow-fail: [false]
 
         exclude:
-          - os: macos-12
+          - os: macos-15
             devshell: gcc
 
     steps:

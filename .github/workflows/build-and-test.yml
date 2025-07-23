@@ -25,13 +25,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12]
+        os: [ubuntu-22.04, macos-15]
         py: [311]
         devshell: [ clang, gcc ]
         #allow-fail: [false]
 
         exclude:
-          - os: macos-12
+          - os: macos-15
             devshell: gcc
 
     steps:
@@ -68,7 +68,7 @@ jobs:
 
       - name: Run compile-time tests
         run: nix develop .#${{ matrix.devshell }}  -c just test-compile-time
-        continue-on-error:  ${{ matrix.os == 'macos-12' }} # bizarre time-dependent encoding errors in python test generator
+        continue-on-error:  ${{ matrix.os == 'macos-15' }} # bizarre time-dependent encoding errors in python test generator
 
       - name: Test variables set by nain4 setupHook
         run: |
@@ -95,7 +95,7 @@ jobs:
       - name: Check for presence of debug symbols in Geant4
         run: |
           nix profile install nixpkgs#ripgrep
-          if ${{ matrix.os == 'macos-12' }}
+          if ${{ matrix.os == 'macos-15' }}
           then
             if rg --files-with-matches debug_info result/lib/libG4*.so
             then echo DEBUG SYMBOLS FOUND
@@ -107,7 +107,7 @@ jobs:
             else echo FAILING BECAUSE DEBUG SYMBOLS NOT FOUND; false
             fi
           fi
-        continue-on-error:  ${{ matrix.os == 'macos-12' }} # Don't know how to get debug symbols on macOS, yet.
+        continue-on-error:  ${{ matrix.os == 'macos-15' }} # Don't know how to get debug symbols on macOS, yet.
 
       - name: Fail if too many warnings
         run: bash ~/work/nain4/nain4/scripts/count-warnings.sh compilation-log scripts/tolerated-warnings fail
