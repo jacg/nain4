@@ -43,7 +43,7 @@ jobs:
           nix_path: nixpkgs=channel:nixos-25.05
           extra_nix_config: |
             experimental-features = nix-command flakes
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v16
         with:
           name: nain4 # The name of the Cachix cache
           # If you chose signing key for write access
