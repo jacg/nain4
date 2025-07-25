@@ -255,7 +255,7 @@ TEST_CASE("nain material_properties", "[nain][material_properties]") {
       .add(key_3, mp1 -> GetConstProperty(key_3)) // Must use Const!!!!
       .NEW(key_4, mp1 -> GetProperty(key_4))
       .NEW(key_5, mp1 -> GetProperty(key_5))
-      .NEW(key_6, mp1 -> GetProperty(key_6))
+      .NEW(key_6, mp1 -> GetConstProperty(key_6)) // Must use Const!!!!
       .done();
 
     CHECK( mp2 -> GetProperty(key_1)  ==  mp1 -> GetProperty(key_1) );
