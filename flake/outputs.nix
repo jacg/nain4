@@ -50,17 +50,17 @@
     in
       pkgs.writeShellScriptBin "export-g4-env" ''
         # TODO replace manual envvar setting with with use of packages' setupHooks
-        export G4NEUTRONHPDATA="${g4-data.G4NDL}/share/Geant4-11.0.4/data/G4NDL4.6"
-        export G4LEDATA="${g4-data.G4EMLOW}/share/Geant4-11.0.4/data/G4EMLOW8.0"
-        export G4LEVELGAMMADATA="${g4-data.G4PhotonEvaporation}/share/Geant4-11.0.4/data/G4PhotonEvaporation5.7"
-        export G4RADIOACTIVEDATA="${g4-data.G4RadioactiveDecay}/share/Geant4-11.0.4/data/G4RadioactiveDecay5.6"
-        export G4PARTICLEXSDATA="${g4-data.G4PARTICLEXS}/share/Geant4-11.0.4/data/G4PARTICLEXS4.0"
-        export G4PIIDATA="${g4-data.G4PII}/share/Geant4-11.0.4/data/G4PII1.3"
-        export G4REALSURFACEDATA="${g4-data.G4RealSurface}/share/Geant4-11.0.4/data/G4RealSurface2.2"
-        export G4SAIDXSDATA="${g4-data.G4SAIDDATA}/share/Geant4-11.0.4/data/G4SAIDDATA2.0"
-        export G4ABLADATA="${g4-data.G4ABLA}/share/Geant4-11.0.4/data/G4ABLA3.1"
-        export G4INCLDATA="${g4-data.G4INCL}/share/Geant4-11.0.4/data/G4INCL1.0"
-        export G4ENSDFSTATEDATA="${g4-data.G4ENSDFSTATE}/share/Geant4-11.0.4/data/G4ENSDFSTATE2.3"
+        export G4NEUTRONHPDATA="${g4-data.G4NDL}/share/Geant4/data/G4NDL4.6"
+        export G4LEDATA="${g4-data.G4EMLOW}/share/Geant4/data/G4EMLOW8.0"
+        export G4LEVELGAMMADATA="${g4-data.G4PhotonEvaporation}/share/Geant4/data/G4PhotonEvaporation5.7"
+        export G4RADIOACTIVEDATA="${g4-data.G4RadioactiveDecay}/share/Geant4/data/G4RadioactiveDecay5.6"
+        export G4PARTICLEXSDATA="${g4-data.G4PARTICLEXS}/share/Geant4/data/G4PARTICLEXS4.0"
+        export G4PIIDATA="${g4-data.G4PII}/share/Geant4/data/G4PII1.3"
+        export G4REALSURFACEDATA="${g4-data.G4RealSurface}/share/Geant4/data/G4RealSurface2.2"
+        export G4SAIDXSDATA="${g4-data.G4SAIDDATA}/share/Geant4/data/G4SAIDDATA2.0"
+        export G4ABLADATA="${g4-data.G4ABLA}/share/Geant4/data/G4ABLA3.1"
+        export G4INCLDATA="${g4-data.G4INCL}/share/Geant4/data/G4INCL1.0"
+        export G4ENSDFSTATEDATA="${g4-data.G4ENSDFSTATE}/share/Geant4/data/G4ENSDFSTATE2.3"
       '';
 
   # Utility for making Nix flake apps. A nix flake app allows "remote" execution of pre-packaged code.
@@ -75,22 +75,8 @@
       '';
     in { type = "app"; program = "${app-package}/bin/${args.executable}"; };
 
-  # Should be able to remove this, once https://github.com/NixOS/nixpkgs/issues/234710 is merged
-  clang_16 = if pkgs.stdenv.isDarwin
-             then pkgs.llvmPackages_16.clang.override rec {
-               libc = pkgs.darwin.Libsystem;
-               bintools = pkgs.bintools.override { inherit libc; };
-               inherit (pkgs.llvmPackages) libcxx;
-               extraPackages = [
-                 pkgs.llvmPackages.libcxxabi
-                 # Use the compiler-rt associated with clang, but use the libc++abi from the stdenv
-                 # to avoid linking against two different versions (for the same reasons as above).
-                 (pkgs.llvmPackages_16.compiler-rt.override {
-                   inherit (pkgs.llvmPackages) libcxxabi;
-                 })
-               ];
-             }
-             else pkgs.llvmPackages_16.clang;
+  llvmPackages_current = pkgs.llvmPackages_21;
+  clang_current = llvmPackages_current.clang;
 
   dev-shell-packages = with self.deps;
     dev   ++ prop-dev   ++
@@ -108,7 +94,7 @@
 
   shell-shared = {
       G4_DIR = "${pkgs.geant4}";
-      G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
+      G4_EXAMPLES_DIR = "${pkgs.geant4}/share/Geant4/examples/";
       QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
 
       shellHook = ''
@@ -138,7 +124,7 @@
       propagatedBuildInputs       = self.deps.prop-run;   # local and client build and runtime environment
 
       hook_g4_dir = "${pkgs.geant4}";
-      hook_g4_examples = "${pkgs.geant4}/share/Geant4-11.0.4/examples/";
+      hook_g4_examples = "${pkgs.geant4}/share/Geant4/examples/";
       hook_qt_stuff = "${pkgs.libsForQt5.qt5.qtbase.bin}/lib/qt-${pkgs.libsForQt5.qt5.qtbase.version}/plugins";
       setupHook = ./nain4-hook.sh;
 
@@ -151,20 +137,20 @@
       nativeBuildInputs = with self; [ packages.nain4 ] ++ deps.build ++ deps.test;
     };
 
-    devShells.gcc = pkgs.mkShell                                          (shell-shared // {
+    devShells.gcc = pkgs.mkShell                                               (shell-shared // {
       name = "nain4-gcc-devenv";
       packages = dev-shell-packages;
     });
 
-    devShells.clang = pkgs.mkShell.override { stdenv = clang_16.stdenv; } (shell-shared // {
+    devShells.clang = pkgs.mkShell.override { stdenv = clang_current.stdenv; } (shell-shared // {
       name = "nain4-clang-devenv";
-      packages = dev-shell-packages ++ [ clang_16 ];
+      packages = dev-shell-packages ++ [ clang_current ];
     });
 
     devShell = self.devShells.clang;
 
     packages.geant4 = my-geant4;
-    packages.clang_16 = clang_16;
+    packages.clang_current = clang_current;
 
     # Executed by `nix run <URL of this flake> -- <args?>`
     # TODO apps.default = { type = "app"; program = "..."; };

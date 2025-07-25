@@ -27,7 +27,7 @@ install-tests: install-nain4
 # Add recipes here to help with discovery of recipes in subdirectories
 
 test-examples:
-    just examples/
+    just n4-examples/run-all
 
 test-client-side:
     just client_side_tests/test-all

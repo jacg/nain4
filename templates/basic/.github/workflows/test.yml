@@ -24,25 +24,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12]
-        py: [311]
+        os: [ubuntu-24.04, macos-15]
+        py: [313]
         devshell: [ clang, gcc ]
         #allow-fail: [false]
 
         exclude:
-          - os: macos-12
+          - os: macos-15
             devshell: gcc
 
     steps:
-      - uses: actions/checkout@v3.5.3
+      - uses: actions/checkout@v4.2.2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - uses: cachix/install-nix-action@v22
+      - uses: cachix/install-nix-action@v31.5.1
         with:
-          nix_path: nixpkgs=channel:nixos-23.05
+          nix_path: nixpkgs=channel:nixos-25.05
           extra_nix_config: |
             experimental-features = nix-command flakes
-      - uses: cachix/cachix-action@v12
+      - uses: cachix/cachix-action@v16
         with:
           name: nain4 # The name of the Cachix cache
           # If you chose signing key for write access

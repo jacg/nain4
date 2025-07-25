@@ -19,7 +19,7 @@ TEST_CASE("nain material", "[nain][material]") {
       auto water = nain4::material("G4_WATER");
       CHECK     (water->GetName()                  == "G4_WATER");
       CHECK     (water->GetChemicalFormula()       == "H_2O");
-      CHECK     (water->GetState()                 == G4State::kStateSolid); // WTF!?
+      CHECK     (water->GetState()                 == G4State::kStateLiquid);
       CHECK_THAT(water->GetTemperature() /  kelvin, Within1ULP( 293.15));
       CHECK_THAT(water->GetPressure() / atmosphere, Within1ULP(   1.  ));
       CHECK_THAT(water->GetDensity() /     (kg/m3), Within1ULP(1000.  ));
@@ -255,7 +255,7 @@ TEST_CASE("nain material_properties", "[nain][material_properties]") {
       .add(key_3, mp1 -> GetConstProperty(key_3)) // Must use Const!!!!
       .NEW(key_4, mp1 -> GetProperty(key_4))
       .NEW(key_5, mp1 -> GetProperty(key_5))
-      .NEW(key_6, mp1 -> GetProperty(key_6))
+      .NEW(key_6, mp1 -> GetConstProperty(key_6)) // Must use Const!!!!
       .done();
 
     CHECK( mp2 -> GetProperty(key_1)  ==  mp1 -> GetProperty(key_1) );
