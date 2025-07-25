@@ -75,22 +75,8 @@
       '';
     in { type = "app"; program = "${app-package}/bin/${args.executable}"; };
 
-  # Should be able to remove this, once https://github.com/NixOS/nixpkgs/issues/234710 is merged
-  clang_16 = if pkgs.stdenv.isDarwin
-             then pkgs.llvmPackages_16.clang.override rec {
-               libc = pkgs.darwin.Libsystem;
-               bintools = pkgs.bintools.override { inherit libc; };
-               inherit (pkgs.llvmPackages) libcxx;
-               extraPackages = [
-                 pkgs.llvmPackages.libcxxabi
-                 # Use the compiler-rt associated with clang, but use the libc++abi from the stdenv
-                 # to avoid linking against two different versions (for the same reasons as above).
-                 (pkgs.llvmPackages_16.compiler-rt.override {
-                   inherit (pkgs.llvmPackages) libcxxabi;
-                 })
-               ];
-             }
-             else pkgs.llvmPackages_16.clang;
+  llvmPackages_current = pkgs.llvmPackages_21;
+  clang_current = llvmPackages_current.clang;
 
   dev-shell-packages = with self.deps;
     dev   ++ prop-dev   ++
@@ -151,20 +137,20 @@
       nativeBuildInputs = with self; [ packages.nain4 ] ++ deps.build ++ deps.test;
     };
 
-    devShells.gcc = pkgs.mkShell                                          (shell-shared // {
+    devShells.gcc = pkgs.mkShell                                               (shell-shared // {
       name = "nain4-gcc-devenv";
       packages = dev-shell-packages;
     });
 
-    devShells.clang = pkgs.mkShell.override { stdenv = clang_16.stdenv; } (shell-shared // {
+    devShells.clang = pkgs.mkShell.override { stdenv = clang_current.stdenv; } (shell-shared // {
       name = "nain4-clang-devenv";
-      packages = dev-shell-packages ++ [ clang_16 ];
+      packages = dev-shell-packages ++ [ clang_current ];
     });
 
     devShell = self.devShells.clang;
 
     packages.geant4 = my-geant4;
-    packages.clang_16 = clang_16;
+    packages.clang_current = clang_current;
 
     # Executed by `nix run <URL of this flake> -- <args?>`
     # TODO apps.default = { type = "app"; program = "..."; };

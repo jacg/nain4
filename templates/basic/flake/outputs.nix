@@ -35,9 +35,9 @@
     devShell = self.devShells.clang;
 
     # Activated by `nix develop <URL to this flake>#clang`
-    devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_16.stdenv; } (shell-shared // {
+    devShells.clang = pkgs.mkShell.override { stdenv = nain4.packages.clang_current.stdenv; } (shell-shared // {
       name = "CHANGEME-PROJECT-NAME-clang-devenv";
-      packages = nain4.deps.dev-shell-packages ++ [ nain4.packages.clang_16 ];
+      packages = nain4.deps.dev-shell-packages ++ [ nain4.packages.clang_current ];
     });
 
     # Activated by `nix develop <URL to this flake>#gcc`
