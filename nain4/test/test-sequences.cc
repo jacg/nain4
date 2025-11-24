@@ -190,3 +190,49 @@ TEST_CASE("nain unpack", "[nain4][unpack]") {
   CHECK_THAT(yo, Within1ULP(yi));
   CHECK_THAT(zo, Within1ULP(zi));
 }
+
+TEST_CASE("nain zip initializer_list", "[nain][zip]") {
+  auto x0 = 5;
+  auto y0 = -27;
+  for (auto [i, j] : n4::zip( {x0, x0+1, x0+2}
+                            , {y0, y0-1, y0-2}
+                            )) {
+    CHECK(i == x0); x0++;
+    CHECK(j == y0); y0--;
+  }
+}
+
+TEST_CASE("nain zip vector", "[nain][zip]") {
+  auto xs = std::vector{4,  7,  1, 3};
+  auto ys = std::vector{0, -1, -2, 9};
+  auto k  = 0;
+  for (auto [xi, yi] : n4::zip(xs, ys)) {
+    CHECK(xi == xs[k]);
+    CHECK(yi == ys[k]);
+    k++;
+  }
+}
+
+TEST_CASE("nain zip initializer_list vector", "[nain][zip]") {
+  auto x0 = 13;
+  auto ys = std::vector{0, -1, -2, 9};
+  auto k  = 0;
+  for (auto [xi, yi] : n4::zip( {x0, x0+1, x0+2, x0+3}
+                              , ys
+                              )) {
+    CHECK(xi == x0   ); x0++;
+    CHECK(yi == ys[k]);  k++;
+  }
+}
+
+TEST_CASE("nain zip vector initializer_list", "[nain][zip]") {
+  auto xs = std::vector{0, -1, -2, 9};
+  auto y0 = 13;
+  auto k  = 0;
+  for (auto [xi, yi] : n4::zip( xs
+                              , {y0, y0+1, y0+2, y0+3}
+                              )) {
+    CHECK(xi == xs[k]);  k++;
+    CHECK(yi == y0   ); y0++;
+  }
+}
