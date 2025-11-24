@@ -16,7 +16,14 @@
       pname = "CHANGEME-PACKAGE";
       version = "0.0.0";
       src = "${self}/src";
-      postInstall = "${pkgs.coreutils}/bin/cp -r ${self}/macs $out";
+      postInstall = ''
+        ${pkgs.coreutils}/bin/cp -r ${self}/macs $out
+        ${pkgs.coreutils}/bin/mv $out/bin/CHANGEME-EXE $out/bin/CHANGEME-EXE-unwrapped
+        echo "#!{pkgs.coreutils}/bin/bash"                                 >  $out/bin/CHANGEME-EXE
+        echo source ${nain4.export-g4-env}/bin/export-g4-env               >> $out/bin/CHANGEME-EXE
+        echo $out/bin/CHANGEME-EXE-unwrapped --macro-path $out/macs '"$@"' >> $out/bin/CHANGEME-EXE
+        ${pkgs.coreutils}/bin/chmod +x $out/bin/CHANGEME-EXE
+'';
       nativeBuildInputs = [];
       buildInputs = [ nain4.packages.nain4 ];
     };
