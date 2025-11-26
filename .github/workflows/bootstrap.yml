@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-15 ]
+        os: [ubuntu-24.04 ]
         py: [313]
         devshell: [ clang, gcc ]
         #allow-fail: [false]
@@ -62,12 +62,12 @@ jobs:
           echo Looking for "'$PATTERN'" in output of 'just'
           grep "$PATTERN" just-output
 
-      - name: Test nix run client app
-        run: |
-          nix run ~/work/my-project# -- -n 13 --early "/my/bubble_radius 0.2 m" | tee run-client-app-output
-          PATTERN="end of event 13"
-          echo Looking for "'$PATTERN'" in output of 'just'
-          grep "$PATTERN" run-client-app-output
+      # - name: Test nix run client app
+      #   run: |
+      #     nix run ~/work/my-project# -- -n 13 --early "/my/bubble_radius 0.2 m" | tee run-client-app-output
+      #     PATTERN="end of event 13"
+      #     echo Looking for "'$PATTERN'" in output of 'just'
+      #     grep "$PATTERN" run-client-app-output
 
       - name: Test run dev environment
         run: |

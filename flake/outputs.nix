@@ -49,18 +49,22 @@
       g4-data = self.deps.g4-data-package;
     in
       pkgs.writeShellScriptBin "export-g4-env" ''
+        getpath() {
+           # eval necessary for globbing
+           eval ls -d $1/share/Geant4*/data/*
+        }
         # TODO replace manual envvar setting with with use of packages' setupHooks
-        export G4NEUTRONHPDATA="${g4-data.G4NDL}/share/Geant4/data/G4NDL4.6"
-        export G4LEDATA="${g4-data.G4EMLOW}/share/Geant4/data/G4EMLOW8.0"
-        export G4LEVELGAMMADATA="${g4-data.G4PhotonEvaporation}/share/Geant4/data/G4PhotonEvaporation5.7"
-        export G4RADIOACTIVEDATA="${g4-data.G4RadioactiveDecay}/share/Geant4/data/G4RadioactiveDecay5.6"
-        export G4PARTICLEXSDATA="${g4-data.G4PARTICLEXS}/share/Geant4/data/G4PARTICLEXS4.0"
-        export G4PIIDATA="${g4-data.G4PII}/share/Geant4/data/G4PII1.3"
-        export G4REALSURFACEDATA="${g4-data.G4RealSurface}/share/Geant4/data/G4RealSurface2.2"
-        export G4SAIDXSDATA="${g4-data.G4SAIDDATA}/share/Geant4/data/G4SAIDDATA2.0"
-        export G4ABLADATA="${g4-data.G4ABLA}/share/Geant4/data/G4ABLA3.1"
-        export G4INCLDATA="${g4-data.G4INCL}/share/Geant4/data/G4INCL1.0"
-        export G4ENSDFSTATEDATA="${g4-data.G4ENSDFSTATE}/share/Geant4/data/G4ENSDFSTATE2.3"
+        export G4NEUTRONHPDATA=$(getpath ${g4-data.G4NDL})
+        export G4LEDATA=$(getpath ${g4-data.G4EMLOW})
+        export G4LEVELGAMMADATA=$(getpath ${g4-data.G4PhotonEvaporation})
+        export G4RADIOACTIVEDATA=$(getpath ${g4-data.G4RadioactiveDecay})
+        export G4PARTICLEXSDATA=$(getpath ${g4-data.G4PARTICLEXS})
+        export G4PIIDATA=$(getpath ${g4-data.G4PII})
+        export G4REALSURFACEDATA=$(getpath ${g4-data.G4RealSurface})
+        export G4SAIDXSDATA=$(getpath ${g4-data.G4SAIDDATA})
+        export G4ABLADATA=$(getpath ${g4-data.G4ABLA})
+        export G4INCLDATA=$(getpath ${g4-data.G4INCL})
+        export G4ENSDFSTATEDATA=$(getpath ${g4-data.G4ENSDFSTATE})
       '';
 
   # Utility for making Nix flake apps. A nix flake app allows "remote" execution of pre-packaged code.
