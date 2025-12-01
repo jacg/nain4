@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs         .url = "github:NixOS/nixpkgs/nixos-25.11";
-    flake-compat = { url = "github:edolstra/flake-compat"; flake = false; };
+    flake-compat = { url = "github:NixOS/flake-compat"; flake = false; };
     nosys           .url = "github:divnix/nosys";
   };
 
