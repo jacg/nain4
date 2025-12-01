@@ -49,6 +49,44 @@ constexpr auto enumerate(const std::initializer_list<T>& data) {
   return iterable_wrapper{ data };
 }
 
+template <typename T1, typename T2>
+const auto zip(T1&& it1, T2&& it2) {
+  using I1 = decltype(std::begin(std::declval<T1>()));
+  using I2 = decltype(std::begin(std::declval<T2>()));
+
+  struct zip_iter {
+    I1 i1;
+    I2 i2;
+
+    bool operator != (const zip_iter& other) const { return this->i1 != other.i1; }
+    void operator ++ ()       { ++i1; ++i2; }
+    auto operator *  () const { return std::tie(*i1, *i2); }
+  };
+
+  struct zip_wrapper {
+    T1 v1;
+    T2 v2;
+    auto begin() const { return zip_iter{ std::begin(v1), std::begin(v2)}; }
+    auto end  () const { return zip_iter{ std::end  (v1), std::end  (v2)}; }
+  };
+  return zip_wrapper{ std::forward<T1>(it1), std::forward<T2>(it2) };
+}
+
+template <typename T1, typename T2>
+const auto zip(const std::initializer_list<T1>& it1, const std::initializer_list<T2>& it2) {
+  return zip(std::vector<T1>{it1}, std::vector<T2>{it2});
+}
+
+template <typename T1, typename T2>
+const auto zip(T1&& it1, const std::initializer_list<T2>& it2) {
+  return zip(it1, std::vector<T2>{it2});
+}
+
+template <typename T1, typename T2>
+const auto zip(const std::initializer_list<T1>& it1, T2&& it2) {
+  return zip(std::vector<T1>{it1}, it2);
+}
+
 std::vector<G4double> linspace(G4double start, G4double stop, size_t n_entries);
 
 template<class O, class I, class F> std::vector<O> map(F f, I const& input) {
