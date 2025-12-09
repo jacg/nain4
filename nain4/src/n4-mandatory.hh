@@ -87,13 +87,17 @@ private:
   };
 
 // ----- stepping_action ------------------------------------------------------------
+struct action_builder;
 struct stepping_action : public G4UserSteppingAction {
   using action_t = std::function<void (const G4Step*)>;
   // Only one method, so set it in constructor.
-  stepping_action(action_t action) : action{action} {}
-  void UserSteppingAction(const G4Step* step) override { action(step); }
+  stepping_action(action_t action) : action_{action} {}
+  void UserSteppingAction(const G4Step* step) override { action_(step); }
 private:
-  action_t action;
+  action_t action_;
+  stepping_action() : action_{nullptr} {}
+  stepping_action* set(action_t action) { action_ = action; return this; }
+  friend action_builder;
 };
 
 // ----- primary generator ----------------------------------------------------------
@@ -128,6 +132,39 @@ private:
   G4UserSteppingAction         * step_  = nullptr;
   G4UserTrackingAction         * track_ = nullptr;
   G4UserStackingAction         * stack_ = nullptr;
+
+  };
+
+  struct action_builder {
+    action_builder(G4VUserPrimaryGeneratorAction* generator);
+    action_builder(generator::function f) : action_builder(new generator{f}) {}
+
+    action_builder& run_begin          (     run_action::  action_t f){ run_begin_           .push_back(f); return *this; }
+    action_builder& run_end            (     run_action::  action_t f){ run_end_             .push_back(f); return *this; }
+    action_builder& event_begin        (   event_action::  action_t f){ event_begin_         .push_back(f); return *this; }
+    action_builder& event_end          (   event_action::  action_t f){ event_end_           .push_back(f); return *this; }
+    action_builder& stacking_classify  (stacking_action::classify_t f){  stacking_classify_  .push_back(f); return *this; }
+    action_builder& stacking_next_stage(stacking_action::   stage_t f){ stacking_next_stage_ .push_back(f); return *this; }
+    action_builder& stacking_next_event(stacking_action::voidvoid_t f){ stacking_next_event_ .push_back(f); return *this; }
+    action_builder& tracking_pre       (tracking_action::  action_t f){ tracking_pre_        .push_back(f); return *this; }
+    action_builder& tracking_post      (tracking_action::  action_t f){  tracking_post_      .push_back(f); return *this; }
+    action_builder& stepping           (stepping_action::  action_t f){ stepping_            .push_back(f); return *this; }
+
+    actions* done();
+
+  private:
+    std::unique_ptr<actions> actions_;
+
+    std::vector<     run_action::  action_t> run_begin_          ;
+    std::vector<     run_action::  action_t> run_end_            ;
+    std::vector<   event_action::  action_t> event_begin_        ;
+    std::vector<   event_action::  action_t> event_end_          ;
+    std::vector<stacking_action::classify_t> stacking_classify_  ;
+    std::vector<stacking_action::   stage_t> stacking_next_stage_;
+    std::vector<stacking_action::voidvoid_t> stacking_next_event_;
+    std::vector<tracking_action::  action_t> tracking_pre_       ;
+    std::vector<tracking_action::  action_t> tracking_post_      ;
+    std::vector<stepping_action::  action_t> stepping_           ;
 };
 
 // ----- geometry -------------------------------------------------------------------
