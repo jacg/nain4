@@ -74,3 +74,28 @@ TEST_CASE("nain action builder all methods", "[nain][action-builder]") {
 
   CHECK(ncalls==10);
 }
+
+TEST_CASE("nain action builder combine actions", "[nain][action-builder]") {
+  /// Add multiple actions to the same method. The number of calls should add up
+
+  auto nsum = 0;
+  auto the_actions = [&nsum]() {
+    auto add = [&](size_t n) { return [&nsum, n](auto) {nsum+=n;}; };
+    return n4::action_builder{a_geantino}
+        .event_begin(add(1))
+        .event_begin(add(2))
+        .event_begin(add(3))
+        .done     ();
+  };
+
+  auto shutup = n4::silence{std::cout};
+
+  n4::run_manager::create()
+    .fake_ui()
+    .physics(default_physics_lists)
+    .geometry(water_box)
+    .actions(the_actions)
+    .run(7);
+
+  CHECK(nsum==7*(1+2+3)); // 7 events times (1 + 2 + 3)
+}
